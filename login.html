@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Iniciar sesión · Yeimy Comercial</title>
+<link rel="manifest" href="/manifest.webmanifest" />
+<meta name="theme-color" content="#7c5cff" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="Yeimy Comercial" />
+<link rel="apple-touch-icon" href="/icon-192.png" />
+<link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --bg:#0a0e1f;--panel:#141a3a;--panel-2:#1a2148;
+    --line:#262e5c;--line-soft:#1f2750;
+    --text:#eef1ff;--text-soft:#c5cbef;--muted:#7d8ab8;
+    --accent:#7c5cff;--accent-2:#22d3ee;
+    --bad:#ef4444;--warn:#f59e0b;
+    --shadow:0 10px 30px rgba(0,0,0,.4);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;min-height:100vh;background:
+    radial-gradient(900px 600px at 85% -5%, rgba(124,92,255,.18) 0%, transparent 55%),
+    radial-gradient(700px 500px at -10% 110%, rgba(34,211,238,.10) 0%, transparent 60%),
+    var(--bg); color:var(--text); font-family:'Inter',system-ui,sans-serif; font-size:14px}
+
+  .wrap{min-height:100vh;display:grid;place-items:center;padding:30px 20px}
+  .card{background:linear-gradient(180deg,var(--panel),var(--panel-2));border:1px solid var(--line);border-radius:18px;padding:36px 32px;box-shadow:var(--shadow);max-width:420px;width:100%}
+  .brand{text-align:center;margin-bottom:24px}
+  .mark{width:64px;height:64px;border-radius:16px;background:linear-gradient(135deg,var(--accent),var(--accent-2));display:grid;place-items:center;font-weight:800;color:#0b1020;font-size:24px;margin:0 auto 12px;box-shadow:0 8px 24px rgba(124,92,255,.4)}
+  h1{margin:0;font-size:20px;font-weight:700}
+  .sub{margin:4px 0 0;color:var(--muted);font-size:13px}
+
+  form{display:flex;flex-direction:column;gap:14px;margin-top:8px}
+  .field{display:flex;flex-direction:column;gap:6px}
+  .lab{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.08em;font-weight:600}
+  input{background:rgba(8,12,28,.55);border:1px solid var(--line);color:var(--text);border-radius:10px;padding:11px 13px;font:inherit;font-size:14px;outline:none;transition:.15s}
+  input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(124,92,255,.18)}
+  .btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent-2));color:#0b1020;border:none;border-radius:10px;padding:12px 18px;font-weight:700;font-size:14px;cursor:pointer;box-shadow:0 4px 14px rgba(124,92,255,.35);transition:.15s;margin-top:6px}
+  .btn-primary:hover{filter:brightness(1.08);transform:translateY(-1px)}
+  .btn-primary:disabled{opacity:.6;cursor:not-allowed}
+
+  .msg{padding:10px 12px;border-radius:8px;font-size:13px;display:none}
+  .msg-err{background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.4);color:#fca5a5;display:block}
+  .msg-info{background:rgba(245,158,11,.10);border:1px solid rgba(245,158,11,.35);color:#f7c272;display:block}
+
+  .foot{margin-top:20px;padding-top:16px;border-top:1px solid var(--line-soft);text-align:center;color:var(--muted);font-size:11px;line-height:1.5}
+
+  .toggle-pwd{position:relative}
+  .toggle-pwd input{padding-right:42px}
+  .toggle-pwd button{position:absolute;right:6px;top:50%;transform:translateY(-50%);background:transparent;border:none;color:var(--muted);cursor:pointer;padding:6px 8px;font-size:16px}
+  .toggle-pwd button:hover{color:var(--text)}
+</style>
+</head>
+<body>
+
+  <div class="wrap">
+    <div class="card">
+      <div class="brand">
+        <div class="mark">YL</div>
+        <h1>Yeimy Comercial</h1>
+        <p class="sub">Sistema interno de ventas · Serviautec</p>
+      </div>
+
+      <div id="msg" class="msg"></div>
+
+      <form id="loginForm">
+        <div class="field">
+          <label class="lab" for="email">Correo electrónico</label>
+          <input type="email" id="email" name="email" autocomplete="username"
+            placeholder="tu.correo@ejemplo.com" required autofocus />
+        </div>
+        <div class="field">
+          <label class="lab" for="password">Clave</label>
+          <div class="toggle-pwd">
+            <input type="password" id="password" name="password" autocomplete="current-password"
+              placeholder="••••••••" required />
+            <button type="button" id="togglePwd" title="Mostrar/ocultar">👁</button>
+          </div>
+        </div>
+
+        <button class="btn-primary" type="submit" id="btnLogin">Entrar</button>
+      </form>
+
+      <div class="foot">
+        ¿Olvidaste tu clave? Habla con tu administradora.<br>
+        Cada acceso queda registrado.
+      </div>
+    </div>
+  </div>
+
+<script>
+  // Registrar service worker para PWA
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/service-worker.js').catch(() => {});
+  }
+
+  const form = document.getElementById('loginForm');
+  const msg = document.getElementById('msg');
+  const btn = document.getElementById('btnLogin');
+  const tog = document.getElementById('togglePwd');
+  const pwd = document.getElementById('password');
+
+  tog.addEventListener('click', () => {
+    pwd.type = pwd.type === 'password' ? 'text' : 'password';
+  });
+
+  function showMsg(text, kind) {
+    msg.textContent = text;
+    msg.className = 'msg ' + (kind === 'err' ? 'msg-err' : 'msg-info');
+  }
+  function clearMsg() { msg.className = 'msg'; msg.textContent = ''; }
+
+  form.addEventListener('submit', async (ev) => {
+    ev.preventDefault();
+    clearMsg();
+    btn.disabled = true;
+    btn.textContent = 'Entrando…';
+    try {
+      const r = await fetch('/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: form.email.value.trim(),
+          password: form.password.value,
+        }),
+      });
+      const data = await r.json();
+      if (data.ok) {
+        window.location.href = '/';
+      } else {
+        showMsg(data.error || 'No fue posible iniciar sesión', 'err');
+        btn.disabled = false;
+        btn.textContent = 'Entrar';
+      }
+    } catch (e) {
+      showMsg('Error de conexión con el servidor', 'err');
+      btn.disabled = false;
+      btn.textContent = 'Entrar';
+    }
+  });
+</script>
+
+</body>
+</html>

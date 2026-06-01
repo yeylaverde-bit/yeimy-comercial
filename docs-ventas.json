@@ -1,0 +1,48 @@
+{
+  "9FLT31607VDC35577": {
+    "cliente": "JHON JAIRO VELASQUEZ",
+    "modelo": "APACHE 160 CARBURADA",
+    "archivos": {
+      "ordenFac": {
+        "path": "ordenFac-1780342397728.pdf",
+        "originalName": "actaentrega1397767.pdf",
+        "size": 75034,
+        "mimetype": "application/pdf",
+        "subidoPor": "yeimy@yeimylaverde.com",
+        "subidoEn": "2026-06-01T19:33:17.733Z"
+      },
+      "preaprobado": {
+        "path": "preaprobado-1780342473970.jpeg",
+        "originalName": "WhatsApp Image 2026-06-01 at 11.15.48 AM.jpeg",
+        "size": 45894,
+        "mimetype": "image/jpeg",
+        "subidoPor": "yeimy@yeimylaverde.com",
+        "subidoEn": "2026-06-01T19:34:33.971Z"
+      },
+      "comprobante": {
+        "path": "comprobante-1780342601058.jpeg",
+        "originalName": "WhatsApp Image 2026-06-01 at 11.15.48 AM.jpeg",
+        "size": 45894,
+        "mimetype": "image/jpeg",
+        "subidoPor": "yeimy@yeimylaverde.com",
+        "subidoEn": "2026-06-01T19:36:41.060Z"
+      },
+      "cedulaFrente": {
+        "path": "cedula-1780342482571.jpeg",
+        "originalName": "cc11.jpeg",
+        "size": 219805,
+        "mimetype": "image/jpeg",
+        "subidoPor": "yeimy@yeimylaverde.com",
+        "subidoEn": "2026-06-01T19:34:42.575Z"
+      },
+      "cedulaReverso": {
+        "path": "cedulaReverso-1780343075422.jpeg",
+        "originalName": "cc12.jpeg",
+        "size": 208300,
+        "mimetype": "image/jpeg",
+        "subidoPor": "yeimy@yeimylaverde.com",
+        "subidoEn": "2026-06-01T19:44:35.427Z"
+      }
+    }
+  }
+}

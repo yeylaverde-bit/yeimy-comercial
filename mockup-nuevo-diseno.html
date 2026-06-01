@@ -1,0 +1,381 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Mockup · Nuevo diseño · Yeimy Comercial</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --bg:#0a0e1f;
+    --bg-elev:#0f1430;
+    --panel:#141a3a;
+    --panel-2:#1a2148;
+    --line:#262e5c;
+    --line-soft:#1f2750;
+    --text:#eef1ff;
+    --text-soft:#c5cbef;
+    --muted:#7d8ab8;
+    --muted-2:#5a6594;
+    --accent:#7c5cff;
+    --accent-2:#22d3ee;
+    --accent-3:#5be58a;
+    --good:#22c55e;
+    --warn:#f59e0b;
+    --bad:#ef4444;
+    --shadow:0 10px 30px rgba(0,0,0,.4);
+    --shadow-soft:0 4px 12px rgba(0,0,0,.25);
+    --radius:14px;
+    --radius-sm:10px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:
+    radial-gradient(900px 600px at 85% -5%, rgba(124,92,255,.18) 0%, transparent 55%),
+    radial-gradient(700px 500px at -10% 110%, rgba(34,211,238,.10) 0%, transparent 60%),
+    var(--bg); color:var(--text); font-family:'Inter',system-ui,sans-serif; font-size:14px; line-height:1.4;}
+  a{color:inherit; text-decoration:none}
+  button{font-family:inherit}
+
+  /* ============ LAYOUT ============ */
+  body{display:grid; grid-template-columns:240px 1fr; min-height:100vh}
+
+  /* ============ SIDEBAR ============ */
+  .sidebar{position:sticky; top:0; height:100vh; padding:18px 14px; background:linear-gradient(180deg, #0c1129, #080c1f); border-right:1px solid var(--line); display:flex; flex-direction:column; gap:14px}
+  .brand{display:flex; align-items:center; gap:10px; padding:6px 8px 14px; border-bottom:1px solid var(--line-soft)}
+  .brand-mark{width:36px; height:36px; border-radius:10px; background:linear-gradient(135deg, var(--accent), var(--accent-2)); display:grid; place-items:center; font-weight:800; color:#0b1020; font-size:16px; box-shadow:var(--shadow-soft)}
+  .brand-name{font-weight:700; font-size:15px; letter-spacing:.01em}
+  .brand-sub{color:var(--muted); font-size:10px; text-transform:uppercase; letter-spacing:.08em; margin-top:1px}
+
+  .user-card{display:flex; align-items:center; gap:10px; padding:10px 12px; background:var(--panel); border:1px solid var(--line-soft); border-radius:var(--radius-sm)}
+  .user-avatar{width:32px; height:32px; border-radius:50%; background:linear-gradient(135deg, #f7c272, #f59e0b); display:grid; place-items:center; font-weight:700; color:#3a2701; font-size:13px}
+  .user-info{flex:1; min-width:0}
+  .user-name{font-weight:600; font-size:13px}
+  .user-role{color:var(--muted); font-size:10px; text-transform:uppercase; letter-spacing:.06em}
+
+  .nav-section{margin-top:4px}
+  .nav-section-title{color:var(--muted-2); font-size:10px; text-transform:uppercase; letter-spacing:.1em; padding:6px 12px; font-weight:600}
+  .nav{display:flex; flex-direction:column; gap:1px}
+  .nav a{padding:9px 12px; border-radius:var(--radius-sm); color:var(--text-soft); font-weight:500; font-size:13px; display:flex; align-items:center; gap:10px; transition:.15s}
+  .nav a:hover{background:var(--panel); color:var(--text)}
+  .nav a.active{background:linear-gradient(90deg, rgba(124,92,255,.18), rgba(34,211,238,.05)); color:var(--text); box-shadow:inset 2px 0 0 var(--accent)}
+  .nav-ico{width:16px; text-align:center; opacity:.85}
+
+  .sidebar-foot{margin-top:auto; padding:10px 12px; background:var(--panel); border:1px solid var(--line-soft); border-radius:var(--radius-sm); display:flex; align-items:center; gap:8px; font-size:11px; color:var(--muted)}
+  .pulse{width:8px; height:8px; border-radius:50%; background:var(--good); box-shadow:0 0 0 0 rgba(34,197,94,.6); animation:pulse 2s infinite}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(34,197,94,.6)} 70%{box-shadow:0 0 0 8px rgba(34,197,94,0)}}
+
+  /* ============ MAIN ============ */
+  .main{padding:0; min-width:0; display:flex; flex-direction:column}
+  .topbar{position:sticky; top:0; z-index:10; background:rgba(10,14,31,.85); backdrop-filter:blur(12px); padding:14px 28px; border-bottom:1px solid var(--line-soft); display:flex; align-items:center; justify-content:space-between; gap:20px}
+  .topbar-left h1{margin:0; font-size:20px; font-weight:700; letter-spacing:-.01em}
+  .topbar-left p{margin:1px 0 0; color:var(--muted); font-size:12px}
+  .env-chip{display:inline-flex; align-items:center; gap:6px; padding:5px 10px; border-radius:999px; font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:.06em}
+  .env-chip.prod{background:rgba(239,68,68,.14); color:#fca5a5; border:1px solid rgba(239,68,68,.35)}
+  .env-chip-dot{width:6px; height:6px; border-radius:50%; background:currentColor}
+
+  .content{padding:20px 28px 40px; max-width:1600px; width:100%; margin:0 auto}
+
+  /* ============ CARDS ============ */
+  .card{background:linear-gradient(180deg, var(--panel), var(--panel-2)); border:1px solid var(--line); border-radius:var(--radius); padding:20px 22px; box-shadow:var(--shadow); margin-bottom:18px}
+  .card-head{display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; gap:12px}
+  .card-title{display:flex; align-items:center; gap:10px}
+  .card-title h2{margin:0; font-size:15px; font-weight:700; letter-spacing:.01em}
+  .card-ico{width:30px; height:30px; border-radius:8px; background:rgba(124,92,255,.18); display:grid; place-items:center; font-size:14px}
+
+  /* ============ FORM ============ */
+  .form-section{margin-bottom:22px}
+  .form-section:last-of-type{margin-bottom:0}
+  .section-label{display:flex; align-items:center; gap:8px; margin:0 0 10px; padding-bottom:8px; border-bottom:1px solid var(--line-soft); font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.1em; color:var(--text-soft)}
+  .section-label .num{display:inline-grid; place-items:center; width:18px; height:18px; border-radius:5px; background:var(--accent); color:#0b1020; font-size:10px; font-weight:800}
+
+  .form-grid{display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:12px}
+  .field{display:flex; flex-direction:column; gap:5px}
+  .field span.lab{color:var(--muted); font-size:10.5px; text-transform:uppercase; letter-spacing:.08em; font-weight:600}
+  .field input, .field select, .field textarea{
+    background:rgba(8,12,28,.55); border:1px solid var(--line); color:var(--text);
+    border-radius:8px; padding:9px 11px; font:inherit; font-size:13px; outline:none;
+    transition:border-color .15s, box-shadow .15s, background .15s;
+  }
+  .field input:hover, .field select:hover, .field textarea:hover{border-color:var(--line)}
+  .field input:focus, .field select:focus, .field textarea:focus{
+    border-color:var(--accent); box-shadow:0 0 0 3px rgba(124,92,255,0.16);
+    background:rgba(8,12,28,.85);
+  }
+  .field textarea{resize:vertical; min-height:56px; font-family:inherit}
+  .col-2{grid-column:span 2}
+  .col-3{grid-column:span 3}
+  .col-4{grid-column:span 4}
+
+  .check-box{display:flex; align-items:flex-start; gap:10px; padding:11px 12px; background:rgba(8,12,28,.45); border:1px solid var(--line); border-radius:8px; cursor:pointer; grid-column:1/-1}
+  .check-box input{margin-top:2px; width:16px; height:16px; accent-color:var(--accent); cursor:pointer}
+  .check-box span{color:var(--text-soft); font-size:12.5px; line-height:1.45}
+
+  .actions{display:flex; gap:10px; justify-content:flex-end; margin-top:18px; padding-top:16px; border-top:1px solid var(--line-soft); flex-wrap:wrap}
+  .btn{border-radius:8px; padding:11px 20px; font-weight:700; cursor:pointer; font-size:13px; border:none; transition:.15s}
+  .btn-primary{background:linear-gradient(135deg, var(--accent), var(--accent-2)); color:#0b1020; box-shadow:var(--shadow-soft)}
+  .btn-primary:hover{filter:brightness(1.08); transform:translateY(-1px)}
+  .btn-secondary{background:var(--panel-2); color:var(--text); border:1px solid var(--line)}
+  .btn-secondary:hover{background:#1c2456}
+
+  /* ============ HINT ============ */
+  .hint{display:flex; gap:12px; padding:12px 14px; background:rgba(34,211,238,.06); border:1px solid rgba(34,211,238,.18); border-radius:10px; margin-bottom:18px; font-size:12.5px; color:var(--text-soft)}
+  .hint-ico{font-size:18px; flex-shrink:0}
+  .hint strong{color:var(--accent-2)}
+
+  /* ============ KPIs ============ */
+  .kpis{display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:12px; margin-bottom:18px}
+  .kpi{background:linear-gradient(180deg, var(--panel), var(--panel-2)); border:1px solid var(--line); border-radius:var(--radius); padding:16px; box-shadow:var(--shadow-soft); position:relative; overflow:hidden}
+  .kpi::before{content:""; position:absolute; top:0; left:0; right:0; height:2px; background:linear-gradient(90deg, var(--accent), var(--accent-2))}
+  .kpi-label{color:var(--muted); font-size:11px; text-transform:uppercase; letter-spacing:.08em; font-weight:600}
+  .kpi-value{font-size:24px; font-weight:800; margin-top:6px; letter-spacing:-.02em}
+  .kpi-foot{color:var(--muted); font-size:11px; margin-top:4px}
+
+  /* ============ RESPONSIVE ============ */
+  @media (max-width:1100px){
+    .form-grid{grid-template-columns:repeat(2, minmax(0,1fr))}
+    .col-3, .col-4{grid-column:span 2}
+    .kpis{grid-template-columns:repeat(2, minmax(0,1fr))}
+  }
+  @media (max-width:768px){
+    body{grid-template-columns:1fr}
+    .sidebar{position:relative; height:auto}
+    .form-grid{grid-template-columns:1fr}
+    .col-2, .col-3, .col-4{grid-column:span 1}
+    .content{padding:16px}
+    .topbar{padding:12px 16px}
+  }
+
+  /* Footer */
+  .mock-note{background:linear-gradient(135deg, rgba(124,92,255,.12), rgba(34,211,238,.06)); border:1px dashed rgba(124,92,255,.4); padding:14px 18px; border-radius:10px; margin-bottom:20px; font-size:13px; color:var(--text-soft)}
+  .mock-note strong{color:var(--accent-2)}
+</style>
+</head>
+<body>
+
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-mark">YL</div>
+      <div>
+        <div class="brand-name">Yeimy Laverde</div>
+        <div class="brand-sub">Comercial · Serviautec</div>
+      </div>
+    </div>
+
+    <div class="user-card">
+      <div class="user-avatar">YE</div>
+      <div class="user-info">
+        <div class="user-name">YEIMI</div>
+        <div class="user-role">Administradora</div>
+      </div>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-section-title">Mi gestión</div>
+      <nav class="nav">
+        <a href="#"><span class="nav-ico">💎</span> Mis ventas</a>
+        <a href="#"><span class="nav-ico">📊</span> Resumen</a>
+        <a href="#"><span class="nav-ico">👥</span> Asesores</a>
+        <a href="#"><span class="nav-ico">📈</span> Analítica</a>
+        <a href="#"><span class="nav-ico">📋</span> Ventas detalladas</a>
+      </nav>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-section-title">Operación diaria</div>
+      <nav class="nav">
+        <a href="#"><span class="nav-ico">📦</span> Inventario y precios</a>
+        <a href="#" class="active"><span class="nav-ico">✍️</span> Registrar venta</a>
+      </nav>
+    </div>
+
+    <div class="sidebar-foot">
+      <span class="pulse"></span>
+      <span>Datos en vivo · actualizado 6:10 p.m.</span>
+    </div>
+  </aside>
+
+  <main class="main">
+
+    <header class="topbar">
+      <div class="topbar-left">
+        <h1>Registrar venta y crear oportunidad</h1>
+        <p>La oportunidad queda como Caliente (AA) en Impulsa CRM · SERVIAUTEC 550026948</p>
+      </div>
+      <span class="env-chip prod"><span class="env-chip-dot"></span>Producción</span>
+    </header>
+
+    <div class="content">
+
+      <div class="mock-note">
+        🎨 <strong>MOCKUP</strong> — Esta es la propuesta del nuevo diseño. Mira cómo cambia el aprovechamiento del espacio (4 columnas en desktop), las secciones agrupadas, los inputs más compactos. Si te gusta, lo aplico al dashboard real.
+      </div>
+
+      <div class="hint">
+        <span class="hint-ico">💡</span>
+        <div>Llena los campos según la venta cerrada. Al guardar se crea la oportunidad en Impulsa con <strong>Origen, Campaña y Forma de pago</strong> que escojas. El total se calcula solo.</div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <div class="card-title">
+            <div class="card-ico">📝</div>
+            <h2>Datos de la venta</h2>
+          </div>
+        </div>
+
+        <!-- SECCIÓN 1: ORIGEN -->
+        <div class="form-section">
+          <div class="section-label"><span class="num">1</span> Origen del lead</div>
+          <div class="form-grid">
+            <label class="field col-2">
+              <span class="lab">¿Cómo llegó el cliente? *</span>
+              <select>
+                <option>WhatsApp directo</option>
+                <option>Instagram</option>
+                <option>Facebook</option>
+                <option>TikTok</option>
+                <option>Referido</option>
+                <option>Cliente directo en sede</option>
+                <option>Llamada telefónica</option>
+              </select>
+            </label>
+            <label class="field col-2">
+              <span class="lab">Campaña *</span>
+              <input value="Venta directa redes Yeimy" />
+            </label>
+          </div>
+        </div>
+
+        <!-- SECCIÓN 2: CLIENTE -->
+        <div class="form-section">
+          <div class="section-label"><span class="num">2</span> Datos del cliente</div>
+          <div class="form-grid">
+            <label class="field col-4">
+              <span class="lab">Nombre completo *</span>
+              <input placeholder="JUAN PEREZ GONZALEZ" />
+            </label>
+            <label class="field">
+              <span class="lab">Tipo doc *</span>
+              <select>
+                <option>Cédula de ciudadanía</option>
+                <option>Cédula de extranjería</option>
+                <option>Pasaporte</option>
+              </select>
+            </label>
+            <label class="field">
+              <span class="lab">Documento *</span>
+              <input placeholder="1015388115" />
+            </label>
+            <label class="field">
+              <span class="lab">Celular *</span>
+              <input placeholder="3001234567" />
+            </label>
+            <label class="field">
+              <span class="lab">Correo *</span>
+              <input placeholder="cliente@correo.com" />
+            </label>
+            <label class="field col-4">
+              <span class="lab">Dirección</span>
+              <input placeholder="CR 50 #20-30, MEDELLIN" />
+            </label>
+          </div>
+        </div>
+
+        <!-- SECCIÓN 3: MOTO -->
+        <div class="form-section">
+          <div class="section-label"><span class="num">3</span> Moto vendida</div>
+          <div class="form-grid">
+            <label class="field col-2">
+              <span class="lab">Marca *</span>
+              <input placeholder="TVS" />
+            </label>
+            <label class="field col-2">
+              <span class="lab">Modelo / Producto *</span>
+              <input placeholder="Apache RTR 160" />
+            </label>
+          </div>
+        </div>
+
+        <!-- SECCIÓN 4: PAGO -->
+        <div class="form-section">
+          <div class="section-label"><span class="num">4</span> Información de pago</div>
+          <div class="form-grid">
+            <label class="field">
+              <span class="lab">Forma de pago *</span>
+              <select>
+                <option>Contado</option>
+                <option selected>Crédito</option>
+              </select>
+            </label>
+            <label class="field">
+              <span class="lab">Financiera</span>
+              <input placeholder="CREDIORBE" value="SUFI" />
+            </label>
+            <label class="field">
+              <span class="lab">Precio moto (COP) *</span>
+              <input value="7500000" />
+            </label>
+            <label class="field">
+              <span class="lab">Valor papeles (COP) *</span>
+              <input value="450000" />
+            </label>
+          </div>
+        </div>
+
+        <!-- SECCIÓN 5: NOTAS -->
+        <div class="form-section">
+          <div class="section-label"><span class="num">5</span> Notas y autorización</div>
+          <div class="form-grid">
+            <label class="field col-4">
+              <span class="lab">Observaciones adicionales</span>
+              <textarea placeholder="Color de la moto, acuerdos especiales, notas del cliente…"></textarea>
+            </label>
+            <label class="check-box">
+              <input type="checkbox" checked />
+              <span>El cliente autorizó el tratamiento de datos personales (habeas data) <strong style="color:#f7c272">*</strong></span>
+            </label>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button class="btn btn-secondary">Limpiar</button>
+          <button class="btn btn-primary">Guardar venta y crear oportunidad</button>
+        </div>
+      </div>
+
+      <!-- Ejemplo cómo se verían KPIs -->
+      <div class="mock-note" style="margin-top:30px">
+        🎨 <strong>Ejemplo de KPIs rediseñados</strong> (lo que verás en la sección "Mis ventas"):
+      </div>
+
+      <div class="kpis">
+        <div class="kpi">
+          <div class="kpi-label">Mis motos vendidas</div>
+          <div class="kpi-value">175</div>
+          <div class="kpi-foot">23 may 2025 - 27 may 2026</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-label">Mi monto vendido</div>
+          <div class="kpi-value">$1.677.730.994</div>
+          <div class="kpi-foot">Ticket promedio $9.587.034</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-label">Base sin IVA</div>
+          <div class="kpi-value">$1.409.857.978</div>
+          <div class="kpi-foot">Precio_Venta − IVA</div>
+        </div>
+        <div class="kpi" style="background:linear-gradient(135deg, rgba(34,197,94,.18), rgba(34,211,238,.10))">
+          <div class="kpi-label">💰 Mi comisión total</div>
+          <div class="kpi-value" style="color:#5be58a">$70.492.899</div>
+          <div class="kpi-foot">5% × base sin IVA</div>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+</body>
+</html>

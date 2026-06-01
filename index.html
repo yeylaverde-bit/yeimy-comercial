@@ -1,0 +1,833 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Yeimy Comercial · Serviautec</title>
+<link rel="manifest" href="/manifest.webmanifest" />
+<meta name="theme-color" content="#7c5cff" />
+<meta name="application-name" content="Yeimy Comercial" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="Yeimy Comercial" />
+<link rel="apple-touch-icon" href="/icon-192.png" />
+<link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png" />
+<link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="brand">
+      <img src="logo.png" alt="Yeimy Laverde" class="brand-logo-img" />
+      <div class="brand-sub-text">Comercial · Serviautec</div>
+    </div>
+
+    <div class="user-card">
+      <div class="user-avatar" id="userAvatar">--</div>
+      <div class="user-info">
+        <div class="user-name" id="userName">Cargando…</div>
+        <div class="user-role" id="userRole">—</div>
+      </div>
+      <button class="logout-btn" id="logoutBtn" title="Cerrar sesión">↩</button>
+    </div>
+
+    <div class="nav-section" data-role-only="admin">
+      <div class="nav-section-title">Mi gestión</div>
+      <nav class="nav">
+        <a class="active" href="#misventas">💎 Mis ventas</a>
+        <a href="#resumen">📊 Resumen</a>
+        <a href="#asesores">👥 Asesores</a>
+        <a href="#mensual">📅 Mes a mes</a>
+        <a href="#analitica">📈 Analítica</a>
+        <a href="#ventas">📋 Ventas detalladas</a>
+      </nav>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-section-title">Operación diaria</div>
+      <nav class="nav">
+        <a href="#precios">💵 Lista de precios</a>
+        <a href="#inventario">📦 Inventario disponible</a>
+        <a href="#registrar" class="nav-cta" data-role-only="admin asesor">✍️ Ingresar lead / cliente</a>
+        <a href="#misleads" data-role-only="admin asesor contable">📋 Mis registros del mes</a>
+        <a href="#preasignacion" data-role-only="admin asesor">🔧 Preasignación</a>
+        <a href="#ordenfac">📑 Orden facturación</a>
+        <a href="#taller" data-role-only="admin asesor">🛠️ Taller</a>
+      </nav>
+    </div>
+
+    <div class="nav-section" data-role-only="admin">
+      <div class="nav-section-title">Administración</div>
+      <nav class="nav">
+        <a href="#actualizarprecios">📤 Actualizar precios (PDF)</a>
+      </nav>
+    </div>
+
+    <div class="refresh-card">
+      <div class="refresh-title">Actualización</div>
+      <div class="refresh-value" id="lastUpdate">--:--:--</div>
+      <div class="refresh-sub">Auto-refresco cada 60 s</div>
+      <button id="refreshBtn" class="refresh-btn">Actualizar ahora</button>
+    </div>
+  </aside>
+
+  <button id="hamburger" class="hamburger" aria-label="Menú">
+    <span></span><span></span><span></span>
+  </button>
+  <div id="backdrop" class="backdrop"></div>
+
+  <main class="main">
+    <header class="topbar">
+      <div class="topbar-title">
+        <h1>Resumen de ventas</h1>
+        <p class="muted">Fuente: Google Sheets en vivo · Concesionario Yeimy Laverde</p>
+      </div>
+      <div class="filters" data-role-only="admin">
+        <label class="filter">
+          <span>Asesor</span>
+          <select id="filterAsesor"><option value="">Todos</option></select>
+        </label>
+        <label class="filter">
+          <span>Marca</span>
+          <select id="filterMarca"><option value="">Todas</option></select>
+        </label>
+        <label class="filter">
+          <span>Medio de pago</span>
+          <select id="filterMedio"><option value="">Todos</option></select>
+        </label>
+        <label class="filter">
+          <span>Año</span>
+          <select id="filterAnio"><option value="">Todos</option></select>
+        </label>
+        <label class="filter">
+          <span>Mes</span>
+          <select id="filterMes"><option value="">Todos</option></select>
+        </label>
+      </div>
+    </header>
+
+    <div id="roleBanner" class="role-banner" data-role-only="asesor" style="margin:0 28px">
+      <div class="role-banner-ico">👤</div>
+      <div>Estás registrando como <strong id="bannerName">—</strong>. La oportunidad creada en Impulsa quedará asociada a tu nombre y tu comisión va a ti.</div>
+    </div>
+
+    <div data-role-only="contable" style="background:linear-gradient(135deg,rgba(34,197,94,.12),rgba(34,211,238,.06));border:1px solid rgba(34,197,94,.3);padding:16px;border-radius:12px;margin-bottom:18px">
+      <strong style="color:#5be58a;font-size:14px">💼 Vista de Contabilidad</strong>
+      <p class="muted" style="margin:4px 0 0;font-size:12.5px">
+        Ves todas las órdenes de facturación de los asesores. Tu trabajo es revisar los 5 documentos (orden, preaprobado, cédula frente, cédula reverso, comprobante) y procesar la facturación. Puedes consultar inventario y precios de referencia.
+      </p>
+    </div>
+
+    <section id="misventas" class="card mis-ventas" data-role-only="admin">
+      <div class="card-head">
+        <h2>💎 Mis ventas <span class="muted" style="font-weight:400;font-size:12px">(Yeimi · comisión 5% antes de IVA)</span></h2>
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+          <span class="badge" id="misVentasPeriodo">—</span>
+          <button class="btn-descargar" id="btnDescargarComisiones" title="Descargar como imagen para contabilidad">
+            📥 Descargar imagen
+          </button>
+        </div>
+      </div>
+      <div class="kpis-mias">
+        <div class="kpi-mio">
+          <div class="kpi-label">Mis motos vendidas</div>
+          <div class="kpi-value" id="miUnidades">—</div>
+          <div class="kpi-foot" id="miUnidadesSub">&nbsp;</div>
+        </div>
+        <div class="kpi-mio">
+          <div class="kpi-label">Mi monto vendido</div>
+          <div class="kpi-value" id="miMonto">—</div>
+          <div class="kpi-foot" id="miMontoSub">Precio total con IVA</div>
+        </div>
+        <div class="kpi-mio">
+          <div class="kpi-label">Base sin IVA</div>
+          <div class="kpi-value" id="miSinIva">—</div>
+          <div class="kpi-foot">Precio_Venta − IVA</div>
+        </div>
+        <div class="kpi-mio kpi-destacado">
+          <div class="kpi-label">💰 Mi comisión total</div>
+          <div class="kpi-value" id="miComision">—</div>
+          <div class="kpi-foot" id="miComisionSub">5% × base sin IVA</div>
+        </div>
+        <div class="kpi-mio kpi-pendiente">
+          <div class="kpi-label">⏳ Pendiente de cobro</div>
+          <div class="kpi-value" id="miPendiente">—</div>
+          <div class="kpi-foot" id="miPendienteSub">Comisiones no marcadas como pagadas</div>
+        </div>
+        <div class="kpi-mio kpi-cobrado">
+          <div class="kpi-label">✅ Ya cobrado</div>
+          <div class="kpi-value" id="miCobrado">—</div>
+          <div class="kpi-foot" id="miCobradoSub">Comisiones marcadas como pagadas</div>
+        </div>
+      </div>
+      <div class="table-wrap" style="margin-top:14px">
+        <table class="table" id="tblMisVentas">
+          <thead>
+            <tr>
+              <th>Fecha</th>
+              <th>Factura</th>
+              <th>Marca</th>
+              <th>Modelo</th>
+              <th>Cliente</th>
+              <th class="num">Precio venta</th>
+              <th class="num">IVA</th>
+              <th class="num">Base sin IVA</th>
+              <th class="num" style="color:#5be58a">Mi comisión 5%</th>
+              <th style="text-align:center">¿Pagada?</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="resumen" class="kpis" data-role-only="admin">
+      <div class="kpi">
+        <div class="kpi-label">Motos vendidas</div>
+        <div class="kpi-value" id="kpiUnidades">—</div>
+        <div class="kpi-foot" id="kpiUnidadesSub">&nbsp;</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">Monto acumulado</div>
+        <div class="kpi-value" id="kpiMonto">—</div>
+        <div class="kpi-foot" id="kpiMontoSub">&nbsp;</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">Ticket promedio</div>
+        <div class="kpi-value" id="kpiTicket">—</div>
+        <div class="kpi-foot">por moto</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">Asesores activos</div>
+        <div class="kpi-value" id="kpiAsesores">—</div>
+        <div class="kpi-foot">con al menos 1 venta</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">Contado vs Financiado</div>
+        <div class="kpi-value small" id="kpiMedio">—</div>
+        <div class="kpi-foot" id="kpiMedioSub">&nbsp;</div>
+      </div>
+    </section>
+
+    <section id="asesores" class="card" data-role-only="admin">
+      <div class="card-head">
+        <h2>Asesores · rentabilidad <span class="muted" style="font-weight:400;font-size:12px">(ajustada por tiempo activo)</span></h2>
+        <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+          <label class="toggle">
+            <input type="checkbox" id="asesorActivos" checked />
+            <span>Solo activos</span>
+          </label>
+          <label class="filter" style="flex-direction:row;gap:6px;align-items:center">
+            <span>Ordenar por</span>
+            <select id="asesorSort">
+              <option value="utilidadMes">Utilidad / mes (rentabilidad real)</option>
+              <option value="ventasMes">Ventas / mes</option>
+              <option value="margen">Margen %</option>
+              <option value="montoMes">Monto / mes</option>
+              <option value="utilidad">Utilidad total</option>
+              <option value="monto">Monto total</option>
+              <option value="ventas">Ventas totales</option>
+            </select>
+          </label>
+          <span class="badge" id="asesoresCount">0</span>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table class="table" id="tblAsesores">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Asesor</th>
+              <th>Estado</th>
+              <th class="num" title="Promedio de motos vendidas por mes activo">Ventas/mes</th>
+              <th class="num" title="Utilidad neta promedio por mes activo">Utilidad/mes</th>
+              <th class="num" title="Utilidad / Monto vendido">Margen %</th>
+              <th class="num" title="Facturación promedio por mes">Monto/mes</th>
+              <th class="num" title="Tiempo desde la primera venta">Antigüedad</th>
+              <th class="num">Ventas tot.</th>
+              <th class="num">Monto acum.</th>
+              <th class="num">Utilidad total</th>
+              <th class="num">Contado</th>
+              <th class="num">Financiado</th>
+              <th>Top modelo</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="mensual" class="card" data-role-only="admin">
+      <div class="card-head">
+        <h2>Asesores · mes a mes <span class="muted" style="font-weight:400;font-size:12px">(últimos 12 meses)</span></h2>
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+          <label class="filter" style="flex-direction:row;gap:6px;align-items:center">
+            <span>Métrica</span>
+            <select id="matrizMetrica">
+              <option value="ventas">Ventas (unidades)</option>
+              <option value="monto">Monto facturado</option>
+              <option value="utilidad">Utilidad neta</option>
+            </select>
+          </label>
+          <label class="toggle">
+            <input type="checkbox" id="matrizSoloActivos" checked />
+            <span>Solo activos</span>
+          </label>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table class="table table-matrix" id="tblMatriz">
+          <thead></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="analitica" class="grid-2" data-role-only="admin">
+      <div class="card">
+        <div class="card-head"><h2>Top modelos vendidos</h2></div>
+        <canvas id="chartModelos" height="220"></canvas>
+      </div>
+      <div class="card">
+        <div class="card-head"><h2>Medio de pago</h2></div>
+        <canvas id="chartMedio" height="220"></canvas>
+      </div>
+      <div class="card">
+        <div class="card-head"><h2>Ventas por financiera</h2></div>
+        <canvas id="chartFinanciera" height="220"></canvas>
+      </div>
+      <div class="card">
+        <div class="card-head"><h2>Evolución mensual</h2></div>
+        <canvas id="chartMensual" height="220"></canvas>
+      </div>
+    </section>
+
+    <section id="ventas" class="card" data-role-only="admin">
+      <div class="card-head">
+        <h2>Ventas detalladas</h2>
+        <div class="search-wrap">
+          <input id="search" placeholder="Buscar por chasis, modelo, asesor..." />
+          <span class="badge" id="ventasCount">0</span>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table class="table" id="tblVentas">
+          <thead>
+            <tr>
+              <th>Fecha</th>
+              <th>Asesor</th>
+              <th>Marca</th>
+              <th>Modelo</th>
+              <th>Color</th>
+              <th>Chasis</th>
+              <th>Medio de pago</th>
+              <th>Financiera</th>
+              <th class="num">Monto</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div class="pager">
+        <button id="prevPage">Anterior</button>
+        <span id="pageInfo">Página 1</span>
+        <button id="nextPage">Siguiente</button>
+      </div>
+    </section>
+
+    <section id="precios" class="card">
+      <div class="card-head">
+        <h2>💵 Lista de precios oficial</h2>
+        <div class="search-wrap">
+          <input id="precSearch" placeholder="Buscar modelo, marca..." />
+          <span class="badge" id="precCount">0</span>
+        </div>
+      </div>
+      <p class="muted" id="precInfo" style="margin:-4px 0 12px;font-size:12px">—</p>
+      <div class="table-wrap">
+        <table class="table" id="tblPrecios">
+          <thead>
+            <tr>
+              <th>Marca</th>
+              <th>Modelo</th>
+              <th class="num">Precio 2026</th>
+              <th class="num">Precio contado</th>
+              <th class="num">V. tránsito (papeles)</th>
+              <th class="num">V. prenda (crédito)</th>
+              <th class="num">Bono</th>
+              <th class="num">Cuota inicial</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="inventario" class="card">
+      <div class="card-head">
+        <h2>📦 Inventario disponible</h2>
+        <div class="search-wrap">
+          <input id="invSearch" placeholder="Buscar marca, modelo, color, bodega..." />
+          <span class="badge" id="invCount">0</span>
+        </div>
+      </div>
+      <div id="invConfigWarn" class="form-msg form-msg-info" style="display:none">
+        ⚙️ Pega la URL del Google Sheets de inventario en <code>app.js</code> (constante <code>INV_CSV_URL</code>) para activar esta sección. Mientras tanto se muestran datos vacíos.
+      </div>
+      <div class="table-wrap">
+        <table class="table" id="tblInventario">
+          <thead>
+            <tr>
+              <th>Marca</th>
+              <th>Modelo</th>
+              <th>Color</th>
+              <th>Chasis</th>
+              <th>Bodega</th>
+              <th class="num" data-role-only="admin contable">Costo (compra)</th>
+              <th class="num">Precio venta</th>
+              <th>Estado</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="registrar" class="card card-registrar" data-role-only="admin asesor">
+      <div class="card-head">
+        <h2>✍️ Registrar venta y crear oportunidad en Impulsa</h2>
+        <span class="badge" id="envBadge">—</span>
+      </div>
+      <p class="muted" style="margin:-4px 0 14px">
+        Al guardar, se crea automáticamente una oportunidad <strong>Caliente (AA)</strong> en Impulsa CRM,
+        asociada al establecimiento <strong>SERVIAUTEC (550026948)</strong>, con el Origen y Campaña que escojas abajo.
+      </p>
+
+      <form id="formRegistrar" class="form-grid" autocomplete="off">
+        <label class="form-field">
+          <span>¿Cómo llegó el cliente? (Origen) *</span>
+          <select name="Origen" required>
+            <option value="WhatsApp directo" selected>WhatsApp directo</option>
+            <option value="Instagram">Instagram</option>
+            <option value="Facebook">Facebook</option>
+            <option value="TikTok">TikTok</option>
+            <option value="Referido">Referido de cliente anterior</option>
+            <option value="Cliente directo en sede">Cliente directo en sede</option>
+            <option value="Llamada telefónica">Llamada telefónica</option>
+            <option value="Otro">Otro</option>
+          </select>
+        </label>
+
+        <label class="form-field">
+          <span>Campaña *</span>
+          <input name="Campanna" required placeholder="Venta directa redes Yeimy"
+            value="Venta directa redes Yeimy" list="campannasLista" />
+          <datalist id="campannasLista">
+            <option value="Venta directa redes Yeimy"></option>
+            <option value="Promo financiación Yeimy"></option>
+            <option value="Cliente referido Yeimy"></option>
+            <option value="Promo Día de la Madre"></option>
+            <option value="Promo Día del Padre"></option>
+            <option value="Promo Amor y Amistad"></option>
+            <option value="Promo Halloween"></option>
+            <option value="Promo Black Friday"></option>
+            <option value="Promo Navidad"></option>
+            <option value="Lanzamiento nuevo modelo"></option>
+            <option value="Bono especial concesionario"></option>
+          </datalist>
+        </label>
+
+        <label class="form-field form-field-full">
+          <span>Nombre completo del cliente *</span>
+          <input name="NombreContacto" required placeholder="JUAN PEREZ GONZALEZ" />
+        </label>
+
+        <label class="form-field">
+          <span>Tipo documento</span>
+          <select name="TipoDocumento">
+            <option value="CC" selected>Cédula de ciudadanía</option>
+            <option value="CE">Cédula de extranjería</option>
+            <option value="PPT">PPT (Permiso de Permanencia Temporal)</option>
+            <option value="PEP">PEP (Permiso Especial de Permanencia)</option>
+            <option value="PA">Pasaporte</option>
+            <option value="TI">Tarjeta de identidad</option>
+            <option value="NIT">NIT</option>
+          </select>
+        </label>
+
+        <label class="form-field">
+          <span>Número de documento *</span>
+          <input name="Documento" required inputmode="numeric" placeholder="1015388115" />
+        </label>
+
+        <label class="form-field">
+          <span>Celular *</span>
+          <input name="Telefono2" required inputmode="tel" placeholder="3001234567" />
+        </label>
+
+        <label class="form-field">
+          <span>Correo electrónico *</span>
+          <input name="Email" type="email" required placeholder="cliente@correo.com" />
+        </label>
+
+        <label class="form-field form-field-full">
+          <span>Dirección</span>
+          <input name="Direccion" placeholder="CR 50 #20-30, MEDELLIN" />
+        </label>
+
+        <label class="form-field">
+          <span>Marca de la moto *</span>
+          <input name="Marca" required placeholder="TVS" list="marcasLista" />
+          <datalist id="marcasLista">
+            <option value="TVS"></option>
+            <option value="MOBILITY"></option>
+            <option value="VICTORY"></option>
+            <option value="KYMCO"></option>
+          </datalist>
+        </label>
+
+        <label class="form-field">
+          <span>Modelo / Producto *</span>
+          <input name="Producto" required placeholder="Apache RTR 160" />
+        </label>
+
+        <label class="form-field">
+          <span>Forma de pago *</span>
+          <select name="FormaPago" id="formaPagoSel" required>
+            <option value="Contado">Contado</option>
+            <option value="Crédito">Crédito</option>
+          </select>
+        </label>
+
+        <label class="form-field" id="financieraField" style="display:none">
+          <span>Financiera</span>
+          <input name="Financiera" list="financierasLista" placeholder="CREDIORBE / RODAS / SUFI / ..." />
+          <datalist id="financierasLista">
+            <option value="CREDIORBE"></option>
+            <option value="RODAS"></option>
+            <option value="SUFI"></option>
+            <option value="PROGRESER"></option>
+            <option value="CEDIDA"></option>
+            <option value="TUYA"></option>
+          </datalist>
+        </label>
+
+        <label class="form-field">
+          <span>Precio moto (COP) *</span>
+          <input name="PrecioMoto" type="text" inputmode="numeric" required placeholder="11000000" data-format-money />
+        </label>
+
+        <label class="form-field">
+          <span>Valor papeles / documentos (COP) *</span>
+          <input name="ValorPapeles" type="text" inputmode="numeric" required placeholder="200000" data-format-money />
+        </label>
+
+        <label class="form-field form-field-full">
+          <span>Observaciones adicionales</span>
+          <textarea name="Observaciones" rows="2"
+            placeholder="Color de la moto, notas del cliente, acuerdos especiales…"></textarea>
+        </label>
+
+        <label class="form-field-checkbox form-field-full">
+          <input type="checkbox" name="HabeasData" required />
+          <span>El cliente autorizó el tratamiento de datos personales (habeas data) *</span>
+        </label>
+
+        <div class="form-actions form-field-full">
+          <button type="reset" class="btn-secondary">Limpiar</button>
+          <button type="submit" class="btn-primary" id="btnSubmit">
+            Guardar venta y crear oportunidad
+          </button>
+        </div>
+      </form>
+
+      <div id="formMsg" class="form-msg" style="display:none"></div>
+    </section>
+
+    <section id="misleads" class="card" data-role-only="admin asesor contable">
+      <div class="card-head">
+        <h2>📋 Mis registros del mes · clientes ingresados</h2>
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+          <select id="leadsFiltroMes" class="filter-select"><option value="">Todos los meses</option></select>
+          <input id="leadsBuscar" placeholder="Buscar cliente, doc, moto…" style="background:var(--panel-2);border:1px solid var(--line);color:var(--text);border-radius:10px;padding:8px 12px;min-width:220px" />
+          <span class="badge" id="leadsCount">0</span>
+        </div>
+      </div>
+      <p class="muted" style="margin:-4px 0 14px;font-size:12.5px">
+        Cada vez que registras una venta con "✍️ Ingresar lead / cliente", queda aquí. Puedes filtrar por mes o buscar por cliente.
+      </p>
+      <div class="table-wrap">
+        <table class="table" id="tblLeads">
+          <thead>
+            <tr>
+              <th>Fecha</th>
+              <th>Cliente</th>
+              <th>Documento</th>
+              <th>Celular</th>
+              <th>Moto</th>
+              <th>Pago</th>
+              <th class="num">Total</th>
+              <th data-role-only="admin contable">Asesor</th>
+              <th>Estado Impulsa</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="preasignacion" class="card" data-role-only="admin asesor">
+      <div class="card-head">
+        <h2>🔧 Preasignación · chasis específico → cliente</h2>
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+          <span class="badge" id="preasigCount">0</span>
+          <label class="toggle" data-role-only="admin">
+            <input type="checkbox" id="preasigVerTodos" />
+            <span>Ver todos</span>
+          </label>
+          <button class="btn-primary" id="btnNuevaPreasignacion" style="padding:9px 14px;font-size:13px;border-radius:8px;border:none">+ Nueva preasignación</button>
+        </div>
+      </div>
+      <p class="muted" style="margin:-4px 0 14px;font-size:12.5px">
+        Asigna un chasis específico del inventario al cliente. Llena los datos de crédito y GPS.
+      </p>
+      <div id="preasigListWrap"></div>
+    </section>
+
+    <section id="ordenfac" class="card">
+      <div class="card-head">
+        <h2>📑 Orden de facturación · documentos para contabilidad</h2>
+        <div class="search-wrap">
+          <input id="docSearch" placeholder="Buscar por chasis, cliente, modelo…" />
+          <span class="badge" id="docCount">0</span>
+        </div>
+      </div>
+      <p class="muted" style="margin:-4px 0 14px;font-size:12.5px">
+        Sube los 4 documentos por venta para que contabilidad pueda procesar la facturación.
+        Acepta fotos del celular (JPG/PNG) o PDFs hasta 10 MB.
+      </p>
+      <div class="docs-quick-upload">
+        <div data-role-only="admin asesor">
+          <p class="muted" style="margin:0 0 10px;font-size:12px;font-weight:600;letter-spacing:.04em;text-transform:uppercase">📤 Sube tus documentos del asesor</p>
+          <div class="docs-quick-buttons">
+            <button class="btn-quickup" data-quick-tipo="ordenFac">📄 Orden de<br>facturación</button>
+            <button class="btn-quickup" data-quick-tipo="preaprobado">💳 Preaprobado<br>del crédito</button>
+            <button class="btn-quickup" data-quick-tipo="cedulaFrente">🆔 Cédula<br><strong>FRENTE</strong></button>
+            <button class="btn-quickup" data-quick-tipo="cedulaReverso">🆔 Cédula<br><strong>REVERSO</strong></button>
+            <button class="btn-quickup" data-quick-tipo="comprobante">💰 Comprobante<br>de pago</button>
+          </div>
+        </div>
+        <div data-role-only="admin contable" style="margin-top:14px">
+          <p class="muted" style="margin:0 0 10px;font-size:12px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:#5be58a">💼 Sube documentos de contabilidad</p>
+          <div class="docs-quick-buttons" style="grid-template-columns:repeat(3,1fr)">
+            <button class="btn-quickup btn-quickup-contable" data-quick-tipo="facturaVenta">🧾 Factura<br>de venta</button>
+            <button class="btn-quickup btn-quickup-contable" data-quick-tipo="facturaGps">📡 Factura<br>GPS</button>
+            <button class="btn-quickup btn-quickup-contable" data-quick-tipo="soat">🛡️ SOAT</button>
+          </div>
+        </div>
+        <input type="file" id="quickFileInput" accept="image/*,application/pdf" style="display:none" />
+      </div>
+
+      <div class="docs-toolbar">
+        <label class="toggle" data-role-only="admin">
+          <input type="checkbox" id="docVerTodos" />
+          <span>Ver de todos los asesores</span>
+        </label>
+      </div>
+      <!-- Vista contable: filtros + tabla -->
+      <div data-role-only="contable" style="margin-bottom:12px;display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+        <span style="color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.06em;font-weight:600;margin-right:6px">Filtrar:</span>
+        <button class="btn-filtro-contable activo" data-filtro-contable="todos">Todos</button>
+        <button class="btn-filtro-contable" data-filtro-contable="pendientes">⏳ Pendientes</button>
+        <button class="btn-filtro-contable" data-filtro-contable="listos">✓ Listos para facturar</button>
+      </div>
+
+      <div id="docsListWrap"></div>
+    </section>
+
+    <!-- Modal detalle contable: muestra todo de una venta -->
+    <div id="modalDetalleVenta" class="modal-backdrop">
+      <div class="modal" style="max-width:920px;max-height:90vh;overflow-y:auto">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:8px">
+          <div>
+            <h2 id="detalleTitulo" style="margin:0">Cliente — Modelo</h2>
+            <p class="muted" id="detalleSubtitulo" style="margin:4px 0 0;font-size:13px">Chasis · Motor · Color</p>
+          </div>
+          <button class="btn-secondary" id="btnCerrarDetalle" style="padding:6px 12px">✕</button>
+        </div>
+
+        <div id="detalleDatosCliente" style="background:rgba(8,12,28,.45);border:1px solid var(--line);border-radius:10px;padding:12px;margin:12px 0;font-size:12.5px">
+          <!-- Lleno dinámico -->
+        </div>
+
+        <h3 style="margin:18px 0 8px;font-size:13px;color:var(--text-soft);text-transform:uppercase;letter-spacing:.06em">📎 Soportes</h3>
+        <div id="detalleSoportes" class="docs-slots"></div>
+
+        <div class="modal-actions" style="margin-top:16px;border-top:1px solid var(--line);padding-top:14px">
+          <span id="detalleEstado" style="margin-right:auto;font-size:12px;color:var(--muted)"></span>
+          <button class="btn-secondary" id="btnCerrarDetalle2">Cerrar</button>
+        </div>
+      </div>
+    </div>
+
+    <section id="taller" class="card" data-role-only="admin asesor">
+      <div class="card-head">
+        <h2>🛠️ Taller · motos en proceso</h2>
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+          <span class="badge" id="tallerCount">0</span>
+          <label class="toggle" data-role-only="admin">
+            <input type="checkbox" id="tallerVerTodos" />
+            <span>Ver todos los asesores</span>
+          </label>
+        </div>
+      </div>
+      <p class="muted" style="margin:-4px 0 12px;font-size:12.5px">
+        Motos que pasaron de preasignación a taller. Cambia el estado a <strong>"Lista"</strong> o <strong>"Entregada"</strong> cuando corresponda.
+      </p>
+      <div class="table-wrap">
+        <table class="table" id="tblTaller">
+          <thead>
+            <tr>
+              <th>Placa</th>
+              <th>Chasis</th>
+              <th>Motor</th>
+              <th>Marca · Modelo</th>
+              <th>Cliente</th>
+              <th>Asesor</th>
+              <th>GPS</th>
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="actualizarprecios" class="card" data-role-only="admin">
+      <div class="card-head">
+        <h2>📤 Actualizar precios · subir PDF de la empresa</h2>
+      </div>
+      <p class="muted" style="margin:-4px 0 14px;font-size:12.5px">
+        Cuando la empresa envía la actualización mensual de precios en PDF, súbelo aquí.
+        Queda guardado en el historial para que cualquier asesor lo consulte.
+      </p>
+      <form id="formSubirPrecios" class="form-grid" style="grid-template-columns:1fr 1fr;gap:14px">
+        <label class="form-field form-field-full">
+          <span>Archivo PDF de precios *</span>
+          <input type="file" name="archivo" accept="application/pdf" required style="background:rgba(8,12,28,.55);border:1px solid var(--line);color:var(--text);border-radius:10px;padding:10px 12px" />
+        </label>
+        <label class="form-field form-field-full">
+          <span>Notas (opcional)</span>
+          <textarea name="notas" rows="2" placeholder="Ej: Lista de precios junio 2026 — incluye nuevo Apache RTR 310"></textarea>
+        </label>
+        <div class="form-actions form-field-full">
+          <button type="submit" class="btn-primary">📤 Subir PDF de precios</button>
+        </div>
+      </form>
+      <div id="preciosUploadMsg" class="form-msg" style="display:none"></div>
+      <div style="margin-top:24px">
+        <h3 style="margin:0 0 10px;font-size:14px">Historial de actualizaciones</h3>
+        <div id="preciosHistorial"></div>
+      </div>
+    </section>
+
+    <footer class="foot">
+      <span>Yeimy Laverde · Dashboard en vivo</span>
+      <span id="rowsTotal">0 filas cargadas</span>
+    </footer>
+  </main>
+
+  <!-- Modal SIMPLE: pedir chasis después de escoger archivo -->
+  <div id="modalChasisRapido" class="modal-backdrop">
+    <div class="modal">
+      <h2 id="modalChasisRapidoTitle">¿A qué moto pertenece?</h2>
+      <p class="muted" id="modalChasisRapidoArchivoInfo">Archivo seleccionado: <strong id="modalChasisArchivo">—</strong></p>
+      <div id="modalChasisRapidoMsg" class="modal-msg"></div>
+      <form id="formChasisRapido">
+        <label>
+          <span>Chasis o # de factura *</span>
+          <input name="idVenta" required list="chasisRapidoList" placeholder="Pega o escoge de la lista" autocomplete="off" autofocus />
+          <datalist id="chasisRapidoList"></datalist>
+        </label>
+        <div class="modal-actions">
+          <button type="button" class="btn-secondary" id="btnCancelarChasisRapido">Cancelar</button>
+          <button type="submit" class="btn-primary" id="btnConfirmarChasisRapido">📤 Subir ahora</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: crear/editar preasignación -->
+  <div id="modalPreasig" class="modal-backdrop">
+    <div class="modal" style="max-width:640px">
+      <h2 id="modalPreasigTitle">Nueva preasignación</h2>
+      <p class="muted">Asigna un chasis específico del inventario al cliente.</p>
+      <div id="preasigMsg" class="modal-msg"></div>
+      <form id="formPreasig" style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <label style="grid-column:1/-1"><span>Chasis * (del inventario)</span>
+          <input name="chasis" required list="chasisList" placeholder="9FL25AF36SDH49299" /></label>
+        <datalist id="chasisList"></datalist>
+        <label><span>Marca</span><input name="marca" placeholder="TVS" /></label>
+        <label><span>Modelo</span><input name="modelo" placeholder="Raider 125" /></label>
+        <label><span>Motor</span><input name="motor" placeholder="ABC12345" /></label>
+        <label><span>Color</span><input name="color" placeholder="NEGRO NEBULOSA" /></label>
+        <label style="grid-column:1/-1"><span>Nombre del cliente *</span>
+          <input name="nombreCliente" required placeholder="JUAN PEREZ GONZALEZ" /></label>
+        <label><span>Cédula cliente</span><input name="cedulaCliente" inputmode="numeric" placeholder="1015388115" /></label>
+        <label><span>Fecha de nacimiento</span><input name="fechaNacimiento" type="date" /></label>
+        <label><span>Celular</span><input name="celular" inputmode="tel" placeholder="3001234567" /></label>
+        <label><span># Crédito</span><input name="numCredito" placeholder="CRED-12345" /></label>
+        <label><span>Financiera</span><input name="financiera" list="financierasListPre" placeholder="CREDIORBE" />
+          <datalist id="financierasListPre">
+            <option value="CREDIORBE"></option><option value="RODAS"></option><option value="SUFI"></option>
+            <option value="PROGRESER"></option><option value="UNIDOS"></option><option value="CONTADO"></option>
+          </datalist></label>
+        <label><span>GPS</span>
+          <select name="gps"><option value="sin">Sin GPS</option><option value="instalar">Instalar</option><option value="activar">Activar</option></select></label>
+        <label><span>Placa (si ya la tiene)</span><input name="placa" placeholder="ABC123" /></label>
+        <div class="modal-actions" style="grid-column:1/-1">
+          <button type="button" class="btn-secondary" id="btnCancelarPreasig">Cancelar</button>
+          <button type="submit" class="btn-primary" id="btnGuardarPreasig">Guardar preasignación</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="toast" class="toast"></div>
+
+  <!-- Modal: cambio obligatorio de clave en primer login -->
+  <div id="changePassModal" class="modal-backdrop">
+    <div class="modal">
+      <h2>Cambia tu clave temporal</h2>
+      <p class="muted">Por seguridad, escoge una clave personal antes de continuar. Mínimo 6 caracteres.</p>
+      <div id="changePassMsg" class="modal-msg"></div>
+      <form id="changePassForm">
+        <label>
+          <span>Clave temporal actual</span>
+          <input type="password" name="passwordActual" required autocomplete="current-password" />
+        </label>
+        <label>
+          <span>Nueva clave (mínimo 6 caracteres)</span>
+          <input type="password" name="passwordNueva" required minlength="6" autocomplete="new-password" />
+        </label>
+        <label>
+          <span>Confirmar nueva clave</span>
+          <input type="password" name="passwordConfirma" required minlength="6" autocomplete="new-password" />
+        </label>
+        <div class="modal-actions">
+          <button type="submit" class="btn-primary" id="changePassBtn">Guardar nueva clave</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

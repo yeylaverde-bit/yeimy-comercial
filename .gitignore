@@ -1,0 +1,13 @@
+node_modules/
+.env
+sessions.db
+*.log
+*.bak
+.DS_Store
+Thumbs.db
+
+# NOTA: los .json y carpetas uploads/ NO se ignoran porque sirven de bootstrap
+# inicial para el deploy a Render. Después del primer arranque, los datos viven
+# en DATA_DIR (/data en Render, persistente). El repo solo conserva el snapshot
+# inicial. El repo DEBE SER PRIVADO en GitHub.
+

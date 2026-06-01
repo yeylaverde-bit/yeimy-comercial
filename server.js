@@ -1,0 +1,818 @@
+/* Servidor local del dashboard de Yeimy — con autenticación multi-usuario.
+ *
+ * Roles:
+ *   - admin   → ve todo (Mis Ventas, KPIs, Asesores, Inventario, Registrar, Admin)
+ *   - asesor  → ve solo Inventario + Registrar Venta + Mis Registros del mes
+ *
+ * Cada usuario se autentica con email + clave. Las claves se guardan hasheadas
+ * con bcrypt en users.json. Las sesiones se manejan con express-session
+ * (cookies firmadas con SESSION_SECRET).
+ *
+ * El servidor escucha en HOST:PORT — para acceso desde otros dispositivos
+ * en la WiFi local, dejar HOST=0.0.0.0 en .env.
+ */
+
+const express = require("express");
+const session = require("express-session");
+const cookieParser = require("cookie-parser");
+const bcrypt = require("bcryptjs");
+const multer = require("multer");
+const path = require("path");
+const fs = require("fs");
+require("dotenv").config({ path: path.join(__dirname, ".env") });
+
+const app = express();
+const PORT = Number(process.env.PORT) || 3000;
+const HOST = process.env.HOST || "0.0.0.0";
+// DATA_DIR: en Render se usa "/data" (disk persistente). Localmente queda __dirname.
+const DATA_DIR = process.env.DATA_DIR || __dirname;
+if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
+
+// Bootstrap: copia los archivos de datos del código al DATA_DIR la PRIMERA vez.
+// Después, los cambios viven solo en DATA_DIR.
+function bootstrapDataDir() {
+  if (DATA_DIR === __dirname) return;
+  const archivos = [
+    "users.json", "comisiones-pagadas.json", "preasignaciones.json",
+    "docs-ventas.json", "ventas-registradas.jsonl", "precios-historial.json",
+  ];
+  for (const f of archivos) {
+    const src = path.join(__dirname, f);
+    const dst = path.join(DATA_DIR, f);
+    if (!fs.existsSync(dst) && fs.existsSync(src)) {
+      try { fs.copyFileSync(src, dst); console.log("  Bootstrap: copied " + f + " → " + DATA_DIR); } catch {}
+    }
+  }
+  // Carpetas de uploads
+  for (const d of ["uploads", "uploads-precios"]) {
+    const src = path.join(__dirname, d);
+    const dst = path.join(DATA_DIR, d);
+    if (!fs.existsSync(dst)) fs.mkdirSync(dst, { recursive: true });
+    if (fs.existsSync(src) && fs.existsSync(dst)) {
+      try {
+        for (const entry of fs.readdirSync(src, { withFileTypes: true })) {
+          const srcEntry = path.join(src, entry.name);
+          const dstEntry = path.join(dst, entry.name);
+          if (!fs.existsSync(dstEntry)) {
+            if (entry.isDirectory()) {
+              fs.cpSync(srcEntry, dstEntry, { recursive: true });
+            } else {
+              fs.copyFileSync(srcEntry, dstEntry);
+            }
+          }
+        }
+      } catch {}
+    }
+  }
+}
+bootstrapDataDir();
+
+// --- Config Impulsa (igual que antes) ---
+const IMPULSA_API_KEY = process.env.IMPULSA_API_KEY || "";
+const IMPULSA_ENV = (process.env.IMPULSA_ENV || "test").toLowerCase();
+const IMPULSA_BASE_URL = IMPULSA_ENV === "prod"
+  ? "https://apiimpulsa.impulsacrm.com/api/v2"
+  : "https://apiimpulsa.azurewebsites.net/api/v2";
+const ESTABLECIMIENTO = process.env.IMPULSA_ESTABLECIMIENTO || "550026948";
+const USUARIO_TRAZABILIDAD = process.env.IMPULSA_USUARIO || "yeimi";
+const CODIGO_DANE = process.env.IMPULSA_CODIGO_DANE || "05001";
+const ORIGEN_DEFAULT = process.env.IMPULSA_ORIGEN || "Venta directa";
+const CAMPANNA_DEFAULT = process.env.IMPULSA_CAMPANNA || "Venta directa";
+const SESSION_SECRET = process.env.SESSION_SECRET || "cambiar-este-secreto-en-produccion";
+
+// --- Middleware base ---
+app.use(express.json({ limit: "200kb" }));
+app.use(cookieParser());
+const IS_PROD = process.env.NODE_ENV === "production";
+if (IS_PROD) app.set("trust proxy", 1);  // necesario detrás de Render/Cloudflare
+app.use(session({
+  name: "yc.sid",
+  secret: SESSION_SECRET,
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    httpOnly: true,
+    secure: IS_PROD,         // HTTPS solo en producción
+    sameSite: "lax",
+    maxAge: 1000 * 60 * 60 * 8, // 8 horas
+  },
+}));
+
+// --- Usuarios ---
+const USERS_PATH = path.join(DATA_DIR, "users.json");
+function leerUsuarios() {
+  try {
+    const raw = fs.readFileSync(USERS_PATH, "utf8");
+    const data = JSON.parse(raw);
+    return data.usuarios || [];
+  } catch {
+    return [];
+  }
+}
+function guardarUsuarios(usuarios) {
+  fs.writeFileSync(USERS_PATH, JSON.stringify({ usuarios }, null, 2), "utf8");
+}
+function buscarUsuario(email) {
+  return leerUsuarios().find(u => u.email.toLowerCase() === String(email || "").toLowerCase().trim());
+}
+
+// --- Middlewares de autorización ---
+function requireAuth(req, res, next) {
+  if (req.session && req.session.userEmail) return next();
+  if (req.path.startsWith("/api/")) {
+    return res.status(401).json({ ok: false, error: "No autenticado" });
+  }
+  return res.redirect("/login.html");
+}
+function requireAdmin(req, res, next) {
+  const u = req.session && req.session.userEmail ? buscarUsuario(req.session.userEmail) : null;
+  if (u && u.rol === "admin") return next();
+  return res.status(403).json({ ok: false, error: "Solo administrador" });
+}
+
+// --- Endpoints de auth ---
+app.post("/api/login", async (req, res) => {
+  const { email, password } = req.body || {};
+  const usuario = buscarUsuario(email);
+  if (!usuario) {
+    return res.status(401).json({ ok: false, error: "Email o clave incorrectos" });
+  }
+  const ok = await bcrypt.compare(String(password || ""), usuario.passwordHash);
+  if (!ok) {
+    return res.status(401).json({ ok: false, error: "Email o clave incorrectos" });
+  }
+  req.session.userEmail = usuario.email;
+  return res.json({
+    ok: true,
+    usuario: {
+      email: usuario.email,
+      nombre: usuario.nombre,
+      apellido: usuario.apellido,
+      rol: usuario.rol,
+      debeChangePass: !!usuario.debeChangePass,
+    },
+  });
+});
+
+app.post("/api/logout", (req, res) => {
+  req.session.destroy(() => res.json({ ok: true }));
+});
+
+app.get("/api/me", (req, res) => {
+  if (!req.session || !req.session.userEmail) {
+    return res.status(401).json({ ok: false, error: "No autenticado" });
+  }
+  const u = buscarUsuario(req.session.userEmail);
+  if (!u) return res.status(401).json({ ok: false, error: "Sesión inválida" });
+  res.json({
+    ok: true,
+    usuario: {
+      email: u.email,
+      nombre: u.nombre,
+      apellido: u.apellido,
+      rol: u.rol,
+      debeChangePass: !!u.debeChangePass,
+    },
+    ambiente: IMPULSA_ENV,
+  });
+});
+
+app.post("/api/change-password", requireAuth, async (req, res) => {
+  const { passwordActual, passwordNueva } = req.body || {};
+  if (!passwordNueva || passwordNueva.length < 6) {
+    return res.status(400).json({ ok: false, error: "La nueva clave debe tener al menos 6 caracteres" });
+  }
+  const usuarios = leerUsuarios();
+  const idx = usuarios.findIndex(u => u.email.toLowerCase() === req.session.userEmail.toLowerCase());
+  if (idx < 0) return res.status(401).json({ ok: false, error: "Sesión inválida" });
+  const ok = await bcrypt.compare(String(passwordActual || ""), usuarios[idx].passwordHash);
+  if (!ok) return res.status(401).json({ ok: false, error: "La clave actual no coincide" });
+  usuarios[idx].passwordHash = await bcrypt.hash(String(passwordNueva), 10);
+  usuarios[idx].debeChangePass = false;
+  usuarios[idx].passwordCambiadaEn = new Date().toISOString();
+  guardarUsuarios(usuarios);
+  return res.json({ ok: true });
+});
+
+// ============================================================
+//      DOCUMENTOS DE VENTA (Orden Facturación)
+// ============================================================
+// Cada venta puede tener 4 documentos: orden de facturación, preaprobado,
+// cédula y comprobante de pago. Se almacenan en /uploads/<idVenta>/
+// y el índice queda en docs-ventas.json.
+const UPLOADS_DIR = path.join(DATA_DIR, "uploads");
+const DOCS_INDEX = path.join(DATA_DIR, "docs-ventas.json");
+if (!fs.existsSync(UPLOADS_DIR)) fs.mkdirSync(UPLOADS_DIR, { recursive: true });
+
+// Documentos por venta. Los primeros 5 los sube el ASESOR, los últimos 3 los sube CONTABILIDAD.
+const TIPOS_DOC = [
+  "ordenFac", "preaprobado", "cedulaFrente", "cedulaReverso", "comprobante",
+  "facturaVenta", "facturaGps", "soat",
+];
+const TIPOS_DOC_NOMBRE = {
+  ordenFac: "Orden de facturación",
+  preaprobado: "Preaprobado del crédito",
+  cedulaFrente: "Cédula (frente)",
+  cedulaReverso: "Cédula (reverso)",
+  comprobante: "Comprobante de pago",
+  facturaVenta: "Factura de venta",
+  facturaGps: "Factura GPS",
+  soat: "SOAT",
+};
+// Para saber a qué grupo pertenece cada tipo (sólo presentación)
+const TIPOS_DOC_GRUPO = {
+  ordenFac: "asesor", preaprobado: "asesor", cedulaFrente: "asesor", cedulaReverso: "asesor", comprobante: "asesor",
+  facturaVenta: "contable", facturaGps: "contable", soat: "contable",
+};
+
+// Migración automática: cédula antigua (un solo archivo) → cédulaFrente
+function migrarCedula() {
+  try {
+    const docs = leerDocsVentas();
+    let cambios = 0;
+    for (const id of Object.keys(docs)) {
+      const a = docs[id].archivos;
+      if (a && a.cedula && !a.cedulaFrente) {
+        a.cedulaFrente = a.cedula;
+        delete a.cedula;
+        cambios++;
+      }
+    }
+    if (cambios > 0) {
+      guardarDocsVentas(docs);
+      console.log(`  Migración: ${cambios} cédulas reasignadas a cedulaFrente`);
+    }
+  } catch {}
+}
+migrarCedula();
+
+function leerDocsVentas() {
+  try { return JSON.parse(fs.readFileSync(DOCS_INDEX, "utf8")); } catch { return {}; }
+}
+function guardarDocsVentas(data) {
+  fs.writeFileSync(DOCS_INDEX, JSON.stringify(data, null, 2), "utf8");
+}
+function idVentaSafe(s) {
+  // Sanitiza para usar como nombre de carpeta
+  return String(s || "").replace(/[^a-zA-Z0-9_\-.]/g, "_").slice(0, 64);
+}
+
+// Multer: guarda en uploads/{idVenta}/{tipo}-{timestamp}.{ext}
+const storage = multer.diskStorage({
+  destination: (req, _file, cb) => {
+    const idVenta = idVentaSafe(req.body.idVenta || req.params.idVenta);
+    if (!idVenta) return cb(new Error("idVenta requerido"));
+    const dir = path.join(UPLOADS_DIR, idVenta);
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+    cb(null, dir);
+  },
+  filename: (req, file, cb) => {
+    const tipo = (req.body.tipo || "doc").replace(/[^a-zA-Z0-9]/g, "");
+    const ext = path.extname(file.originalname).toLowerCase() || ".bin";
+    cb(null, `${tipo}-${Date.now()}${ext}`);
+  },
+});
+const upload = multer({
+  storage,
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10 MB
+  fileFilter: (_req, file, cb) => {
+    const ok = /^(image\/(jpe?g|png|webp|heic)|application\/pdf)$/.test(file.mimetype);
+    cb(ok ? null : new Error("Solo se aceptan imágenes (JPG, PNG, WebP) o PDF"), ok);
+  },
+});
+
+// Subir 1 documento de una venta
+app.post("/api/docs/upload", requireAuth, upload.single("archivo"), (req, res) => {
+  try {
+    const { idVenta: rawId, tipo, cliente, modelo } = req.body;
+    const idVenta = idVentaSafe(rawId);
+    if (!idVenta) return res.status(400).json({ ok: false, error: "Falta idVenta" });
+    if (!TIPOS_DOC.includes(tipo)) return res.status(400).json({ ok: false, error: "Tipo de doc inválido" });
+    if (!req.file) return res.status(400).json({ ok: false, error: "No se recibió archivo" });
+
+    const docs = leerDocsVentas();
+    if (!docs[idVenta]) docs[idVenta] = { cliente: cliente || "", modelo: modelo || "", archivos: {} };
+    // Si ya había uno del mismo tipo, lo borramos del disco antes de reemplazar
+    const previo = docs[idVenta].archivos[tipo];
+    if (previo?.path) {
+      try { fs.unlinkSync(path.join(UPLOADS_DIR, idVenta, previo.path)); } catch {}
+    }
+    docs[idVenta].archivos[tipo] = {
+      path: req.file.filename,
+      originalName: req.file.originalname,
+      size: req.file.size,
+      mimetype: req.file.mimetype,
+      subidoPor: req.session.userEmail,
+      subidoEn: new Date().toISOString(),
+    };
+    if (cliente && !docs[idVenta].cliente) docs[idVenta].cliente = cliente;
+    if (modelo && !docs[idVenta].modelo) docs[idVenta].modelo = modelo;
+    guardarDocsVentas(docs);
+
+    res.json({
+      ok: true,
+      idVenta,
+      tipo,
+      url: `/uploads/${idVenta}/${req.file.filename}`,
+      completo: TIPOS_DOC.every(t => docs[idVenta].archivos[t]),
+    });
+  } catch (e) {
+    res.status(500).json({ ok: false, error: e.message });
+  }
+});
+
+// Listar documentos: si query.todos=1 (solo admin) trae todos; sino, solo del usuario logueado
+app.get("/api/docs/lista", requireAuth, (req, res) => {
+  const docs = leerDocsVentas();
+  const usuario = buscarUsuario(req.session.userEmail);
+  // El rol "contable" SIEMPRE ve todos los docs (no es opcional para ellos)
+  const verTodos = (req.query.todos === "1" && usuario?.rol === "admin") || usuario?.rol === "contable";
+  const out = {};
+  for (const [id, info] of Object.entries(docs)) {
+    if (!verTodos) {
+      // Filtrar: el usuario logueado debe haber subido algún archivo
+      const fueElUsuario = Object.values(info.archivos || {}).some(a => a.subidoPor === usuario.email);
+      if (!fueElUsuario) continue;
+    }
+    out[id] = info;
+  }
+  res.json({ ok: true, docs: out, tipos: TIPOS_DOC, tiposNombre: TIPOS_DOC_NOMBRE, tiposGrupo: TIPOS_DOC_GRUPO });
+});
+
+// Borrar un documento específico
+app.delete("/api/docs/:idVenta/:tipo", requireAuth, (req, res) => {
+  const idVenta = idVentaSafe(req.params.idVenta);
+  const { tipo } = req.params;
+  if (!TIPOS_DOC.includes(tipo)) return res.status(400).json({ ok: false, error: "Tipo inválido" });
+  const docs = leerDocsVentas();
+  const info = docs[idVenta];
+  if (!info?.archivos[tipo]) return res.status(404).json({ ok: false, error: "No existe" });
+
+  // Solo el que subió el doc o un admin puede borrarlo
+  const usuario = buscarUsuario(req.session.userEmail);
+  if (info.archivos[tipo].subidoPor !== usuario.email && usuario.rol !== "admin") {
+    return res.status(403).json({ ok: false, error: "Sin permiso" });
+  }
+  try { fs.unlinkSync(path.join(UPLOADS_DIR, idVenta, info.archivos[tipo].path)); } catch {}
+  delete info.archivos[tipo];
+  if (Object.keys(info.archivos).length === 0) delete docs[idVenta];
+  guardarDocsVentas(docs);
+  res.json({ ok: true });
+});
+
+// Servir archivos subidos (requiere auth)
+app.get("/uploads/:idVenta/:archivo", requireAuth, (req, res) => {
+  const file = path.join(UPLOADS_DIR, idVentaSafe(req.params.idVenta), req.params.archivo);
+  if (!fs.existsSync(file)) return res.status(404).send("No encontrado");
+  res.sendFile(file);
+});
+
+// ============================================================
+//      PREASIGNACIONES (chasis específico → cliente + crédito)
+// ============================================================
+const PREASIG_PATH = path.join(DATA_DIR, "preasignaciones.json");
+
+function leerPreasig() {
+  try { return JSON.parse(fs.readFileSync(PREASIG_PATH, "utf8")); } catch { return {}; }
+}
+function guardarPreasig(data) {
+  fs.writeFileSync(PREASIG_PATH, JSON.stringify(data, null, 2), "utf8");
+}
+
+app.get("/api/preasignaciones/lista", requireAuth, (req, res) => {
+  const usuario = buscarUsuario(req.session.userEmail);
+  // Contable y admin ven todas; asesor solo lo suyo
+  const verTodos = usuario?.rol === "contable" || (req.query.todos === "1" && usuario?.rol === "admin");
+  const todas = leerPreasig();
+  const out = {};
+  for (const [id, p] of Object.entries(todas)) {
+    if (verTodos || p.asesorEmail === usuario.email) out[id] = p;
+  }
+  res.json({ ok: true, preasignaciones: out });
+});
+
+app.post("/api/preasignaciones/crear", requireAuth, (req, res) => {
+  const usuario = buscarUsuario(req.session.userEmail);
+  const b = req.body || {};
+  if (!b.chasis) return res.status(400).json({ ok: false, error: "Chasis es obligatorio" });
+  if (!b.nombreCliente) return res.status(400).json({ ok: false, error: "Nombre del cliente es obligatorio" });
+
+  const todas = leerPreasig();
+  const id = String(b.chasis).trim().toUpperCase();
+  todas[id] = {
+    chasis: id,
+    motor: String(b.motor || "").trim(),
+    marca: String(b.marca || "").trim().toUpperCase(),
+    modelo: String(b.modelo || "").trim().toUpperCase(),
+    color: String(b.color || "").trim(),
+    nombreCliente: String(b.nombreCliente || "").trim().toUpperCase(),
+    cedulaCliente: String(b.cedulaCliente || "").trim(),
+    fechaNacimiento: String(b.fechaNacimiento || "").trim(),
+    celular: String(b.celular || "").trim(),
+    numCredito: String(b.numCredito || "").trim(),
+    financiera: String(b.financiera || "").trim().toUpperCase(),
+    gps: String(b.gps || "sin").trim(),  // "instalar" | "activar" | "sin"
+    placa: String(b.placa || "").trim().toUpperCase(),
+    estado: "preasignada",  // preasignada | en_taller | entregada
+    asesorEmail: usuario.email,
+    asesorNombre: usuario.nombre,
+    creadoEn: todas[id]?.creadoEn || new Date().toISOString(),
+    actualizadoEn: new Date().toISOString(),
+  };
+  guardarPreasig(todas);
+  res.json({ ok: true, preasignacion: todas[id] });
+});
+
+app.patch("/api/preasignaciones/:chasis", requireAuth, (req, res) => {
+  const chasis = String(req.params.chasis).toUpperCase();
+  const todas = leerPreasig();
+  if (!todas[chasis]) return res.status(404).json({ ok: false, error: "No existe" });
+  const usuario = buscarUsuario(req.session.userEmail);
+  if (todas[chasis].asesorEmail !== usuario.email && usuario.rol !== "admin") {
+    return res.status(403).json({ ok: false, error: "Sin permiso" });
+  }
+  // Solo permite actualizar ciertos campos
+  const camposPermitidos = ["estado", "gps", "placa", "numCredito", "financiera", "celular", "fechaNacimiento"];
+  for (const c of camposPermitidos) {
+    if (req.body[c] !== undefined) todas[chasis][c] = String(req.body[c]).trim();
+  }
+  todas[chasis].actualizadoEn = new Date().toISOString();
+  guardarPreasig(todas);
+  res.json({ ok: true, preasignacion: todas[chasis] });
+});
+
+app.delete("/api/preasignaciones/:chasis", requireAuth, (req, res) => {
+  const chasis = String(req.params.chasis).toUpperCase();
+  const todas = leerPreasig();
+  if (!todas[chasis]) return res.status(404).json({ ok: false, error: "No existe" });
+  const usuario = buscarUsuario(req.session.userEmail);
+  if (todas[chasis].asesorEmail !== usuario.email && usuario.rol !== "admin") {
+    return res.status(403).json({ ok: false, error: "Sin permiso" });
+  }
+  delete todas[chasis];
+  guardarPreasig(todas);
+  res.json({ ok: true });
+});
+
+// ============================================================
+//      PRECIOS — actualización via PDF (solo admin)
+// ============================================================
+const PDFS_PRECIOS_DIR = path.join(DATA_DIR, "uploads-precios");
+if (!fs.existsSync(PDFS_PRECIOS_DIR)) fs.mkdirSync(PDFS_PRECIOS_DIR, { recursive: true });
+
+const uploadPrecios = multer({
+  storage: multer.diskStorage({
+    destination: (_req, _file, cb) => cb(null, PDFS_PRECIOS_DIR),
+    filename: (_req, file, cb) => {
+      const ext = path.extname(file.originalname).toLowerCase() || ".pdf";
+      cb(null, `precios-${Date.now()}${ext}`);
+    },
+  }),
+  limits: { fileSize: 20 * 1024 * 1024 },  // 20 MB
+  fileFilter: (_req, file, cb) => cb(file.mimetype === "application/pdf" ? null : new Error("Solo PDF"), file.mimetype === "application/pdf"),
+});
+
+app.post("/api/precios/upload", requireAuth, requireAdmin, uploadPrecios.single("archivo"), (req, res) => {
+  if (!req.file) return res.status(400).json({ ok: false, error: "Falta archivo PDF" });
+  const meta = {
+    archivo: req.file.filename,
+    originalName: req.file.originalname,
+    size: req.file.size,
+    subidoPor: req.session.userEmail,
+    subidoEn: new Date().toISOString(),
+    notas: String(req.body.notas || "").trim(),
+  };
+  // Guardar en historial
+  const histPath = path.join(DATA_DIR, "precios-historial.json");
+  let hist = [];
+  try { hist = JSON.parse(fs.readFileSync(histPath, "utf8")); } catch {}
+  hist.unshift(meta);  // más reciente primero
+  fs.writeFileSync(histPath, JSON.stringify(hist, null, 2), "utf8");
+  res.json({ ok: true, ...meta, url: `/precios/${req.file.filename}` });
+});
+
+app.get("/api/precios/historial", requireAuth, (req, res) => {
+  const histPath = path.join(DATA_DIR, "precios-historial.json");
+  let hist = [];
+  try { hist = JSON.parse(fs.readFileSync(histPath, "utf8")); } catch {}
+  res.json({ ok: true, historial: hist });
+});
+
+app.get("/precios/:archivo", requireAuth, (req, res) => {
+  const file = path.join(PDFS_PRECIOS_DIR, req.params.archivo);
+  if (!fs.existsSync(file)) return res.status(404).send("No encontrado");
+  res.sendFile(file);
+});
+
+// ============================================================
+//      LEADS REGISTRADOS (lista de los clientes ingresados)
+// ============================================================
+app.get("/api/leads/lista", requireAuth, (req, res) => {
+  const usuario = buscarUsuario(req.session.userEmail);
+  if (!fs.existsSync(LOG_PATH)) return res.json({ ok: true, leads: [] });
+
+  const lineas = fs.readFileSync(LOG_PATH, "utf8").split("\n").filter(Boolean);
+  const leads = [];
+  for (const linea of lineas) {
+    try {
+      const r = JSON.parse(linea);
+      // Cada usuario ve solo sus registros, salvo admin/contable que ven todo
+      if (usuario.rol !== "admin" && usuario.rol !== "contable") {
+        if (r.usuario !== usuario.email) continue;
+      }
+      const p = r.payload || {};
+      leads.push({
+        ts: r.ts,
+        enviadoAImpulsa: !!r.enviadoAImpulsa,
+        statusImpulsa: r.status || null,
+        idImpulsa: r.respuesta?.idRegistro || null,
+        ambiente: r.ambiente || null,
+        usuario: r.usuario || "",
+        usuarioNombre: r.usuario ? buscarUsuario(r.usuario)?.nombre || r.usuario.split("@")[0] : "",
+        cliente: p.NombreContacto || "",
+        documento: p.Documento || "",
+        tipoDocumento: p.TipoDocumento || "",
+        celular: p.Telefono2 || "",
+        email: p.Email || "",
+        marca: p.Productos?.[0]?.Marca || "",
+        modelo: p.Productos?.[0]?.Producto || "",
+        observaciones: p.Observaciones || "",
+        origen: p.Origen || "",
+        campanna: p.Campanna || "",
+      });
+    } catch {}
+  }
+  // Más recientes primero
+  leads.sort((a, b) => (b.ts || "").localeCompare(a.ts || ""));
+  res.json({ ok: true, leads });
+});
+
+// --- Comisiones pagadas (solo admin) ---
+const COMISIONES_PATH = path.join(DATA_DIR, "comisiones-pagadas.json");
+function leerComisionesPagadas() {
+  try {
+    const raw = fs.readFileSync(COMISIONES_PATH, "utf8");
+    return JSON.parse(raw);
+  } catch {
+    return {}; // { "<chasis_o_id>": { pagada: true, fechaPago: "ISO", marcadoPor: "email" } }
+  }
+}
+function guardarComisionesPagadas(data) {
+  fs.writeFileSync(COMISIONES_PATH, JSON.stringify(data, null, 2), "utf8");
+}
+
+app.get("/api/comisiones/pagadas", requireAuth, requireAdmin, (req, res) => {
+  res.json({ ok: true, comisiones: leerComisionesPagadas() });
+});
+
+app.post("/api/comisiones/marcar", requireAuth, requireAdmin, (req, res) => {
+  const { id, pagada } = req.body || {};
+  if (!id) return res.status(400).json({ ok: false, error: "Falta id de la venta" });
+  const data = leerComisionesPagadas();
+  if (pagada) {
+    data[String(id)] = {
+      pagada: true,
+      fechaPago: new Date().toISOString(),
+      marcadoPor: req.session.userEmail,
+    };
+  } else {
+    delete data[String(id)];
+  }
+  guardarComisionesPagadas(data);
+  res.json({ ok: true, id, pagada: !!pagada });
+});
+
+// --- Endpoints de gestión de usuarios (solo admin) ---
+app.get("/api/usuarios", requireAuth, requireAdmin, (req, res) => {
+  const usuarios = leerUsuarios().map(u => ({
+    email: u.email,
+    nombre: u.nombre,
+    apellido: u.apellido,
+    rol: u.rol,
+    debeChangePass: !!u.debeChangePass,
+    creadoEn: u.creadoEn,
+  }));
+  res.json({ ok: true, usuarios });
+});
+
+// --- Log de ventas registradas ---
+const LOG_PATH = path.join(DATA_DIR, "ventas-registradas.jsonl");
+function append(record) {
+  try {
+    fs.appendFileSync(LOG_PATH, JSON.stringify(record) + "\n", "utf8");
+  } catch (e) {
+    console.error("No se pudo escribir log:", e.message);
+  }
+}
+
+// --- Construcción de payload Impulsa ---
+function parseMonto(s) {
+  // Quita puntos/comas/$ y todo lo que no sea dígito antes de parsear
+  if (s === null || s === undefined || s === "") return 0;
+  const cleaned = String(s).replace(/[^0-9]/g, "");
+  return cleaned ? parseInt(cleaned, 10) : 0;
+}
+function fmtCOP(n) {
+  const v = parseMonto(n);
+  if (!v) return null;
+  return "$" + v.toLocaleString("es-CO");
+}
+
+function construirObservaciones(form, usuario) {
+  const partes = [];
+  const formaPago = String(form.FormaPago || "").trim();
+  const financiera = String(form.Financiera || "").trim();
+  const precioMoto = fmtCOP(form.PrecioMoto);
+  const valorPapeles = fmtCOP(form.ValorPapeles);
+  const total = parseMonto(form.PrecioMoto) + parseMonto(form.ValorPapeles);
+  const totalFmt = fmtCOP(total);
+  const libres = String(form.Observaciones || "").trim();
+
+  if (formaPago) {
+    partes.push(financiera
+      ? `Pago: ${formaPago.toUpperCase()} (${financiera.toUpperCase()})`
+      : `Pago: ${formaPago.toUpperCase()}`);
+  }
+  if (precioMoto) partes.push(`Precio moto: ${precioMoto}`);
+  if (valorPapeles) partes.push(`Papeles: ${valorPapeles}`);
+  if (totalFmt && total > 0) partes.push(`Total: ${totalFmt}`);
+  if (usuario) partes.push(`Registró: ${usuario.nombre}`);
+
+  let resumen = partes.join(" | ");
+  if (libres) resumen += (resumen ? "\n" : "") + libres;
+  return resumen;
+}
+
+function construirPayload(form, usuario) {
+  const ts = Date.now();
+  const habeas = form.HabeasData === true || form.HabeasData === "on" || form.HabeasData === "true";
+  // Defaults por usuario: si no manda Origen/Campanna explícitos, usar nombre del logueado
+  const origen = (form.Origen || `Venta ${usuario.nombre}`).slice(0, 50);
+  const campanna = (form.Campanna || `Venta ${usuario.nombre}`).slice(0, 50);
+  return {
+    ID: 0,
+    IDOportunidadAuteco: `${usuario.nombre.replace(/\s+/g, "")}-${ts}`,
+    Origen: origen,
+    Campanna: campanna,
+    Establecimiento: String(ESTABLECIMIENTO),
+    TipoDocumento: form.TipoDocumento || "CC",
+    Documento: String(form.Documento || "").trim(),
+    NombreContacto: String(form.NombreContacto || "").trim().toUpperCase(),
+    Email: String(form.Email || "").trim(),
+    Telefono2: String(form.Telefono2 || "").trim(),
+    CodigoDANE: form.CodigoDANE || CODIGO_DANE,
+    Direccion: String(form.Direccion || "").trim().toUpperCase(),
+    Productos: [
+      { Producto: String(form.Producto || "").trim(), Marca: String(form.Marca || "").trim() },
+    ],
+    Observaciones: construirObservaciones(form, usuario),
+    HabeasData: !!habeas,
+    Sistema: "",
+    NivelInteres: form.NivelInteres || "AA",
+    Usuario: usuario.email.split("@")[0],
+  };
+}
+
+function validar(payload) {
+  const faltan = [];
+  if (!payload.NombreContacto) faltan.push("Nombre");
+  if (!payload.Documento) faltan.push("Documento");
+  if (!payload.Email) faltan.push("Correo");
+  if (!payload.Productos[0].Producto) faltan.push("Modelo de moto");
+  if (!payload.HabeasData) faltan.push("Autorización habeas data");
+  return faltan;
+}
+
+app.post("/api/registrar-venta", requireAuth, async (req, res) => {
+  const usuarioLogueado = buscarUsuario(req.session.userEmail);
+  if (!usuarioLogueado) return res.status(401).json({ ok: false, error: "Sesión inválida" });
+
+  const payload = construirPayload(req.body || {}, usuarioLogueado);
+  const faltan = validar(payload);
+  if (faltan.length) {
+    return res.status(400).json({
+      ok: false,
+      error: `Faltan campos obligatorios: ${faltan.join(", ")}`,
+      payload,
+    });
+  }
+  if (!IMPULSA_API_KEY) {
+    append({ ts: new Date().toISOString(), enviadoAImpulsa: false, motivo: "API_KEY ausente", usuario: usuarioLogueado.email, payload });
+    return res.status(500).json({
+      ok: false,
+      error: "IMPULSA_API_KEY no configurada en .env",
+      payload,
+    });
+  }
+  try {
+    const r = await fetch(`${IMPULSA_BASE_URL}/oportunidades/Crear`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${IMPULSA_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+    let data = null;
+    try { data = await r.json(); } catch { data = { Exitoso: r.ok }; }
+    append({
+      ts: new Date().toISOString(),
+      enviadoAImpulsa: r.ok,
+      status: r.status,
+      ambiente: IMPULSA_ENV,
+      usuario: usuarioLogueado.email,
+      payload,
+      respuesta: data,
+    });
+    return res.status(r.ok ? 200 : r.status).json({
+      ok: r.ok,
+      status: r.status,
+      ambiente: IMPULSA_ENV,
+      impulsa: data,
+      payload,
+    });
+  } catch (e) {
+    append({ ts: new Date().toISOString(), enviadoAImpulsa: false, motivo: e.message, usuario: usuarioLogueado.email, payload });
+    return res.status(500).json({
+      ok: false,
+      error: `Error de red: ${e.message}`,
+      payload,
+    });
+  }
+});
+
+// --- Health (público, útil para diagnóstico) ---
+app.get("/api/health", (req, res) => {
+  res.json({
+    ok: true,
+    ambiente: IMPULSA_ENV,
+    baseUrl: IMPULSA_BASE_URL,
+    establecimiento: ESTABLECIMIENTO,
+    usuarioImpulsa: USUARIO_TRAZABILIDAD,
+    apiKeyConfigurada: !!IMPULSA_API_KEY,
+    apiKeyLongitud: IMPULSA_API_KEY.length,
+    totalUsuarios: leerUsuarios().length,
+    sesionActiva: !!(req.session && req.session.userEmail),
+  });
+});
+
+// --- Static files con control de auth ---
+// El login es público. Todo lo demás requiere sesión.
+app.get("/login.html", (req, res, next) => {
+  if (req.session && req.session.userEmail) return res.redirect("/");
+  next();
+});
+
+// Servir archivos públicos sin restricción (login, manifest PWA, íconos, service worker)
+const PUBLIC_FILES = [
+  "/login.html", "/logo.png", "/styles.css",
+  "/manifest.webmanifest", "/service-worker.js",
+  "/icon-192.png", "/icon-512.png", "/icon-512-maskable.png",
+];
+app.get(PUBLIC_FILES, (req, res) => {
+  const file = req.path.replace(/^\//, "");
+  res.sendFile(path.join(__dirname, file));
+});
+
+// Todo lo demás (incluyendo /) requiere sesión
+app.use(requireAuth);
+app.use(express.static(__dirname));
+
+// --- Arranque ---
+app.listen(PORT, HOST, () => {
+  const usuarios = leerUsuarios();
+  console.log("");
+  console.log("==================================================================");
+  console.log("  Yeimy Comercial — servidor multi-usuario iniciado");
+  console.log("==================================================================");
+  console.log(`  Acceso local:        http://localhost:${PORT}`);
+  if (HOST === "0.0.0.0") {
+    // Mostrar IPs locales para acceso desde otros dispositivos
+    const nets = require("os").networkInterfaces();
+    const ips = [];
+    for (const name of Object.keys(nets)) {
+      for (const net of nets[name]) {
+        if (net.family === "IPv4" && !net.internal) ips.push(net.address);
+      }
+    }
+    if (ips.length) {
+      console.log("  Acceso por WiFi:");
+      ips.forEach(ip => console.log(`     http://${ip}:${PORT}`));
+      console.log("     (los asesores entran a una de estas URLs desde sus dispositivos)");
+    }
+  }
+  console.log(`  Ambiente Impulsa:    ${IMPULSA_ENV.toUpperCase()}`);
+  console.log(`  Establecimiento:     ${ESTABLECIMIENTO}`);
+  console.log(`  Usuarios cargados:   ${usuarios.length}`);
+  usuarios.forEach(u => console.log(`     - ${u.email.padEnd(40)} [${u.rol}]`));
+  if (!IMPULSA_API_KEY) {
+    console.log("");
+    console.log("  ATENCION: IMPULSA_API_KEY no está configurada en .env");
+  } else {
+    console.log(`  API Key Impulsa:     configurada (${IMPULSA_API_KEY.length} caracteres)`);
+  }
+  console.log("");
+  console.log("  Para detener: presiona Ctrl+C");
+  console.log("==================================================================");
+  console.log("");
+});

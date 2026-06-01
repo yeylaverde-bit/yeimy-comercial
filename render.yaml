@@ -1,0 +1,42 @@
+# Configuración como código para Render — opcional pero útil.
+# Con este archivo, en lugar de configurar el Web Service desde el panel,
+# Render lo lee automáticamente.
+services:
+  - type: web
+    name: yeimy-comercial
+    runtime: node
+    region: ohio        # más cerca de Colombia que oregon
+    plan: starter       # $7/mes — siempre activo, sin cold starts
+    buildCommand: npm install
+    startCommand: npm start
+    autoDeploy: true
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: HOST
+        value: 0.0.0.0
+      - key: DATA_DIR
+        value: /data
+      # Las variables sensibles se setean en el panel (Settings → Environment),
+      # NO en este archivo (este sí se sube al repo).
+      - key: SESSION_SECRET
+        sync: false
+      - key: IMPULSA_API_KEY
+        sync: false
+      - key: IMPULSA_ENV
+        value: prod
+      - key: IMPULSA_ESTABLECIMIENTO
+        value: "550026948"
+      - key: IMPULSA_USUARIO
+        value: yeimi
+      - key: IMPULSA_CODIGO_DANE
+        value: "05001"
+      - key: IMPULSA_ORIGEN
+        value: Venta Yeimy
+      - key: IMPULSA_CAMPANNA
+        value: Venta directa redes Yeimy
+    disk:
+      name: yeimy-data
+      mountPath: /data
+      sizeGB: 1

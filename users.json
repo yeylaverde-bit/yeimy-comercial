@@ -1,0 +1,71 @@
+{
+  "usuarios": [
+    {
+      "email": "yeimy@yeimylaverde.com",
+      "nombre": "YEIMI",
+      "apellido": "Laverde",
+      "rol": "admin",
+      "passwordHash": "$2a$10$pzhz1jwG2W3k4I0eauA.GOw0z5QNFNnU/KlLb1DEKscJ.oJpSbgsm",
+      "debeChangePass": false,
+      "creadoEn": "2026-05-29T01:08:37.717Z",
+      "passwordCambiadaEn": "2026-06-01T17:56:40.604Z"
+    },
+    {
+      "email": "lpcipuc@gmail.com",
+      "nombre": "JUAN PABLO",
+      "apellido": "",
+      "rol": "asesor",
+      "passwordHash": "$2a$10$BaXUC9uCqaCmp8GSBTQ6ZePq2qUpV7TNP0UtHLDqblavsLCqv/y16",
+      "debeChangePass": false,
+      "creadoEn": "2026-05-29T01:08:37.810Z",
+      "passwordCambiadaEn": "2026-06-01T17:35:17.907Z"
+    },
+    {
+      "email": "serviautecmotos101@gmail.com",
+      "nombre": "ALEJANDRA",
+      "apellido": "",
+      "rol": "asesor",
+      "passwordHash": "$2a$10$ulL2cY.Ujb3je9hHrq4Ke.hXYD8ao/2BicQ4RAfiR.US40w3vBmbC",
+      "debeChangePass": true,
+      "creadoEn": "2026-05-29T01:08:37.915Z"
+    },
+    {
+      "email": "serviautecmotos104@gmail.com",
+      "nombre": "NATHALIA",
+      "apellido": "",
+      "rol": "asesor",
+      "passwordHash": "$2a$10$a9Cixcw9KAcA404uma3CWudpnDHaOZuGgpYdOYBGbnHs8y/pyYOMO",
+      "debeChangePass": true,
+      "creadoEn": "2026-06-01T16:20:59.673Z"
+    },
+    {
+      "email": "serviautecmotos111@gmail.com",
+      "nombre": "LORENA",
+      "apellido": "",
+      "rol": "asesor",
+      "passwordHash": "$2a$10$.xmK1rNyq0nzOKKG/g9kXOe2rglxiKzgbVzgGciXjSjKi9vEIKJ0S",
+      "debeChangePass": false,
+      "creadoEn": "2026-06-01T16:20:59.729Z",
+      "passwordCambiadaEn": "2026-06-01T21:10:01.036Z"
+    },
+    {
+      "email": "asesorexterno105@gmail.com",
+      "nombre": "MIGUEL",
+      "apellido": "",
+      "rol": "asesor",
+      "passwordHash": "$2a$10$F71Sa0fR3reMTXwz/yKA7.NwjO8wBP2BEfgY3cxDJoeh3UCmjMV4a",
+      "debeChangePass": true,
+      "creadoEn": "2026-06-01T16:29:51.137Z"
+    },
+    {
+      "email": "serviautecconcesionario@gmail.com",
+      "nombre": "CONTABILIDAD",
+      "apellido": "Serviautec",
+      "rol": "contable",
+      "passwordHash": "$2a$10$ehfv/uM37rmsYA1HmvEX/OfWvbGLNQAlw5g33E1zsiV3euhZZ/WnW",
+      "debeChangePass": false,
+      "creadoEn": "2026-06-01T20:56:59.983Z",
+      "passwordCambiadaEn": "2026-06-01T21:03:11.813Z"
+    }
+  ]
+}
