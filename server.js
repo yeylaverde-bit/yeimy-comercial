@@ -21,6 +21,7 @@ const path = require("path");
 const fs = require("fs");
 const Anthropic = require("@anthropic-ai/sdk");
 require("dotenv").config({ path: path.join(__dirname, ".env") });
+const siigo = require("./siigo");
 
 const app = express();
 const PORT = Number(process.env.PORT) || 3000;
@@ -920,6 +921,34 @@ app.post("/api/registrar-venta", requireAuth, async (req, res) => {
   }
 });
 
+// --- Siigo: leer inventario de productos ---
+// Cualquier usuario autenticado puede consultar el inventario combinado.
+let siigoCache = { data: null, fetchedAt: 0 };
+const SIIGO_CACHE_MS = 5 * 60 * 1000; // 5 min — evita martillar la API
+
+app.get("/api/siigo/productos", requireAuth, async (req, res) => {
+  if (!siigo.siigoConfigurado()) {
+    return res.status(503).json({
+      ok: false,
+      error: "Siigo no configurado (faltan SIIGO_USERNAME / SIIGO_ACCESS_KEY)",
+    });
+  }
+  try {
+    const force = req.query.refresh === "1";
+    const now = Date.now();
+    if (!force && siigoCache.data && (now - siigoCache.fetchedAt) < SIIGO_CACHE_MS) {
+      return res.json({ ok: true, fuente: "cache", productos: siigoCache.data });
+    }
+    const crudos = await siigo.obtenerProductos();
+    const productos = crudos.map(siigo.normalizarProducto);
+    siigoCache = { data: productos, fetchedAt: now };
+    res.json({ ok: true, fuente: "siigo", total: productos.length, productos });
+  } catch (e) {
+    console.error("[siigo] error:", e.message);
+    res.status(500).json({ ok: false, error: e.message });
+  }
+});
+
 // --- Health (público, útil para diagnóstico) ---
 app.get("/api/health", (req, res) => {
   res.json({
@@ -932,6 +961,7 @@ app.get("/api/health", (req, res) => {
     apiKeyLongitud: IMPULSA_API_KEY.length,
     totalUsuarios: leerUsuarios().length,
     sesionActiva: !!(req.session && req.session.userEmail),
+    siigoConfigurado: siigo.siigoConfigurado(),
   });
 });
 
