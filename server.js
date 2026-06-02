@@ -206,9 +206,9 @@ const UPLOADS_DIR = path.join(DATA_DIR, "uploads");
 const DOCS_INDEX = path.join(DATA_DIR, "docs-ventas.json");
 if (!fs.existsSync(UPLOADS_DIR)) fs.mkdirSync(UPLOADS_DIR, { recursive: true });
 
-// Documentos por venta. Los primeros 5 los sube el ASESOR, los últimos 3 los sube CONTABILIDAD.
+// Documentos por venta. Los primeros 6 los sube el ASESOR, los últimos 3 los sube CONTABILIDAD.
 const TIPOS_DOC = [
-  "ordenFac", "preaprobado", "cedulaFrente", "cedulaReverso", "comprobante",
+  "ordenFac", "preaprobado", "cedulaFrente", "cedulaReverso", "comprobante", "empadronamiento",
   "facturaVenta", "facturaGps", "soat",
 ];
 const TIPOS_DOC_NOMBRE = {
@@ -217,13 +217,15 @@ const TIPOS_DOC_NOMBRE = {
   cedulaFrente: "Cédula (frente)",
   cedulaReverso: "Cédula (reverso)",
   comprobante: "Comprobante de pago",
+  empadronamiento: "Empadronamiento",
   facturaVenta: "Factura de venta",
   facturaGps: "Factura GPS",
   soat: "SOAT",
 };
 // Para saber a qué grupo pertenece cada tipo (sólo presentación)
 const TIPOS_DOC_GRUPO = {
-  ordenFac: "asesor", preaprobado: "asesor", cedulaFrente: "asesor", cedulaReverso: "asesor", comprobante: "asesor",
+  ordenFac: "asesor", preaprobado: "asesor", cedulaFrente: "asesor",
+  cedulaReverso: "asesor", comprobante: "asesor", empadronamiento: "asesor",
   facturaVenta: "contable", facturaGps: "contable", soat: "contable",
 };
 

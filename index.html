@@ -58,6 +58,7 @@
         <a href="#misleads" data-role-only="admin asesor contable">📋 Mis registros del mes</a>
         <a href="#preasignacion" data-role-only="admin asesor">🔧 Preasignación</a>
         <a href="#ordenfac">📑 Orden facturación</a>
+        <a href="#soat" data-role-only="admin contable">🛡️ Crear SOAT</a>
         <a href="#taller" data-role-only="admin asesor">🛠️ Taller</a>
       </nav>
     </div>
@@ -628,6 +629,7 @@
             <button class="btn-quickup" data-quick-tipo="cedulaFrente">🆔 Cédula<br><strong>FRENTE</strong></button>
             <button class="btn-quickup" data-quick-tipo="cedulaReverso">🆔 Cédula<br><strong>REVERSO</strong></button>
             <button class="btn-quickup" data-quick-tipo="comprobante">💰 Comprobante<br>de pago</button>
+            <button class="btn-quickup" data-quick-tipo="empadronamiento">📋 Empadronamiento<br>(datos moto)</button>
           </div>
         </div>
         <div data-role-only="admin contable" style="margin-top:14px">
@@ -716,6 +718,22 @@
         </div>
       </div>
     </div>
+
+    <section id="soat" class="card" data-role-only="admin contable">
+      <div class="card-head">
+        <h2>🛡️ Crear SOAT · pendientes</h2>
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+          <span class="badge" id="soatCount">0</span>
+          <div class="search-wrap">
+            <input id="soatSearch" placeholder="Buscar cliente, placa, cédula..." />
+          </div>
+        </div>
+      </div>
+      <p class="muted" style="margin:-4px 0 12px;font-size:12.5px">
+        Motos con <strong>empadronamiento subido</strong> y <strong>SOAT pendiente</strong>. Copia los datos del cliente y descarga el empadronamiento para generar el SOAT en tu sistema. Cuando lo tengas, súbelo abajo.
+      </p>
+      <div id="soatLista" style="display:grid;gap:14px"></div>
+    </section>
 
     <section id="taller" class="card" data-role-only="admin asesor">
       <div class="card-head">

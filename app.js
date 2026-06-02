@@ -1245,6 +1245,7 @@ async function loadLeads() {
       // Re-render Orden Facturación si ya tiene docs cargados: ahora puede cruzar cliente+asesor
       if (docState.docs && Object.keys(docState.docs).length) {
         try { renderDocs(); } catch {}
+        try { renderSoatPendientes(); } catch {}
       }
     }
   } catch (e) { console.error("Error loadLeads:", e); }
@@ -1472,9 +1473,10 @@ async function loadPreasignaciones() {
       preasigState.preasignaciones = data.preasignaciones || {};
       renderPreasignaciones();
       renderTaller();  // taller depende de preasignaciones
-      // Re-render Orden Facturación: ahora puede cruzar info de preasignaciones
+      // Re-render Orden Facturación + SOAT: cruza info de preasignaciones
       if (docState.docs && Object.keys(docState.docs).length) {
         try { renderDocs(); } catch {}
+        try { renderSoatPendientes(); } catch {}
       }
     }
   } catch (e) { console.error("Error loadPreasignaciones:", e); }
@@ -1698,6 +1700,144 @@ const tallerVerTodos = document.getElementById("tallerVerTodos");
 if (tallerVerTodos) tallerVerTodos.addEventListener("change", e => { preasigState.verTodos = e.target.checked; loadPreasignaciones(); });
 
 // ============================================================
+//          SOAT — pendientes de crear (vista contabilidad)
+// ============================================================
+const soatState = { search: "" };
+
+function renderSoatPendientes() {
+  const wrap = document.getElementById("soatLista");
+  const countEl = document.getElementById("soatCount");
+  if (!wrap || !countEl) return;
+
+  // Lista de ventas que tienen empadronamiento subido PERO no SOAT subido todavía
+  const candidatas = Object.entries(docState.docs || {}).filter(([id, info]) => {
+    const tieneEmp = !!info.archivos?.empadronamiento;
+    const tieneSoat = !!info.archivos?.soat;
+    return tieneEmp && !tieneSoat;
+  });
+
+  // Filtro de búsqueda
+  const q = (soatState.search || "").toLowerCase().trim();
+  const filtradas = candidatas.filter(([id, info]) => {
+    if (!q) return true;
+    const ctx = resolverContextoVenta(id, info);
+    return [id, ctx.cliente, ctx.documento, ctx.modelo,
+            preasigState.preasignaciones[id]?.placa || ""]
+      .some(v => String(v || "").toLowerCase().includes(q));
+  });
+
+  countEl.textContent = fmtNum.format(filtradas.length);
+
+  if (filtradas.length === 0) {
+    wrap.innerHTML = `<div style="text-align:center;color:var(--muted);padding:30px;border:1px dashed var(--line);border-radius:12px">
+      ${candidatas.length === 0
+        ? "Sin SOATs pendientes. Cuando un asesor suba el <strong>empadronamiento</strong> de una moto, aparecerá aquí lista para que crees el SOAT."
+        : "Sin resultados para esa búsqueda."}
+    </div>`;
+    return;
+  }
+
+  wrap.innerHTML = filtradas.map(([id, info]) => {
+    const ctx = resolverContextoVenta(id, info);
+    const p = preasigState.preasignaciones[id] || preasigState.preasignaciones[String(id).toUpperCase()];
+    const lead = ctx.lead || {};
+    const empArchivo = info.archivos.empadronamiento;
+    const fechaEmp = empArchivo?.subidoEn ? new Date(empArchivo.subidoEn).toLocaleDateString("es-CO") : "—";
+    const facturaArchivo = info.archivos?.facturaVenta;
+
+    return `<div class="card" style="border:1px solid var(--line);padding:16px;background:rgba(8,12,28,.5)">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:14px;flex-wrap:wrap;margin-bottom:14px">
+        <div>
+          <h3 style="margin:0 0 4px;font-size:16px">${escapeHtml(ctx.cliente || "(sin cliente)")} <code style="font-size:11px;color:var(--accent-2);font-weight:400;margin-left:6px">${escapeHtml(id)}</code></h3>
+          <p class="muted" style="margin:0;font-size:12.5px">${escapeHtml(ctx.modelo || "—")}${ctx.color ? ` · ${escapeHtml(ctx.color)}` : ""}</p>
+        </div>
+        <span class="tag tag-financiado">SOAT pendiente</span>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px 18px;font-size:13px;margin-bottom:14px">
+        <div>
+          <span class="muted" style="font-size:11px;text-transform:uppercase;letter-spacing:.04em">Placa</span><br>
+          <strong style="font-size:15px;color:var(--accent-2)">${escapeHtml(p?.placa || "—")}</strong>
+          ${p?.placa ? `<button class="btn-mini" data-copy="${escapeHtml(p.placa)}" title="Copiar">📋</button>` : ""}
+        </div>
+        <div>
+          <span class="muted" style="font-size:11px;text-transform:uppercase;letter-spacing:.04em">Cédula</span><br>
+          <strong>${escapeHtml(ctx.documento || "—")}</strong>
+          ${ctx.documento ? `<button class="btn-mini" data-copy="${escapeHtml(ctx.documento)}" title="Copiar">📋</button>` : ""}
+        </div>
+        <div>
+          <span class="muted" style="font-size:11px;text-transform:uppercase;letter-spacing:.04em">Correo</span><br>
+          <strong>${escapeHtml(lead.email || "—")}</strong>
+          ${lead.email ? `<button class="btn-mini" data-copy="${escapeHtml(lead.email)}" title="Copiar">📋</button>` : ""}
+        </div>
+        <div>
+          <span class="muted" style="font-size:11px;text-transform:uppercase;letter-spacing:.04em">Celular</span><br>
+          <strong>${escapeHtml(lead.celular || p?.celular || "—")}</strong>
+        </div>
+        <div>
+          <span class="muted" style="font-size:11px;text-transform:uppercase;letter-spacing:.04em">Chasis</span><br>
+          <code style="font-size:12px;color:var(--accent-2)">${escapeHtml(p?.chasis || ctx.lead?.chasis || id)}</code>
+        </div>
+        <div>
+          <span class="muted" style="font-size:11px;text-transform:uppercase;letter-spacing:.04em">Motor</span><br>
+          <code style="font-size:12px;color:var(--muted)">${escapeHtml(ctx.motor || "—")}</code>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+        <a class="btn-primary" href="/uploads/${encodeURIComponent(id)}/${encodeURIComponent(empArchivo.path)}" target="_blank" style="padding:8px 14px;font-size:13px;text-decoration:none">
+          📋 Ver empadronamiento <span class="muted" style="font-size:11px;font-weight:400">(${fechaEmp})</span>
+        </a>
+        ${facturaArchivo ? `<a class="btn-secondary" href="/uploads/${encodeURIComponent(id)}/${encodeURIComponent(facturaArchivo.path)}" target="_blank" style="padding:8px 14px;font-size:13px;text-decoration:none">
+          🧾 Ver factura
+        </a>` : ""}
+        <label class="btn-primary" style="padding:8px 14px;font-size:13px;cursor:pointer;background:#22c55e;border-color:#22c55e">
+          ✓ Subir SOAT generado
+          <input type="file" data-soat-upload data-id="${escapeHtml(id)}" accept="image/*,application/pdf" style="display:none" />
+        </label>
+      </div>
+    </div>`;
+  }).join("");
+
+  // Listeners de copy
+  wrap.querySelectorAll("[data-copy]").forEach(btn => {
+    btn.addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText(btn.dataset.copy);
+        showToast(`Copiado: ${btn.dataset.copy}`);
+      } catch { showToast("No se pudo copiar"); }
+    });
+  });
+
+  // Listeners de subida del SOAT
+  wrap.querySelectorAll("input[data-soat-upload]").forEach(inp => {
+    inp.addEventListener("change", async (ev) => {
+      const file = ev.target.files?.[0];
+      if (!file) return;
+      const id = inp.dataset.id;
+      const fd = new FormData();
+      fd.append("idVenta", id);
+      fd.append("tipo", "soat");
+      fd.append("archivo", file);
+      try {
+        const r = await fetch("/api/docs/upload", { method: "POST", body: fd });
+        const data = await r.json();
+        if (data.ok) {
+          showToast("✓ SOAT subido");
+          await loadDocs();
+          renderSoatPendientes();
+        } else {
+          showToast("Error: " + (data.error || "no se pudo subir"));
+        }
+      } catch (e) { showToast("Error: " + e.message); }
+    });
+  });
+}
+
+const soatSearchEl = document.getElementById("soatSearch");
+if (soatSearchEl) soatSearchEl.addEventListener("input", e => { soatState.search = e.target.value; renderSoatPendientes(); });
+
+// ============================================================
 //          FACTURA AUTECO — OCR con Claude Vision (solo admin)
 // ============================================================
 const formFactura = document.getElementById("formFactura");
@@ -1881,6 +2021,7 @@ async function loadDocs() {
       docState.tipos = data.tipos || [];
       docState.tiposNombre = data.tiposNombre || {};
       renderDocs();
+      try { renderSoatPendientes(); } catch {}
     }
   } catch (e) { console.error("Error cargando docs:", e); }
 }
