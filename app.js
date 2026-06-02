@@ -974,30 +974,7 @@ async function loadInventario() {
   if (warn) warn.style.display = "none";
   if (fuenteLabel) fuenteLabel.textContent = "cargando…";
 
-  // 1) Fuente primaria: Siigo
-  try {
-    const res = await fetch("/api/siigo/productos", { cache: "no-store" });
-    const data = await res.json();
-    if (data.ok && Array.isArray(data.productos)) {
-      invState.rows = data.productos
-        .map(normalizeSiigoMoto)
-        .filter(r => r.modelo)
-        .filter(r => r.stock > 0)
-        .sort((a, b) => a.modelo.localeCompare(b.modelo));
-      invState.fuente = `🧾 Siigo (${invState.rows.length} motos con stock · cache 5min)`;
-      if (fuenteLabel) fuenteLabel.textContent = invState.fuente;
-      renderInventario();
-      // Re-render Orden Facturación: ahora puede cruzar chasis → modelo/motor desde Siigo
-      if (docState.docs && Object.keys(docState.docs).length) {
-        try { renderDocs(); } catch {}
-      }
-      return;
-    }
-  } catch (e) {
-    console.warn("[inventario] Siigo falló, intento Sheet…", e.message);
-  }
-
-  // 2) Fallback: Google Sheets pestaña inventario
+  // 1) Fuente primaria: Google Sheets pestaña inventario (lo que mantiene el concesionario)
   try {
     const url = INV_CSV_URL + (INV_CSV_URL.includes("?") ? "&" : "?") + "t=" + Date.now();
     const res = await fetch(url, { cache: "no-store" });
@@ -1007,15 +984,40 @@ async function loadInventario() {
       .map(normalizeInvRow)
       .filter(r => r.modelo || r.marca)
       .filter(r => r.estado !== "VENDIDA");
-    invState.fuente = `📊 Google Sheets (Siigo no disponible)`;
+    invState.fuente = `📊 Google Sheets · ${invState.rows.length} motos disponibles`;
     if (fuenteLabel) fuenteLabel.textContent = invState.fuente;
     renderInventario();
+    // Re-render Orden Facturación: ahora puede cruzar chasis → modelo
+    if (docState.docs && Object.keys(docState.docs).length) {
+      try { renderDocs(); } catch {}
+    }
+    return;
+  } catch (e) {
+    console.warn("[inventario] Sheets falló, intento Siigo como fallback…", e.message);
+  }
+
+  // 2) Fallback: Siigo (si el Sheet no responde)
+  try {
+    const res = await fetch("/api/siigo/productos", { cache: "no-store" });
+    const data = await res.json();
+    if (data.ok && Array.isArray(data.productos)) {
+      invState.rows = data.productos
+        .map(normalizeSiigoMoto)
+        .filter(r => r.modelo)
+        .filter(r => r.stock > 0)
+        .sort((a, b) => a.modelo.localeCompare(b.modelo));
+      invState.fuente = `🧾 Siigo · ${invState.rows.length} motos (fallback, Sheets no disponible)`;
+      if (fuenteLabel) fuenteLabel.textContent = invState.fuente;
+      renderInventario();
+      return;
+    }
   } catch (e) {
     console.error("Error cargando inventario:", e);
-    if (warn) warn.style.display = "block";
-    document.querySelector("#tblInventario tbody").innerHTML =
-      `<tr><td colspan="10" style="text-align:center;color:var(--bad);padding:20px">Error al cargar inventario.</td></tr>`;
   }
+
+  if (warn) warn.style.display = "block";
+  document.querySelector("#tblInventario tbody").innerHTML =
+    `<tr><td colspan="10" style="text-align:center;color:var(--bad);padding:20px">Error al cargar inventario.</td></tr>`;
 }
 
 function normalizeInvRow(raw) {
