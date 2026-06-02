@@ -835,18 +835,22 @@
     </footer>
   </main>
 
-  <!-- Modal SIMPLE: pedir chasis después de escoger archivo -->
+  <!-- Modal SIMPLE: buscar cliente o chasis para asociar el archivo -->
   <div id="modalChasisRapido" class="modal-backdrop">
     <div class="modal">
-      <h2 id="modalChasisRapidoTitle">¿A qué moto pertenece?</h2>
+      <h2 id="modalChasisRapidoTitle">¿De qué cliente es este documento?</h2>
       <p class="muted" id="modalChasisRapidoArchivoInfo">Archivo seleccionado: <strong id="modalChasisArchivo">—</strong></p>
       <div id="modalChasisRapidoMsg" class="modal-msg"></div>
       <form id="formChasisRapido">
         <label>
-          <span>Chasis o # de factura *</span>
-          <input name="idVenta" required list="chasisRapidoList" placeholder="Pega o escoge de la lista" autocomplete="off" autofocus />
+          <span>Cliente, cédula o chasis</span>
+          <input name="idVenta" required list="chasisRapidoList" placeholder="Empieza a escribir el nombre del cliente…" autocomplete="off" autofocus />
           <datalist id="chasisRapidoList"></datalist>
+          <small class="muted" style="display:block;margin-top:6px;font-size:11.5px">
+            💡 Puedes escribir el <strong>nombre del cliente</strong>, <strong>cédula</strong> o el <strong>chasis</strong>. El sistema lo asocia automáticamente.
+          </small>
         </label>
+        <div id="modalChasisRapidoPreview" class="muted" style="margin:10px 0;font-size:12px"></div>
         <div class="modal-actions">
           <button type="button" class="btn-secondary" id="btnCancelarChasisRapido">Cancelar</button>
           <button type="submit" class="btn-primary" id="btnConfirmarChasisRapido">📤 Subir ahora</button>

@@ -2321,22 +2321,81 @@ if (quickFileInput) quickFileInput.addEventListener("change", (ev) => {
   if (!file) return;
   quickUploadState.archivo = file;
 
-  // Mostrar modal pidiendo SOLO el chasis
+  // Mostrar modal pidiendo cliente/chasis
   const modal = document.getElementById("modalChasisRapido");
   const titulo = docState.tiposNombre[quickUploadState.tipo] || quickUploadState.tipo;
   document.getElementById("modalChasisRapidoTitle").textContent = `📤 Subir ${titulo}`;
   document.getElementById("modalChasisArchivo").textContent = file.name;
   document.getElementById("modalChasisRapidoMsg").className = "modal-msg";
+  document.getElementById("modalChasisRapidoPreview").innerHTML = "";
 
-  // Llenar datalist con preasignaciones existentes
+  // Construir opciones: cada cliente con preasignación y/o lead
+  // Cada option `value` será el identificador real (chasis si existe, cédula si no)
+  // y el `label` será el nombre del cliente + info corta para que se vea bonito.
   const dl = document.getElementById("chasisRapidoList");
-  dl.innerHTML = Object.values(preasigState.preasignaciones || {})
-    .map(p => `<option value="${escapeHtml(p.chasis)}">${escapeHtml(p.nombreCliente || '')} - ${escapeHtml(p.marca || '')} ${escapeHtml(p.modelo || '')}</option>`)
+  const opciones = [];
+  const vistos = new Set();
+
+  // 1. Preasignaciones primero (tienen chasis confirmado)
+  for (const p of Object.values(preasigState.preasignaciones || {})) {
+    if (!p.chasis) continue;
+    const key = p.chasis.toUpperCase();
+    if (vistos.has(key)) continue;
+    vistos.add(key);
+    const cli = p.nombreCliente || "(sin nombre)";
+    const moto = `${p.marca || ""} ${p.modelo || ""}`.trim() || "(sin moto)";
+    opciones.push({ value: p.chasis, label: `${cli} · ${moto} · chasis ${p.chasis}` });
+  }
+  // 2. Leads sin preasignación (usar cédula como id)
+  for (const l of leadsState.leads) {
+    const id = (l.chasis || l.documento || "").toUpperCase();
+    if (!id || vistos.has(id)) continue;
+    vistos.add(id);
+    const cli = l.cliente || "(sin nombre)";
+    const moto = `${l.marca || ""} ${l.modelo || ""}`.trim() || "—";
+    const idCorto = l.chasis ? `chasis ${l.chasis}` : `CC ${l.documento || "—"}`;
+    opciones.push({ value: l.chasis || l.documento, label: `${cli} · ${moto} · ${idCorto}` });
+  }
+
+  dl.innerHTML = opciones
+    .map(o => `<option value="${escapeHtml(o.value)}">${escapeHtml(o.label)}</option>`)
     .join("");
 
   document.getElementById("formChasisRapido").reset();
   modal.classList.add("show");
   setTimeout(() => modal.querySelector('input[name="idVenta"]').focus(), 100);
+});
+
+// Resolución en vivo: cuando escribes en el input, busca el cliente y muestra preview
+document.querySelector('#formChasisRapido input[name="idVenta"]')?.addEventListener("input", (ev) => {
+  const valor = String(ev.target.value || "").trim().toUpperCase();
+  const preview = document.getElementById("modalChasisRapidoPreview");
+  if (!valor || valor.length < 3) {
+    preview.innerHTML = "";
+    return;
+  }
+  // Match exacto contra preasignaciones por chasis
+  const p = Object.values(preasigState.preasignaciones || {}).find(p =>
+    (p.chasis || "").toUpperCase() === valor
+    || (p.cedulaCliente || "").replace(/[^0-9]/g, "") === valor.replace(/[^0-9]/g, "")
+    || (p.nombreCliente || "").toUpperCase().includes(valor)
+  );
+  // Match contra leads
+  const l = leadsState.leads.find(l =>
+    (l.chasis || "").toUpperCase() === valor
+    || String(l.documento || "").replace(/[^0-9]/g, "") === valor.replace(/[^0-9]/g, "")
+    || (l.cliente || "").toUpperCase().includes(valor)
+  );
+  if (p) {
+    preview.innerHTML = `✅ <strong>${escapeHtml(p.nombreCliente)}</strong> — ${escapeHtml(p.marca || "")} ${escapeHtml(p.modelo || "")} · chasis ${escapeHtml(p.chasis)}`;
+    preview.style.color = "#5be58a";
+  } else if (l) {
+    preview.innerHTML = `✅ <strong>${escapeHtml(l.cliente)}</strong> — ${escapeHtml(l.marca || "")} ${escapeHtml(l.modelo || "")} · CC ${escapeHtml(l.documento || "—")}`;
+    preview.style.color = "#5be58a";
+  } else {
+    preview.innerHTML = `⚠️ No encontré ese cliente. Se guardará con el ID "${escapeHtml(valor)}"`;
+    preview.style.color = "#f7c272";
+  }
 });
 
 document.getElementById("btnCancelarChasisRapido")?.addEventListener("click", () => {
