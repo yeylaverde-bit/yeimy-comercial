@@ -511,16 +511,35 @@ app.get("/api/leads/lista", requireAuth, (req, res) => {
   const usuario = buscarUsuario(req.session.userEmail);
   if (!fs.existsSync(LOG_PATH)) return res.json({ ok: true, leads: [] });
 
+  // Pre-cargar preasignaciones para cruzar por documento del cliente
+  const preasigs = leerPreasig();
+  const indiceXDoc = {};
+  const indiceXNombre = {};
+  for (const p of Object.values(preasigs)) {
+    if (p.cedulaCliente) {
+      const k = String(p.cedulaCliente).replace(/[^0-9]/g, "");
+      if (k) indiceXDoc[k] = p;
+    }
+    if (p.nombreCliente) {
+      const k = p.nombreCliente.toUpperCase().trim();
+      if (k && !indiceXNombre[k]) indiceXNombre[k] = p;
+    }
+  }
+
   const lineas = fs.readFileSync(LOG_PATH, "utf8").split("\n").filter(Boolean);
   const leads = [];
   for (const linea of lineas) {
     try {
       const r = JSON.parse(linea);
-      // Cada usuario ve solo sus registros, salvo admin/contable que ven todo
       if (usuario.rol !== "admin" && usuario.rol !== "contable") {
         if (r.usuario !== usuario.email) continue;
       }
       const p = r.payload || {};
+      // Cruzar con preasignación: primero por documento, fallback por nombre
+      const docKey = String(p.Documento || "").replace(/[^0-9]/g, "");
+      const nomKey = (p.NombreContacto || "").toUpperCase().trim();
+      const pre = (docKey && indiceXDoc[docKey]) || (nomKey && indiceXNombre[nomKey]) || null;
+
       leads.push({
         ts: r.ts,
         enviadoAImpulsa: !!r.enviadoAImpulsa,
@@ -529,22 +548,91 @@ app.get("/api/leads/lista", requireAuth, (req, res) => {
         ambiente: r.ambiente || null,
         usuario: r.usuario || "",
         usuarioNombre: r.usuario ? buscarUsuario(r.usuario)?.nombre || r.usuario.split("@")[0] : "",
+        // Datos del lead
         cliente: p.NombreContacto || "",
         documento: p.Documento || "",
         tipoDocumento: p.TipoDocumento || "",
         celular: p.Telefono2 || "",
         email: p.Email || "",
+        direccion: p.Direccion || "",
+        codigoDANE: p.CodigoDANE || "",
         marca: p.Productos?.[0]?.Marca || "",
         modelo: p.Productos?.[0]?.Producto || "",
         observaciones: p.Observaciones || "",
         origen: p.Origen || "",
         campanna: p.Campanna || "",
+        idOportunidadAuteco: p.IDOportunidadAuteco || "",
+        // Datos enriquecidos desde Preasignación (si existe)
+        chasis: pre?.chasis || "",
+        motor: pre?.motor || "",
+        color: pre?.color || pre?.colorMoto || "",
+        placa: pre?.placa || "",
+        numCredito: pre?.numCredito || "",
+        financiera: pre?.financiera || "",
+        fechaNacimiento: pre?.fechaNacimiento || "",
+        gps: pre?.gps || "",
+        estadoPreasignacion: pre?.estado || "",
+        tienePreasignacion: !!pre,
       });
     } catch {}
   }
-  // Más recientes primero
   leads.sort((a, b) => (b.ts || "").localeCompare(a.ts || ""));
   res.json({ ok: true, leads });
+});
+
+// Borrar un lead del log (por timestamp ISO). Admin borra cualquiera; asesor solo los suyos.
+app.delete("/api/leads/:ts", requireAuth, (req, res) => {
+  const usuario = buscarUsuario(req.session.userEmail);
+  const ts = String(req.params.ts);
+  if (!fs.existsSync(LOG_PATH)) return res.json({ ok: true, borrados: 0 });
+
+  const lineas = fs.readFileSync(LOG_PATH, "utf8").split("\n").filter(Boolean);
+  const nuevas = [];
+  let borrados = 0;
+  for (const linea of lineas) {
+    try {
+      const r = JSON.parse(linea);
+      if (r.ts === ts) {
+        if (usuario.rol !== "admin" && r.usuario !== usuario.email) {
+          nuevas.push(linea);  // Sin permiso → no se borra
+          continue;
+        }
+        borrados++;
+        continue;  // Saltar = borrar
+      }
+      nuevas.push(linea);
+    } catch {
+      nuevas.push(linea);
+    }
+  }
+  fs.writeFileSync(LOG_PATH, nuevas.length ? nuevas.join("\n") + "\n" : "", "utf8");
+  res.json({ ok: true, borrados });
+});
+
+// Borrar TODA la venta (con todos sus documentos). Admin o quien subió original.
+app.delete("/api/docs/:idVenta", requireAuth, (req, res) => {
+  const idVenta = idVentaSafe(req.params.idVenta);
+  const docs = leerDocsVentas();
+  const info = docs[idVenta];
+  if (!info) return res.status(404).json({ ok: false, error: "No existe" });
+
+  const usuario = buscarUsuario(req.session.userEmail);
+  const subidor = Object.values(info.archivos || {})[0]?.subidoPor;
+  if (usuario.rol !== "admin" && subidor && subidor !== usuario.email) {
+    return res.status(403).json({ ok: false, error: "Sin permiso" });
+  }
+
+  // Borrar archivos físicos
+  for (const tipo of Object.keys(info.archivos || {})) {
+    const archivo = info.archivos[tipo];
+    try { fs.unlinkSync(path.join(UPLOADS_DIR, idVenta, archivo.path)); } catch {}
+  }
+  // Intentar borrar la carpeta de la venta
+  try { fs.rmdirSync(path.join(UPLOADS_DIR, idVenta)); } catch {}
+
+  delete docs[idVenta];
+  guardarDocsVentas(docs);
+  res.json({ ok: true });
 });
 
 // --- Comisiones pagadas (solo admin) ---

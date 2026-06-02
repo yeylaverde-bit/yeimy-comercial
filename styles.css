@@ -76,6 +76,26 @@ body{display:grid; grid-template-columns: 260px 1fr; min-height:100vh}
 .kpi-cobrado{background:linear-gradient(135deg, rgba(34,211,238,0.14), rgba(124,92,255,0.08)); border-color:rgba(34,211,238,0.35)}
 .kpi-cobrado .kpi-value{color:#7be6f4}
 
+/* Grid del modal de detalle lead */
+.lead-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px 16px;background:rgba(8,12,28,.45);border:1px solid var(--line);border-radius:10px;padding:12px;font-size:12.5px}
+.lead-grid > div{display:flex;flex-direction:column;gap:2px}
+.lead-grid .lab{color:var(--muted);font-size:10.5px;text-transform:uppercase;letter-spacing:.04em;font-weight:600}
+.lead-grid .val{color:var(--text);font-weight:600;word-break:break-word}
+.lead-grid .val.vacio{color:var(--muted-2);font-weight:400;font-style:italic}
+@media (max-width:768px){.lead-grid{grid-template-columns:1fr 1fr}}
+
+/* Botón ver completo en tabla leads */
+.btn-ver-lead{background:rgba(124,92,255,.15);border:1px solid rgba(124,92,255,.4);color:var(--text);padding:5px 10px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;transition:.15s}
+.btn-ver-lead:hover{background:var(--accent);color:#0b1020;border-color:var(--accent)}
+
+/* Botón borrar lead (icono) */
+.btn-borrar-lead{background:transparent;border:1px solid var(--line);color:var(--muted);width:28px;height:28px;border-radius:6px;cursor:pointer;font-size:13px;line-height:1;padding:0;transition:.15s}
+.btn-borrar-lead:hover{background:var(--bad);border-color:var(--bad);color:#fff;transform:scale(1.05)}
+
+/* Botón borrar venta completa */
+.btn-borrar-venta{background:transparent;border:1px solid rgba(239,68,68,.35);color:#fca5a5;padding:5px 10px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;transition:.15s}
+.btn-borrar-venta:hover{background:var(--bad);color:#fff;border-color:var(--bad)}
+
 /* ============ VISTA CONTABLE: tabla + filtros ============ */
 .btn-filtro-contable{background:var(--panel-2);border:1px solid var(--line);color:var(--text-soft);padding:6px 12px;border-radius:999px;font-size:12px;font-weight:600;cursor:pointer;transition:.15s}
 .btn-filtro-contable:hover{background:var(--panel);color:var(--text)}

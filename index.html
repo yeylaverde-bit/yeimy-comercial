@@ -575,6 +575,7 @@
               <th class="num">Total</th>
               <th data-role-only="admin contable">Asesor</th>
               <th>Estado Impulsa</th>
+              <th></th>
             </tr>
           </thead>
           <tbody></tbody>
@@ -650,6 +651,40 @@
 
       <div id="docsListWrap"></div>
     </section>
+
+    <!-- Modal detalle completo de un LEAD -->
+    <div id="modalDetalleLead" class="modal-backdrop">
+      <div class="modal" style="max-width:880px;max-height:90vh;overflow-y:auto">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:8px">
+          <div>
+            <h2 id="leadTitulo" style="margin:0">Cliente</h2>
+            <p class="muted" id="leadSubtitulo" style="margin:4px 0 0;font-size:13px">—</p>
+          </div>
+          <button class="btn-secondary" id="btnCerrarLead" style="padding:6px 12px">✕</button>
+        </div>
+
+        <div id="leadAvisoSinPreasig" class="form-msg form-msg-info" style="display:none;margin:10px 0">
+          ⚠️ Este lead todavía NO tiene preasignación. La placa, chasis, motor y datos de crédito se llenarán cuando crees la preasignación en "🔧 Preasignación".
+        </div>
+
+        <h3 style="margin:18px 0 6px;font-size:12px;color:var(--accent-2);text-transform:uppercase;letter-spacing:.06em">👤 Datos del cliente</h3>
+        <div class="lead-grid" id="leadDatosCliente"></div>
+
+        <h3 style="margin:18px 0 6px;font-size:12px;color:var(--accent-2);text-transform:uppercase;letter-spacing:.06em">🏍️ Moto</h3>
+        <div class="lead-grid" id="leadDatosMoto"></div>
+
+        <h3 style="margin:18px 0 6px;font-size:12px;color:var(--accent-2);text-transform:uppercase;letter-spacing:.06em">💳 Crédito y pago</h3>
+        <div class="lead-grid" id="leadDatosCredito"></div>
+
+        <h3 style="margin:18px 0 6px;font-size:12px;color:var(--accent-2);text-transform:uppercase;letter-spacing:.06em">📝 Registro</h3>
+        <div class="lead-grid" id="leadDatosRegistro"></div>
+
+        <div class="modal-actions" style="margin-top:16px;border-top:1px solid var(--line);padding-top:14px">
+          <button class="btn-secondary" id="btnCopiarLead">📋 Copiar todo</button>
+          <button class="btn-secondary" id="btnCerrarLead2">Cerrar</button>
+        </div>
+      </div>
+    </div>
 
     <!-- Modal detalle contable: muestra todo de una venta -->
     <div id="modalDetalleVenta" class="modal-backdrop">

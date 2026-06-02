@@ -1209,7 +1209,7 @@ function renderLeads() {
   document.getElementById("leadsCount").textContent = fmtNum.format(filtrados.length);
 
   if (filtrados.length === 0) {
-    const colspan = currentUser?.rol === "admin" || currentUser?.rol === "contable" ? 9 : 8;
+    const colspan = currentUser?.rol === "admin" || currentUser?.rol === "contable" ? 10 : 9;
     tbody.innerHTML = `<tr><td colspan="${colspan}" style="text-align:center;color:var(--muted);padding:20px">Sin registros en este filtro.</td></tr>`;
     return;
   }
@@ -1229,6 +1229,7 @@ function renderLeads() {
       estado = `<span class="tag" style="background:rgba(239,68,68,.12);color:#fca5a5;border:1px solid rgba(239,68,68,.35)">✗ Error ${l.statusImpulsa || ""}</span>`;
     }
     const showAsesor = currentUser?.rol === "admin" || currentUser?.rol === "contable";
+    const puedeBorrar = currentUser?.rol === "admin" || l.usuario === currentUser?.email;
     return `<tr>
       <td>${fecha}</td>
       <td><strong>${escapeHtml(l.cliente)}</strong></td>
@@ -1239,9 +1240,137 @@ function renderLeads() {
       <td class="num">${total ? "$" + escapeHtml(total) : "—"}</td>
       ${showAsesor ? `<td>${escapeHtml(l.usuarioNombre || l.usuario)}</td>` : ""}
       <td>${estado}</td>
+      <td style="text-align:center;white-space:nowrap">
+        <button class="btn-ver-lead" data-ver-ts="${escapeHtml(l.ts)}" title="Ver toda la info">📋 Ver</button>
+        ${puedeBorrar ? ` <button class="btn-borrar-lead" data-borrar-ts="${escapeHtml(l.ts)}" title="Borrar este registro">🗑️</button>` : ""}
+      </td>
     </tr>`;
   }).join("");
+
+  // Listeners "Ver completo"
+  document.querySelectorAll(".btn-ver-lead").forEach(b => {
+    b.addEventListener("click", () => abrirDetalleLead(b.dataset.verTs));
+  });
+
+  // Listeners de borrar
+  document.querySelectorAll(".btn-borrar-lead").forEach(b => {
+    b.addEventListener("click", async () => {
+      const ts = b.dataset.borrarTs;
+      const fila = b.closest("tr");
+      const nombre = fila?.querySelector("strong")?.textContent || "este registro";
+      if (!confirm(`¿Borrar el registro de "${nombre}"? Esta acción no se puede deshacer.`)) return;
+      try {
+        const r = await fetch(`/api/leads/${encodeURIComponent(ts)}`, { method: "DELETE" });
+        const data = await r.json();
+        if (data.ok) {
+          showToast(`Registro borrado (${data.borrados})`);
+          loadLeads();
+        } else {
+          showToast("Error: " + (data.error || "no se pudo borrar"));
+        }
+      } catch (e) { showToast("Error: " + e.message); }
+    });
+  });
 }
+
+// Abrir modal con detalle COMPLETO de un lead (cruzado con preasignación)
+function celda(label, valor) {
+  const v = valor && String(valor).trim();
+  return `<div><span class="lab">${escapeHtml(label)}</span><span class="val ${v ? '' : 'vacio'}">${v ? escapeHtml(v) : "— sin dato"}</span></div>`;
+}
+
+function abrirDetalleLead(ts) {
+  const lead = leadsState.leads.find(l => l.ts === ts);
+  if (!lead) return;
+
+  const fecha = lead.ts ? new Date(lead.ts).toLocaleString("es-CO") : "—";
+  document.getElementById("leadTitulo").textContent = lead.cliente || "(sin nombre)";
+  document.getElementById("leadSubtitulo").innerHTML =
+    `<code style="color:var(--accent-2)">${escapeHtml(lead.tipoDocumento || "")} ${escapeHtml(lead.documento || "")}</code> · ${escapeHtml(lead.celular || "")} · Registrado el ${fecha}`;
+
+  document.getElementById("leadAvisoSinPreasig").style.display = lead.tienePreasignacion ? "none" : "block";
+
+  document.getElementById("leadDatosCliente").innerHTML = `
+    ${celda("Nombre completo", lead.cliente)}
+    ${celda("Tipo documento", lead.tipoDocumento)}
+    ${celda("Número documento", lead.documento)}
+    ${celda("Celular", lead.celular)}
+    ${celda("Correo electrónico", lead.email)}
+    ${celda("Dirección", lead.direccion)}
+    ${celda("Fecha de nacimiento", lead.fechaNacimiento)}
+  `;
+
+  document.getElementById("leadDatosMoto").innerHTML = `
+    ${celda("Marca", lead.marca)}
+    ${celda("Modelo", lead.modelo)}
+    ${celda("Color", lead.color)}
+    ${celda("Chasis (VIN)", lead.chasis)}
+    ${celda("Motor", lead.motor)}
+    ${celda("Placa", lead.placa)}
+    ${celda("GPS", ({sin:"Sin GPS",instalar:"Instalar",activar:"Activar"})[lead.gps] || "—")}
+    ${celda("Estado preasignación", lead.estadoPreasignacion)}
+  `;
+
+  // Extraer datos de pago de las observaciones (formato "Pago: CONTADO | Precio moto: ... | Papeles: ... | Total: ...")
+  const obs = lead.observaciones || "";
+  const formaPago = obs.match(/Pago:\s*([^|]+)/i)?.[1].trim() || "";
+  const precioMoto = obs.match(/Precio moto:\s*\$?([\d.,]+)/i)?.[1] || "";
+  const papeles = obs.match(/Papeles:\s*\$?([\d.,]+)/i)?.[1] || "";
+  const total = obs.match(/Total:\s*\$?([\d.,]+)/i)?.[1] || "";
+
+  document.getElementById("leadDatosCredito").innerHTML = `
+    ${celda("Forma de pago", formaPago)}
+    ${celda("Financiera", lead.financiera)}
+    ${celda("# Crédito", lead.numCredito)}
+    ${celda("Precio moto", precioMoto ? "$" + precioMoto : "")}
+    ${celda("Valor papeles", papeles ? "$" + papeles : "")}
+    ${celda("Total", total ? "$" + total : "")}
+  `;
+
+  let estadoImpulsa;
+  if (lead.enviadoAImpulsa && lead.statusImpulsa >= 200 && lead.statusImpulsa < 300) {
+    estadoImpulsa = `✓ Enviado · oportunidad #${lead.idImpulsa || "?"}`;
+  } else if (lead.statusImpulsa) {
+    estadoImpulsa = `✗ Error ${lead.statusImpulsa}`;
+  } else {
+    estadoImpulsa = "No enviado";
+  }
+
+  document.getElementById("leadDatosRegistro").innerHTML = `
+    ${celda("Origen del lead", lead.origen)}
+    ${celda("Campaña", lead.campanna)}
+    ${celda("Asesor que registró", lead.usuarioNombre || lead.usuario)}
+    ${celda("Fecha de registro", fecha)}
+    ${celda("Estado en Impulsa", estadoImpulsa)}
+    ${celda("ID Impulsa", lead.idImpulsa)}
+  `;
+
+  document.getElementById("modalDetalleLead").classList.add("show");
+}
+
+document.getElementById("btnCerrarLead")?.addEventListener("click", () => document.getElementById("modalDetalleLead").classList.remove("show"));
+document.getElementById("btnCerrarLead2")?.addEventListener("click", () => document.getElementById("modalDetalleLead").classList.remove("show"));
+
+// Copiar todo el detalle al portapapeles (útil para WhatsApp o pasar a contabilidad)
+document.getElementById("btnCopiarLead")?.addEventListener("click", () => {
+  const titulo = document.getElementById("leadTitulo").textContent;
+  const subt = document.getElementById("leadSubtitulo").textContent;
+  const secciones = ["leadDatosCliente", "leadDatosMoto", "leadDatosCredito", "leadDatosRegistro"];
+  const lines = [titulo, subt, ""];
+  for (const id of secciones) {
+    const h3 = document.querySelector(`h3[style*="accent-2"] + .lead-grid[id="${id}"]`)?.previousElementSibling?.textContent
+            || document.querySelector(`#${id}`)?.previousElementSibling?.textContent;
+    if (h3) lines.push("=== " + h3 + " ===");
+    document.getElementById(id).querySelectorAll("div").forEach(d => {
+      const lab = d.querySelector(".lab")?.textContent;
+      const val = d.querySelector(".val")?.textContent;
+      if (lab && val) lines.push(lab + ": " + val);
+    });
+    lines.push("");
+  }
+  const texto = lines.join("\n");
+  navigator.clipboard.writeText(texto).then(() => showToast("✓ Copiado al portapapeles"));
+});
 
 const leadsBuscarEl = document.getElementById("leadsBuscar");
 if (leadsBuscarEl) leadsBuscarEl.addEventListener("input", e => { leadsState.buscar = e.target.value; renderLeads(); });
@@ -1621,13 +1750,18 @@ function renderDocs() {
       </label>`;
     }).join("");
 
+    const puedeBorrar = currentUser?.rol === "admin"
+      || Object.values(info.archivos || {})[0]?.subidoPor === currentUser?.email;
     return `<div class="docs-venta-card">
       <div class="docs-venta-head">
         <div>
           <h3>${escapeHtml(info.cliente || "(sin cliente)")} <code>${escapeHtml(id)}</code></h3>
           <div class="docs-venta-sub">${escapeHtml(info.modelo || "")}</div>
         </div>
-        <span class="docs-progress ${progClass}">${subidos}/${total} ${subidos === total ? "✓ listo contabilidad" : "subidos"}</span>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+          <span class="docs-progress ${progClass}">${subidos}/${total} ${subidos === total ? "✓ listo contabilidad" : "subidos"}</span>
+          ${puedeBorrar ? `<button class="btn-borrar-venta" data-borrar-venta="${escapeHtml(id)}" title="Borrar esta venta y todos sus documentos">🗑️ Borrar venta</button>` : ""}
+        </div>
       </div>
       <div class="docs-slots">${slots}</div>
     </div>`;
@@ -1639,6 +1773,23 @@ function renderDocs() {
   });
   wrap.querySelectorAll("button[data-borrar]").forEach(btn => {
     btn.addEventListener("click", borrarDocHandler);
+  });
+  // Borrar venta completa
+  wrap.querySelectorAll("button[data-borrar-venta]").forEach(btn => {
+    btn.addEventListener("click", async () => {
+      const id = btn.dataset.borrarVenta;
+      if (!confirm(`¿Borrar la venta del chasis "${id}" con TODOS sus documentos?\n\nEsta acción no se puede deshacer.`)) return;
+      try {
+        const r = await fetch(`/api/docs/${encodeURIComponent(id)}`, { method: "DELETE" });
+        const data = await r.json();
+        if (data.ok) {
+          showToast("Venta borrada completa");
+          loadDocs();
+        } else {
+          showToast("Error: " + (data.error || "no se pudo borrar"));
+        }
+      } catch (e) { showToast("Error: " + e.message); }
+    });
   });
 }
 
