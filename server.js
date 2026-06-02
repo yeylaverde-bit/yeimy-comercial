@@ -19,6 +19,7 @@ const bcrypt = require("bcryptjs");
 const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
+const Anthropic = require("@anthropic-ai/sdk");
 require("dotenv").config({ path: path.join(__dirname, ".env") });
 
 const app = express();
@@ -502,6 +503,95 @@ app.get("/precios/:archivo", requireAuth, (req, res) => {
   const file = path.join(PDFS_PRECIOS_DIR, req.params.archivo);
   if (!fs.existsSync(file)) return res.status(404).send("No encontrado");
   res.sendFile(file);
+});
+
+// ============================================================
+//      FACTURA AUTECO — OCR con Claude Vision
+// ============================================================
+const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY || "";
+const anthropic = ANTHROPIC_API_KEY ? new Anthropic({ apiKey: ANTHROPIC_API_KEY }) : null;
+
+const FACTURAS_DIR = path.join(DATA_DIR, "facturas-auteco");
+if (!fs.existsSync(FACTURAS_DIR)) fs.mkdirSync(FACTURAS_DIR, { recursive: true });
+
+const uploadFactura = multer({
+  storage: multer.diskStorage({
+    destination: (_req, _file, cb) => cb(null, FACTURAS_DIR),
+    filename: (_req, file, cb) => {
+      const ext = path.extname(file.originalname).toLowerCase() || ".jpg";
+      cb(null, `factura-${Date.now()}${ext}`);
+    },
+  }),
+  limits: { fileSize: 15 * 1024 * 1024 },  // 15 MB
+  fileFilter: (_req, file, cb) => {
+    const ok = /^(image\/(jpe?g|png|webp|heic)|application\/pdf)$/.test(file.mimetype);
+    cb(ok ? null : new Error("Solo imágenes (JPG/PNG/WebP/HEIC) o PDF"), ok);
+  },
+});
+
+// POST /api/factura/procesar — recibe imagen, llama a Claude Vision
+app.post("/api/factura/procesar", requireAuth, uploadFactura.single("archivo"), async (req, res) => {
+  if (!anthropic) return res.status(500).json({ ok: false, error: "ANTHROPIC_API_KEY no configurada en el servidor. Pídele al admin que la añada en Render → Environment." });
+  if (!req.file) return res.status(400).json({ ok: false, error: "Falta archivo de factura" });
+
+  const filepath = path.join(FACTURAS_DIR, req.file.filename);
+  try {
+    const buf = fs.readFileSync(filepath);
+    const base64 = buf.toString("base64");
+    const mediaType = req.file.mimetype === "application/pdf" ? "application/pdf" : req.file.mimetype;
+
+    // Si es PDF, Claude Vision necesita "type: document"; si es imagen, "type: image"
+    const contentItem = mediaType === "application/pdf"
+      ? { type: "document", source: { type: "base64", media_type: "application/pdf", data: base64 } }
+      : { type: "image", source: { type: "base64", media_type: mediaType, data: base64 } };
+
+    const prompt = `Esta es una factura de Auteco (importador de motocicletas en Colombia: TVS, Victory, Kymco, Benelli, Kawasaki, Ceronte).
+
+Por cada moto en la factura, extrae estos datos exactos:
+- chasis (VIN, número de chasis, suele ser alfanumérico de 17 caracteres)
+- motor (número del motor)
+- marca (TVS, VICTORY, KYMCO, BENELLI, KAWASAKI, CERONTE, etc.)
+- modelo (ej: APACHE RTR 160, RAIDER 125, NTORQ 125)
+- color (NEGRO, ROJO, AZUL, GRIS, etc.)
+- año (modelo o cilindraje si aparece, ej: 2026)
+- precio (valor unitario o total por moto, en COP)
+
+Devuelve SOLO un JSON válido con este formato exacto, sin texto extra ni explicación:
+
+{
+  "motos": [
+    { "chasis": "...", "motor": "...", "marca": "...", "modelo": "...", "color": "...", "anio": "...", "precio": 0 },
+    ...
+  ]
+}
+
+Si no puedes leer algún campo, usa "" o 0. Si la imagen no es una factura legible, devuelve {"motos": []}.`;
+
+    const result = await anthropic.messages.create({
+      model: "claude-sonnet-4-5",
+      max_tokens: 4096,
+      messages: [{
+        role: "user",
+        content: [contentItem, { type: "text", text: prompt }],
+      }],
+    });
+
+    // Extraer JSON de la respuesta
+    let texto = result.content[0]?.text || "";
+    const jsonMatch = texto.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) throw new Error("Claude no devolvió JSON válido. Respuesta: " + texto.slice(0, 200));
+    const data = JSON.parse(jsonMatch[0]);
+
+    res.json({
+      ok: true,
+      motos: data.motos || [],
+      archivo: req.file.filename,
+      usoTokens: { input: result.usage?.input_tokens, output: result.usage?.output_tokens },
+    });
+  } catch (e) {
+    console.error("Error factura:", e);
+    res.status(500).json({ ok: false, error: e.message });
+  }
 });
 
 // ============================================================

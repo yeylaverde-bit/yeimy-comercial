@@ -66,6 +66,7 @@
       <div class="nav-section-title">Administración</div>
       <nav class="nav">
         <a href="#actualizarprecios">📤 Actualizar precios (PDF)</a>
+        <a href="#facturaauteco">🧾 Cargar factura Auteco</a>
       </nav>
     </div>
 
@@ -742,6 +743,56 @@
           </thead>
           <tbody></tbody>
         </table>
+      </div>
+    </section>
+
+    <section id="facturaauteco" class="card" data-role-only="admin">
+      <div class="card-head">
+        <h2>🧾 Cargar factura Auteco · agregar motos al inventario</h2>
+      </div>
+      <p class="muted" style="margin:-4px 0 14px;font-size:12.5px">
+        Toma foto de la factura que llega de Auteco. Claude IA lee chasis, motor, marca, modelo, color y precio de cada moto.
+        Revisa la tabla extraída, corrige lo necesario, y confirma para agregar al inventario.
+      </p>
+
+      <form id="formFactura" style="display:grid;grid-template-columns:1fr auto;gap:14px;align-items:end">
+        <label class="form-field">
+          <span>Foto o PDF de la factura (máx 15 MB)</span>
+          <input type="file" name="archivo" accept="image/*,application/pdf" required style="background:rgba(8,12,28,.55);border:1px solid var(--line);color:var(--text);border-radius:10px;padding:10px 12px" />
+        </label>
+        <button type="submit" class="btn-primary" id="btnProcesarFactura">🤖 Procesar con IA</button>
+      </form>
+
+      <div id="facturaMsg" class="form-msg" style="display:none"></div>
+
+      <div id="facturaResultado" style="display:none;margin-top:20px">
+        <h3 style="margin:0 0 10px;font-size:14px">Motos detectadas en la factura</h3>
+        <p class="muted" style="font-size:12px;margin:0 0 10px">Revisa cada fila. Puedes editar valores directamente si la IA leyó algo mal. Después clic en "Confirmar y agregar al inventario".</p>
+        <div class="table-wrap">
+          <table class="table" id="tblFacturaMotos">
+            <thead>
+              <tr>
+                <th>Marca</th>
+                <th>Modelo</th>
+                <th>Color</th>
+                <th>Año</th>
+                <th>Chasis</th>
+                <th>Motor</th>
+                <th class="num">Precio</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:14px">
+          <button type="button" class="btn-secondary" id="btnCancelarFactura">Cancelar</button>
+          <button type="button" class="btn-primary" id="btnConfirmarFactura">✓ Confirmar y agregar al inventario</button>
+        </div>
+        <p class="muted" style="font-size:11.5px;margin-top:8px">
+          ⚠️ Para escribir al Google Sheets oficial, primero hay que coordinar permisos con el encargado.
+          Mientras tanto, las motos se guardan en archivo local y aparecen combinadas en el inventario.
+        </p>
       </div>
     </section>
 

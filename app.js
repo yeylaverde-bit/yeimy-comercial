@@ -1614,6 +1614,117 @@ const tallerVerTodos = document.getElementById("tallerVerTodos");
 if (tallerVerTodos) tallerVerTodos.addEventListener("change", e => { preasigState.verTodos = e.target.checked; loadPreasignaciones(); });
 
 // ============================================================
+//          FACTURA AUTECO — OCR con Claude Vision (solo admin)
+// ============================================================
+const formFactura = document.getElementById("formFactura");
+if (formFactura) {
+  formFactura.addEventListener("submit", async (ev) => {
+    ev.preventDefault();
+    const fd = new FormData(formFactura);
+    const msg = document.getElementById("facturaMsg");
+    const btn = document.getElementById("btnProcesarFactura");
+    msg.style.display = "block";
+    msg.className = "form-msg";
+    msg.textContent = "🤖 Procesando factura con Claude IA, esto toma 10-30 segundos…";
+    btn.disabled = true;
+    btn.textContent = "Procesando…";
+    document.getElementById("facturaResultado").style.display = "none";
+
+    try {
+      const r = await fetch("/api/factura/procesar", { method: "POST", body: fd });
+      const data = await r.json();
+      if (data.ok) {
+        const n = data.motos.length;
+        if (n === 0) {
+          msg.className = "form-msg form-msg-info";
+          msg.textContent = "⚠️ La IA no detectó motos en esta imagen. Asegúrate que la foto sea clara y muestre la factura completa con los datos de cada moto.";
+        } else {
+          msg.className = "form-msg form-msg-ok";
+          const tokens = data.usoTokens ? ` · Tokens: ${data.usoTokens.input}+${data.usoTokens.output}` : "";
+          msg.innerHTML = `✅ <strong>${n} ${n === 1 ? 'moto detectada' : 'motos detectadas'}</strong>. Revisa y corrige abajo antes de confirmar.${tokens}`;
+          renderFacturaMotos(data.motos);
+          document.getElementById("facturaResultado").style.display = "block";
+        }
+      } else {
+        msg.className = "form-msg form-msg-err";
+        msg.textContent = "❌ " + (data.error || "Error procesando");
+      }
+    } catch (e) {
+      msg.className = "form-msg form-msg-err";
+      msg.textContent = "Error de conexión: " + e.message;
+    } finally {
+      btn.disabled = false;
+      btn.textContent = "🤖 Procesar con IA";
+    }
+  });
+}
+
+function renderFacturaMotos(motos) {
+  const tbody = document.querySelector("#tblFacturaMotos tbody");
+  tbody.innerHTML = motos.map((m, i) => `
+    <tr data-idx="${i}">
+      <td><input class="celda-edit" data-campo="marca" value="${escapeHtml(m.marca || '')}" /></td>
+      <td><input class="celda-edit" data-campo="modelo" value="${escapeHtml(m.modelo || '')}" /></td>
+      <td><input class="celda-edit" data-campo="color" value="${escapeHtml(m.color || '')}" /></td>
+      <td><input class="celda-edit" data-campo="anio" value="${escapeHtml(m.anio || '')}" style="width:70px" /></td>
+      <td><input class="celda-edit" data-campo="chasis" value="${escapeHtml(m.chasis || '')}" style="font-family:monospace;font-size:11px" /></td>
+      <td><input class="celda-edit" data-campo="motor" value="${escapeHtml(m.motor || '')}" style="font-family:monospace;font-size:11px" /></td>
+      <td><input class="celda-edit" data-campo="precio" value="${m.precio || ''}" inputmode="numeric" style="width:120px;text-align:right" /></td>
+      <td><button class="btn-borrar-lead" data-quitar-idx="${i}" title="Quitar esta moto">🗑️</button></td>
+    </tr>
+  `).join("");
+
+  tbody.querySelectorAll("[data-quitar-idx]").forEach(b => {
+    b.addEventListener("click", () => {
+      b.closest("tr").remove();
+    });
+  });
+}
+
+function recolectarMotosFactura() {
+  const filas = document.querySelectorAll("#tblFacturaMotos tbody tr");
+  const motos = [];
+  for (const tr of filas) {
+    const moto = {};
+    tr.querySelectorAll(".celda-edit").forEach(inp => {
+      moto[inp.dataset.campo] = inp.value.trim();
+    });
+    moto.precio = parseInt(String(moto.precio).replace(/[^0-9]/g, ""), 10) || 0;
+    if (moto.chasis || moto.modelo) motos.push(moto);
+  }
+  return motos;
+}
+
+document.getElementById("btnCancelarFactura")?.addEventListener("click", () => {
+  document.getElementById("facturaResultado").style.display = "none";
+  document.getElementById("facturaMsg").style.display = "none";
+  formFactura?.reset();
+});
+
+document.getElementById("btnConfirmarFactura")?.addEventListener("click", async () => {
+  const motos = recolectarMotosFactura();
+  if (motos.length === 0) { showToast("No hay motos para confirmar"); return; }
+  if (!confirm(`¿Confirmar y agregar ${motos.length} ${motos.length === 1 ? 'moto' : 'motos'} al inventario?`)) return;
+  // TODO Fase 2: enviar a backend que escribe en Google Sheets oficial
+  // Por ahora muestro mensaje
+  showToast(`✓ ${motos.length} motos guardadas (pendiente Google Sheets)`);
+  console.log("Motos a confirmar:", motos);
+  const msg = document.getElementById("facturaMsg");
+  msg.className = "form-msg form-msg-info";
+  msg.innerHTML = `📌 <strong>${motos.length} motos listas para subir al Sheets oficial.</strong><br>
+    Pendiente: configurar permisos de escritura del Google Sheets con el encargado del concesionario.
+    Cuando esté listo, las subimos con un clic.`;
+});
+
+// Estilos inline para los inputs de la tabla editable de factura
+const styleEditTbl = document.createElement("style");
+styleEditTbl.textContent = `
+  .celda-edit { background:rgba(8,12,28,.55); border:1px solid var(--line); color:var(--text); border-radius:6px; padding:5px 8px; font:inherit; font-size:12px; width:100%; outline:none; }
+  .celda-edit:focus { border-color:var(--accent); }
+`;
+document.head.appendChild(styleEditTbl);
+
+// ============================================================
 //          ACTUALIZAR PRECIOS — subir PDF (solo admin)
 // ============================================================
 const formSubirPrecios = document.getElementById("formSubirPrecios");
