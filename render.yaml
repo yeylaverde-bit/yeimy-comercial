@@ -3,7 +3,7 @@
 # Render lo lee automáticamente.
 services:
   - type: web
-    name: yeimy-comercial
+    name: serviautec-concesionario
     runtime: node
     region: ohio        # más cerca de Colombia que oregon
     plan: starter       # $7/mes — siempre activo, sin cold starts
