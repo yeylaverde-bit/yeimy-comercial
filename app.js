@@ -987,6 +987,10 @@ async function loadInventario() {
       invState.fuente = `🧾 Siigo (${invState.rows.length} motos con stock · cache 5min)`;
       if (fuenteLabel) fuenteLabel.textContent = invState.fuente;
       renderInventario();
+      // Re-render Orden Facturación: ahora puede cruzar chasis → modelo/motor desde Siigo
+      if (docState.docs && Object.keys(docState.docs).length) {
+        try { renderDocs(); } catch {}
+      }
       return;
     }
   } catch (e) {
@@ -1238,6 +1242,10 @@ async function loadLeads() {
       leadsState.leads = data.leads || [];
       populateLeadsMesFilter();
       renderLeads();
+      // Re-render Orden Facturación si ya tiene docs cargados: ahora puede cruzar cliente+asesor
+      if (docState.docs && Object.keys(docState.docs).length) {
+        try { renderDocs(); } catch {}
+      }
     }
   } catch (e) { console.error("Error loadLeads:", e); }
 }
@@ -1464,6 +1472,10 @@ async function loadPreasignaciones() {
       preasigState.preasignaciones = data.preasignaciones || {};
       renderPreasignaciones();
       renderTaller();  // taller depende de preasignaciones
+      // Re-render Orden Facturación: ahora puede cruzar info de preasignaciones
+      if (docState.docs && Object.keys(docState.docs).length) {
+        try { renderDocs(); } catch {}
+      }
     }
   } catch (e) { console.error("Error loadPreasignaciones:", e); }
 }
@@ -1981,6 +1993,57 @@ function renderDocs() {
 // ============================================================
 let filtroContable = "todos";  // todos | pendientes | listos
 
+/**
+ * Resuelve TODOS los datos de una venta (chasis) cruzando 4 fuentes:
+ *   1) docs-ventas (info que metió quien subió el archivo)
+ *   2) preasignaciones (chasis → cliente + crédito)
+ *   3) leads registrados (chasis del lead → cliente + asesor)
+ *   4) inventario Siigo (chasis → modelo + color + año)
+ *
+ * Para el asesor, usa el `usuarioNombre` que el backend ya resuelve desde users.json
+ * (vía leads). Si no hay lead, intenta inferir del email del subidoPor.
+ */
+function resolverContextoVenta(id, info) {
+  const idUp = String(id || "").toUpperCase().trim();
+  const p = preasigState.preasignaciones[id] || preasigState.preasignaciones[idUp];
+
+  // 1) Buscar lead por chasis exacto
+  let lead = leadsState.leads.find(l => (l.chasis || "").toUpperCase() === idUp) || null;
+
+  // 2) Si no encontró por chasis, intentar por documento del cliente (si docs lo tiene)
+  if (!lead && info?.cedula) {
+    const cc = String(info.cedula).replace(/[^0-9]/g, "");
+    lead = leadsState.leads.find(l => String(l.documento || "").replace(/[^0-9]/g, "") === cc) || null;
+  }
+
+  // 3) Buscar moto en inventario Siigo por chasis
+  const motoSiigo = invState.rows.find(r => (r.chasis || "").toUpperCase() === idUp) || null;
+
+  // Email del primer asesor que subió un archivo
+  const emailRaw = Object.values(info?.archivos || {})[0]?.subidoPor || "";
+  // Resolver email → nombre usando el mapa de leads (backend ya pobla usuarioNombre)
+  const lookup = leadsState.leads.find(l => l.usuario === emailRaw);
+  const asesorNombre = p?.asesorNombre
+    || lead?.usuarioNombre
+    || lookup?.usuarioNombre
+    || "";
+
+  return {
+    cliente: info?.cliente || p?.nombreCliente || lead?.cliente || "",
+    documento: info?.cedula || p?.cedulaCliente || lead?.documento || "",
+    modelo: info?.modelo
+      || (p ? `${p.marca || ""} ${p.modelo || ""}`.trim() : "")
+      || (lead ? `${lead.marca || ""} ${lead.modelo || ""}`.trim() : "")
+      || (motoSiigo ? `${motoSiigo.marca || ""} ${motoSiigo.modelo || ""}`.trim() : ""),
+    color: p?.color || p?.colorMoto || motoSiigo?.color || "",
+    motor: p?.motor || motoSiigo?.motor || "",
+    asesorNombre,
+    asesorRaw: emailRaw ? emailRaw.split("@")[0].toUpperCase() : "",
+    lead,
+    motoSiigo,
+  };
+}
+
 function renderDocsTablaContable() {
   const wrap = document.getElementById("docsListWrap");
   if (!wrap) return;
@@ -2021,16 +2084,22 @@ function renderDocsTablaContable() {
     const subidos = tipos.filter(t => info.archivos?.[t]).length;
     const listo = subidos === totalTipos;
     const pct = Math.round((subidos / totalTipos) * 100);
-    // Buscar preasignación para info adicional
-    const p = preasigState.preasignaciones[id] || preasigState.preasignaciones[id.toUpperCase()];
-    const cliente = info.cliente || p?.nombreCliente || "(sin cliente)";
-    const modelo = info.modelo || (p ? `${p.marca || ""} ${p.modelo || ""}`.trim() : "—");
-    const asesor = p?.asesorNombre || (Object.values(info.archivos || {})[0]?.subidoPor?.split("@")[0]?.toUpperCase()) || "—";
+    // Cruzar info desde tres fuentes: docs-ventas, preasignación, leads, inventario Siigo
+    const ctx = resolverContextoVenta(id, info);
+    const clienteCell = ctx.cliente
+      ? `<strong>${escapeHtml(ctx.cliente)}</strong>${ctx.documento ? `<br><span class="muted" style="font-size:11px">CC ${escapeHtml(ctx.documento)}</span>` : ""}`
+      : `<span style="color:var(--bad)">⚠️ Sin lead asociado</span>`;
+    const motoCell = ctx.modelo
+      ? `<strong>${escapeHtml(ctx.modelo)}</strong>${ctx.color ? `<br><span class="muted" style="font-size:11px">${escapeHtml(ctx.color)}</span>` : ""}`
+      : "—";
+    const asesorCell = ctx.asesorNombre
+      ? `<strong>${escapeHtml(ctx.asesorNombre)}</strong>`
+      : `<span class="muted">${escapeHtml(ctx.asesorRaw || "—")}</span>`;
     html += `<tr class="${listo ? "listo" : ""}" data-detalle-id="${escapeHtml(id)}">
-      <td><strong>${escapeHtml(cliente)}</strong></td>
-      <td>${escapeHtml(modelo)}</td>
+      <td>${clienteCell}</td>
+      <td>${motoCell}</td>
       <td><code style="font-size:11px;color:var(--accent-2)">${escapeHtml(id)}</code></td>
-      <td>${escapeHtml(asesor)}</td>
+      <td>${asesorCell}</td>
       <td>
         <span class="progreso ${listo ? "listo" : ""}">
           ${subidos}/${totalTipos} ${listo ? "✓" : ""}
@@ -2056,33 +2125,61 @@ function abrirDetalleVenta(idVenta) {
   if (!info) return;
   const p = preasigState.preasignaciones[idVenta] || preasigState.preasignaciones[idVenta.toUpperCase()];
   const tipos = docState.tipos || [];
+  const ctx = resolverContextoVenta(idVenta, info);
 
   // Header
-  const cliente = info.cliente || p?.nombreCliente || "(sin cliente)";
-  const modelo = info.modelo || (p ? `${p.marca || ""} ${p.modelo || ""}`.trim() : "—");
+  const cliente = ctx.cliente || "(sin cliente)";
+  const modelo = ctx.modelo || "—";
   document.getElementById("detalleTitulo").textContent = `${cliente} — ${modelo}`;
   document.getElementById("detalleSubtitulo").innerHTML =
     `Chasis: <code style="color:var(--accent-2)">${escapeHtml(idVenta)}</code>` +
-    (p?.motor ? ` · Motor: <code style="color:var(--muted)">${escapeHtml(p.motor)}</code>` : "") +
-    (p?.color ? ` · Color: ${escapeHtml(p.color)}` : "");
+    (ctx.motor ? ` · Motor: <code style="color:var(--muted)">${escapeHtml(ctx.motor)}</code>` : "") +
+    (ctx.color ? ` · Color: ${escapeHtml(ctx.color)}` : "") +
+    (ctx.asesorNombre ? ` · Asesor: <strong style="color:var(--accent)">${escapeHtml(ctx.asesorNombre)}</strong>` : "");
 
-  // Datos del cliente (de la preasignación si existe)
+  // Datos del cliente — combina preasignación + lead + Siigo
   const datosCliente = document.getElementById("detalleDatosCliente");
-  if (p) {
+  const lead = ctx.lead;
+  const tieneDatos = p || lead;
+  if (tieneDatos) {
+    // Fuente del dato (preasignación gana, después lead)
+    const get = (campoP, campoL, label) => {
+      const valor = (p && p[campoP]) || (lead && lead[campoL]) || "";
+      const fuente = (p && p[campoP]) ? "preasig" : (lead && lead[campoL] ? "lead" : "");
+      return { valor, fuente, label };
+    };
+    const fila = [
+      get("cedulaCliente", "documento", "Cédula"),
+      get("fechaNacimiento", "fechaNacimiento", "F. nacimiento"),
+      get("celular", "celular", "Celular"),
+      get("numCredito", "numCredito", "# Crédito"),
+      get("financiera", "financiera", "Financiera"),
+      get("placa", "placa", "Placa"),
+    ];
+    const gpsLabel = p?.gps ? ({sin:"Sin GPS",instalar:"Instalar",activar:"Activar"})[p.gps] : "—";
+    const asesorBlock = ctx.asesorNombre || "—";
+
     datosCliente.innerHTML = `
       <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px 18px">
-        <div><span class="muted">Cédula:</span> <strong>${escapeHtml(p.cedulaCliente || "—")}</strong></div>
-        <div><span class="muted">F. nacimiento:</span> <strong>${escapeHtml(p.fechaNacimiento || "—")}</strong></div>
-        <div><span class="muted">Celular:</span> <strong>${escapeHtml(p.celular || "—")}</strong></div>
-        <div><span class="muted"># Crédito:</span> <strong>${escapeHtml(p.numCredito || "—")}</strong></div>
-        <div><span class="muted">Financiera:</span> <strong>${escapeHtml(p.financiera || "—")}</strong></div>
-        <div><span class="muted">Placa:</span> <strong>${escapeHtml(p.placa || "—")}</strong></div>
-        <div><span class="muted">GPS:</span> <strong>${({sin:"Sin GPS",instalar:"Instalar",activar:"Activar"})[p.gps] || "—"}</strong></div>
-        <div><span class="muted">Asesor:</span> <strong>${escapeHtml(p.asesorNombre || "—")}</strong></div>
-        <div><span class="muted">Estado moto:</span> <strong>${escapeHtml(p.estado || "—")}</strong></div>
-      </div>`;
+        ${fila.map(f => `
+          <div><span class="muted">${f.label}:</span> <strong>${escapeHtml(f.valor || "—")}</strong>
+          ${f.fuente === "lead" ? `<span class="muted" style="font-size:10px">· del lead</span>` : ""}</div>
+        `).join("")}
+        <div><span class="muted">GPS:</span> <strong>${gpsLabel}</strong></div>
+        <div><span class="muted">Asesor:</span> <strong>${escapeHtml(asesorBlock)}</strong></div>
+        <div><span class="muted">Origen:</span> <strong>${escapeHtml(lead?.origen || "—")}</strong></div>
+      </div>
+      ${!p ? `<p class="muted" style="margin:10px 0 0;font-size:12px;color:#f7c272">
+        ℹ️ No hay preasignación todavía — los datos vienen del lead registrado. Cuando el asesor cree la preasignación se mostrará más detalle (placa, # crédito, GPS, etc).
+      </p>` : ""}`;
   } else {
-    datosCliente.innerHTML = `<p class="muted" style="margin:0">⚠️ No se encontró preasignación para esta venta. Los datos del cliente no están disponibles. Pídele al asesor que cree la preasignación.</p>`;
+    datosCliente.innerHTML = `<div style="padding:14px;background:rgba(247,194,114,0.1);border-left:3px solid #f7c272;border-radius:6px">
+      <strong style="color:#f7c272">⚠️ Sin lead ni preasignación para este chasis</strong>
+      <p class="muted" style="margin:6px 0 0;font-size:13px">
+        Este chasis no aparece en los leads ingresados ni en las preasignaciones.<br>
+        Verifica que el asesor haya creado el lead en <strong>Ingresar lead/cliente</strong> antes de facturar.
+      </p>
+    </div>`;
   }
 
   // Slots
