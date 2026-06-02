@@ -374,12 +374,15 @@
       <div class="card-head">
         <h2>📦 Inventario disponible</h2>
         <div class="search-wrap">
-          <input id="invSearch" placeholder="Buscar marca, modelo, color, bodega..." />
+          <input id="invSearch" placeholder="Buscar chasis, motor, modelo, color, año..." />
           <span class="badge" id="invCount">0</span>
         </div>
       </div>
+      <p class="muted" id="invFuente" style="margin:-6px 0 12px;font-size:12px">
+        Fuente: <span id="invFuenteLabel">cargando…</span>
+      </p>
       <div id="invConfigWarn" class="form-msg form-msg-info" style="display:none">
-        ⚙️ Pega la URL del Google Sheets de inventario en <code>app.js</code> (constante <code>INV_CSV_URL</code>) para activar esta sección. Mientras tanto se muestran datos vacíos.
+        ⚙️ No se pudo cargar el inventario.
       </div>
       <div class="table-wrap">
         <table class="table" id="tblInventario">
@@ -387,9 +390,11 @@
             <tr>
               <th>Marca</th>
               <th>Modelo</th>
+              <th>Año</th>
               <th>Color</th>
               <th>Chasis</th>
-              <th>Bodega</th>
+              <th>Motor</th>
+              <th>CC</th>
               <th class="num" data-role-only="admin contable">Costo (compra)</th>
               <th class="num">Precio venta</th>
               <th>Estado</th>

@@ -864,7 +864,9 @@ async function loadPrecios() {
       rows.push({
         marca: marcaActual,
         modelo: modelo.toUpperCase(),
-        precio2026: precio2026 || precio2025 || precio2027 || 0,
+        precio2025,
+        precio2026,
+        precio2027,
         precioContado,
         transito,
         prenda,
@@ -934,17 +936,64 @@ if (precSearchEl) precSearchEl.addEventListener("input", e => { precState.search
 // (estado distinto de VENDIDA) antes de renderizar.
 const INV_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSh3BOUXsJVvIOH_07kqNa-BgWDBGc5bP40jrJ5I320V4SxsBrbJoHTkUD7XuTQSHvNfJ-xMc6dpAEr/pub?gid=966946261&single=true&output=csv";
 
-const invState = { rows: [], filtered: [], search: "" };
+const invState = { rows: [], filtered: [], search: "", fuente: "—" };
+
+// Inferir marca a partir del nombre del modelo Siigo (que no la trae explícita)
+function inferirMarcaPorModelo(modelo) {
+  const m = String(modelo || "").toUpperCase();
+  if (/RAIDER|APACHE|NTORQ|SPORT|STAR|HLX|RTX|\bRR\b|RAIDER|RADEON|JUPITER|XL|FIERO|NEO/i.test(m)) return "TVS";
+  if (/KING|VICTORY|XKM|SCOOTER|MOBILITY/i.test(m)) return "MOBILITY";
+  if (/AKT/i.test(m)) return "AKT";
+  if (/AUTECO|KAWA|YAMAHA|SUZUKI|HONDA|BAJAJ|HERO/i.test(m)) {
+    return m.match(/AUTECO|KAWA|YAMAHA|SUZUKI|HONDA|BAJAJ|HERO/)[0].toUpperCase();
+  }
+  return "OTRO";
+}
+
+function normalizeSiigoMoto(p) {
+  const modelo = (p.nombre || "").replace(/^MOTOCICLET[A]?\s+/i, "").trim().toUpperCase();
+  return {
+    marca: inferirMarcaPorModelo(modelo),
+    modelo,
+    color: (p.color || "").toUpperCase(),
+    chasis: (p.chasis || "").toUpperCase(),
+    motor: (p.motor || "").toUpperCase(),
+    anio: p.anio || "",
+    cilindraje: p.cilindraje || "",
+    bodega: "—",
+    costo: null,                       // Siigo /v1/products no devuelve costo
+    stock: p.stock || 0,
+    estado: p.activo ? "DISPONIBLE" : "INACTIVA",
+    codigoSiigo: p.codigo || "",
+  };
+}
 
 async function loadInventario() {
   const warn = document.getElementById("invConfigWarn");
-  if (!INV_CSV_URL) {
-    if (warn) warn.style.display = "block";
-    document.querySelector("#tblInventario tbody").innerHTML =
-      `<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:20px">Pendiente configurar URL del inventario.</td></tr>`;
-    return;
-  }
+  const fuenteLabel = document.getElementById("invFuenteLabel");
   if (warn) warn.style.display = "none";
+  if (fuenteLabel) fuenteLabel.textContent = "cargando…";
+
+  // 1) Fuente primaria: Siigo
+  try {
+    const res = await fetch("/api/siigo/productos", { cache: "no-store" });
+    const data = await res.json();
+    if (data.ok && Array.isArray(data.productos)) {
+      invState.rows = data.productos
+        .map(normalizeSiigoMoto)
+        .filter(r => r.modelo)
+        .filter(r => r.stock > 0)
+        .sort((a, b) => a.modelo.localeCompare(b.modelo));
+      invState.fuente = `🧾 Siigo (${invState.rows.length} motos con stock · cache 5min)`;
+      if (fuenteLabel) fuenteLabel.textContent = invState.fuente;
+      renderInventario();
+      return;
+    }
+  } catch (e) {
+    console.warn("[inventario] Siigo falló, intento Sheet…", e.message);
+  }
+
+  // 2) Fallback: Google Sheets pestaña inventario
   try {
     const url = INV_CSV_URL + (INV_CSV_URL.includes("?") ? "&" : "?") + "t=" + Date.now();
     const res = await fetch(url, { cache: "no-store" });
@@ -954,11 +1003,14 @@ async function loadInventario() {
       .map(normalizeInvRow)
       .filter(r => r.modelo || r.marca)
       .filter(r => r.estado !== "VENDIDA");
+    invState.fuente = `📊 Google Sheets (Siigo no disponible)`;
+    if (fuenteLabel) fuenteLabel.textContent = invState.fuente;
     renderInventario();
   } catch (e) {
     console.error("Error cargando inventario:", e);
+    if (warn) warn.style.display = "block";
     document.querySelector("#tblInventario tbody").innerHTML =
-      `<tr><td colspan="7" style="text-align:center;color:var(--bad);padding:20px">Error al cargar inventario.</td></tr>`;
+      `<tr><td colspan="10" style="text-align:center;color:var(--bad);padding:20px">Error al cargar inventario.</td></tr>`;
   }
 }
 
@@ -970,22 +1022,39 @@ function normalizeInvRow(raw) {
     modelo: pick(raw, ["Modelo_Moto_Disponible", "LINEA", "Modelo", "MODELO"]).toUpperCase(),
     color: pick(raw, ["Color_Moto", "Color", "COLOR"]),
     chasis: pick(raw, ["Nro. Chasis", "Nro_Chasis", "Chasis", "VIN"]),
+    motor: pick(raw, ["Nro_Motor", "Motor", "MOTOR", "Nro. Motor"]),
+    anio: pick(raw, ["Anio", "Año", "AÑO", "Year"]),
+    cilindraje: pick(raw, ["Cilindraje", "CC"]),
     bodega: pick(raw, ["Bodega", "BODEGA", "Almacen", "Ubicacion"]),
     costo: parseMoney(pick(raw, ["Costo_Total", "Costo_Compra", "Costo"])),  // Precio de compra (sensible)
     estado: estadoRaw || "DISPONIBLE",
   };
 }
 
-// Buscar precio de venta oficial cruzando con la Lista de Precios por modelo (fuzzy)
-function buscarPrecioVenta(modeloInv) {
+// Buscar precio de venta oficial cruzando con la Lista de Precios por modelo + año.
+// Prioriza Precio_Contado (lo que paga el cliente en efectivo).
+// Si no hay, usa el precio del año específico (2025/2026/2027) según `anio`.
+function buscarPrecioVenta(modeloInv, anio) {
   if (!modeloInv || !precState.rows.length) return null;
   const m = String(modeloInv).toUpperCase().trim();
+
+  function precioDe(row) {
+    if (!row) return null;
+    if (row.precioContado) return row.precioContado;
+    // Por año específico
+    if (anio === "2025" && row.precio2025) return row.precio2025;
+    if (anio === "2026" && row.precio2026) return row.precio2026;
+    if (anio === "2027" && row.precio2027) return row.precio2027;
+    // Fallback: cualquier precio disponible
+    return row.precio2026 || row.precio2027 || row.precio2025 || null;
+  }
+
   // Match exacto
   let p = precState.rows.find(r => r.modelo === m);
-  if (p) return p.precioContado || p.precio2026 || null;
+  if (p) return precioDe(p);
   // Match: cualquiera contiene al otro
   p = precState.rows.find(r => r.modelo.includes(m) || m.includes(r.modelo));
-  if (p) return p.precioContado || p.precio2026 || null;
+  if (p) return precioDe(p);
   // Match por tokens significativos (3+ chars)
   const tokensInv = m.split(/\s+/).filter(t => t.length >= 3);
   if (tokensInv.length >= 2) {
@@ -993,7 +1062,7 @@ function buscarPrecioVenta(modeloInv) {
       const tp = r.modelo.split(/\s+/);
       return tokensInv.filter(t => tp.some(x => x === t)).length >= 2;
     });
-    if (p) return p.precioContado || p.precio2026 || null;
+    if (p) return precioDe(p);
   }
   return null;
 }
@@ -1001,7 +1070,8 @@ function buscarPrecioVenta(modeloInv) {
 function renderInventario() {
   const q = (invState.search || "").toLowerCase().trim();
   invState.filtered = invState.rows.filter(r =>
-    !q || [r.marca, r.modelo, r.color, r.bodega, r.estado, r.chasis].some(v => (v || "").toLowerCase().includes(q))
+    !q || [r.marca, r.modelo, r.color, r.bodega, r.estado, r.chasis, r.motor, r.anio, r.cilindraje]
+      .some(v => (v || "").toString().toLowerCase().includes(q))
   );
   document.getElementById("invCount").textContent = fmtNum.format(invState.filtered.length);
   const tbody = document.querySelector("#tblInventario tbody");
@@ -1009,20 +1079,22 @@ function renderInventario() {
     const marcaTag = r.marca === "TVS" ? `<span class="tag tag-tvs">TVS</span>`
                    : r.marca === "MOBILITY" ? `<span class="tag tag-mobility">MOBILITY</span>`
                    : `<span class="tag tag-otro">${escapeHtml(r.marca || "—")}</span>`;
-    const precioVenta = buscarPrecioVenta(r.modelo);
+    const precioVenta = buscarPrecioVenta(r.modelo, r.anio);
     return `<tr>
       <td>${marcaTag}</td>
       <td><strong>${escapeHtml(r.modelo || "—")}</strong></td>
+      <td>${escapeHtml(r.anio || "—")}</td>
       <td>${escapeHtml(r.color || "—")}</td>
       <td><code style="font-size:11px;color:var(--muted)">${escapeHtml(r.chasis || "—")}</code></td>
-      <td>${escapeHtml(r.bodega || "—")}</td>
+      <td><code style="font-size:11px;color:var(--muted)">${escapeHtml(r.motor || "—")}</code></td>
+      <td>${escapeHtml(r.cilindraje || "—")}</td>
       <td class="num" data-role-only="admin contable">${r.costo ? fmtCOP.format(r.costo) : "—"}</td>
       <td class="num"><strong style="color:#5be58a">${precioVenta ? fmtCOP.format(precioVenta) : "—"}</strong></td>
       <td>${escapeHtml(r.estado || "—")}</td>
     </tr>`;
-  }).join("") || `<tr><td colspan="8" style="text-align:center;color:var(--muted);padding:20px">Sin resultados.</td></tr>`;
+  }).join("") || `<tr><td colspan="10" style="text-align:center;color:var(--muted);padding:20px">Sin resultados.</td></tr>`;
   if (invState.filtered.length > 200) {
-    tbody.innerHTML += `<tr><td colspan="8" style="text-align:center;color:var(--muted);padding:10px;font-style:italic">Mostrando primeras 200 de ${invState.filtered.length} filas — refina la búsqueda</td></tr>`;
+    tbody.innerHTML += `<tr><td colspan="10" style="text-align:center;color:var(--muted);padding:10px;font-style:italic">Mostrando primeras 200 de ${invState.filtered.length} filas — refina la búsqueda</td></tr>`;
   }
 }
 
