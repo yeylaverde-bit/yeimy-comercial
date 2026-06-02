@@ -757,7 +757,8 @@ function construirPayload(form, usuario) {
     HabeasData: !!habeas,
     Sistema: "",
     NivelInteres: form.NivelInteres || "AA",
-    Usuario: usuario.email.split("@")[0],
+    // Login en Impulsa: si users.json define usuarioImpulsa, lo usamos; sino, parte antes del @
+    Usuario: usuario.usuarioImpulsa || usuario.email.split("@")[0],
   };
 }
 
