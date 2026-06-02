@@ -97,9 +97,49 @@ async function obtenerProductos({ pageSize = 100, maxPaginas = 50 } = {}) {
 }
 
 /**
+ * Extrae chasis, motor, color, año y cilindraje desde el campo `description`
+ * de Siigo. Ejemplo:
+ *   "MOTOCICLETA RAIDER 125 FI GRIS CALIFORNIA CALCOMANIA DORADA 2027 (124.8CC)
+ *    CHASIS 9FL25AF99VDE17429 MOTOR GF9AV10A3896"
+ *
+ * → { chasis: "9FL25AF99VDE17429", motor: "GF9AV10A3896",
+ *     anio: "2027", cilindraje: "124.8CC", color: "GRIS CALIFORNIA CALCOMANIA DORADA" }
+ */
+function parseDescripcion(desc) {
+  if (!desc || typeof desc !== "string") return {};
+  const out = {};
+
+  const mChasis = desc.match(/CHASIS\s+([A-Z0-9]+)/i);
+  if (mChasis) out.chasis = mChasis[1].toUpperCase();
+
+  const mMotor = desc.match(/MOTOR\s+([A-Z0-9]+)/i);
+  if (mMotor) out.motor = mMotor[1].toUpperCase();
+
+  const mAnio = desc.match(/\b(20\d{2})\b/);
+  if (mAnio) out.anio = mAnio[1];
+
+  const mCC = desc.match(/\(([\d.]+\s*CC)\)/i);
+  if (mCC) out.cilindraje = mCC[1].toUpperCase().replace(/\s+/g, "");
+
+  // Color: lo que está entre el modelo y el año (o CHASIS, lo que aparezca primero)
+  // Estrategia: tomar la parte después de "FI"/"ABS"/"CBS"/"FACELIFT" y antes del año o "CHASIS"
+  const limpio = desc
+    .replace(/^MOTOCICLET[A]?\s+/i, "")
+    .replace(/\s*CHASIS\s+.*$/i, "")
+    .replace(/\s*\([\d.]+\s*CC\)\s*/i, " ")
+    .replace(/\b(20\d{2})\b/, "")
+    .trim();
+  // Quitar el modelo del inicio (ej "RAIDER 125 FI") — heurística: hasta encontrar
+  // una palabra completamente alfa que sea color común
+  const partes = limpio.split(/\s+/);
+  const colorIdx = partes.findIndex(w => /^(NEGR|BLANC|ROJ|AZUL|GRIS|VERDE|AMARILL|PLATA|NARANJ|MARRON|DORAD)/i.test(w));
+  if (colorIdx > 0) out.color = partes.slice(colorIdx).join(" ").trim();
+
+  return out;
+}
+
+/**
  * Normaliza un producto Siigo al shape mínimo que usa el frontend.
- * Siigo retorna campos como: id, code, name, account_group, stock, available_quantity,
- * prices: [{ currency_code, price_list: [{ position, value }] }], etc.
  */
 function normalizarProducto(p) {
   const precio = (() => {
@@ -107,16 +147,25 @@ function normalizarProducto(p) {
     if (typeof lista === "number") return lista;
     return null;
   })();
+  const desc = p.description || "";
+  const parsed = parseDescripcion(desc);
+
   return {
     id: p.id || p.code || null,
     codigo: p.code || "",
     nombre: p.name || "",
     referencia: p.reference || "",
+    descripcion: desc,
+    chasis: parsed.chasis || "",
+    motor: parsed.motor || "",
+    color: parsed.color || "",
+    anio: parsed.anio || "",
+    cilindraje: parsed.cilindraje || "",
     stock: typeof p.available_quantity === "number" ? p.available_quantity
          : typeof p.stock === "number" ? p.stock : null,
     precio,
     activo: p.active !== false,
-    raw: p,
+    creado: p?.metadata?.created || null,
   };
 }
 
