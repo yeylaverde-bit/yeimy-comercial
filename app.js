@@ -2534,24 +2534,6 @@ function renderGpsLista(tipo) {
       } catch (e) { showToast("Error: " + e.message); }
     });
   });
-}
-
-async function guardarImei(chasis, imei) {
-  try {
-    const r = await fetch(`/api/preasignaciones/${encodeURIComponent(chasis)}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ imeiGps: imei.trim() }),
-    });
-    const data = await r.json();
-    if (data.ok) {
-      showToast(`✓ IMEI guardado: ${imei}`);
-      await loadPreasignaciones();
-    } else {
-      showToast("Error: " + (data.error || "no se pudo guardar"));
-    }
-  } catch (e) { showToast("Error: " + e.message); }
-}
 
   // Listeners — subir video evidencia (GPS Instalar)
   wrap.querySelectorAll("input[data-gps-video]").forEach(inp => {
@@ -2606,6 +2588,24 @@ async function guardarImei(chasis, imei) {
       } catch (e) { showToast("Error: " + e.message); }
     });
   });
+}
+
+// Helper (afuera de renderGpsLista) — guarda IMEI en una preasignación
+async function guardarImei(chasis, imei) {
+  try {
+    const r = await fetch(`/api/preasignaciones/${encodeURIComponent(chasis)}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ imeiGps: imei.trim() }),
+    });
+    const data = await r.json();
+    if (data.ok) {
+      showToast(`✓ IMEI guardado: ${imei}`);
+      await loadPreasignaciones();
+    } else {
+      showToast("Error: " + (data.error || "no se pudo guardar"));
+    }
+  } catch (e) { showToast("Error: " + e.message); }
 }
 
 const gpsInstalarSearchEl = document.getElementById("gpsInstalarSearch");
