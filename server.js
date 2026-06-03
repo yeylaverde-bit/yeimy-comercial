@@ -995,9 +995,9 @@ app.get("/api/siigo/buscar/:chasis", requireAuth, async (req, res) => {
   if (!siigo.siigoConfigurado()) {
     return res.status(503).json({ ok: false, error: "Siigo no configurado" });
   }
-  const chasis = String(req.params.chasis || "").trim().toUpperCase();
-  if (chasis.length < 5) {
-    return res.status(400).json({ ok: false, error: "Chasis muy corto" });
+  const query = String(req.params.chasis || "").trim().toUpperCase();
+  if (query.length < 3) {
+    return res.status(400).json({ ok: false, error: "Búsqueda muy corta (mínimo 3 caracteres)" });
   }
   try {
     // Usa el cache si está fresco (no hace falta refrescar para cada búsqueda)
@@ -1008,31 +1008,47 @@ app.get("/api/siigo/buscar/:chasis", requireAuth, async (req, res) => {
       productos = crudos.map(siigo.normalizarProducto);
       siigoCache = { data: productos, fetchedAt: now };
     }
-    const match = productos.find(p => (p.chasis || "").toUpperCase() === chasis);
-    if (!match) {
+
+    // Helper para inferir marca
+    function inferirMarca(nombre) {
+      const n = (nombre || "").toUpperCase();
+      if (/RAIDER|APACHE|NTORQ|SPORT|STAR|HLX|RTX/.test(n)) return "TVS";
+      if (/KING|VICTORY|NITRO|MOTO\s*CARRO|MRX|XKM|MOBILITY/.test(n)) return "MOBILITY";
+      if (/AKT/.test(n)) return "AKT";
+      return "OTRO";
+    }
+
+    // Búsqueda parcial: el query puede ser parte del chasis o motor
+    const matches = productos.filter(p =>
+      (p.chasis || "").toUpperCase().includes(query) ||
+      (p.motor || "").toUpperCase().includes(query) ||
+      (p.codigo || "").toUpperCase().includes(query)
+    );
+
+    if (matches.length === 0) {
       return res.json({ ok: false, encontrado: false, mensaje: "Chasis no está en Siigo" });
     }
-    // Inferir marca por nombre (mismo helper que usa el frontend)
-    const nombreUp = (match.nombre || "").toUpperCase();
-    let marca = "OTRO";
-    if (/RAIDER|APACHE|NTORQ|SPORT|STAR|HLX|RTX/.test(nombreUp)) marca = "TVS";
-    else if (/KING|VICTORY|NITRO|MOTO\s*CARRO|MRX|XKM|MOBILITY/.test(nombreUp)) marca = "MOBILITY";
-    else if (/AKT/.test(nombreUp)) marca = "AKT";
-    res.json({
-      ok: true,
-      encontrado: true,
-      moto: {
-        chasis: match.chasis,
-        motor: match.motor,
-        modelo: (match.nombre || "").replace(/^MOTOCICLET[A]?\s+/i, "").trim(),
-        marca,
-        color: match.color,
-        anio: match.anio,
-        cilindraje: match.cilindraje,
-        stock: match.stock,
-        codigo: match.codigo,
-      },
-    });
+
+    // Mapear a formato estándar (hasta 20 resultados)
+    const lista = matches.slice(0, 20).map(p => ({
+      chasis: p.chasis,
+      motor: p.motor,
+      modelo: (p.nombre || "").replace(/^MOTOCICLET[A]?\s+/i, "").trim(),
+      marca: inferirMarca(p.nombre),
+      color: p.color,
+      anio: p.anio,
+      cilindraje: p.cilindraje,
+      stock: p.stock,
+      codigo: p.codigo,
+    }));
+
+    // Si solo hay 1 resultado: devolver como única encontrada
+    if (lista.length === 1) {
+      return res.json({ ok: true, encontrado: true, moto: lista[0], total: 1 });
+    }
+
+    // Múltiples coincidencias: devolver lista
+    res.json({ ok: true, encontrado: true, total: matches.length, opciones: lista, multiple: true });
   } catch (e) {
     res.status(500).json({ ok: false, error: e.message });
   }

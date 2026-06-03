@@ -1669,37 +1669,61 @@ function attachChasisAutocomplete() {
   let timer = null;
   async function buscarYRellenar() {
     const c = chasisInp.value.trim().toUpperCase();
-    if (c.length < 5) return;
+    if (c.length < 3) return;
 
-    // 1) Inventario local primero (instantáneo)
-    const moto = (invState.rows || []).find(r => r.chasis === c);
-    if (moto) {
-      if (!f.querySelector('[name="marca"]').value) f.querySelector('[name="marca"]').value = moto.marca || "";
-      if (!f.querySelector('[name="modelo"]').value) f.querySelector('[name="modelo"]').value = moto.modelo || "";
-      if (!f.querySelector('[name="color"]').value) f.querySelector('[name="color"]').value = moto.color || "";
-      if (moto.motor && !f.querySelector('[name="motor"]').value) f.querySelector('[name="motor"]').value = moto.motor;
-      mostrarMsgAutofill("✓ Datos prellenados desde inventario", "ok");
+    // Helper para llenar campos
+    function llenar(m, fuente) {
+      if (!f.querySelector('[name="marca"]').value) f.querySelector('[name="marca"]').value = m.marca || "";
+      if (!f.querySelector('[name="modelo"]').value) f.querySelector('[name="modelo"]').value = m.modelo || "";
+      if (!f.querySelector('[name="color"]').value) f.querySelector('[name="color"]').value = m.color || "";
+      if (m.motor && !f.querySelector('[name="motor"]').value) f.querySelector('[name="motor"]').value = m.motor;
+      // Reemplazar el chasis parcial por el COMPLETO
+      if (m.chasis && m.chasis !== c) chasisInp.value = m.chasis;
+      mostrarMsgAutofill(`✓ Datos prellenados desde ${fuente} · ${m.modelo} ${m.color || ""}${m.stock === 0 ? " · ⚠️ VENDIDA (stock 0)" : ""}`, "ok");
+    }
+
+    // 1) Inventario local primero — match exacto o parcial
+    let motosLocal = (invState.rows || []).filter(r => (r.chasis || "").includes(c));
+    if (motosLocal.length === 1) {
+      llenar(motosLocal[0], "inventario");
+      return;
+    }
+    if (motosLocal.length > 1 && motosLocal.length <= 20) {
+      mostrarOpcionesEnDatalist(motosLocal);
+      mostrarMsgAutofill(`📋 ${motosLocal.length} coincidencias — abre el menú o escribe más caracteres`, "info");
       return;
     }
 
-    // 2) Buscar en Siigo (si no se encontró localmente)
+    // 2) Buscar en Siigo (búsqueda parcial)
     mostrarMsgAutofill("🔎 Buscando en Siigo…", "");
     try {
       const r = await fetch(`/api/siigo/buscar/${encodeURIComponent(c)}`);
       const data = await r.json();
-      if (data.ok && data.encontrado) {
-        const m = data.moto;
-        if (!f.querySelector('[name="marca"]').value) f.querySelector('[name="marca"]').value = m.marca || "";
-        if (!f.querySelector('[name="modelo"]').value) f.querySelector('[name="modelo"]').value = m.modelo || "";
-        if (!f.querySelector('[name="color"]').value) f.querySelector('[name="color"]').value = m.color || "";
-        if (m.motor && !f.querySelector('[name="motor"]').value) f.querySelector('[name="motor"]').value = m.motor;
-        mostrarMsgAutofill(`✓ Datos prellenados desde Siigo · ${m.modelo} ${m.color || ""}`, "ok");
-      } else {
+      if (!data.ok || !data.encontrado) {
         mostrarMsgAutofill("⚠️ Chasis no está en Siigo ni en inventario · llena los datos manualmente", "info");
+        return;
       }
+      if (data.multiple && data.opciones?.length > 1) {
+        // Hay varias motos que matchean — mostrar opciones en el datalist
+        mostrarOpcionesEnDatalist(data.opciones);
+        mostrarMsgAutofill(`📋 ${data.total} coincidencias en Siigo — abre el menú desplegable o escribe más caracteres`, "info");
+        return;
+      }
+      const m = data.moto || data.opciones?.[0];
+      if (m) llenar(m, "Siigo");
     } catch (e) {
       mostrarMsgAutofill("", "");
     }
+  }
+
+  function mostrarOpcionesEnDatalist(motos) {
+    const dl = document.getElementById("chasisList");
+    if (!dl) return;
+    dl.innerHTML = motos.slice(0, 20).map(m => {
+      const estado = m.stock === 0 ? " · VENDIDA" : "";
+      const label = `${m.marca || ""} ${m.modelo || ""} · ${m.color || ""}${estado}`.trim();
+      return `<option value="${escapeHtml(m.chasis)}">${escapeHtml(label)}</option>`;
+    }).join("");
   }
 
   function mostrarMsgAutofill(texto, tipo) {
