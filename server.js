@@ -513,7 +513,7 @@ app.patch("/api/preasignaciones/:chasis", requireAuth, (req, res) => {
     if (req.body.gpsActivadoEn) todas[chasis].gpsActivadoPor = usuario.email;
   } else {
     // Solo permite actualizar ciertos campos
-    const camposPermitidos = ["estado", "gps", "placa", "numCredito", "financiera", "celular", "fechaNacimiento"];
+    const camposPermitidos = ["estado", "gps", "placa", "numCredito", "financiera", "celular", "fechaNacimiento", "imeiGps", "gpsInstalarEvidenciaPath", "gpsActivarEvidenciaPath"];
     for (const c of camposPermitidos) {
       if (req.body[c] !== undefined) todas[chasis][c] = String(req.body[c]).trim();
     }
@@ -680,6 +680,77 @@ Si no puedes leer algún campo, usa "" o 0. Si la imagen no es una factura legib
     });
   } catch (e) {
     console.error("Error factura:", e);
+    res.status(500).json({ ok: false, error: e.message });
+  }
+});
+
+// ============================================================
+//      GPS — leer IMEI desde foto del sticker (Claude Vision)
+// ============================================================
+const GPS_DIR = path.join(DATA_DIR, "gps-imei");
+if (!fs.existsSync(GPS_DIR)) fs.mkdirSync(GPS_DIR, { recursive: true });
+const uploadGps = multer({
+  storage: multer.diskStorage({
+    destination: (_req, _file, cb) => cb(null, GPS_DIR),
+    filename: (_req, file, cb) => cb(null, Date.now() + "-" + file.originalname.replace(/[^a-zA-Z0-9.\-_]/g, "_")),
+  }),
+  limits: { fileSize: 10 * 1024 * 1024 },
+});
+
+app.post("/api/gps/leer-imei", requireAuth, uploadGps.single("archivo"), async (req, res) => {
+  if (!anthropic) return res.status(500).json({ ok: false, error: "ANTHROPIC_API_KEY no configurada" });
+  if (!req.file) return res.status(400).json({ ok: false, error: "Falta foto del sticker" });
+
+  const filepath = path.join(GPS_DIR, req.file.filename);
+  try {
+    const buf = fs.readFileSync(filepath);
+    const base64 = buf.toString("base64");
+    const mediaType = req.file.mimetype === "application/pdf" ? "application/pdf" : req.file.mimetype;
+
+    const contentItem = mediaType === "application/pdf"
+      ? { type: "document", source: { type: "base64", media_type: "application/pdf", data: base64 } }
+      : { type: "image", source: { type: "base64", media_type: mediaType, data: base64 } };
+
+    const prompt = `Esta es una foto de un sticker pegado a un dispositivo GPS (rastreador vehicular).
+Suele tener un código de barras y un IMEI (número de 15 dígitos que identifica el dispositivo).
+
+Extrae:
+- imei: el número IMEI (15 dígitos numéricos, generalmente empieza con 86 o 35)
+- serial: número de serie si aparece (puede ser alfanumérico)
+- modelo: marca/modelo del GPS si aparece (ej: TS101, GT06, etc.)
+
+Devuelve SOLO un JSON válido con este formato exacto, sin texto extra:
+{
+  "imei": "...",
+  "serial": "...",
+  "modelo": "..."
+}
+
+Si no puedes leer algún campo, usa "". Si la imagen no es un sticker de GPS, devuelve {"imei":"","serial":"","modelo":""}.`;
+
+    const result = await anthropic.messages.create({
+      model: "claude-sonnet-4-5",
+      max_tokens: 512,
+      messages: [{
+        role: "user",
+        content: [contentItem, { type: "text", text: prompt }],
+      }],
+    });
+
+    let texto = result.content[0]?.text || "";
+    const jsonMatch = texto.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) throw new Error("Claude no devolvió JSON válido: " + texto.slice(0, 200));
+    const data = JSON.parse(jsonMatch[0]);
+
+    res.json({
+      ok: true,
+      imei: data.imei || "",
+      serial: data.serial || "",
+      modelo: data.modelo || "",
+      archivo: req.file.filename,
+    });
+  } catch (e) {
+    console.error("Error GPS IMEI:", e);
     res.status(500).json({ ok: false, error: e.message });
   }
 });
