@@ -65,7 +65,7 @@
         <a href="#misleads" data-role-only="admin asesor contable dueno">📋 Registros del mes</a>
         <a href="#preasignacion" data-role-only="admin asesor dueno">🔧 Preasignación</a>
         <a href="#ordenfac">📑 Orden facturación</a>
-        <a href="#soat" data-role-only="admin contable dueno">🛡️ Crear SOAT</a>
+        <a href="#soat" data-role-only="admin asesor contable dueno">🛡️ Crear SOAT</a>
         <a href="#taller" data-role-only="admin asesor dueno">🛠️ Taller</a>
       </nav>
     </div>
@@ -775,7 +775,7 @@
       </div>
     </div>
 
-    <section id="soat" class="card" data-role-only="admin contable dueno">
+    <section id="soat" class="card" data-role-only="admin asesor contable dueno">
       <div class="card-head">
         <h2>🛡️ Crear SOAT · pendientes</h2>
         <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
@@ -785,8 +785,11 @@
           </div>
         </div>
       </div>
-      <p class="muted" style="margin:-4px 0 12px;font-size:12.5px">
-        Motos con <strong>empadronamiento subido</strong> y <strong>SOAT pendiente</strong>. Copia los datos del cliente y descarga el empadronamiento para generar el SOAT en tu sistema. Cuando lo tengas, súbelo abajo.
+      <p class="muted" style="margin:-4px 0 12px;font-size:12.5px" data-role-only="admin asesor dueno">
+        Tus motos en preasignación. Sube el empadronamiento y contabilidad podrá generar el SOAT con todos los datos del cliente.
+      </p>
+      <p class="muted" style="margin:-4px 0 12px;font-size:12.5px" data-role-only="contable">
+        Motos en preasignación que necesitan SOAT. Aquí tienes <strong>todos los datos del cliente y la moto</strong> para generar el SOAT externamente. Cuando lo tengas, súbelo en cada tarjeta.
       </p>
       <div id="soatLista" style="display:grid;gap:14px"></div>
     </section>

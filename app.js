@@ -1712,20 +1712,25 @@ function renderSoatPendientes() {
   const countEl = document.getElementById("soatCount");
   if (!wrap || !countEl) return;
 
-  // Lista de ventas que tienen empadronamiento subido PERO no SOAT subido todavía
-  const candidatas = Object.entries(docState.docs || {}).filter(([id, info]) => {
-    const tieneEmp = !!info.archivos?.empadronamiento;
-    const tieneSoat = !!info.archivos?.soat;
-    return tieneEmp && !tieneSoat;
+  // Fuente: TODAS las preasignaciones que no tengan SOAT subido todavía
+  // (no requiere empadronamiento previo — el asesor puede subirlo desde acá)
+  const preasigs = Object.values(preasigState.preasignaciones || {})
+    .filter(p => p.chasis)  // solo las que tienen chasis válido
+    .filter(p => p.estado !== "entregada");  // no las ya entregadas
+
+  // Verificar cuáles no tienen SOAT subido en docState.docs
+  const candidatas = preasigs.filter(p => {
+    const docs = docState.docs?.[p.chasis] || docState.docs?.[String(p.chasis).toUpperCase()];
+    return !docs?.archivos?.soat;
   });
 
   // Filtro de búsqueda
   const q = (soatState.search || "").toLowerCase().trim();
-  const filtradas = candidatas.filter(([id, info]) => {
+  const filtradas = candidatas.filter(p => {
     if (!q) return true;
-    const ctx = resolverContextoVenta(id, info);
-    return [id, ctx.cliente, ctx.documento, ctx.modelo,
-            preasigState.preasignaciones[id]?.placa || ""]
+    const lead = leadsState.leads.find(l => (l.chasis || "").toUpperCase() === (p.chasis || "").toUpperCase());
+    return [p.chasis, p.placa, p.nombreCliente, p.cedulaCliente, p.modelo, p.marca,
+            lead?.email, lead?.celular, lead?.direccion]
       .some(v => String(v || "").toLowerCase().includes(q));
   });
 
@@ -1734,75 +1739,118 @@ function renderSoatPendientes() {
   if (filtradas.length === 0) {
     wrap.innerHTML = `<div style="text-align:center;color:var(--muted);padding:30px;border:1px dashed var(--line);border-radius:12px">
       ${candidatas.length === 0
-        ? "Sin SOATs pendientes. Cuando un asesor suba el <strong>empadronamiento</strong> de una moto, aparecerá aquí lista para que crees el SOAT."
+        ? "Sin SOATs pendientes. Cuando un asesor cree una <strong>preasignación</strong>, aparecerá aquí para crear el SOAT."
         : "Sin resultados para esa búsqueda."}
     </div>`;
     return;
   }
 
-  wrap.innerHTML = filtradas.map(([id, info]) => {
-    const ctx = resolverContextoVenta(id, info);
-    const p = preasigState.preasignaciones[id] || preasigState.preasignaciones[String(id).toUpperCase()];
-    const lead = ctx.lead || {};
-    const empArchivo = info.archivos.empadronamiento;
+  // Ordenar: las que tienen empadronamiento primero (listas para SOAT), después las que faltan
+  filtradas.sort((a, b) => {
+    const docsA = docState.docs?.[a.chasis] || docState.docs?.[String(a.chasis).toUpperCase()];
+    const docsB = docState.docs?.[b.chasis] || docState.docs?.[String(b.chasis).toUpperCase()];
+    const empA = !!docsA?.archivos?.empadronamiento;
+    const empB = !!docsB?.archivos?.empadronamiento;
+    if (empA !== empB) return empB - empA;  // con empadronamiento primero
+    return (b.creadoEn || "").localeCompare(a.creadoEn || "");
+  });
+
+  wrap.innerHTML = filtradas.map(p => {
+    const chasis = p.chasis;
+    const docs = docState.docs?.[chasis] || docState.docs?.[String(chasis).toUpperCase()] || { archivos: {} };
+    const lead = leadsState.leads.find(l => (l.chasis || "").toUpperCase() === chasis.toUpperCase())
+              || leadsState.leads.find(l => String(l.documento || "").replace(/[^0-9]/g, "") === String(p.cedulaCliente || "").replace(/[^0-9]/g, ""));
+
+    const empArchivo = docs.archivos?.empadronamiento;
+    const facturaArchivo = docs.archivos?.facturaVenta;
+    const tieneEmp = !!empArchivo;
     const fechaEmp = empArchivo?.subidoEn ? new Date(empArchivo.subidoEn).toLocaleDateString("es-CO") : "—";
-    const facturaArchivo = info.archivos?.facturaVenta;
+    const fechaFac = facturaArchivo?.subidoEn ? new Date(facturaArchivo.subidoEn).toLocaleDateString("es-CO") : "—";
+    const cliente = p.nombreCliente || lead?.cliente || "(sin cliente)";
+    const cedula = p.cedulaCliente || lead?.documento || "";
+    const correo = lead?.email || "";
+    const celular = p.celular || lead?.celular || "";
+    const direccion = lead?.direccion || "";
+    const modelo = `${p.marca || ""} ${p.modelo || ""}`.trim();
+
+    const statusTag = tieneEmp
+      ? `<span class="tag tag-contado">✓ Listo para SOAT</span>`
+      : `<span class="tag tag-financiado">⏳ Falta empadronamiento</span>`;
 
     return `<div class="card" style="border:1px solid var(--line);padding:16px;background:rgba(8,12,28,.5)">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:14px;flex-wrap:wrap;margin-bottom:14px">
         <div>
-          <h3 style="margin:0 0 4px;font-size:16px">${escapeHtml(ctx.cliente || "(sin cliente)")} <code style="font-size:11px;color:var(--accent-2);font-weight:400;margin-left:6px">${escapeHtml(id)}</code></h3>
-          <p class="muted" style="margin:0;font-size:12.5px">${escapeHtml(ctx.modelo || "—")}${ctx.color ? ` · ${escapeHtml(ctx.color)}` : ""}</p>
+          <h3 style="margin:0 0 4px;font-size:16px">${escapeHtml(cliente)} <code style="font-size:11px;color:var(--accent-2);font-weight:400;margin-left:6px">${escapeHtml(chasis)}</code></h3>
+          <p class="muted" style="margin:0;font-size:12.5px">${escapeHtml(modelo || "—")}${p.color ? ` · ${escapeHtml(p.color)}` : ""}</p>
         </div>
-        <span class="tag tag-financiado">SOAT pendiente</span>
+        ${statusTag}
       </div>
 
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px 18px;font-size:13px;margin-bottom:14px">
         <div>
           <span class="muted" style="font-size:11px;text-transform:uppercase;letter-spacing:.04em">Placa</span><br>
-          <strong style="font-size:15px;color:var(--accent-2)">${escapeHtml(p?.placa || "—")}</strong>
-          ${p?.placa ? `<button class="btn-mini" data-copy="${escapeHtml(p.placa)}" title="Copiar">📋</button>` : ""}
+          <strong style="font-size:15px;color:var(--accent-2)">${escapeHtml(p.placa || "—")}</strong>
+          ${p.placa ? `<button class="btn-mini" data-copy="${escapeHtml(p.placa)}" title="Copiar">📋</button>` : ""}
         </div>
         <div>
           <span class="muted" style="font-size:11px;text-transform:uppercase;letter-spacing:.04em">Cédula</span><br>
-          <strong>${escapeHtml(ctx.documento || "—")}</strong>
-          ${ctx.documento ? `<button class="btn-mini" data-copy="${escapeHtml(ctx.documento)}" title="Copiar">📋</button>` : ""}
+          <strong>${escapeHtml(cedula || "—")}</strong>
+          ${cedula ? `<button class="btn-mini" data-copy="${escapeHtml(cedula)}" title="Copiar">📋</button>` : ""}
         </div>
         <div>
           <span class="muted" style="font-size:11px;text-transform:uppercase;letter-spacing:.04em">Correo</span><br>
-          <strong>${escapeHtml(lead.email || "—")}</strong>
-          ${lead.email ? `<button class="btn-mini" data-copy="${escapeHtml(lead.email)}" title="Copiar">📋</button>` : ""}
+          <strong>${escapeHtml(correo || "—")}</strong>
+          ${correo ? `<button class="btn-mini" data-copy="${escapeHtml(correo)}" title="Copiar">📋</button>` : ""}
         </div>
         <div>
           <span class="muted" style="font-size:11px;text-transform:uppercase;letter-spacing:.04em">Celular</span><br>
-          <strong>${escapeHtml(lead.celular || p?.celular || "—")}</strong>
+          <strong>${escapeHtml(celular || "—")}</strong>
+          ${celular ? `<button class="btn-mini" data-copy="${escapeHtml(celular)}" title="Copiar">📋</button>` : ""}
+        </div>
+        <div style="grid-column:span 2">
+          <span class="muted" style="font-size:11px;text-transform:uppercase;letter-spacing:.04em">Dirección</span><br>
+          <strong>${escapeHtml(direccion || "—")}</strong>
+          ${direccion ? `<button class="btn-mini" data-copy="${escapeHtml(direccion)}" title="Copiar">📋</button>` : ""}
         </div>
         <div>
           <span class="muted" style="font-size:11px;text-transform:uppercase;letter-spacing:.04em">Chasis</span><br>
-          <code style="font-size:12px;color:var(--accent-2)">${escapeHtml(p?.chasis || ctx.lead?.chasis || id)}</code>
+          <code style="font-size:12px;color:var(--accent-2)">${escapeHtml(chasis)}</code>
         </div>
         <div>
           <span class="muted" style="font-size:11px;text-transform:uppercase;letter-spacing:.04em">Motor</span><br>
-          <code style="font-size:12px;color:var(--muted)">${escapeHtml(ctx.motor || "—")}</code>
+          <code style="font-size:12px;color:var(--muted)">${escapeHtml(p.motor || "—")}</code>
+        </div>
+        <div>
+          <span class="muted" style="font-size:11px;text-transform:uppercase;letter-spacing:.04em"># Crédito</span><br>
+          <strong>${escapeHtml(p.numCredito || "—")}</strong>
+        </div>
+        <div>
+          <span class="muted" style="font-size:11px;text-transform:uppercase;letter-spacing:.04em">Financiera</span><br>
+          <strong>${escapeHtml(p.financiera || "—")}</strong>
         </div>
       </div>
 
       <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
-        <a class="btn-primary" href="/uploads/${encodeURIComponent(id)}/${encodeURIComponent(empArchivo.path)}" target="_blank" style="padding:8px 14px;font-size:13px;text-decoration:none">
-          📋 Ver empadronamiento <span class="muted" style="font-size:11px;font-weight:400">(${fechaEmp})</span>
-        </a>
-        ${facturaArchivo ? `<a class="btn-secondary" href="/uploads/${encodeURIComponent(id)}/${encodeURIComponent(facturaArchivo.path)}" target="_blank" style="padding:8px 14px;font-size:13px;text-decoration:none">
-          🧾 Ver factura
+        ${tieneEmp
+          ? `<a class="btn-primary" href="/uploads/${encodeURIComponent(chasis)}/${encodeURIComponent(empArchivo.path)}" target="_blank" style="padding:8px 14px;font-size:13px;text-decoration:none">
+              📋 Ver empadronamiento <span class="muted" style="font-size:11px;font-weight:400">(${fechaEmp})</span>
+            </a>`
+          : `<label class="btn-primary" style="padding:8px 14px;font-size:13px;cursor:pointer;background:#f7c272;border-color:#f7c272;color:#1a1a1a">
+              📋 Subir empadronamiento
+              <input type="file" data-emp-upload data-id="${escapeHtml(chasis)}" accept="image/*,application/pdf" style="display:none" />
+            </label>`}
+        ${facturaArchivo ? `<a class="btn-secondary" href="/uploads/${encodeURIComponent(chasis)}/${encodeURIComponent(facturaArchivo.path)}" target="_blank" style="padding:8px 14px;font-size:13px;text-decoration:none">
+          🧾 Ver factura <span class="muted" style="font-size:11px;font-weight:400">(${fechaFac})</span>
         </a>` : ""}
-        <label class="btn-primary" style="padding:8px 14px;font-size:13px;cursor:pointer;background:#22c55e;border-color:#22c55e">
+        <label class="btn-primary" data-role-only="admin contable" style="padding:8px 14px;font-size:13px;cursor:pointer;background:#22c55e;border-color:#22c55e">
           ✓ Subir SOAT generado
-          <input type="file" data-soat-upload data-id="${escapeHtml(id)}" accept="image/*,application/pdf" style="display:none" />
+          <input type="file" data-soat-upload data-id="${escapeHtml(chasis)}" accept="image/*,application/pdf" style="display:none" />
         </label>
       </div>
     </div>`;
   }).join("");
 
-  // Listeners de copy
+  // Copy al portapapeles
   wrap.querySelectorAll("[data-copy]").forEach(btn => {
     btn.addEventListener("click", async () => {
       try {
@@ -1812,7 +1860,30 @@ function renderSoatPendientes() {
     });
   });
 
-  // Listeners de subida del SOAT
+  // Subir empadronamiento (asesor o admin)
+  wrap.querySelectorAll("input[data-emp-upload]").forEach(inp => {
+    inp.addEventListener("change", async (ev) => {
+      const file = ev.target.files?.[0];
+      if (!file) return;
+      const id = inp.dataset.id;
+      const fd = new FormData();
+      fd.append("idVenta", id);
+      fd.append("tipo", "empadronamiento");
+      fd.append("archivo", file);
+      try {
+        const r = await fetch("/api/docs/upload", { method: "POST", body: fd });
+        const data = await r.json();
+        if (data.ok) {
+          showToast("✓ Empadronamiento subido");
+          await loadDocs();
+        } else {
+          showToast("Error: " + (data.error || "no se pudo subir"));
+        }
+      } catch (e) { showToast("Error: " + e.message); }
+    });
+  });
+
+  // Subir SOAT (contabilidad)
   wrap.querySelectorAll("input[data-soat-upload]").forEach(inp => {
     inp.addEventListener("change", async (ev) => {
       const file = ev.target.files?.[0];
@@ -1828,7 +1899,6 @@ function renderSoatPendientes() {
         if (data.ok) {
           showToast("✓ SOAT subido");
           await loadDocs();
-          renderSoatPendientes();
         } else {
           showToast("Error: " + (data.error || "no se pudo subir"));
         }
