@@ -14,6 +14,7 @@
 
 const express = require("express");
 const session = require("express-session");
+const FileStore = require("session-file-store")(session);
 const cookieParser = require("cookie-parser");
 const bcrypt = require("bcryptjs");
 const multer = require("multer");
@@ -111,11 +112,22 @@ app.use(express.json({ limit: "200kb" }));
 app.use(cookieParser());
 const IS_PROD = process.env.NODE_ENV === "production";
 if (IS_PROD) app.set("trust proxy", 1);  // necesario detrás de Render/Cloudflare
+// Carpeta para guardar sesiones en disco (sobrevive a deploys/reinicios)
+const SESSIONS_DIR = path.join(DATA_DIR, "sessions");
+if (!fs.existsSync(SESSIONS_DIR)) fs.mkdirSync(SESSIONS_DIR, { recursive: true });
+
 app.use(session({
   name: "yc.sid",
   secret: SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
+  store: new FileStore({
+    path: SESSIONS_DIR,
+    ttl: 8 * 60 * 60,           // 8h en segundos
+    reapInterval: 60 * 60,      // limpiar expiradas cada 1h
+    retries: 1,
+    logFn: () => {},            // silenciar logs de FileStore
+  }),
   cookie: {
     httpOnly: true,
     secure: IS_PROD,         // HTTPS solo en producción
