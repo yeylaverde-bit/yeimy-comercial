@@ -953,6 +953,11 @@ function inferirMarcaPorModelo(modelo) {
 
 function normalizeSiigoMoto(p) {
   const modelo = (p.nombre || "").replace(/^MOTOCICLET[A]?\s+/i, "").trim().toUpperCase();
+  const stock = p.stock || 0;
+  let estado;
+  if (!p.activo) estado = "INACTIVA";
+  else if (stock > 0) estado = "DISPONIBLE";
+  else estado = "VENDIDA";
   return {
     marca: inferirMarcaPorModelo(modelo),
     modelo,
@@ -963,8 +968,8 @@ function normalizeSiigoMoto(p) {
     cilindraje: p.cilindraje || "",
     bodega: "—",
     costo: null,                       // Siigo /v1/products no devuelve costo
-    stock: p.stock || 0,
-    estado: p.activo ? "DISPONIBLE" : "INACTIVA",
+    stock,
+    estado,
     codigoSiigo: p.codigo || "",
   };
 }
@@ -980,19 +985,26 @@ async function loadInventario(opts = {}) {
 
   // Selección del usuario: "sheets" (default) o "siigo"
   if (invState.fuenteSeleccionada === "siigo") {
-    // Carga desde Siigo (puede forzar refresh)
+    // Carga desde Siigo (puede forzar refresh) — muestra TODAS las motos
     try {
       const url = "/api/siigo/productos" + (refresh ? "?refresh=1" : "");
       const res = await fetch(url, { cache: "no-store" });
       const data = await res.json();
       if (data.ok && Array.isArray(data.productos)) {
-        invState.rows = data.productos
+        // Mostrar TODAS las motos de Siigo (vendidas + disponibles)
+        const todas = data.productos
           .map(normalizeSiigoMoto)
           .filter(r => r.modelo)
-          .filter(r => r.stock > 0)
-          .sort((a, b) => a.modelo.localeCompare(b.modelo));
+          .sort((a, b) => {
+            // Disponibles primero, luego por modelo
+            if ((b.stock > 0) !== (a.stock > 0)) return (b.stock > 0) - (a.stock > 0);
+            return a.modelo.localeCompare(b.modelo);
+          });
+        invState.rows = todas;
+        const disponibles = todas.filter(r => r.stock > 0).length;
+        const vendidas = todas.length - disponibles;
         const cacheNota = data.fuente === "cache" ? " · cache" : " · recién leído";
-        invState.fuente = `🧾 Siigo · ${invState.rows.length} motos con stock${cacheNota}`;
+        invState.fuente = `🧾 Siigo · ${todas.length} motos totales (${disponibles} disponibles, ${vendidas} vendidas)${cacheNota}`;
         if (fuenteLabel) fuenteLabel.textContent = invState.fuente;
         renderInventario();
         if (docState.docs && Object.keys(docState.docs).length) {
@@ -1111,7 +1123,15 @@ function renderInventario() {
                    : r.marca === "MOBILITY" ? `<span class="tag tag-mobility">MOBILITY</span>`
                    : `<span class="tag tag-otro">${escapeHtml(r.marca || "—")}</span>`;
     const precioVenta = buscarPrecioVenta(r.modelo, r.anio);
-    return `<tr>
+    const estadoUp = String(r.estado || "").toUpperCase();
+    const esVendida = estadoUp === "VENDIDA" || (typeof r.stock === "number" && r.stock <= 0 && r.estado !== "DISPONIBLE");
+    const estadoTag = esVendida
+      ? `<span class="tag" style="background:rgba(120,120,140,.2);color:#999;border:1px solid rgba(120,120,140,.3)">VENDIDA</span>`
+      : estadoUp === "DISPONIBLE"
+        ? `<span class="tag tag-contado">DISPONIBLE</span>`
+        : `<span class="tag">${escapeHtml(r.estado || "—")}</span>`;
+    const rowStyle = esVendida ? ' style="opacity:.55"' : "";
+    return `<tr${rowStyle}>
       <td>${marcaTag}</td>
       <td><strong>${escapeHtml(r.modelo || "—")}</strong></td>
       <td>${escapeHtml(r.anio || "—")}</td>
@@ -1119,9 +1139,9 @@ function renderInventario() {
       <td><code style="font-size:11px;color:var(--muted)">${escapeHtml(r.chasis || "—")}</code></td>
       <td><code style="font-size:11px;color:var(--muted)">${escapeHtml(r.motor || "—")}</code></td>
       <td>${escapeHtml(r.cilindraje || "—")}</td>
-      <td class="num" data-role-only="admin contable">${r.costo ? fmtCOP.format(r.costo) : "—"}</td>
+      <td class="num" data-role-only="admin contable dueno">${r.costo ? fmtCOP.format(r.costo) : "—"}</td>
       <td class="num"><strong style="color:#5be58a">${precioVenta ? fmtCOP.format(precioVenta) : "—"}</strong></td>
-      <td>${escapeHtml(r.estado || "—")}</td>
+      <td>${estadoTag}</td>
     </tr>`;
   }).join("") || `<tr><td colspan="10" style="text-align:center;color:var(--muted);padding:20px">Sin resultados.</td></tr>`;
   if (invState.filtered.length > 200) {
