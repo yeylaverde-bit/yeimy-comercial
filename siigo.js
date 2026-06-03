@@ -169,9 +169,95 @@ function normalizarProducto(p) {
   };
 }
 
+/**
+ * Crea un producto (moto) en Siigo vía POST /v1/products.
+ * Defaults aplicados:
+ *   - account_group: { id: 743 }  (Productos)
+ *   - tax_classification: "Taxed"
+ *   - taxes: [{ id: 7801 }]       (IVA 19%)
+ *   - unit: { code: "94" }        (unidad)
+ *   - stock_control: true
+ *   - active: true
+ *
+ * Datos esperados:
+ *   { modelo, marca, color, anio, chasis, motor, precio, cilindraje }
+ *
+ * Construye el `description` en el formato estándar de Siigo:
+ *   "MOTOCICLETA {modelo} {color} {año} ({cilindraje}) CHASIS {x} MOTOR {y}"
+ */
+async function crearProducto(datos) {
+  const jwt = await obtenerToken();
+  const modelo = String(datos.modelo || "").trim().toUpperCase();
+  const color = String(datos.color || "").trim().toUpperCase();
+  const anio = String(datos.anio || "").trim();
+  const chasis = String(datos.chasis || "").trim().toUpperCase();
+  const motor = String(datos.motor || "").trim().toUpperCase();
+  const cilindraje = String(datos.cilindraje || "").trim().toUpperCase();
+  const precio = Number(datos.precio) || 0;
+
+  if (!chasis || !modelo) {
+    throw new Error("chasis y modelo son obligatorios");
+  }
+
+  // Code: usar el motor (es el que Siigo usa hoy como code). Si no hay motor, usar chasis.
+  const code = motor || chasis;
+
+  // Description en el formato que ya usa Siigo
+  const descParts = ["MOTOCICLETA", modelo];
+  if (color) descParts.push(color);
+  if (anio) descParts.push(anio);
+  if (cilindraje) descParts.push(`(${cilindraje})`);
+  descParts.push("CHASIS", chasis);
+  if (motor) descParts.push("MOTOR", motor);
+  const description = descParts.join(" ");
+
+  const body = {
+    code,
+    name: `MOTOCICLETA ${modelo}`,
+    account_group: { id: 743 },
+    type: "Product",
+    stock_control: true,
+    active: true,
+    tax_classification: "Taxed",
+    tax_included: false,
+    tax_consumption_value: 0,
+    taxes: [{ id: 7801 }],
+    unit: { code: "94" },
+    unit_label: "unidad",
+    description,
+    additional_fields: {},
+  };
+
+  // Si trae precio, agregarlo
+  if (precio > 0) {
+    body.prices = [{
+      currency_code: "COP",
+      price_list: [{ position: 1, value: precio }],
+    }];
+  }
+
+  const resp = await fetch(`${SIIGO_BASE}/v1/products`, {
+    method: "POST",
+    headers: {
+      "Authorization": `Bearer ${jwt}`,
+      "Partner-Id": PARTNER_ID,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(body),
+  });
+
+  if (!resp.ok) {
+    const txt = await resp.text().catch(() => "");
+    throw new Error(`Siigo POST /v1/products ${resp.status}: ${txt.slice(0, 300)}`);
+  }
+
+  return await resp.json();
+}
+
 module.exports = {
   siigoConfigurado,
   obtenerToken,
   obtenerProductos,
   normalizarProducto,
+  crearProducto,
 };

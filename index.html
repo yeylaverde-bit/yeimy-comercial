@@ -849,11 +849,14 @@
 
       <div id="facturaResultado" style="display:none;margin-top:20px">
         <h3 style="margin:0 0 10px;font-size:14px">Motos detectadas en la factura</h3>
-        <p class="muted" style="font-size:12px;margin:0 0 10px">Revisa cada fila. Puedes editar valores directamente si la IA leyó algo mal. Después clic en "Confirmar y agregar al inventario".</p>
+        <p class="muted" style="font-size:12px;margin:0 0 10px">
+          ☑️ Revisa cada moto. <strong>Edita valores si la IA leyó algo mal</strong> (chasis, motor, precio). Solo las motos con check ✓ se enviarán a Siigo.
+        </p>
         <div class="table-wrap">
           <table class="table" id="tblFacturaMotos">
             <thead>
               <tr>
+                <th style="width:36px;text-align:center" title="Enviar a Siigo">✓</th>
                 <th>Marca</th>
                 <th>Modelo</th>
                 <th>Color</th>
@@ -869,11 +872,11 @@
         </div>
         <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:14px">
           <button type="button" class="btn-secondary" id="btnCancelarFactura">Cancelar</button>
-          <button type="button" class="btn-primary" id="btnConfirmarFactura">✓ Confirmar y agregar al inventario</button>
+          <button type="button" class="btn-primary" id="btnConfirmarFactura">🚀 Enviar a Siigo</button>
         </div>
         <p class="muted" style="font-size:11.5px;margin-top:8px">
-          ⚠️ Para escribir al Google Sheets oficial, primero hay que coordinar permisos con el encargado.
-          Mientras tanto, las motos se guardan en archivo local y aparecen combinadas en el inventario.
+          🔒 Las motos marcadas se crearán como productos nuevos en Siigo (categoría Productos, IVA 19%).
+          Si hay errores en alguna, te aviso por chasis. Las que estén bien quedan registradas en Siigo.
         </p>
       </div>
     </section>

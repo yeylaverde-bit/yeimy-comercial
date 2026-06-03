@@ -1960,6 +1960,7 @@ function renderFacturaMotos(motos) {
   const tbody = document.querySelector("#tblFacturaMotos tbody");
   tbody.innerHTML = motos.map((m, i) => `
     <tr data-idx="${i}">
+      <td style="text-align:center"><input type="checkbox" class="moto-check" checked data-idx="${i}" title="Marcar para enviar a Siigo" /></td>
       <td><input class="celda-edit" data-campo="marca" value="${escapeHtml(m.marca || '')}" /></td>
       <td><input class="celda-edit" data-campo="modelo" value="${escapeHtml(m.modelo || '')}" /></td>
       <td><input class="celda-edit" data-campo="color" value="${escapeHtml(m.color || '')}" /></td>
@@ -1982,6 +1983,8 @@ function recolectarMotosFactura() {
   const filas = document.querySelectorAll("#tblFacturaMotos tbody tr");
   const motos = [];
   for (const tr of filas) {
+    const check = tr.querySelector(".moto-check");
+    if (check && !check.checked) continue;  // saltar las no marcadas
     const moto = {};
     tr.querySelectorAll(".celda-edit").forEach(inp => {
       moto[inp.dataset.campo] = inp.value.trim();
@@ -2000,17 +2003,56 @@ document.getElementById("btnCancelarFactura")?.addEventListener("click", () => {
 
 document.getElementById("btnConfirmarFactura")?.addEventListener("click", async () => {
   const motos = recolectarMotosFactura();
-  if (motos.length === 0) { showToast("No hay motos para confirmar"); return; }
-  if (!confirm(`¿Confirmar y agregar ${motos.length} ${motos.length === 1 ? 'moto' : 'motos'} al inventario?`)) return;
-  // TODO Fase 2: enviar a backend que escribe en Google Sheets oficial
-  // Por ahora muestro mensaje
-  showToast(`✓ ${motos.length} motos guardadas (pendiente Google Sheets)`);
-  console.log("Motos a confirmar:", motos);
+  if (motos.length === 0) { showToast("No hay motos marcadas para enviar"); return; }
+  if (!confirm(`¿Enviar ${motos.length} ${motos.length === 1 ? 'moto' : 'motos'} al inventario de Siigo?\n\nEsto las creará como productos nuevos en Siigo con sus datos (chasis, motor, modelo, precio).`)) return;
+
   const msg = document.getElementById("facturaMsg");
-  msg.className = "form-msg form-msg-info";
-  msg.innerHTML = `📌 <strong>${motos.length} motos listas para subir al Sheets oficial.</strong><br>
-    Pendiente: configurar permisos de escritura del Google Sheets con el encargado del concesionario.
-    Cuando esté listo, las subimos con un clic.`;
+  const btn = document.getElementById("btnConfirmarFactura");
+  btn.disabled = true; btn.textContent = "Enviando a Siigo…";
+  msg.style.display = "block";
+  msg.className = "form-msg";
+  msg.textContent = `🚀 Creando ${motos.length} producto(s) en Siigo...`;
+
+  try {
+    const r = await fetch("/api/siigo/crear-productos", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ motos }),
+    });
+    const data = await r.json();
+
+    if (!data.ok) {
+      msg.className = "form-msg form-msg-error";
+      msg.innerHTML = `❌ Error: ${escapeHtml(data.error || "no se pudo enviar a Siigo")}`;
+      btn.disabled = false; btn.textContent = "Enviar a Siigo";
+      return;
+    }
+
+    const okCount = data.creados?.length || 0;
+    const errCount = data.errores?.length || 0;
+    let html = `<strong>${okCount} de ${data.total} motos creadas en Siigo.</strong>`;
+    if (okCount > 0) {
+      html += `<br><br>✅ <strong>Creadas:</strong><ul style="margin:6px 0 0 18px;font-size:12px">`;
+      html += data.creados.map(c => `<li>${escapeHtml(c.modelo || "—")} · chasis <code>${escapeHtml(c.chasis || "—")}</code></li>`).join("");
+      html += `</ul>`;
+    }
+    if (errCount > 0) {
+      html += `<br>⚠️ <strong>${errCount} con error:</strong><ul style="margin:6px 0 0 18px;font-size:12px;color:#f7c272">`;
+      html += data.errores.map(e => `<li>chasis <code>${escapeHtml(e.chasis || "—")}</code> · ${escapeHtml(e.error || "error")}</li>`).join("");
+      html += `</ul>`;
+    }
+
+    msg.className = errCount === 0 ? "form-msg form-msg-ok" : "form-msg form-msg-info";
+    msg.innerHTML = html;
+
+    // Refrescar inventario en background para mostrar las nuevas
+    setTimeout(() => loadInventario(), 1000);
+  } catch (e) {
+    msg.className = "form-msg form-msg-error";
+    msg.innerHTML = `❌ Error de red: ${escapeHtml(e.message)}`;
+  } finally {
+    btn.disabled = false; btn.textContent = "Enviar a Siigo";
+  }
 });
 
 // Estilos inline para los inputs de la tabla editable de factura

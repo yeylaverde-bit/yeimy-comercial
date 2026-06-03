@@ -978,6 +978,40 @@ app.get("/api/siigo/productos", requireAuth, async (req, res) => {
   }
 });
 
+// --- Siigo: crear productos (motos) en lote desde factura Auteco ---
+// Solo admin. Body esperado: { motos: [{modelo, marca, color, anio, chasis, motor, precio, cilindraje}, ...] }
+app.post("/api/siigo/crear-productos", requireAuth, requireAdmin, async (req, res) => {
+  if (!siigo.siigoConfigurado()) {
+    return res.status(503).json({ ok: false, error: "Siigo no configurado" });
+  }
+  const motos = Array.isArray(req.body?.motos) ? req.body.motos : [];
+  if (motos.length === 0) {
+    return res.status(400).json({ ok: false, error: "Sin motos para crear" });
+  }
+  const creados = [];
+  const errores = [];
+  for (const m of motos) {
+    try {
+      const resultado = await siigo.crearProducto(m);
+      creados.push({
+        chasis: m.chasis,
+        modelo: m.modelo,
+        id: resultado.id || null,
+        code: resultado.code || null,
+      });
+    } catch (e) {
+      errores.push({
+        chasis: m.chasis,
+        modelo: m.modelo,
+        error: e.message,
+      });
+    }
+  }
+  // Invalidar cache de productos para que la próxima lectura traiga los nuevos
+  siigoCache = { data: null, fetchedAt: 0 };
+  res.json({ ok: true, total: motos.length, creados, errores });
+});
+
 // --- Health (público, útil para diagnóstico) ---
 app.get("/api/health", (req, res) => {
   res.json({
