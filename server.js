@@ -168,17 +168,95 @@ function requireAdmin(req, res, next) {
   return res.status(403).json({ ok: false, error: "Solo administrador" });
 }
 
+// --- Rate limit por IP en /api/login (anti-brute-force) ---
+// Estructura: { ip: { intentosFallidos: N, primerIntento: ts, bloqueadoHasta: ts } }
+const loginAttempts = new Map();
+const MAX_INTENTOS = 5;          // intentos antes de bloquear
+const VENTANA_MS = 15 * 60 * 1000;  // 15 min para acumular intentos
+const BLOQUEO_MS = 15 * 60 * 1000;  // 15 min bloqueado
+
+function ipDeRequest(req) {
+  return (req.headers["x-forwarded-for"] || "").split(",")[0].trim()
+    || req.connection?.remoteAddress
+    || req.ip
+    || "unknown";
+}
+
+function registrarIntentoFallido(ip) {
+  const ahora = Date.now();
+  const reg = loginAttempts.get(ip) || { intentosFallidos: 0, primerIntento: ahora, bloqueadoHasta: 0 };
+  // Si pasó la ventana, resetear contador
+  if (ahora - reg.primerIntento > VENTANA_MS) {
+    reg.intentosFallidos = 0;
+    reg.primerIntento = ahora;
+  }
+  reg.intentosFallidos++;
+  if (reg.intentosFallidos >= MAX_INTENTOS) {
+    reg.bloqueadoHasta = ahora + BLOQUEO_MS;
+    console.warn(`[seguridad] IP ${ip} BLOQUEADA por ${BLOQUEO_MS/60000} min (${reg.intentosFallidos} intentos)`);
+  }
+  loginAttempts.set(ip, reg);
+}
+
+function limpiarIntentos(ip) {
+  loginAttempts.delete(ip);
+}
+
+function checkBloqueo(ip) {
+  const reg = loginAttempts.get(ip);
+  if (!reg) return null;
+  const ahora = Date.now();
+  if (reg.bloqueadoHasta > ahora) {
+    const minRestantes = Math.ceil((reg.bloqueadoHasta - ahora) / 60000);
+    return { bloqueado: true, minutosRestantes: minRestantes, intentos: reg.intentosFallidos };
+  }
+  // Limpiar bloqueo expirado
+  if (reg.bloqueadoHasta > 0 && reg.bloqueadoHasta <= ahora) {
+    loginAttempts.delete(ip);
+  }
+  return null;
+}
+
+// Limpieza periódica del mapa (cada hora)
+setInterval(() => {
+  const ahora = Date.now();
+  for (const [ip, reg] of loginAttempts.entries()) {
+    if (reg.bloqueadoHasta <= ahora && (ahora - reg.primerIntento) > VENTANA_MS) {
+      loginAttempts.delete(ip);
+    }
+  }
+}, 60 * 60 * 1000);
+
 // --- Endpoints de auth ---
 app.post("/api/login", async (req, res) => {
+  const ip = ipDeRequest(req);
+  // Verificar si la IP está bloqueada
+  const bloqueo = checkBloqueo(ip);
+  if (bloqueo) {
+    return res.status(429).json({
+      ok: false,
+      error: `Demasiados intentos fallidos. Bloqueado por ${bloqueo.minutosRestantes} minutos. Si crees que es un error, habla con tu administrador.`,
+    });
+  }
+
   const { email, password } = req.body || {};
   const usuario = buscarUsuario(email);
   if (!usuario) {
+    registrarIntentoFallido(ip);
     return res.status(401).json({ ok: false, error: "Email o clave incorrectos" });
   }
   const ok = await bcrypt.compare(String(password || ""), usuario.passwordHash);
   if (!ok) {
-    return res.status(401).json({ ok: false, error: "Email o clave incorrectos" });
+    registrarIntentoFallido(ip);
+    const reg = loginAttempts.get(ip);
+    const intentosRestantes = Math.max(0, MAX_INTENTOS - (reg?.intentosFallidos || 0));
+    const aviso = intentosRestantes > 0 && intentosRestantes <= 2
+      ? ` (te quedan ${intentosRestantes} intento${intentosRestantes === 1 ? "" : "s"} antes del bloqueo)`
+      : "";
+    return res.status(401).json({ ok: false, error: "Email o clave incorrectos" + aviso });
   }
+  // Login exitoso: limpiar intentos de esa IP
+  limpiarIntentos(ip);
   req.session.userEmail = usuario.email;
   return res.json({
     ok: true,
