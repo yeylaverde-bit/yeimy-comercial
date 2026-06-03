@@ -576,6 +576,10 @@
       <div class="card-head">
         <h2>📋 Mis registros del mes · clientes ingresados</h2>
         <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+          <label class="toggle" data-role-only="admin contable dueno" style="display:flex;align-items:center;gap:6px;font-size:12.5px;cursor:pointer">
+            <input type="checkbox" id="leadsSoloMios" />
+            <span>Solo mis registros</span>
+          </label>
           <select id="leadsFiltroMes" class="filter-select"><option value="">Todos los meses</option></select>
           <input id="leadsBuscar" placeholder="Buscar cliente, doc, moto…" style="background:var(--panel-2);border:1px solid var(--line);color:var(--text);border-radius:10px;padding:8px 12px;min-width:220px" />
           <span class="badge" id="leadsCount">0</span>

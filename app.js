@@ -1461,7 +1461,7 @@ if (formEl) {
 // ============================================================
 //          MIS REGISTROS DEL MES — leads ingresados
 // ============================================================
-const leadsState = { leads: [], filtroMes: "", buscar: "" };
+const leadsState = { leads: [], filtroMes: "", buscar: "", soloMios: false };
 
 async function loadLeads() {
   try {
@@ -1506,14 +1506,18 @@ function renderLeads() {
   if (!tbody) return;
   const q = (leadsState.buscar || "").toLowerCase().trim();
   const filtroMes = leadsState.filtroMes;
+  const miEmail = (currentUser?.email || "").toLowerCase();
   const filtrados = leadsState.leads.filter(l => {
+    // Filtro "solo mis registros" (toggle): solo aplica si el usuario es admin/contable/dueno
+    // y tiene el toggle activado. Asesor siempre ve solo los suyos por el backend.
+    if (leadsState.soloMios && miEmail && (l.usuario || "").toLowerCase() !== miEmail) return false;
     if (filtroMes && l.ts) {
       const d = new Date(l.ts);
       const m = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
       if (m !== filtroMes) return false;
     }
     if (q) {
-      return [l.cliente, l.documento, l.celular, l.modelo, l.marca, l.email].some(v => (v || "").toLowerCase().includes(q));
+      return [l.cliente, l.documento, l.celular, l.modelo, l.marca, l.email, l.usuarioNombre].some(v => (v || "").toLowerCase().includes(q));
     }
     return true;
   });
@@ -1687,6 +1691,8 @@ const leadsBuscarEl = document.getElementById("leadsBuscar");
 if (leadsBuscarEl) leadsBuscarEl.addEventListener("input", e => { leadsState.buscar = e.target.value; renderLeads(); });
 const leadsFiltroMesEl = document.getElementById("leadsFiltroMes");
 if (leadsFiltroMesEl) leadsFiltroMesEl.addEventListener("change", e => { leadsState.filtroMes = e.target.value; renderLeads(); });
+const leadsSoloMiosEl = document.getElementById("leadsSoloMios");
+if (leadsSoloMiosEl) leadsSoloMiosEl.addEventListener("change", e => { leadsState.soloMios = e.target.checked; renderLeads(); });
 
 // ============================================================
 //          PREASIGNACIÓN — chasis → cliente + crédito
