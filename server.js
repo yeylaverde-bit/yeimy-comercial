@@ -990,6 +990,54 @@ app.get("/api/siigo/productos", requireAuth, async (req, res) => {
   }
 });
 
+// --- Siigo: buscar un chasis específico para autocompletar formularios ---
+app.get("/api/siigo/buscar/:chasis", requireAuth, async (req, res) => {
+  if (!siigo.siigoConfigurado()) {
+    return res.status(503).json({ ok: false, error: "Siigo no configurado" });
+  }
+  const chasis = String(req.params.chasis || "").trim().toUpperCase();
+  if (chasis.length < 5) {
+    return res.status(400).json({ ok: false, error: "Chasis muy corto" });
+  }
+  try {
+    // Usa el cache si está fresco (no hace falta refrescar para cada búsqueda)
+    let productos = siigoCache.data;
+    const now = Date.now();
+    if (!productos || (now - siigoCache.fetchedAt) > SIIGO_CACHE_MS) {
+      const crudos = await siigo.obtenerProductos();
+      productos = crudos.map(siigo.normalizarProducto);
+      siigoCache = { data: productos, fetchedAt: now };
+    }
+    const match = productos.find(p => (p.chasis || "").toUpperCase() === chasis);
+    if (!match) {
+      return res.json({ ok: false, encontrado: false, mensaje: "Chasis no está en Siigo" });
+    }
+    // Inferir marca por nombre (mismo helper que usa el frontend)
+    const nombreUp = (match.nombre || "").toUpperCase();
+    let marca = "OTRO";
+    if (/RAIDER|APACHE|NTORQ|SPORT|STAR|HLX|RTX/.test(nombreUp)) marca = "TVS";
+    else if (/KING|VICTORY|NITRO|MOTO\s*CARRO|MRX|XKM|MOBILITY/.test(nombreUp)) marca = "MOBILITY";
+    else if (/AKT/.test(nombreUp)) marca = "AKT";
+    res.json({
+      ok: true,
+      encontrado: true,
+      moto: {
+        chasis: match.chasis,
+        motor: match.motor,
+        modelo: (match.nombre || "").replace(/^MOTOCICLET[A]?\s+/i, "").trim(),
+        marca,
+        color: match.color,
+        anio: match.anio,
+        cilindraje: match.cilindraje,
+        stock: match.stock,
+        codigo: match.codigo,
+      },
+    });
+  } catch (e) {
+    res.status(500).json({ ok: false, error: e.message });
+  }
+});
+
 // --- Siigo: crear productos (motos) en lote desde factura Auteco ---
 // Solo admin. Body esperado: { motos: [{modelo, marca, color, anio, chasis, motor, precio, cilindraje}, ...] }
 app.post("/api/siigo/crear-productos", requireAuth, requireAdmin, async (req, res) => {

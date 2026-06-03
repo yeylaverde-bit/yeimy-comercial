@@ -1640,18 +1640,61 @@ function abrirPreasigModal(chasisExistente) {
 }
 
 // Auto-completar marca/modelo/motor/color al pegar chasis
+// Busca primero en el inventario local (rápido); si no, en Siigo (más completo)
 function attachChasisAutocomplete() {
   const f = document.getElementById("formPreasig");
   const chasisInp = f?.querySelector('[name="chasis"]');
   if (!chasisInp) return;
-  chasisInp.addEventListener("change", () => {
+
+  let timer = null;
+  async function buscarYRellenar() {
     const c = chasisInp.value.trim().toUpperCase();
+    if (c.length < 5) return;
+
+    // 1) Inventario local primero (instantáneo)
     const moto = (invState.rows || []).find(r => r.chasis === c);
     if (moto) {
-      f.querySelector('[name="marca"]').value = moto.marca || "";
-      f.querySelector('[name="modelo"]').value = moto.modelo || "";
-      f.querySelector('[name="color"]').value = moto.color || "";
+      if (!f.querySelector('[name="marca"]').value) f.querySelector('[name="marca"]').value = moto.marca || "";
+      if (!f.querySelector('[name="modelo"]').value) f.querySelector('[name="modelo"]').value = moto.modelo || "";
+      if (!f.querySelector('[name="color"]').value) f.querySelector('[name="color"]').value = moto.color || "";
+      if (moto.motor && !f.querySelector('[name="motor"]').value) f.querySelector('[name="motor"]').value = moto.motor;
+      mostrarMsgAutofill("✓ Datos prellenados desde inventario", "ok");
+      return;
     }
+
+    // 2) Buscar en Siigo (si no se encontró localmente)
+    mostrarMsgAutofill("🔎 Buscando en Siigo…", "");
+    try {
+      const r = await fetch(`/api/siigo/buscar/${encodeURIComponent(c)}`);
+      const data = await r.json();
+      if (data.ok && data.encontrado) {
+        const m = data.moto;
+        if (!f.querySelector('[name="marca"]').value) f.querySelector('[name="marca"]').value = m.marca || "";
+        if (!f.querySelector('[name="modelo"]').value) f.querySelector('[name="modelo"]').value = m.modelo || "";
+        if (!f.querySelector('[name="color"]').value) f.querySelector('[name="color"]').value = m.color || "";
+        if (m.motor && !f.querySelector('[name="motor"]').value) f.querySelector('[name="motor"]').value = m.motor;
+        mostrarMsgAutofill(`✓ Datos prellenados desde Siigo · ${m.modelo} ${m.color || ""}`, "ok");
+      } else {
+        mostrarMsgAutofill("⚠️ Chasis no está en Siigo ni en inventario · llena los datos manualmente", "info");
+      }
+    } catch (e) {
+      mostrarMsgAutofill("", "");
+    }
+  }
+
+  function mostrarMsgAutofill(texto, tipo) {
+    const msgEl = document.getElementById("preasigMsg");
+    if (!msgEl) return;
+    if (!texto) { msgEl.className = "modal-msg"; msgEl.textContent = ""; return; }
+    msgEl.className = "modal-msg " + (tipo === "ok" ? "ok" : tipo === "info" ? "info" : "");
+    msgEl.textContent = texto;
+  }
+
+  // Buscar al pegar/cambiar (con debounce de 400ms al escribir)
+  chasisInp.addEventListener("change", buscarYRellenar);
+  chasisInp.addEventListener("input", () => {
+    clearTimeout(timer);
+    timer = setTimeout(buscarYRellenar, 400);
   });
 }
 
