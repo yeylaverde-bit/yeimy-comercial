@@ -915,7 +915,7 @@ function renderPrecios() {
     html += `<tr>
       <td>${marcaTag}</td>
       <td><strong>${escapeHtml(r.modelo || "—")}</strong></td>
-      <td class="num">${r.precio2026 ? fmtCOP.format(r.precio2026) : "—"}</td>
+      <td class="num">${r.precio2027 ? fmtCOP.format(r.precio2027) : "—"}</td>
       <td class="num"><strong style="color:#5be58a">${r.precioContado ? fmtCOP.format(r.precioContado) : "—"}</strong></td>
       <td class="num">${r.transito ? fmtCOP.format(r.transito) : "—"}</td>
       <td class="num">${r.prenda ? fmtCOP.format(r.prenda) : "—"}</td>
@@ -1157,8 +1157,8 @@ function buscarPrecioVenta(modeloInv, anio) {
     if (anio === "2025" && row.precio2025) return row.precio2025;
     if (anio === "2026" && row.precio2026) return row.precio2026;
     if (anio === "2027" && row.precio2027) return row.precio2027;
-    // Fallback: cualquier precio disponible
-    return row.precio2026 || row.precio2027 || row.precio2025 || null;
+    // Fallback: cualquier precio disponible (priorizar el más nuevo)
+    return row.precio2027 || row.precio2025 || null;
   }
 
   // Match exacto
