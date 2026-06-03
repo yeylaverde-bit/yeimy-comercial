@@ -990,6 +990,52 @@ app.get("/api/siigo/productos", requireAuth, async (req, res) => {
   }
 });
 
+// --- Códigos Impulsa: catálogo manual que crece con cada venta ---
+// Mapa: { "MODELO|COLOR|ANIO": "Código Impulsa" }
+const CODIGOS_IMPULSA_PATH = path.join(DATA_DIR, "codigos-impulsa.json");
+function leerCodigosImpulsa() {
+  try {
+    if (!fs.existsSync(CODIGOS_IMPULSA_PATH)) return {};
+    return JSON.parse(fs.readFileSync(CODIGOS_IMPULSA_PATH, "utf8"));
+  } catch { return {}; }
+}
+function guardarCodigosImpulsa(data) {
+  try { fs.writeFileSync(CODIGOS_IMPULSA_PATH, JSON.stringify(data, null, 2), "utf8"); }
+  catch (e) { console.error("[codigos-impulsa] error guardando:", e.message); }
+}
+function clavesCodigo(modelo, color, anio) {
+  const m = String(modelo || "").toUpperCase().trim();
+  const c = String(color || "").toUpperCase().trim();
+  const a = String(anio || "").trim();
+  return `${m}|${c}|${a}`;
+}
+
+app.get("/api/codigos-impulsa", requireAuth, (req, res) => {
+  res.json({ ok: true, codigos: leerCodigosImpulsa() });
+});
+
+app.post("/api/codigos-impulsa", requireAuth, (req, res) => {
+  const { modelo, color, anio, codigo } = req.body || {};
+  if (!modelo || !codigo) {
+    return res.status(400).json({ ok: false, error: "Se requiere modelo y codigo" });
+  }
+  const codigos = leerCodigosImpulsa();
+  const key = clavesCodigo(modelo, color, anio);
+  codigos[key] = String(codigo).trim();
+  guardarCodigosImpulsa(codigos);
+  res.json({ ok: true, key, codigo: codigos[key] });
+});
+
+app.delete("/api/codigos-impulsa", requireAuth, (req, res) => {
+  const { modelo, color, anio } = req.body || {};
+  if (!modelo) return res.status(400).json({ ok: false, error: "Se requiere modelo" });
+  const codigos = leerCodigosImpulsa();
+  const key = clavesCodigo(modelo, color, anio);
+  delete codigos[key];
+  guardarCodigosImpulsa(codigos);
+  res.json({ ok: true });
+});
+
 // --- Siigo: buscar un chasis específico para autocompletar formularios ---
 app.get("/api/siigo/buscar/:chasis", requireAuth, async (req, res) => {
   if (!siigo.siigoConfigurado()) {

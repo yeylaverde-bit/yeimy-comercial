@@ -939,6 +939,75 @@ const INV_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSh3BOUXsJV
 
 const invState = { rows: [], filtered: [], search: "", fuente: "—", fuenteSeleccionada: "sheets" };
 
+// Códigos Impulsa: mapa "MODELO|COLOR|ANIO" → código Impulsa
+const codigosImpulsa = { mapa: {} };
+
+async function loadCodigosImpulsa() {
+  try {
+    const r = await fetch("/api/codigos-impulsa");
+    const data = await r.json();
+    if (data.ok) {
+      codigosImpulsa.mapa = data.codigos || {};
+      if (invState.rows.length) renderInventario();
+    }
+  } catch (e) { console.warn("loadCodigosImpulsa:", e.message); }
+}
+
+function claveCodigoImpulsa(modelo, color, anio) {
+  return `${String(modelo || "").toUpperCase().trim()}|${String(color || "").toUpperCase().trim()}|${String(anio || "").trim()}`;
+}
+
+function buscarCodigoImpulsa(modelo, color, anio) {
+  const exact = claveCodigoImpulsa(modelo, color, anio);
+  if (codigosImpulsa.mapa[exact]) return codigosImpulsa.mapa[exact];
+  // Match relajado: modelo+color (sin año) por si el año varía
+  const keyMC = claveCodigoImpulsa(modelo, color, "");
+  for (const k of Object.keys(codigosImpulsa.mapa)) {
+    if (k.startsWith(`${String(modelo || "").toUpperCase().trim()}|${String(color || "").toUpperCase().trim()}|`)) {
+      return codigosImpulsa.mapa[k];
+    }
+  }
+  return null;
+}
+
+async function asociarCodigoImpulsa(modelo, color, anio) {
+  const codigoActual = buscarCodigoImpulsa(modelo, color, anio) || "";
+  const codigo = prompt(
+    `Asociar código de Impulsa\n\nMoto: ${modelo}\nColor: ${color}\nAño: ${anio}\n\nPega el código exacto de Impulsa (ej: APACHE 160 FI ABS NG_GR GRA NENE_RJ_MY27):`,
+    codigoActual
+  );
+  if (codigo === null) return; // canceló
+  if (!codigo.trim()) {
+    // Vacío: borrar la asociación
+    try {
+      await fetch("/api/codigos-impulsa", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ modelo, color, anio }),
+      });
+      delete codigosImpulsa.mapa[claveCodigoImpulsa(modelo, color, anio)];
+      showToast("Código borrado");
+      renderInventario();
+    } catch (e) { showToast("Error: " + e.message); }
+    return;
+  }
+  try {
+    const r = await fetch("/api/codigos-impulsa", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ modelo, color, anio, codigo: codigo.trim() }),
+    });
+    const data = await r.json();
+    if (data.ok) {
+      codigosImpulsa.mapa[data.key] = data.codigo;
+      showToast("✓ Código asociado");
+      renderInventario();
+    } else {
+      showToast("Error: " + (data.error || "no se pudo guardar"));
+    }
+  } catch (e) { showToast("Error: " + e.message); }
+}
+
 // Inferir marca a partir del nombre del modelo Siigo (que no la trae explícita)
 function inferirMarcaPorModelo(modelo) {
   const m = String(modelo || "").toUpperCase();
@@ -1131,6 +1200,13 @@ function renderInventario() {
         ? `<span class="tag tag-contado">DISPONIBLE</span>`
         : `<span class="tag">${escapeHtml(r.estado || "—")}</span>`;
     const rowStyle = esVendida ? ' style="opacity:.55"' : "";
+    // Código Impulsa
+    const cod = buscarCodigoImpulsa(r.modelo, r.color, r.anio);
+    const codigoCell = cod
+      ? `<code style="font-size:10.5px;color:#5be58a;background:rgba(91,229,138,.08);padding:2px 6px;border-radius:4px;display:inline-block;max-width:160px;overflow:hidden;text-overflow:ellipsis;vertical-align:middle">${escapeHtml(cod)}</code>
+         <button class="btn-mini" data-copiar-codigo="${escapeHtml(cod)}" title="Copiar código" style="margin-left:4px">📋</button>
+         <button class="btn-mini" data-editar-codigo data-modelo="${escapeHtml(r.modelo || '')}" data-color="${escapeHtml(r.color || '')}" data-anio="${escapeHtml(r.anio || '')}" title="Editar" style="margin-left:2px">✏️</button>`
+      : `<button class="btn-mini" data-asociar-codigo data-modelo="${escapeHtml(r.modelo || '')}" data-color="${escapeHtml(r.color || '')}" data-anio="${escapeHtml(r.anio || '')}" title="Asociar código Impulsa" style="background:rgba(247,194,114,.15);border-color:rgba(247,194,114,.4);color:#f7c272">+ Asociar</button>`;
     return `<tr${rowStyle}>
       <td>${marcaTag}</td>
       <td><strong>${escapeHtml(r.modelo || "—")}</strong></td>
@@ -1141,12 +1217,28 @@ function renderInventario() {
       <td>${escapeHtml(r.cilindraje || "—")}</td>
       <td class="num" data-role-only="admin contable dueno">${r.costo ? fmtCOP.format(r.costo) : "—"}</td>
       <td class="num"><strong style="color:#5be58a">${precioVenta ? fmtCOP.format(precioVenta) : "—"}</strong></td>
+      <td>${codigoCell}</td>
       <td>${estadoTag}</td>
     </tr>`;
-  }).join("") || `<tr><td colspan="10" style="text-align:center;color:var(--muted);padding:20px">Sin resultados.</td></tr>`;
+  }).join("") || `<tr><td colspan="11" style="text-align:center;color:var(--muted);padding:20px">Sin resultados.</td></tr>`;
   if (invState.filtered.length > 200) {
-    tbody.innerHTML += `<tr><td colspan="10" style="text-align:center;color:var(--muted);padding:10px;font-style:italic">Mostrando primeras 200 de ${invState.filtered.length} filas — refina la búsqueda</td></tr>`;
+    tbody.innerHTML += `<tr><td colspan="11" style="text-align:center;color:var(--muted);padding:10px;font-style:italic">Mostrando primeras 200 de ${invState.filtered.length} filas — refina la búsqueda</td></tr>`;
   }
+
+  // Listeners de los botones de código Impulsa
+  tbody.querySelectorAll("[data-copiar-codigo]").forEach(b => {
+    b.addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText(b.dataset.copiarCodigo);
+        showToast(`📋 Copiado: ${b.dataset.copiarCodigo}`);
+      } catch { showToast("No se pudo copiar"); }
+    });
+  });
+  tbody.querySelectorAll("[data-asociar-codigo], [data-editar-codigo]").forEach(b => {
+    b.addEventListener("click", () => {
+      asociarCodigoImpulsa(b.dataset.modelo, b.dataset.color, b.dataset.anio);
+    });
+  });
 }
 
 const invSearchEl = document.getElementById("invSearch");
@@ -3307,6 +3399,7 @@ if (btnRefrescarMet) btnRefrescarMet.addEventListener("click", async () => {
   loadDocs();
   loadPreasignaciones();
   loadLeads();
+  loadCodigosImpulsa();
   if (currentUser?.rol === "admin") loadHistorialPrecios();
   attachChasisAutocomplete();
 })();
