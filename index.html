@@ -961,8 +961,9 @@
         <label><span>Modelo</span><input name="modelo" placeholder="Raider 125" /></label>
         <label><span>Motor</span><input name="motor" placeholder="ABC12345" /></label>
         <label><span>Color</span><input name="color" placeholder="NEGRO NEBULOSA" /></label>
-        <label style="grid-column:1/-1"><span>Nombre del cliente *</span>
-          <input name="nombreCliente" required placeholder="JUAN PEREZ GONZALEZ" /></label>
+        <label style="grid-column:1/-1"><span>Nombre del cliente * <span class="muted" style="font-size:11px;font-weight:400">— escribe para buscar de leads existentes</span></span>
+          <input name="nombreCliente" required list="clientesLeadsList" placeholder="Empieza a escribir el nombre del cliente..." autocomplete="off" /></label>
+        <datalist id="clientesLeadsList"></datalist>
         <label><span>Cédula cliente</span><input name="cedulaCliente" inputmode="numeric" placeholder="1015388115" /></label>
         <label><span>Fecha de nacimiento</span><input name="fechaNacimiento" type="date" /></label>
         <label><span>Celular</span><input name="celular" inputmode="tel" placeholder="3001234567" /></label>

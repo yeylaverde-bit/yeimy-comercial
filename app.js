@@ -1738,6 +1738,26 @@ function abrirPreasigModal(chasisExistente) {
     .map(r => `<option value="${escapeHtml(r.chasis)}">${escapeHtml(r.marca)} ${escapeHtml(r.modelo)} · ${escapeHtml(r.color)}</option>`)
     .join("");
 
+  // Llenar el datalist de clientes desde leads existentes
+  const dlClientes = document.getElementById("clientesLeadsList");
+  if (dlClientes) {
+    // Quitar duplicados por nombre
+    const vistos = new Set();
+    const opciones = [];
+    for (const l of leadsState.leads) {
+      const key = (l.cliente || "").toUpperCase().trim();
+      if (!key || vistos.has(key)) continue;
+      vistos.add(key);
+      const detalles = [
+        l.documento ? "CC " + l.documento : "",
+        l.modelo ? l.modelo : "",
+        l.celular ? l.celular : "",
+      ].filter(Boolean).join(" · ");
+      opciones.push(`<option value="${escapeHtml(l.cliente)}">${escapeHtml(detalles)}</option>`);
+    }
+    dlClientes.innerHTML = opciones.join("");
+  }
+
   if (chasisExistente && preasigState.preasignaciones[chasisExistente]) {
     const p = preasigState.preasignaciones[chasisExistente];
     for (const [k, v] of Object.entries(p)) {
@@ -1832,6 +1852,48 @@ function attachChasisAutocomplete() {
     clearTimeout(timer);
     timer = setTimeout(buscarYRellenar, 400);
   });
+
+  // Auto-llenar datos del cliente al escoger desde leads
+  const clienteInp = f.querySelector('[name="nombreCliente"]');
+  if (clienteInp) {
+    const llenarDatosCliente = () => {
+      const nombre = clienteInp.value.trim().toUpperCase();
+      if (!nombre || nombre.length < 3) return;
+      // Buscar lead con nombre exacto, luego que empiece igual, luego que incluya
+      const lead = leadsState.leads.find(l => (l.cliente || "").toUpperCase() === nombre)
+                || leadsState.leads.find(l => (l.cliente || "").toUpperCase().startsWith(nombre))
+                || leadsState.leads.find(l => (l.cliente || "").toUpperCase().includes(nombre));
+      if (!lead) return;
+      // Auto-llenar cédula, celular, fecha nacimiento, # crédito, financiera SOLO si están vacíos
+      const camposLead = {
+        cedulaCliente: lead.documento,
+        celular: lead.celular,
+        fechaNacimiento: lead.fechaNacimiento,
+        numCredito: lead.numCredito,
+        financiera: lead.financiera,
+        placa: lead.placa,
+      };
+      let llenados = [];
+      for (const [campo, valor] of Object.entries(camposLead)) {
+        const inp = f.querySelector(`[name="${campo}"]`);
+        if (inp && valor && !inp.value) {
+          inp.value = valor;
+          llenados.push(campo);
+        }
+      }
+      // Si el nombre del input no es exactamente el del lead, usar el del lead
+      if (clienteInp.value !== lead.cliente) clienteInp.value = lead.cliente;
+      if (llenados.length > 0) {
+        const msgEl = document.getElementById("preasigMsg");
+        if (msgEl) {
+          msgEl.className = "modal-msg ok";
+          msgEl.textContent = `✓ Datos del cliente cargados desde lead existente (${llenados.length} campos)`;
+        }
+      }
+    };
+    clienteInp.addEventListener("change", llenarDatosCliente);
+    clienteInp.addEventListener("blur", llenarDatosCliente);
+  }
 }
 
 const btnNuevaPreasignacion = document.getElementById("btnNuevaPreasignacion");
