@@ -330,7 +330,9 @@ app.get("/api/docs/lista", requireAuth, (req, res) => {
   const docs = leerDocsVentas();
   const usuario = buscarUsuario(req.session.userEmail);
   // El rol "contable" SIEMPRE ve todos los docs (no es opcional para ellos)
-  const verTodos = (req.query.todos === "1" && usuario?.rol === "admin") || usuario?.rol === "contable";
+  // contable y dueno SIEMPRE ven todos (solo lectura para dueno)
+  const verTodos = (req.query.todos === "1" && usuario?.rol === "admin")
+    || usuario?.rol === "contable" || usuario?.rol === "dueno";
   const out = {};
   for (const [id, info] of Object.entries(docs)) {
     if (!verTodos) {
@@ -385,8 +387,9 @@ function guardarPreasig(data) {
 
 app.get("/api/preasignaciones/lista", requireAuth, (req, res) => {
   const usuario = buscarUsuario(req.session.userEmail);
-  // Contable y admin ven todas; asesor solo lo suyo
-  const verTodos = usuario?.rol === "contable" || (req.query.todos === "1" && usuario?.rol === "admin");
+  // Contable, dueno y admin ven todas; asesor solo lo suyo
+  const verTodos = usuario?.rol === "contable" || usuario?.rol === "dueno"
+    || (req.query.todos === "1" && usuario?.rol === "admin");
   const todas = leerPreasig();
   const out = {};
   for (const [id, p] of Object.entries(todas)) {
@@ -624,7 +627,7 @@ app.get("/api/leads/lista", requireAuth, (req, res) => {
   for (const linea of lineas) {
     try {
       const r = JSON.parse(linea);
-      if (usuario.rol !== "admin" && usuario.rol !== "contable") {
+      if (usuario.rol !== "admin" && usuario.rol !== "contable" && usuario.rol !== "dueno") {
         if (r.usuario !== usuario.email) continue;
       }
       const p = r.payload || {};

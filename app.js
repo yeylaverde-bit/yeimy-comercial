@@ -193,6 +193,7 @@ async function loadData() {
     applyFilters();
     $("#lastUpdate").textContent = new Date().toLocaleTimeString("es-CO");
     $("#rowsTotal").textContent = `${fmtNum.format(state.rows.length)} filas cargadas`;
+    try { renderMetricasGerenciales(); } catch (e) { console.warn("metricas:", e.message); }
     showToast("Datos actualizados");
   } catch (e) {
     console.error(e);
@@ -2748,7 +2749,7 @@ async function loadCurrentUser() {
 }
 
 function aplicarRol(usuario) {
-  document.body.classList.remove("role-admin", "role-asesor", "role-contable");
+  document.body.classList.remove("role-admin", "role-asesor", "role-contable", "role-dueno");
   document.body.classList.add("role-" + usuario.rol);
 
   // User card
@@ -2762,6 +2763,7 @@ function aplicarRol(usuario) {
       admin: "Administradora",
       asesor: "Asesor",
       contable: "Contabilidad",
+      dueno: "Gerencia",
     })[usuario.rol] || usuario.rol;
   }
   if (avEl) {
@@ -2849,6 +2851,206 @@ if (changePassForm) {
     }
   });
 }
+
+// ============================================================
+//          MÉTRICAS GERENCIALES (admin + dueño)
+// ============================================================
+const metricasState = { mesSeleccionado: "" };
+
+function nombreMes(ym) {
+  if (!ym) return "—";
+  const meses = ["ene","feb","mar","abr","may","jun","jul","ago","sep","oct","nov","dic"];
+  const [y, m] = ym.split("-");
+  return `${meses[+m - 1]} ${y}`;
+}
+
+function renderMetricasGerenciales() {
+  const seccion = document.getElementById("metricas");
+  if (!seccion || !state?.rows) return;
+
+  // Solo ventas con fecha y monto (no inventario)
+  const ventas = state.rows.filter(isSold);
+  if (ventas.length === 0) return;
+
+  // Poblar selector de mes
+  const selMes = document.getElementById("metricasMes");
+  if (selMes && selMes.options.length <= 1) {
+    const meses = [...new Set(ventas.map(v => v.mes).filter(Boolean))].sort().reverse();
+    selMes.innerHTML = `<option value="">Todos los meses</option>` +
+      meses.map(m => `<option value="${m}">${nombreMes(m)}</option>`).join("");
+  }
+
+  const mesFiltro = metricasState.mesSeleccionado || "";
+  const filtradas = mesFiltro ? ventas.filter(v => v.mes === mesFiltro) : ventas;
+
+  // ===== KPIs principales =====
+  const motosVendidas = filtradas.length;
+  const ingresosTotales = filtradas.reduce((s, v) => s + (v.monto || 0), 0);
+  const utilidadTotal = filtradas.reduce((s, v) => s + (v.utilidad || 0), 0);
+  const ticketPromedio = motosVendidas ? ingresosTotales / motosVendidas : 0;
+
+  // Mes actual (del filtro o último mes con ventas)
+  const ahora = new Date();
+  const mesActualYM = `${ahora.getFullYear()}-${String(ahora.getMonth()+1).padStart(2,"0")}`;
+  const ventasMesActual = ventas.filter(v => v.mes === mesActualYM);
+  const motosMesActual = ventasMesActual.length;
+  const ingresosMesActual = ventasMesActual.reduce((s, v) => s + (v.monto || 0), 0);
+
+  // Comparar mes actual vs mes anterior
+  const mesAnteriorYM = (() => {
+    const d = new Date(ahora.getFullYear(), ahora.getMonth() - 1, 1);
+    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}`;
+  })();
+  const motosMesAnterior = ventas.filter(v => v.mes === mesAnteriorYM).length;
+  const variacion = motosMesAnterior ? ((motosMesActual - motosMesActual ? motosMesActual : 0) - motosMesAnterior) / motosMesAnterior * 100 : 0;
+  const variacionReal = motosMesAnterior ? ((motosMesActual - motosMesAnterior) / motosMesAnterior * 100) : 0;
+  const trendIcon = variacionReal > 0 ? "↑" : variacionReal < 0 ? "↓" : "→";
+  const trendCls = variacionReal > 0 ? "good" : variacionReal < 0 ? "warn" : "";
+
+  const kpisHtml = `
+    <div class="metric-card ${trendCls}">
+      <div class="metric-label">Motos vendidas · ${mesFiltro ? nombreMes(mesFiltro) : nombreMes(mesActualYM)}</div>
+      <div class="metric-value">${fmtNum.format(mesFiltro ? motosVendidas : motosMesActual)}</div>
+      ${!mesFiltro && motosMesAnterior ? `<div class="metric-trend">${trendIcon} ${Math.abs(variacionReal).toFixed(1)}% vs ${nombreMes(mesAnteriorYM)}</div>` : ""}
+    </div>
+    <div class="metric-card good">
+      <div class="metric-label">Ingresos totales</div>
+      <div class="metric-value">${fmtCOP.format(mesFiltro ? ingresosTotales : ingresosMesActual)}</div>
+      <div class="metric-trend">${mesFiltro ? "Mes seleccionado" : "Mes actual"}</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Ticket promedio</div>
+      <div class="metric-value">${fmtCOP.format(ticketPromedio)}</div>
+      <div class="metric-trend">por moto</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Ventas totales históricas</div>
+      <div class="metric-value">${fmtNum.format(ventas.length)}</div>
+      <div class="metric-trend">desde el inicio del registro</div>
+    </div>
+  `;
+  document.getElementById("metricasKpis").innerHTML = kpisHtml;
+
+  // ===== Comparativo últimos 6 meses =====
+  const mesesUlt6 = [];
+  for (let i = 5; i >= 0; i--) {
+    const d = new Date(ahora.getFullYear(), ahora.getMonth() - i, 1);
+    mesesUlt6.push(`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}`);
+  }
+  const tbodyMensual = document.querySelector("#tblMetricasMensual tbody");
+  tbodyMensual.innerHTML = mesesUlt6.map(m => {
+    const vs = ventas.filter(v => v.mes === m);
+    const motos = vs.length;
+    const ingreso = vs.reduce((s, v) => s + (v.monto || 0), 0);
+    const ticket = motos ? ingreso / motos : 0;
+    return `<tr>
+      <td><strong>${nombreMes(m)}</strong></td>
+      <td class="num">${fmtNum.format(motos)}</td>
+      <td class="num">${fmtCOP.format(ingreso)}</td>
+      <td class="num">${motos ? fmtCOP.format(ticket) : "—"}</td>
+    </tr>`;
+  }).join("");
+
+  // ===== Top asesores =====
+  const porAsesor = {};
+  for (const v of filtradas) {
+    const a = v.asesor || "(sin asesor)";
+    if (!porAsesor[a]) porAsesor[a] = { motos: 0, ingreso: 0 };
+    porAsesor[a].motos++;
+    porAsesor[a].ingreso += v.monto || 0;
+  }
+  const asesoresSorted = Object.entries(porAsesor).sort((a, b) => b[1].motos - a[1].motos);
+  const tbodyAsesores = document.querySelector("#tblMetricasAsesores tbody");
+  tbodyAsesores.innerHTML = asesoresSorted.length === 0
+    ? `<tr><td colspan="4" style="text-align:center;color:var(--muted);padding:20px">Sin ventas en el período</td></tr>`
+    : asesoresSorted.map(([a, d]) => {
+        const pct = motosVendidas ? (d.motos / motosVendidas * 100) : 0;
+        return `<tr>
+          <td><strong>${escapeHtml(a)}</strong></td>
+          <td class="num">${fmtNum.format(d.motos)}</td>
+          <td class="num">${fmtCOP.format(d.ingreso)}</td>
+          <td class="num">${pct.toFixed(1)}%</td>
+        </tr>`;
+      }).join("");
+
+  // ===== Top modelos =====
+  const porModelo = {};
+  for (const v of filtradas) {
+    const key = `${v.marca || "—"}|${v.modelo || "—"}`;
+    if (!porModelo[key]) porModelo[key] = { marca: v.marca, modelo: v.modelo, unidades: 0 };
+    porModelo[key].unidades++;
+  }
+  const modelosSorted = Object.values(porModelo).sort((a, b) => b.unidades - a.unidades).slice(0, 10);
+  const tbodyModelos = document.querySelector("#tblMetricasModelos tbody");
+  tbodyModelos.innerHTML = modelosSorted.length === 0
+    ? `<tr><td colspan="4" style="text-align:center;color:var(--muted);padding:20px">Sin datos</td></tr>`
+    : modelosSorted.map(m => {
+        const pct = motosVendidas ? (m.unidades / motosVendidas * 100) : 0;
+        return `<tr>
+          <td><strong>${escapeHtml(m.modelo || "—")}</strong></td>
+          <td>${escapeHtml(m.marca || "—")}</td>
+          <td class="num">${fmtNum.format(m.unidades)}</td>
+          <td class="num">${pct.toFixed(1)}%</td>
+        </tr>`;
+      }).join("");
+
+  // ===== Estado del flujo operativo =====
+  const preasigs = Object.values(preasigState.preasignaciones || {});
+  const enPreasig = preasigs.filter(p => !p.estado || p.estado === "pendiente").length;
+  const enTaller = preasigs.filter(p => p.estado === "en_taller").length;
+  const entregadas = preasigs.filter(p => p.estado === "entregada").length;
+  const leadsActivos = leadsState.leads.length;
+  const docsCompletos = Object.values(docState.docs || {}).filter(d => {
+    const tipos = docState.tipos || [];
+    return tipos.every(t => d.archivos?.[t]);
+  }).length;
+  const inventarioStock = invState.rows.length;
+
+  document.getElementById("metricasFlujo").innerHTML = `
+    <div class="metric-card">
+      <div class="metric-label">Leads activos en sistema</div>
+      <div class="metric-value">${fmtNum.format(leadsActivos)}</div>
+      <div class="metric-trend">Ingresados al CRM</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Preasignaciones pendientes</div>
+      <div class="metric-value">${fmtNum.format(enPreasig)}</div>
+      <div class="metric-trend">Esperando proceso</div>
+    </div>
+    <div class="metric-card warn">
+      <div class="metric-label">Motos en taller</div>
+      <div class="metric-value">${fmtNum.format(enTaller)}</div>
+      <div class="metric-trend">En preparación</div>
+    </div>
+    <div class="metric-card good">
+      <div class="metric-label">Entregadas a cliente</div>
+      <div class="metric-value">${fmtNum.format(entregadas)}</div>
+      <div class="metric-trend">Proceso completo</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Inventario disponible</div>
+      <div class="metric-value">${fmtNum.format(inventarioStock)}</div>
+      <div class="metric-trend">motos en stock</div>
+    </div>
+    <div class="metric-card good">
+      <div class="metric-label">Listos para facturar</div>
+      <div class="metric-value">${fmtNum.format(docsCompletos)}</div>
+      <div class="metric-trend">Con todos los documentos</div>
+    </div>
+  `;
+}
+
+// Listeners de la sección métricas
+const selMetricasMes = document.getElementById("metricasMes");
+if (selMetricasMes) selMetricasMes.addEventListener("change", e => {
+  metricasState.mesSeleccionado = e.target.value;
+  try { renderMetricasGerenciales(); } catch {}
+});
+const btnRefrescarMet = document.getElementById("btnRefrescarMetricas");
+if (btnRefrescarMet) btnRefrescarMet.addEventListener("click", async () => {
+  await loadData();
+  showToast("Métricas actualizadas");
+});
 
 // --- arranque ---
 (async () => {

@@ -49,17 +49,24 @@
       </nav>
     </div>
 
+    <div class="nav-section" data-role-only="admin dueno">
+      <div class="nav-section-title">Gerencia</div>
+      <nav class="nav">
+        <a href="#metricas">📊 Métricas gerenciales</a>
+      </nav>
+    </div>
+
     <div class="nav-section">
       <div class="nav-section-title">Operación diaria</div>
       <nav class="nav">
         <a href="#precios">💵 Lista de precios</a>
         <a href="#inventario">📦 Inventario disponible</a>
         <a href="#registrar" class="nav-cta" data-role-only="admin asesor">✍️ Ingresar lead / cliente</a>
-        <a href="#misleads" data-role-only="admin asesor contable">📋 Mis registros del mes</a>
-        <a href="#preasignacion" data-role-only="admin asesor">🔧 Preasignación</a>
+        <a href="#misleads" data-role-only="admin asesor contable dueno">📋 Registros del mes</a>
+        <a href="#preasignacion" data-role-only="admin asesor dueno">🔧 Preasignación</a>
         <a href="#ordenfac">📑 Orden facturación</a>
-        <a href="#soat" data-role-only="admin contable">🛡️ Crear SOAT</a>
-        <a href="#taller" data-role-only="admin asesor">🛠️ Taller</a>
+        <a href="#soat" data-role-only="admin contable dueno">🛡️ Crear SOAT</a>
+        <a href="#taller" data-role-only="admin asesor dueno">🛠️ Taller</a>
       </nav>
     </div>
 
@@ -557,7 +564,7 @@
       <div id="formMsg" class="form-msg" style="display:none"></div>
     </section>
 
-    <section id="misleads" class="card" data-role-only="admin asesor contable">
+    <section id="misleads" class="card" data-role-only="admin asesor contable dueno">
       <div class="card-head">
         <h2>📋 Mis registros del mes · clientes ingresados</h2>
         <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
@@ -580,7 +587,7 @@
               <th>Moto</th>
               <th>Pago</th>
               <th class="num">Total</th>
-              <th data-role-only="admin contable">Asesor</th>
+              <th data-role-only="admin contable dueno">Asesor</th>
               <th>Estado Impulsa</th>
               <th></th>
             </tr>
@@ -590,7 +597,56 @@
       </div>
     </section>
 
-    <section id="preasignacion" class="card" data-role-only="admin asesor">
+    <section id="metricas" class="card" data-role-only="admin dueno">
+      <div class="card-head">
+        <h2>📊 Métricas gerenciales</h2>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+          <select id="metricasMes" style="background:rgba(8,12,28,.7);color:var(--text);border:1px solid var(--line);border-radius:8px;padding:6px 10px;font-size:13px">
+            <option value="">Todos los meses</option>
+          </select>
+          <button class="btn-mini" id="btnRefrescarMetricas">↻ Refrescar</button>
+        </div>
+      </div>
+      <p class="muted" style="margin:-4px 0 16px;font-size:12.5px">
+        Vista gerencial consolidada del concesionario. Datos en vivo desde Google Sheets, Impulsa y operación interna.
+      </p>
+
+      <!-- KPIs principales -->
+      <div class="metrics-grid" id="metricasKpis"></div>
+
+      <!-- Comparativo mensual -->
+      <h3 style="margin:24px 0 12px;font-size:15px">📅 Ventas últimos 6 meses</h3>
+      <div class="table-wrap">
+        <table class="table" id="tblMetricasMensual">
+          <thead><tr><th>Mes</th><th class="num">Motos vendidas</th><th class="num">Ingresos totales</th><th class="num">Ticket promedio</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <!-- Top asesores -->
+      <h3 style="margin:24px 0 12px;font-size:15px">🏆 Top asesores</h3>
+      <div class="table-wrap">
+        <table class="table" id="tblMetricasAsesores">
+          <thead><tr><th>Asesor</th><th class="num">Motos vendidas</th><th class="num">Ingresos generados</th><th class="num">% del total</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <!-- Top modelos -->
+      <h3 style="margin:24px 0 12px;font-size:15px">🏍️ Top modelos vendidos</h3>
+      <div class="table-wrap">
+        <table class="table" id="tblMetricasModelos">
+          <thead><tr><th>Modelo</th><th>Marca</th><th class="num">Unidades</th><th class="num">% del total</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <!-- Estado del flujo operativo -->
+      <h3 style="margin:24px 0 12px;font-size:15px">⚙️ Estado del flujo operativo</h3>
+      <div class="metrics-grid" id="metricasFlujo"></div>
+    </section>
+
+    <section id="preasignacion" class="card" data-role-only="admin asesor dueno">
       <div class="card-head">
         <h2>🔧 Preasignación · chasis específico → cliente</h2>
         <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
@@ -719,7 +775,7 @@
       </div>
     </div>
 
-    <section id="soat" class="card" data-role-only="admin contable">
+    <section id="soat" class="card" data-role-only="admin contable dueno">
       <div class="card-head">
         <h2>🛡️ Crear SOAT · pendientes</h2>
         <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
@@ -735,7 +791,7 @@
       <div id="soatLista" style="display:grid;gap:14px"></div>
     </section>
 
-    <section id="taller" class="card" data-role-only="admin asesor">
+    <section id="taller" class="card" data-role-only="admin asesor dueno">
       <div class="card-head">
         <h2>🛠️ Taller · motos en proceso</h2>
         <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">

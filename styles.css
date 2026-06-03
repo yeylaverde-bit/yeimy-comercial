@@ -284,9 +284,21 @@ body.menu-open .backdrop{opacity:1}
 body.role-admin [data-role-only~="admin"]{display:revert}
 body.role-asesor [data-role-only~="asesor"]{display:revert}
 body.role-contable [data-role-only~="contable"]{display:revert}
+body.role-dueno [data-role-only~="dueno"]{display:revert}
 
 /* Avatar contable: color verde billete */
 .user-avatar.contable{background:linear-gradient(135deg,#22c55e,#15803d);color:#fff}
+/* Avatar dueño: azul corporativo */
+.user-avatar.dueno{background:linear-gradient(135deg,#3b82f6,#1e40af);color:#fff}
+
+/* Estilos métricas gerenciales */
+.metrics-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-bottom:20px}
+.metric-card{background:rgba(8,12,28,.55);border:1px solid var(--line);border-radius:14px;padding:16px}
+.metric-card .metric-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px}
+.metric-card .metric-value{font-size:24px;font-weight:700;color:var(--text);line-height:1.1}
+.metric-card .metric-trend{font-size:11.5px;margin-top:4px;color:var(--muted)}
+.metric-card.good .metric-value{color:#5be58a}
+.metric-card.warn .metric-value{color:#f7c272}
 
 /* Topbar env-chip */
 .env-chip{display:inline-flex;align-items:center;gap:6px;padding:5px 10px;border-radius:999px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;align-self:center}
