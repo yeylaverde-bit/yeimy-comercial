@@ -69,6 +69,30 @@ function bootstrapDataDir() {
 }
 bootstrapDataDir();
 
+// Sincroniza usuarios nuevos del repo a /data sin TOCAR los usuarios existentes.
+// Esto permite agregar nuevos perfiles (como Esteban) editando users.json del
+// repo y que aparezcan en producción al deploy, preservando los hashes de
+// password actuales de los usuarios que ya cambiaron su clave.
+function syncUsuariosNuevos() {
+  if (DATA_DIR === __dirname) return;
+  const srcPath = path.join(__dirname, "users.json");
+  const dstPath = path.join(DATA_DIR, "users.json");
+  if (!fs.existsSync(srcPath) || !fs.existsSync(dstPath)) return;
+  try {
+    const src = JSON.parse(fs.readFileSync(srcPath, "utf8"));
+    const dst = JSON.parse(fs.readFileSync(dstPath, "utf8"));
+    const emailsExistentes = new Set((dst.usuarios || []).map(u => (u.email || "").toLowerCase()));
+    const nuevos = (src.usuarios || []).filter(u => !emailsExistentes.has((u.email || "").toLowerCase()));
+    if (nuevos.length === 0) return;
+    dst.usuarios = [...(dst.usuarios || []), ...nuevos];
+    fs.writeFileSync(dstPath, JSON.stringify(dst, null, 2), "utf8");
+    console.log(`  Sync usuarios: agregados ${nuevos.length} nuevos → ${nuevos.map(u => u.email).join(", ")}`);
+  } catch (e) {
+    console.warn("  Sync usuarios falló:", e.message);
+  }
+}
+syncUsuariosNuevos();
+
 // --- Config Impulsa (igual que antes) ---
 const IMPULSA_API_KEY = process.env.IMPULSA_API_KEY || "";
 const IMPULSA_ENV = (process.env.IMPULSA_ENV || "test").toLowerCase();
