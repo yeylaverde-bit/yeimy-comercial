@@ -285,11 +285,14 @@ body.role-admin [data-role-only~="admin"]{display:revert}
 body.role-asesor [data-role-only~="asesor"]{display:revert}
 body.role-contable [data-role-only~="contable"]{display:revert}
 body.role-dueno [data-role-only~="dueno"]{display:revert}
+body.role-taller [data-role-only~="taller"]{display:revert}
 
 /* Avatar contable: color verde billete */
 .user-avatar.contable{background:linear-gradient(135deg,#22c55e,#15803d);color:#fff}
 /* Avatar dueño: azul corporativo */
 .user-avatar.dueno{background:linear-gradient(135deg,#3b82f6,#1e40af);color:#fff}
+/* Avatar taller: naranja mecánico */
+.user-avatar.taller{background:linear-gradient(135deg,#f97316,#c2410c);color:#fff}
 
 /* Estilos métricas gerenciales */
 .metrics-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-bottom:20px}

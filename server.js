@@ -423,8 +423,8 @@ function guardarPreasig(data) {
 
 app.get("/api/preasignaciones/lista", requireAuth, (req, res) => {
   const usuario = buscarUsuario(req.session.userEmail);
-  // Contable, dueno y admin ven todas; asesor solo lo suyo
-  const verTodos = usuario?.rol === "contable" || usuario?.rol === "dueno"
+  // Contable, dueno, taller y admin ven todas; asesor solo lo suyo
+  const verTodos = usuario?.rol === "contable" || usuario?.rol === "dueno" || usuario?.rol === "taller"
     || (req.query.todos === "1" && usuario?.rol === "admin");
   const todas = leerPreasig();
   const out = {};
@@ -471,13 +471,35 @@ app.patch("/api/preasignaciones/:chasis", requireAuth, (req, res) => {
   const todas = leerPreasig();
   if (!todas[chasis]) return res.status(404).json({ ok: false, error: "No existe" });
   const usuario = buscarUsuario(req.session.userEmail);
-  if (todas[chasis].asesorEmail !== usuario.email && usuario.rol !== "admin") {
+  // Rol taller puede cambiar estado a lista_para_entregar de cualquier preasignación
+  const esTaller = usuario.rol === "taller";
+  const esDueno = todas[chasis].asesorEmail === usuario.email;
+  if (!esDueno && usuario.rol !== "admin" && !esTaller) {
     return res.status(403).json({ ok: false, error: "Sin permiso" });
   }
-  // Solo permite actualizar ciertos campos
-  const camposPermitidos = ["estado", "gps", "placa", "numCredito", "financiera", "celular", "fechaNacimiento"];
-  for (const c of camposPermitidos) {
-    if (req.body[c] !== undefined) todas[chasis][c] = String(req.body[c]).trim();
+  // Taller solo puede cambiar estado a lista_para_entregar (no otros campos)
+  if (esTaller && !esDueno && usuario.rol !== "admin") {
+    if (req.body.estado !== "lista_para_entregar") {
+      return res.status(403).json({ ok: false, error: "Taller solo puede marcar 'lista_para_entregar'" });
+    }
+    todas[chasis].estado = "lista_para_entregar";
+    todas[chasis].listaEn = new Date().toISOString();
+    todas[chasis].listaPor = usuario.email;
+  } else {
+    // Solo permite actualizar ciertos campos
+    const camposPermitidos = ["estado", "gps", "placa", "numCredito", "financiera", "celular", "fechaNacimiento"];
+    for (const c of camposPermitidos) {
+      if (req.body[c] !== undefined) todas[chasis][c] = String(req.body[c]).trim();
+    }
+    // Si pasa a en_taller, registrar timestamp de entrada
+    if (req.body.estado === "en_taller" && !todas[chasis].entradaTaller) {
+      todas[chasis].entradaTaller = new Date().toISOString();
+    }
+    // Si pasa a lista_para_entregar, registrar timestamp
+    if (req.body.estado === "lista_para_entregar") {
+      todas[chasis].listaEn = new Date().toISOString();
+      todas[chasis].listaPor = usuario.email;
+    }
   }
   todas[chasis].actualizadoEn = new Date().toISOString();
   guardarPreasig(todas);

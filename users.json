@@ -75,6 +75,15 @@
       "passwordHash": "$2a$10$NOjKIIe2fvjwck0mJ7LC5.VQf/APvAQ3koMHAtajmnOGjO97S7Zxa",
       "debeChangePass": true,
       "creadoEn": "2026-06-03T20:30:00.000Z"
+    },
+    {
+      "email": "garantiasserviautec@gmail.com",
+      "nombre": "TALLER",
+      "apellido": "Serviautec",
+      "rol": "taller",
+      "passwordHash": "$2a$10$kGwKlF7RyT/tc1JePLjOvO2bU4/lSKXKQPAwL9/vQOfYYb0BJphu2",
+      "debeChangePass": true,
+      "creadoEn": "2026-06-04T00:00:00.000Z"
     }
   ]
 }

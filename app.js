@@ -2024,32 +2024,80 @@ if (formPreasig) {
 function renderTaller() {
   const tbody = document.querySelector("#tblTaller tbody");
   if (!tbody) return;
-  const enTaller = Object.values(preasigState.preasignaciones).filter(p => p.estado === "en_taller" || p.estado === "entregada");
+  const esRolTaller = currentUser?.rol === "taller";
+  // Para el rol taller: mostrar solo las que están en taller (pendientes) — no muestra entregadas ni listas
+  // Para los demás: mostrar en_taller + lista_para_entregar + entregada
+  const enTaller = Object.values(preasigState.preasignaciones).filter(p => {
+    if (esRolTaller) return p.estado === "en_taller"; // solo pendientes para taller
+    return p.estado === "en_taller" || p.estado === "lista_para_entregar" || p.estado === "entregada";
+  });
   document.getElementById("tallerCount").textContent = fmtNum.format(enTaller.length);
 
   if (enTaller.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;color:var(--muted);padding:30px">
-      Sin motos en taller. Mueve una preasignación con el botón <strong>"→ A taller"</strong>.
+    const colspan = esRolTaller ? 9 : 10;
+    tbody.innerHTML = `<tr><td colspan="${colspan}" style="text-align:center;color:var(--muted);padding:30px">
+      ${esRolTaller ? "✓ ¡Todo al día! Sin motos pendientes de alistar." : 'Sin motos en taller. Mueve una preasignación con el botón <strong>"→ A taller"</strong>.'}
     </td></tr>`;
     return;
   }
-  tbody.innerHTML = enTaller.sort((a, b) => (b.actualizadoEn || "").localeCompare(a.actualizadoEn || ""))
-    .map(p => {
+
+  // Ordenar por fecha de entrada a taller — MÁS ANTIGUAS PRIMERO (orden de cola)
+  const sorted = enTaller.sort((a, b) => {
+    const ta = a.entradaTaller || a.actualizadoEn || "";
+    const tb = b.entradaTaller || b.actualizadoEn || "";
+    return ta.localeCompare(tb); // ascendente: las que llevan más tiempo primero
+  });
+
+  tbody.innerHTML = sorted.map(p => {
       const gpsLabel = { sin: "Sin GPS", instalar: "⚙ Instalar", activar: "📡 Activar" }[p.gps] || "—";
-      const estadoCls = p.estado === "entregada" ? "tag-contado" : "tag-financiado";
-      const estadoTexto = p.estado === "entregada" ? "✓ Entregada" : "🛠 En taller";
+      const estadoCls = p.estado === "entregada" ? "tag-contado"
+                      : p.estado === "lista_para_entregar" ? "tag-financiado" : "tag-financiado";
+      const estadoTexto = p.estado === "entregada" ? "✓ Entregada"
+                        : p.estado === "lista_para_entregar" ? "✓ Lista — avisar cliente"
+                        : "🛠 En taller";
+      // Fecha + hora de entrada a taller
+      const fechaEntrada = p.entradaTaller || p.actualizadoEn;
+      const fechaFmt = fechaEntrada
+        ? new Date(fechaEntrada).toLocaleString("es-CO", { day:"2-digit", month:"2-digit", year:"numeric", hour:"2-digit", minute:"2-digit" })
+        : "—";
+      // Calcular cuánto tiempo lleva en taller
+      let tiempoLleva = "";
+      if (fechaEntrada) {
+        const mins = Math.floor((Date.now() - new Date(fechaEntrada).getTime()) / 60000);
+        if (mins < 60) tiempoLleva = `${mins} min`;
+        else if (mins < 60*24) tiempoLleva = `${Math.floor(mins/60)}h ${mins%60}min`;
+        else tiempoLleva = `${Math.floor(mins/(60*24))} días`;
+      }
+
+      // Acciones según rol
+      let acciones = "";
+      if (esRolTaller && p.estado === "en_taller") {
+        // Taller: botón "Lista para entregar"
+        acciones = `<button class="btn-primary" data-taller-lista="${escapeHtml(p.chasis)}" style="padding:6px 12px;font-size:12px;background:#22c55e;border-color:#22c55e">✓ Lista para entregar</button>`;
+      } else if (!esRolTaller && p.estado === "en_taller") {
+        acciones = `<span class="muted" style="font-size:11px">Esperando taller…</span>`;
+      } else if (!esRolTaller && p.estado === "lista_para_entregar") {
+        // Asesor/admin: ahora puede marcar entregada o avisar cliente
+        acciones = `<button class="btn-primary" data-taller-entregar="${escapeHtml(p.chasis)}" style="padding:6px 12px;font-size:12px">✓ Marcar entregada</button>`;
+      }
+
+      // Columna asesor (oculta para taller mediante data-role-only del th)
+      const asesorCell = esRolTaller ? "" : `<td>${escapeHtml(p.asesorNombre || "—")}</td>`;
+
       return `<tr ${p.estado === "entregada" ? 'class="row-inactive"' : ""}>
-        <td>${escapeHtml(p.placa || "—")}</td>
+        <td>
+          <div style="font-size:12px">${escapeHtml(fechaFmt)}</div>
+          ${tiempoLleva ? `<div class="muted" style="font-size:10.5px">hace ${tiempoLleva}</div>` : ""}
+        </td>
+        <td><strong>${escapeHtml(p.placa || "—")}</strong></td>
         <td><code style="font-size:11px;color:var(--accent-2)">${escapeHtml(p.chasis)}</code></td>
         <td><code style="font-size:11px;color:var(--muted)">${escapeHtml(p.motor || "—")}</code></td>
         <td><strong>${escapeHtml(p.marca || "")} ${escapeHtml(p.modelo || "")}</strong></td>
         <td>${escapeHtml(p.nombreCliente || "—")}</td>
-        <td>${escapeHtml(p.asesorNombre || "—")}</td>
+        ${asesorCell}
         <td>${gpsLabel}</td>
         <td><span class="tag ${estadoCls}">${estadoTexto}</span></td>
-        <td>
-          ${p.estado === "en_taller" ? `<button class="btn-secondary" data-taller-entregar="${escapeHtml(p.chasis)}" style="padding:5px 10px;font-size:11px">✓ Marcar entregada</button>` : ""}
-        </td>
+        <td>${acciones}</td>
       </tr>`;
     }).join("");
 
@@ -2059,6 +2107,32 @@ function renderTaller() {
       await cambiarEstadoPreasig(b.dataset.tallerEntregar, "entregada");
     });
   });
+  // Botón "Lista para entregar" (rol taller)
+  tbody.querySelectorAll("[data-taller-lista]").forEach(b => {
+    b.addEventListener("click", async () => {
+      if (!confirm("¿Marcar esta moto como Lista para entregar?\n\nSe avisará al asesor para que contacte al cliente.")) return;
+      await cambiarEstadoPreasig(b.dataset.tallerLista, "lista_para_entregar");
+    });
+  });
+
+  // Actualizar el badge del sidebar con el conteo de motos listas para entregar
+  // (solo aplica para asesor/admin/dueno — para que vean cuántas hay listas)
+  const motosListas = Object.values(preasigState.preasignaciones || {})
+    .filter(p => p.estado === "lista_para_entregar");
+  // Para asesor: solo las suyas; para admin/dueno: todas
+  const propias = currentUser?.rol === "asesor"
+    ? motosListas.filter(p => p.asesorEmail === currentUser.email)
+    : motosListas;
+  const badge = document.getElementById("tallerListasBadge");
+  if (badge) {
+    if (propias.length > 0) {
+      badge.textContent = propias.length;
+      badge.style.display = "inline-block";
+      badge.title = `${propias.length} moto(s) lista(s) para avisar al cliente`;
+    } else {
+      badge.style.display = "none";
+    }
+  }
 }
 
 const tallerVerTodos = document.getElementById("tallerVerTodos");
@@ -3223,7 +3297,7 @@ async function loadCurrentUser() {
 }
 
 function aplicarRol(usuario) {
-  document.body.classList.remove("role-admin", "role-asesor", "role-contable", "role-dueno");
+  document.body.classList.remove("role-admin", "role-asesor", "role-contable", "role-dueno", "role-taller");
   document.body.classList.add("role-" + usuario.rol);
 
   // User card
@@ -3238,6 +3312,7 @@ function aplicarRol(usuario) {
       asesor: "Asesor",
       contable: "Contabilidad",
       dueno: "Gerencia",
+      taller: "Taller",
     })[usuario.rol] || usuario.rol;
   }
   if (avEl) {

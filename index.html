@@ -56,7 +56,7 @@
       </nav>
     </div>
 
-    <div class="nav-section">
+    <div class="nav-section" data-role-only="admin asesor contable dueno">
       <div class="nav-section-title">Operación diaria</div>
       <nav class="nav">
         <a href="#precios">💵 Lista de precios</a>
@@ -66,7 +66,15 @@
         <a href="#preasignacion" data-role-only="admin asesor dueno">🔧 Preasignación</a>
         <a href="#ordenfac">📑 Orden facturación</a>
         <a href="#soat" data-role-only="admin asesor contable dueno">🛡️ Crear SOAT</a>
-        <a href="#taller" data-role-only="admin asesor dueno">🛠️ Taller</a>
+        <a href="#taller" data-role-only="admin asesor dueno">🛠️ Taller <span id="tallerListasBadge" class="badge" style="display:none;background:#22c55e;color:#fff;margin-left:6px;font-size:10px"></span></a>
+      </nav>
+    </div>
+
+    <!-- Sidebar SOLO para rol taller -->
+    <div class="nav-section" data-role-only="taller">
+      <div class="nav-section-title">Mi área</div>
+      <nav class="nav">
+        <a class="active" href="#taller">🛠️ Motos por alistar</a>
       </nav>
     </div>
 
@@ -806,7 +814,7 @@
       <div id="soatLista" style="display:grid;gap:14px"></div>
     </section>
 
-    <section id="taller" class="card" data-role-only="admin asesor dueno">
+    <section id="taller" class="card" data-role-only="admin asesor dueno taller">
       <div class="card-head">
         <h2>🛠️ Taller · motos en proceso</h2>
         <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
@@ -817,19 +825,23 @@
           </label>
         </div>
       </div>
-      <p class="muted" style="margin:-4px 0 12px;font-size:12.5px">
+      <p class="muted" style="margin:-4px 0 12px;font-size:12.5px" data-role-only="admin asesor dueno">
         Motos que pasaron de preasignación a taller. Cambia el estado a <strong>"Lista"</strong> o <strong>"Entregada"</strong> cuando corresponda.
+      </p>
+      <p class="muted" style="margin:-4px 0 12px;font-size:12.5px" data-role-only="taller">
+        Motos pendientes de alistamiento, en orden de llegada (más antiguas primero). Cuando termines de alistar una moto, da click en <strong>"✓ Lista para entregar"</strong> para avisar al asesor.
       </p>
       <div class="table-wrap">
         <table class="table" id="tblTaller">
           <thead>
             <tr>
+              <th>Entró a taller</th>
               <th>Placa</th>
               <th>Chasis</th>
               <th>Motor</th>
               <th>Marca · Modelo</th>
               <th>Cliente</th>
-              <th>Asesor</th>
+              <th data-role-only="admin asesor dueno">Asesor</th>
               <th>GPS</th>
               <th>Estado</th>
               <th>Acciones</th>
