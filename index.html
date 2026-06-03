@@ -386,9 +386,16 @@
           <span class="badge" id="invCount">0</span>
         </div>
       </div>
-      <p class="muted" id="invFuente" style="margin:-6px 0 12px;font-size:12px">
-        Fuente: <span id="invFuenteLabel">cargando…</span>
-      </p>
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:-6px 0 12px">
+        <p class="muted" id="invFuente" style="margin:0;font-size:12px">
+          Fuente: <span id="invFuenteLabel">cargando…</span>
+        </p>
+        <div style="display:flex;gap:6px;margin-left:auto">
+          <button class="btn-mini" id="btnInvSheets" data-fuente="sheets" title="Cargar desde Google Sheets" style="background:rgba(124,92,255,.2);border-color:var(--accent)">📊 Sheets</button>
+          <button class="btn-mini" id="btnInvSiigo" data-fuente="siigo" title="Cargar desde Siigo">🧾 Siigo</button>
+          <button class="btn-mini" id="btnInvRefresh" title="Refrescar fuente actual">↻</button>
+        </div>
+      </div>
       <div id="invConfigWarn" class="form-msg form-msg-info" style="display:none">
         ⚙️ No se pudo cargar el inventario.
       </div>

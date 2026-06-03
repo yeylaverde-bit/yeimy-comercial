@@ -937,7 +937,7 @@ if (precSearchEl) precSearchEl.addEventListener("input", e => { precState.search
 // (estado distinto de VENDIDA) antes de renderizar.
 const INV_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSh3BOUXsJVvIOH_07kqNa-BgWDBGc5bP40jrJ5I320V4SxsBrbJoHTkUD7XuTQSHvNfJ-xMc6dpAEr/pub?gid=966946261&single=true&output=csv";
 
-const invState = { rows: [], filtered: [], search: "", fuente: "—" };
+const invState = { rows: [], filtered: [], search: "", fuente: "—", fuenteSeleccionada: "sheets" };
 
 // Inferir marca a partir del nombre del modelo Siigo (que no la trae explícita)
 function inferirMarcaPorModelo(modelo) {
@@ -969,13 +969,48 @@ function normalizeSiigoMoto(p) {
   };
 }
 
-async function loadInventario() {
+async function loadInventario(opts = {}) {
   const warn = document.getElementById("invConfigWarn");
   const fuenteLabel = document.getElementById("invFuenteLabel");
   if (warn) warn.style.display = "none";
   if (fuenteLabel) fuenteLabel.textContent = "cargando…";
+  actualizarBotonesFuente();
 
-  // 1) Fuente primaria: Google Sheets pestaña inventario (lo que mantiene el concesionario)
+  const refresh = !!opts.refresh;
+
+  // Selección del usuario: "sheets" (default) o "siigo"
+  if (invState.fuenteSeleccionada === "siigo") {
+    // Carga desde Siigo (puede forzar refresh)
+    try {
+      const url = "/api/siigo/productos" + (refresh ? "?refresh=1" : "");
+      const res = await fetch(url, { cache: "no-store" });
+      const data = await res.json();
+      if (data.ok && Array.isArray(data.productos)) {
+        invState.rows = data.productos
+          .map(normalizeSiigoMoto)
+          .filter(r => r.modelo)
+          .filter(r => r.stock > 0)
+          .sort((a, b) => a.modelo.localeCompare(b.modelo));
+        const cacheNota = data.fuente === "cache" ? " · cache" : " · recién leído";
+        invState.fuente = `🧾 Siigo · ${invState.rows.length} motos con stock${cacheNota}`;
+        if (fuenteLabel) fuenteLabel.textContent = invState.fuente;
+        renderInventario();
+        if (docState.docs && Object.keys(docState.docs).length) {
+          try { renderDocs(); } catch {}
+        }
+        return;
+      }
+      throw new Error(data.error || "Siigo no devolvió productos");
+    } catch (e) {
+      console.error("[inventario] Siigo falló:", e.message);
+      if (fuenteLabel) fuenteLabel.textContent = `🧾 Siigo · ❌ ${e.message}`;
+      document.querySelector("#tblInventario tbody").innerHTML =
+        `<tr><td colspan="10" style="text-align:center;color:var(--bad);padding:20px">Error al cargar Siigo: ${escapeHtml(e.message)}</td></tr>`;
+      return;
+    }
+  }
+
+  // Default: Google Sheets
   try {
     const url = INV_CSV_URL + (INV_CSV_URL.includes("?") ? "&" : "?") + "t=" + Date.now();
     const res = await fetch(url, { cache: "no-store" });
@@ -988,37 +1023,26 @@ async function loadInventario() {
     invState.fuente = `📊 Google Sheets · ${invState.rows.length} motos disponibles`;
     if (fuenteLabel) fuenteLabel.textContent = invState.fuente;
     renderInventario();
-    // Re-render Orden Facturación: ahora puede cruzar chasis → modelo
     if (docState.docs && Object.keys(docState.docs).length) {
       try { renderDocs(); } catch {}
     }
-    return;
-  } catch (e) {
-    console.warn("[inventario] Sheets falló, intento Siigo como fallback…", e.message);
-  }
-
-  // 2) Fallback: Siigo (si el Sheet no responde)
-  try {
-    const res = await fetch("/api/siigo/productos", { cache: "no-store" });
-    const data = await res.json();
-    if (data.ok && Array.isArray(data.productos)) {
-      invState.rows = data.productos
-        .map(normalizeSiigoMoto)
-        .filter(r => r.modelo)
-        .filter(r => r.stock > 0)
-        .sort((a, b) => a.modelo.localeCompare(b.modelo));
-      invState.fuente = `🧾 Siigo · ${invState.rows.length} motos (fallback, Sheets no disponible)`;
-      if (fuenteLabel) fuenteLabel.textContent = invState.fuente;
-      renderInventario();
-      return;
-    }
   } catch (e) {
     console.error("Error cargando inventario:", e);
+    if (warn) warn.style.display = "block";
+    document.querySelector("#tblInventario tbody").innerHTML =
+      `<tr><td colspan="10" style="text-align:center;color:var(--bad);padding:20px">Error al cargar inventario.</td></tr>`;
   }
+}
 
-  if (warn) warn.style.display = "block";
-  document.querySelector("#tblInventario tbody").innerHTML =
-    `<tr><td colspan="10" style="text-align:center;color:var(--bad);padding:20px">Error al cargar inventario.</td></tr>`;
+function actualizarBotonesFuente() {
+  const btnSheets = document.getElementById("btnInvSheets");
+  const btnSiigo = document.getElementById("btnInvSiigo");
+  if (!btnSheets || !btnSiigo) return;
+  const sel = invState.fuenteSeleccionada;
+  btnSheets.style.background = sel === "sheets" ? "rgba(124,92,255,.2)" : "";
+  btnSheets.style.borderColor = sel === "sheets" ? "var(--accent)" : "";
+  btnSiigo.style.background = sel === "siigo" ? "rgba(34,197,94,.18)" : "";
+  btnSiigo.style.borderColor = sel === "siigo" ? "#22c55e" : "";
 }
 
 function normalizeInvRow(raw) {
@@ -1107,6 +1131,22 @@ function renderInventario() {
 
 const invSearchEl = document.getElementById("invSearch");
 if (invSearchEl) invSearchEl.addEventListener("input", e => { invState.search = e.target.value; renderInventario(); });
+
+// Toggle Sheets / Siigo
+document.getElementById("btnInvSheets")?.addEventListener("click", () => {
+  if (invState.fuenteSeleccionada === "sheets") return;
+  invState.fuenteSeleccionada = "sheets";
+  loadInventario();
+});
+document.getElementById("btnInvSiigo")?.addEventListener("click", () => {
+  if (invState.fuenteSeleccionada === "siigo") return;
+  invState.fuenteSeleccionada = "siigo";
+  loadInventario();
+});
+document.getElementById("btnInvRefresh")?.addEventListener("click", () => {
+  loadInventario({ refresh: true });
+  showToast("↻ Refrescando inventario…");
+});
 
 // ============================================================
 //             FORMULARIO REGISTRAR VENTA → IMPULSA
