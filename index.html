@@ -100,7 +100,7 @@
   <div id="backdrop" class="backdrop"></div>
 
   <main class="main">
-    <header class="topbar">
+    <header class="topbar" data-role-only="admin asesor contable dueno">
       <div class="topbar-title">
         <h1>Resumen de ventas</h1>
         <p class="muted">Fuente: Google Sheets en vivo · Concesionario Yeimy Laverde</p>
@@ -132,6 +132,13 @@
     <div id="roleBanner" class="role-banner" data-role-only="asesor" style="margin:0 28px">
       <div class="role-banner-ico">👤</div>
       <div>Estás registrando como <strong id="bannerName">—</strong>. La oportunidad creada en Impulsa quedará asociada a tu nombre y tu comisión va a ti.</div>
+    </div>
+
+    <div data-role-only="taller" style="background:linear-gradient(135deg,rgba(249,115,22,.14),rgba(194,65,12,.08));border:1px solid rgba(249,115,22,.35);padding:18px;border-radius:12px;margin:0 28px 18px">
+      <h1 style="margin:0 0 4px;font-size:20px;color:#fb923c">🛠️ Motos por alistar</h1>
+      <p class="muted" style="margin:0;font-size:13px">
+        Bienvenido al área de Taller · Serviautec. Aquí ves las motos pendientes en orden de llegada. Cuando termines de alistar una, da clic en <strong style="color:#22c55e">"✓ Lista para entregar"</strong>.
+      </p>
     </div>
 
     <div data-role-only="contable" style="background:linear-gradient(135deg,rgba(34,197,94,.12),rgba(34,211,238,.06));border:1px solid rgba(34,197,94,.3);padding:16px;border-radius:12px;margin-bottom:18px">
@@ -358,7 +365,7 @@
       </div>
     </section>
 
-    <section id="precios" class="card">
+    <section id="precios" class="card" data-role-only="admin asesor contable dueno">
       <div class="card-head">
         <h2>💵 Lista de precios oficial</h2>
         <div class="search-wrap">
@@ -386,7 +393,7 @@
       </div>
     </section>
 
-    <section id="inventario" class="card">
+    <section id="inventario" class="card" data-role-only="admin asesor contable dueno">
       <div class="card-head">
         <h2>📦 Inventario disponible</h2>
         <div class="search-wrap">
@@ -684,7 +691,7 @@
       <div id="preasigListWrap"></div>
     </section>
 
-    <section id="ordenfac" class="card">
+    <section id="ordenfac" class="card" data-role-only="admin asesor contable dueno">
       <div class="card-head">
         <h2>📑 Orden de facturación · documentos para contabilidad</h2>
         <div class="search-wrap">
