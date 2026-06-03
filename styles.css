@@ -286,6 +286,8 @@ body.role-asesor [data-role-only~="asesor"]{display:revert}
 body.role-contable [data-role-only~="contable"]{display:revert}
 body.role-dueno [data-role-only~="dueno"]{display:revert}
 body.role-taller [data-role-only~="taller"]{display:revert}
+body.role-gps_instalar [data-role-only~="gps_instalar"]{display:revert}
+body.role-gps_activar [data-role-only~="gps_activar"]{display:revert}
 
 /* Avatar contable: color verde billete */
 .user-avatar.contable{background:linear-gradient(135deg,#22c55e,#15803d);color:#fff}
@@ -293,6 +295,10 @@ body.role-taller [data-role-only~="taller"]{display:revert}
 .user-avatar.dueno{background:linear-gradient(135deg,#3b82f6,#1e40af);color:#fff}
 /* Avatar taller: naranja mecánico */
 .user-avatar.taller{background:linear-gradient(135deg,#f97316,#c2410c);color:#fff}
+/* Avatar GPS Instalar: cyan satelital */
+.user-avatar.gps_instalar{background:linear-gradient(135deg,#06b6d4,#0e7490);color:#fff}
+/* Avatar GPS Activar: morado señal */
+.user-avatar.gps_activar{background:linear-gradient(135deg,#a855f7,#7e22ce);color:#fff}
 
 /* Estilos métricas gerenciales */
 .metrics-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-bottom:20px}

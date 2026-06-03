@@ -66,6 +66,8 @@
         <a href="#preasignacion" data-role-only="admin asesor dueno">🔧 Preasignación</a>
         <a href="#ordenfac">📑 Orden facturación</a>
         <a href="#soat" data-role-only="admin asesor contable dueno">🛡️ Crear SOAT</a>
+        <a href="#gpsinstalar" data-role-only="admin asesor dueno">📡 GPS Instalar <span id="gpsInstalarBadge" class="badge" style="display:none;background:#06b6d4;color:#fff;margin-left:6px;font-size:10px"></span></a>
+        <a href="#gpsactivar" data-role-only="admin asesor dueno">🛰️ GPS Activar <span id="gpsActivarBadge" class="badge" style="display:none;background:#a855f7;color:#fff;margin-left:6px;font-size:10px"></span></a>
         <a href="#taller" data-role-only="admin asesor dueno">🛠️ Taller <span id="tallerListasBadge" class="badge" style="display:none;background:#22c55e;color:#fff;margin-left:6px;font-size:10px"></span></a>
       </nav>
     </div>
@@ -75,6 +77,22 @@
       <div class="nav-section-title">Mi área</div>
       <nav class="nav">
         <a class="active" href="#taller">🛠️ Motos por alistar</a>
+      </nav>
+    </div>
+
+    <!-- Sidebar SOLO para rol gps_instalar -->
+    <div class="nav-section" data-role-only="gps_instalar">
+      <div class="nav-section-title">Mi área</div>
+      <nav class="nav">
+        <a class="active" href="#gpsinstalar">📡 GPS pendientes de instalación</a>
+      </nav>
+    </div>
+
+    <!-- Sidebar SOLO para rol gps_activar -->
+    <div class="nav-section" data-role-only="gps_activar">
+      <div class="nav-section-title">Mi área</div>
+      <nav class="nav">
+        <a class="active" href="#gpsactivar">🛰️ GPS pendientes de activación</a>
       </nav>
     </div>
 
@@ -819,6 +837,50 @@
         Motos en preasignación que necesitan SOAT. Aquí tienes <strong>todos los datos del cliente y la moto</strong> para generar el SOAT externamente. Cuando lo tengas, súbelo en cada tarjeta.
       </p>
       <div id="soatLista" style="display:grid;gap:14px"></div>
+    </section>
+
+    <!-- Banner bienvenida instalador GPS -->
+    <div data-role-only="gps_instalar" style="background:linear-gradient(135deg,rgba(6,182,212,.14),rgba(14,116,144,.08));border:1px solid rgba(6,182,212,.35);padding:18px;border-radius:12px;margin:0 28px 18px">
+      <h1 style="margin:0 0 4px;font-size:20px;color:#22d3ee">📡 GPS pendientes de instalación</h1>
+      <p class="muted" style="margin:0;font-size:13px">
+        Hola, bienvenido. Aquí ves las motos que necesitan instalación de GPS, en orden de llegada. Cuando termines, sube un video corto donde se vea el comando prendido como evidencia y marca <strong style="color:#22c55e">"✓ GPS Instalado"</strong>.
+      </p>
+    </div>
+
+    <section id="gpsinstalar" class="card" data-role-only="admin asesor dueno gps_instalar">
+      <div class="card-head">
+        <h2>📡 GPS · Pendientes de instalación</h2>
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+          <span class="badge" id="gpsInstalarCount">0</span>
+          <input id="gpsInstalarSearch" placeholder="Buscar placa, chasis, cliente..." style="background:rgba(8,12,28,.7);border:1px solid var(--line);color:var(--text);border-radius:8px;padding:6px 10px;font-size:13px;min-width:200px" />
+        </div>
+      </div>
+      <p class="muted" style="margin:-4px 0 12px;font-size:12.5px">
+        Motos con GPS marcado como <strong>"Instalar"</strong>, ordenadas por fecha de preasignación. Cuando el instalador termina, sube video evidencia y marca instalado.
+      </p>
+      <div id="gpsInstalarLista" style="display:grid;gap:14px"></div>
+    </section>
+
+    <!-- Banner bienvenida activador GPS -->
+    <div data-role-only="gps_activar" style="background:linear-gradient(135deg,rgba(168,85,247,.14),rgba(126,34,206,.08));border:1px solid rgba(168,85,247,.35);padding:18px;border-radius:12px;margin:0 28px 18px">
+      <h1 style="margin:0 0 4px;font-size:20px;color:#c084fc">🛰️ GPS pendientes de activación</h1>
+      <p class="muted" style="margin:0;font-size:13px">
+        Bienvenido. Aquí ves las motos que necesitan activación de GPS. Cuando termines, marca <strong style="color:#22c55e">"✓ GPS Activado"</strong>.
+      </p>
+    </div>
+
+    <section id="gpsactivar" class="card" data-role-only="admin asesor dueno gps_activar">
+      <div class="card-head">
+        <h2>🛰️ GPS · Pendientes de activación</h2>
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+          <span class="badge" id="gpsActivarCount">0</span>
+          <input id="gpsActivarSearch" placeholder="Buscar placa, chasis, cliente..." style="background:rgba(8,12,28,.7);border:1px solid var(--line);color:var(--text);border-radius:8px;padding:6px 10px;font-size:13px;min-width:200px" />
+        </div>
+      </div>
+      <p class="muted" style="margin:-4px 0 12px;font-size:12.5px">
+        Motos con GPS marcado como <strong>"Activar"</strong>, ordenadas por fecha de preasignación.
+      </p>
+      <div id="gpsActivarLista" style="display:grid;gap:14px"></div>
     </section>
 
     <section id="taller" class="card" data-role-only="admin asesor dueno taller">

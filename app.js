@@ -1709,6 +1709,8 @@ async function loadPreasignaciones() {
       preasigState.preasignaciones = data.preasignaciones || {};
       renderPreasignaciones();
       renderTaller();  // taller depende de preasignaciones
+      try { renderGpsLista("instalar"); } catch {}
+      try { renderGpsLista("activar"); } catch {}
       // Re-render Orden Facturación + SOAT: cruza info de preasignaciones
       if (docState.docs && Object.keys(docState.docs).length) {
         try { renderDocs(); } catch {}
@@ -2345,6 +2347,192 @@ function renderSoatPendientes() {
 
 const soatSearchEl = document.getElementById("soatSearch");
 if (soatSearchEl) soatSearchEl.addEventListener("input", e => { soatState.search = e.target.value; renderSoatPendientes(); });
+
+// ============================================================
+//          GPS INSTALAR / ACTIVAR — secciones del instalador
+// ============================================================
+const gpsState = { searchInstalar: "", searchActivar: "" };
+
+function renderGpsLista(tipo) {
+  // tipo: "instalar" o "activar"
+  const wrapId = tipo === "instalar" ? "gpsInstalarLista" : "gpsActivarLista";
+  const countId = tipo === "instalar" ? "gpsInstalarCount" : "gpsActivarCount";
+  const badgeId = tipo === "instalar" ? "gpsInstalarBadge" : "gpsActivarBadge";
+  const search = tipo === "instalar" ? gpsState.searchInstalar : gpsState.searchActivar;
+  const wrap = document.getElementById(wrapId);
+  const countEl = document.getElementById(countId);
+  if (!wrap || !countEl) return;
+
+  // Estado complemento: si ya fue instalado, no aparece
+  const flagCompletado = tipo === "instalar" ? "gpsInstaladoEn" : "gpsActivadoEn";
+
+  // Fuente: preasignaciones con gps == tipo, no entregadas, sin marcar completado
+  const candidatas = Object.values(preasigState.preasignaciones || {})
+    .filter(p => p.gps === tipo)
+    .filter(p => p.estado !== "entregada")
+    .filter(p => !p[flagCompletado]);
+
+  const q = (search || "").toLowerCase().trim();
+  const filtradas = q ? candidatas.filter(p =>
+    [p.placa, p.chasis, p.nombreCliente, p.cedulaCliente, p.modelo, p.marca]
+      .some(v => String(v || "").toLowerCase().includes(q))
+  ) : candidatas;
+
+  // Ordenar más antiguas primero
+  filtradas.sort((a, b) => (a.creadoEn || "").localeCompare(b.creadoEn || ""));
+
+  countEl.textContent = fmtNum.format(filtradas.length);
+
+  // Actualizar badge en sidebar (para asesor/admin)
+  const badge = document.getElementById(badgeId);
+  if (badge) {
+    if (candidatas.length > 0) {
+      badge.textContent = candidatas.length;
+      badge.style.display = "inline-block";
+    } else { badge.style.display = "none"; }
+  }
+
+  if (filtradas.length === 0) {
+    const esRolGps = currentUser?.rol === ("gps_" + tipo);
+    wrap.innerHTML = `<div style="text-align:center;color:var(--muted);padding:30px;border:1px dashed var(--line);border-radius:12px">
+      ${candidatas.length === 0
+        ? (esRolGps
+            ? `✓ Sin motos pendientes de ${tipo === "instalar" ? "instalación" : "activación"} ahora.`
+            : `Sin motos pendientes de ${tipo === "instalar" ? "instalación" : "activación"} de GPS. Cuando un asesor marque GPS=${tipo} en la preasignación, aparecerán aquí.`)
+        : "Sin resultados para esa búsqueda."}
+    </div>`;
+    return;
+  }
+
+  const titulo = tipo === "instalar" ? "Instalado" : "Activado";
+  const flagColor = tipo === "instalar" ? "#06b6d4" : "#a855f7";
+  const lead = (chasis) => leadsState.leads.find(l => (l.chasis || "").toUpperCase() === (chasis || "").toUpperCase());
+
+  wrap.innerHTML = filtradas.map(p => {
+    const l = lead(p.chasis) || {};
+    const fechaPreasig = p.creadoEn
+      ? new Date(p.creadoEn).toLocaleString("es-CO", { day:"2-digit", month:"2-digit", year:"numeric", hour:"2-digit", minute:"2-digit" })
+      : "—";
+    let tiempoLleva = "";
+    if (p.creadoEn) {
+      const mins = Math.floor((Date.now() - new Date(p.creadoEn).getTime()) / 60000);
+      if (mins < 60) tiempoLleva = `${mins} min`;
+      else if (mins < 60*24) tiempoLleva = `${Math.floor(mins/60)}h ${mins%60}min`;
+      else tiempoLleva = `${Math.floor(mins/(60*24))} días`;
+    }
+    const evidenciaURL = p[`gps${tipo === "instalar" ? "Instalar" : "Activar"}EvidenciaPath`]
+      ? `/uploads/${encodeURIComponent(p.chasis)}/${encodeURIComponent(p[`gps${tipo === "instalar" ? "Instalar" : "Activar"}EvidenciaPath`])}`
+      : null;
+
+    return `<div class="card" style="border:1px solid var(--line);padding:16px;background:rgba(8,12,28,.5)">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:14px;flex-wrap:wrap;margin-bottom:14px">
+        <div>
+          <h3 style="margin:0 0 4px;font-size:16px">${escapeHtml(p.nombreCliente || "(sin cliente)")}
+            <code style="font-size:11px;color:${flagColor};font-weight:400;margin-left:6px">${escapeHtml(p.chasis)}</code>
+          </h3>
+          <p class="muted" style="margin:0;font-size:12.5px">${escapeHtml(p.marca || "")} ${escapeHtml(p.modelo || "")}${p.color ? ` · ${escapeHtml(p.color)}` : ""}</p>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em">Preasignada</div>
+          <div style="font-size:13px">${escapeHtml(fechaPreasig)}</div>
+          ${tiempoLleva ? `<div class="muted" style="font-size:10.5px">hace ${tiempoLleva}</div>` : ""}
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px 18px;font-size:13px;margin-bottom:14px">
+        <div>
+          <span class="muted" style="font-size:11px;text-transform:uppercase;letter-spacing:.04em">Placa</span><br>
+          <strong style="font-size:15px;color:${flagColor}">${escapeHtml(p.placa || "—")}</strong>
+        </div>
+        <div>
+          <span class="muted" style="font-size:11px;text-transform:uppercase;letter-spacing:.04em">Cédula</span><br>
+          <strong>${escapeHtml(p.cedulaCliente || l.documento || "—")}</strong>
+        </div>
+        <div>
+          <span class="muted" style="font-size:11px;text-transform:uppercase;letter-spacing:.04em">Celular</span><br>
+          <strong>${escapeHtml(p.celular || l.celular || "—")}</strong>
+        </div>
+        <div>
+          <span class="muted" style="font-size:11px;text-transform:uppercase;letter-spacing:.04em">Motor</span><br>
+          <code style="font-size:11px;color:var(--muted)">${escapeHtml(p.motor || "—")}</code>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;padding-top:10px;border-top:1px solid rgba(255,255,255,.06)">
+        ${evidenciaURL
+          ? `<a class="btn-secondary" href="${evidenciaURL}" target="_blank" style="padding:6px 12px;font-size:12px;text-decoration:none">🎥 Ver evidencia</a>`
+          : tipo === "instalar"
+            ? `<label class="btn-secondary" style="padding:6px 12px;font-size:12px;cursor:pointer">
+                🎥 Subir video evidencia
+                <input type="file" data-gps-video="${escapeHtml(p.chasis)}" accept="video/*,image/*" style="display:none" />
+              </label>`
+            : ""}
+        <button class="btn-primary" data-gps-completar="${escapeHtml(p.chasis)}" data-gps-tipo="${tipo}" style="padding:6px 12px;font-size:12px;background:#22c55e;border-color:#22c55e">
+          ✓ GPS ${titulo}
+        </button>
+      </div>
+    </div>`;
+  }).join("");
+
+  // Listeners — subir video evidencia (GPS Instalar)
+  wrap.querySelectorAll("input[data-gps-video]").forEach(inp => {
+    inp.addEventListener("change", async (ev) => {
+      const file = ev.target.files?.[0];
+      if (!file) return;
+      const chasis = inp.dataset.gpsVideo;
+      const fd = new FormData();
+      fd.append("idVenta", chasis);
+      fd.append("tipo", "gpsInstalarEvidencia");
+      fd.append("archivo", file);
+      try {
+        const r = await fetch("/api/docs/upload", { method: "POST", body: fd });
+        const data = await r.json();
+        if (data.ok) {
+          showToast("✓ Evidencia subida");
+          // Guardar referencia en preasignación
+          await fetch(`/api/preasignaciones/${encodeURIComponent(chasis)}`, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ gpsInstalarEvidenciaPath: data.archivo?.path || file.name }),
+          });
+          await loadPreasignaciones();
+        } else {
+          showToast("Error: " + (data.error || "no se pudo subir"));
+        }
+      } catch (e) { showToast("Error: " + e.message); }
+    });
+  });
+
+  // Listeners — botón completar GPS
+  wrap.querySelectorAll("[data-gps-completar]").forEach(b => {
+    b.addEventListener("click", async () => {
+      const tipoBtn = b.dataset.gpsTipo;
+      const verbo = tipoBtn === "instalar" ? "instalada" : "activada";
+      if (!confirm(`¿Marcar el GPS de esta moto como ${verbo}?`)) return;
+      const chasis = b.dataset.gpsCompletar;
+      const campo = tipoBtn === "instalar" ? "gpsInstaladoEn" : "gpsActivadoEn";
+      try {
+        const r = await fetch(`/api/preasignaciones/${encodeURIComponent(chasis)}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ [campo]: new Date().toISOString() }),
+        });
+        const data = await r.json();
+        if (data.ok) {
+          showToast(`✓ GPS ${verbo}`);
+          await loadPreasignaciones();
+        } else {
+          showToast("Error: " + (data.error || "no se pudo guardar"));
+        }
+      } catch (e) { showToast("Error: " + e.message); }
+    });
+  });
+}
+
+const gpsInstalarSearchEl = document.getElementById("gpsInstalarSearch");
+if (gpsInstalarSearchEl) gpsInstalarSearchEl.addEventListener("input", e => { gpsState.searchInstalar = e.target.value; renderGpsLista("instalar"); });
+const gpsActivarSearchEl = document.getElementById("gpsActivarSearch");
+if (gpsActivarSearchEl) gpsActivarSearchEl.addEventListener("input", e => { gpsState.searchActivar = e.target.value; renderGpsLista("activar"); });
 
 // ============================================================
 //          FACTURA AUTECO — OCR con Claude Vision (solo admin)
@@ -3297,7 +3485,7 @@ async function loadCurrentUser() {
 }
 
 function aplicarRol(usuario) {
-  document.body.classList.remove("role-admin", "role-asesor", "role-contable", "role-dueno", "role-taller");
+  document.body.classList.remove("role-admin", "role-asesor", "role-contable", "role-dueno", "role-taller", "role-gps_instalar", "role-gps_activar");
   document.body.classList.add("role-" + usuario.rol);
 
   // User card
@@ -3313,6 +3501,8 @@ function aplicarRol(usuario) {
       contable: "Contabilidad",
       dueno: "Gerencia",
       taller: "Taller",
+      gps_instalar: "GPS Instalación",
+      gps_activar: "GPS Activación",
     })[usuario.rol] || usuario.rol;
   }
   if (avEl) {

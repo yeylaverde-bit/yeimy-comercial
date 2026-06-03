@@ -84,6 +84,15 @@
       "passwordHash": "$2a$10$kGwKlF7RyT/tc1JePLjOvO2bU4/lSKXKQPAwL9/vQOfYYb0BJphu2",
       "debeChangePass": true,
       "creadoEn": "2026-06-04T00:00:00.000Z"
+    },
+    {
+      "email": "posventa@tsgps.com.co",
+      "nombre": "INSTALADOR",
+      "apellido": "TS GPS",
+      "rol": "gps_instalar",
+      "passwordHash": "$2a$10$IdUFaPCeMEtyZmf1OBNhP.ZWlpkJs3kwdBvW4WW35jfmfy3dRJwfm",
+      "debeChangePass": true,
+      "creadoEn": "2026-06-04T01:00:00.000Z"
     }
   ]
 }

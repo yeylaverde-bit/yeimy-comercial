@@ -423,8 +423,8 @@ function guardarPreasig(data) {
 
 app.get("/api/preasignaciones/lista", requireAuth, (req, res) => {
   const usuario = buscarUsuario(req.session.userEmail);
-  // Contable, dueno, taller y admin ven todas; asesor solo lo suyo
-  const verTodos = usuario?.rol === "contable" || usuario?.rol === "dueno" || usuario?.rol === "taller"
+  // Contable, dueno, taller, gps_instalar, gps_activar y admin ven todas; asesor solo lo suyo
+  const verTodos = ["contable", "dueno", "taller", "gps_instalar", "gps_activar"].includes(usuario?.rol)
     || (req.query.todos === "1" && usuario?.rol === "admin");
   const todas = leerPreasig();
   const out = {};
@@ -471,10 +471,13 @@ app.patch("/api/preasignaciones/:chasis", requireAuth, (req, res) => {
   const todas = leerPreasig();
   if (!todas[chasis]) return res.status(404).json({ ok: false, error: "No existe" });
   const usuario = buscarUsuario(req.session.userEmail);
-  // Rol taller puede cambiar estado a lista_para_entregar de cualquier preasignación
+  // Roles especiales (taller, gps_instalar, gps_activar) tienen permisos limitados
   const esTaller = usuario.rol === "taller";
+  const esGpsInstalar = usuario.rol === "gps_instalar";
+  const esGpsActivar = usuario.rol === "gps_activar";
+  const esRolEspecial = esTaller || esGpsInstalar || esGpsActivar;
   const esDueno = todas[chasis].asesorEmail === usuario.email;
-  if (!esDueno && usuario.rol !== "admin" && !esTaller) {
+  if (!esDueno && usuario.rol !== "admin" && !esRolEspecial) {
     return res.status(403).json({ ok: false, error: "Sin permiso" });
   }
   // Taller solo puede cambiar estado a lista_para_entregar (no otros campos)
@@ -485,6 +488,29 @@ app.patch("/api/preasignaciones/:chasis", requireAuth, (req, res) => {
     todas[chasis].estado = "lista_para_entregar";
     todas[chasis].listaEn = new Date().toISOString();
     todas[chasis].listaPor = usuario.email;
+  } else if (esGpsInstalar && !esDueno && usuario.rol !== "admin") {
+    // GPS instalador solo puede marcar gpsInstaladoEn o gpsInstalarEvidenciaPath
+    const camposPermitidosGps = ["gpsInstaladoEn", "gpsInstalarEvidenciaPath"];
+    let cambioAlgo = false;
+    for (const c of camposPermitidosGps) {
+      if (req.body[c] !== undefined) {
+        todas[chasis][c] = req.body[c];
+        cambioAlgo = true;
+      }
+    }
+    if (!cambioAlgo) return res.status(403).json({ ok: false, error: "GPS Instalar: solo puede marcar instalado o subir evidencia" });
+    if (req.body.gpsInstaladoEn) todas[chasis].gpsInstaladoPor = usuario.email;
+  } else if (esGpsActivar && !esDueno && usuario.rol !== "admin") {
+    const camposPermitidosGps = ["gpsActivadoEn", "gpsActivarEvidenciaPath"];
+    let cambioAlgo = false;
+    for (const c of camposPermitidosGps) {
+      if (req.body[c] !== undefined) {
+        todas[chasis][c] = req.body[c];
+        cambioAlgo = true;
+      }
+    }
+    if (!cambioAlgo) return res.status(403).json({ ok: false, error: "GPS Activar: solo puede marcar activado o subir evidencia" });
+    if (req.body.gpsActivadoEn) todas[chasis].gpsActivadoPor = usuario.email;
   } else {
     // Solo permite actualizar ciertos campos
     const camposPermitidos = ["estado", "gps", "placa", "numCredito", "financiera", "celular", "fechaNacimiento"];
