@@ -1381,6 +1381,81 @@ if (formEl) {
       btn.textContent = original;
     }
   });
+
+  // ============================================================
+  //   AUTO-FILL: si la cédula o nombre ya existe → traer datos
+  // ============================================================
+  function buscarClienteExistente() {
+    const cedula = String(formEl.querySelector('[name="Documento"]')?.value || "").replace(/[^0-9]/g, "");
+    const nombre = String(formEl.querySelector('[name="NombreContacto"]')?.value || "").toUpperCase().trim();
+
+    // Buscar primero por cédula exacta
+    let lead = null;
+    let preasig = null;
+    if (cedula.length >= 5) {
+      lead = leadsState.leads.find(l => String(l.documento || "").replace(/[^0-9]/g, "") === cedula);
+      preasig = Object.values(preasigState.preasignaciones || {}).find(p =>
+        String(p.cedulaCliente || "").replace(/[^0-9]/g, "") === cedula);
+    }
+    // Si no encontró por cédula y hay nombre, buscar por nombre
+    if (!lead && !preasig && nombre.length >= 4) {
+      lead = leadsState.leads.find(l => (l.cliente || "").toUpperCase() === nombre)
+          || leadsState.leads.find(l => (l.cliente || "").toUpperCase().includes(nombre));
+    }
+    if (!lead && !preasig) return;
+
+    // Llenar campos vacíos (no sobrescribir lo que el asesor ya escribió)
+    const setIfEmpty = (selector, valor) => {
+      const inp = formEl.querySelector(selector);
+      if (inp && valor && !inp.value) inp.value = valor;
+    };
+    setIfEmpty('[name="NombreContacto"]', lead?.cliente || preasig?.nombreCliente);
+    setIfEmpty('[name="Documento"]', lead?.documento || preasig?.cedulaCliente);
+    setIfEmpty('[name="Telefono2"]', lead?.celular || preasig?.celular);
+    setIfEmpty('[name="Email"]', lead?.email);
+    setIfEmpty('[name="Direccion"]', lead?.direccion);
+    if (lead?.marca) setIfEmpty('[name="Marca"]', lead.marca);
+    if (lead?.modelo) setIfEmpty('[name="Producto"]', lead.modelo);
+
+    showFormMsg(
+      `✓ Cliente <strong>${escapeHtml(lead?.cliente || preasig?.nombreCliente || "")}</strong> encontrado en el sistema. Datos prellenados.`,
+      "info"
+    );
+  }
+
+  // Listener en cédula (al perder foco o cambiar)
+  const cedulaInp = formEl.querySelector('[name="Documento"]');
+  if (cedulaInp) {
+    cedulaInp.addEventListener("change", buscarClienteExistente);
+    cedulaInp.addEventListener("blur", buscarClienteExistente);
+  }
+  // Listener en nombre
+  const nombreInp = formEl.querySelector('[name="NombreContacto"]');
+  if (nombreInp) {
+    nombreInp.addEventListener("change", buscarClienteExistente);
+    nombreInp.addEventListener("blur", buscarClienteExistente);
+    // Datalist con clientes existentes
+    let dl = document.getElementById("clientesExistentesList");
+    if (!dl) {
+      dl = document.createElement("datalist");
+      dl.id = "clientesExistentesList";
+      formEl.appendChild(dl);
+    }
+    nombreInp.setAttribute("list", "clientesExistentesList");
+    // Re-poblar el datalist cada vez que enfoca el campo
+    nombreInp.addEventListener("focus", () => {
+      const vistos = new Set();
+      const opts = [];
+      for (const l of leadsState.leads) {
+        const key = (l.cliente || "").toUpperCase().trim();
+        if (!key || vistos.has(key)) continue;
+        vistos.add(key);
+        const det = [l.documento ? "CC " + l.documento : "", l.celular].filter(Boolean).join(" · ");
+        opts.push(`<option value="${escapeHtml(l.cliente)}">${escapeHtml(det)}</option>`);
+      }
+      dl.innerHTML = opts.join("");
+    });
+  }
 }
 
 // ============================================================
