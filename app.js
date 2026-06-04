@@ -3085,7 +3085,7 @@ function renderDocs() {
 // ============================================================
 //          VISTA CONTABLE — tabla compacta + modal detalle
 // ============================================================
-let filtroContable = "todos";  // todos | pendientes | listos
+let filtroContable = "sin_facturar";  // sin_facturar (default) | facturadas | todos
 
 /**
  * Resuelve TODOS los datos de una venta (chasis) cruzando 4 fuentes:
@@ -3150,17 +3150,26 @@ function renderDocsTablaContable() {
       const hay = [id, info.cliente || "", info.modelo || ""].some(v => v.toLowerCase().includes(q));
       if (!hay) return false;
     }
+    // Factura de venta subida (no cuenta como facturada si está marcada "no aplica")
+    const tieneFactura = !!(info.archivos?.facturaVenta && !info.archivos.facturaVenta.noAplica);
+    if (filtroContable === "sin_facturar") return !tieneFactura;
+    if (filtroContable === "facturadas") return tieneFactura;
+    // Compatibilidad con filtros viejos por si los hay
     const completados = tipos.filter(t => info.archivos?.[t]).length;
     if (filtroContable === "pendientes") return completados < totalTipos;
     if (filtroContable === "listos") return completados === totalTipos;
-    return true;
+    return true; // "todos"
   });
   document.getElementById("docCount").textContent = fmtNum.format(entradas.length);
 
   if (entradas.length === 0) {
-    wrap.innerHTML = `<div style="text-align:center;color:var(--muted);padding:30px;border:1px dashed var(--line);border-radius:12px">
-      ${filtroContable === "pendientes" ? "Sin ventas pendientes." : filtroContable === "listos" ? "Sin ventas listas para facturar todavía." : "Sin ventas registradas con documentos todavía."}
-    </div>`;
+    let mensaje;
+    if (filtroContable === "sin_facturar") mensaje = "✅ ¡No hay ventas pendientes de factura! Todas las ventas ya tienen factura subida.";
+    else if (filtroContable === "facturadas") mensaje = "Aún no hay ventas con factura subida.";
+    else if (filtroContable === "pendientes") mensaje = "Sin ventas pendientes.";
+    else if (filtroContable === "listos") mensaje = "Sin ventas listas para facturar todavía.";
+    else mensaje = "Sin ventas registradas con documentos todavía.";
+    wrap.innerHTML = `<div style="text-align:center;color:var(--muted);padding:30px;border:1px dashed var(--line);border-radius:12px">${mensaje}</div>`;
     return;
   }
 

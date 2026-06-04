@@ -757,11 +757,11 @@
         </label>
       </div>
       <!-- Vista contable: filtros + tabla -->
-      <div data-role-only="contable" style="margin-bottom:12px;display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+      <div data-role-only="contable admin" style="margin-bottom:12px;display:flex;gap:8px;flex-wrap:wrap;align-items:center">
         <span style="color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.06em;font-weight:600;margin-right:6px">Filtrar:</span>
-        <button class="btn-filtro-contable activo" data-filtro-contable="todos">Todos</button>
-        <button class="btn-filtro-contable" data-filtro-contable="pendientes">⏳ Pendientes</button>
-        <button class="btn-filtro-contable" data-filtro-contable="listos">✓ Listos para facturar</button>
+        <button class="btn-filtro-contable activo" data-filtro-contable="sin_facturar">⏳ Sin facturar</button>
+        <button class="btn-filtro-contable" data-filtro-contable="facturadas">🧾 Facturadas</button>
+        <button class="btn-filtro-contable" data-filtro-contable="todos">Todas</button>
       </div>
 
       <div id="docsListWrap"></div>
