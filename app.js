@@ -3286,8 +3286,13 @@ function abrirDetalleVenta(idVenta) {
       return `<label class="doc-slot subido">
         <div class="doc-slot-titulo">${escapeHtml(nombre)}</div>
         <div class="doc-slot-estado">✓</div>
-        <div class="doc-slot-acciones">
-          <a href="/uploads/${encodeURIComponent(idVenta)}/${encodeURIComponent(a.path)}" target="_blank">Ver/Descargar</a>
+        <div class="doc-slot-acciones" style="display:flex;gap:6px;flex-wrap:wrap;justify-content:center">
+          <a href="/uploads/${encodeURIComponent(idVenta)}/${encodeURIComponent(a.path)}" target="_blank">Ver</a>
+          <label style="cursor:pointer;color:var(--accent-2);text-decoration:underline">
+            Reemplazar
+            <input type="file" data-upload data-id="${escapeHtml(idVenta)}" data-tipo="${tipo}" accept="image/*,application/pdf" style="display:none" />
+          </label>
+          <button class="btn-borrar-doc" data-borrar-doc data-id="${escapeHtml(idVenta)}" data-tipo="${tipo}" title="Borrar este documento" style="background:transparent;border:none;color:#f87171;cursor:pointer;font-size:12px;text-decoration:underline;padding:0">🗑️ Borrar</button>
         </div>
         <span class="fecha-pago">subido ${fecha}</span>
       </label>`;
@@ -3302,12 +3307,39 @@ function abrirDetalleVenta(idVenta) {
     </label>`;
   }).join("");
 
-  // Listeners de upload en slots vacíos
+  // Listeners de upload en slots vacíos / reemplazar
   slots.querySelectorAll("input[data-upload]").forEach(inp => {
     inp.addEventListener("change", async (ev) => {
       await subirDocHandler(ev);
       // Re-render detalle con datos actualizados
       setTimeout(() => abrirDetalleVenta(idVenta), 500);
+    });
+  });
+
+  // Listeners de borrar documento individual
+  slots.querySelectorAll("[data-borrar-doc]").forEach(btn => {
+    btn.addEventListener("click", async (ev) => {
+      ev.preventDefault();
+      const id = btn.dataset.id;
+      const tipo = btn.dataset.tipo;
+      const nombreDoc = docState.tiposNombre[tipo] || tipo;
+      if (!confirm(`¿Borrar el documento "${nombreDoc}"?\n\nDespués lo puedes volver a subir si fue un error.`)) return;
+      try {
+        const r = await fetch(`/api/docs/${encodeURIComponent(id)}/${encodeURIComponent(tipo)}`, { method: "DELETE" });
+        const data = await r.json();
+        if (data.ok) {
+          showToast(`🗑️ ${nombreDoc} borrado`);
+          await loadDocs();
+          // Si la venta todavía tiene documentos, re-abrir detalle; sino, cerrar modal
+          if (docState.docs?.[id]) {
+            abrirDetalleVenta(id);
+          } else {
+            document.getElementById("modalDetalleVenta")?.classList.remove("show");
+          }
+        } else {
+          showToast("Error: " + (data.error || "no se pudo borrar"));
+        }
+      } catch (e) { showToast("Error: " + e.message); }
     });
   });
 
