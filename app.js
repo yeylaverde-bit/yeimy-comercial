@@ -2589,6 +2589,11 @@ function renderGpsLista(tipo) {
       ` : ""}
 
       <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;padding-top:10px;border-top:1px solid rgba(255,255,255,.06)">
+        ${tipo === "instalar" ? `
+          <button class="btn-primary" data-agendar-gps="${escapeHtml(p.chasis)}" title="Abrir JotForm de TS GPS con los datos prellenados" style="padding:6px 12px;font-size:12px;background:#06b6d4;border-color:#06b6d4">
+            📅 Agendar con TS GPS
+          </button>
+        ` : ""}
         ${evidenciaURL
           ? `<a class="btn-secondary" href="${evidenciaURL}" target="_blank" style="padding:6px 12px;font-size:12px;text-decoration:none">🎥 Ver evidencia</a>`
           : tipo === "instalar"
@@ -2667,6 +2672,29 @@ function renderGpsLista(tipo) {
           showToast("Error: " + (data.error || "no se pudo subir"));
         }
       } catch (e) { showToast("Error: " + e.message); }
+    });
+  });
+
+  // Listener — agendar instalación GPS en JotForm de TS GPS
+  wrap.querySelectorAll("[data-agendar-gps]").forEach(b => {
+    b.addEventListener("click", () => {
+      const chasis = b.dataset.agendarGps;
+      const p = preasigState.preasignaciones[chasis] || preasigState.preasignaciones[String(chasis).toUpperCase()];
+      if (!p) { showToast("No se encontró la preasignación"); return; }
+      // Últimos 4 dígitos del chasis (lo que pide TS GPS)
+      const ultimos4 = String(p.chasis || "").slice(-4);
+      const modelo = `${p.marca || ""} ${p.modelo || ""}`.trim();
+      const asesorNombre = p.asesorNombre || currentUser?.nombre || "";
+      // Construir URL prellenada del JotForm TS GPS
+      const params = new URLSearchParams();
+      if (modelo) params.set("q32_escribaUna", modelo);
+      if (p.placa) params.set("q38_placaDe38", p.placa);
+      if (ultimos4) params.set("q39_numeroDe39", ultimos4);
+      params.set("q41_servicioA", "INSTALACIÓN");
+      if (asesorNombre) params.set("q43_asesorDe43", asesorNombre);
+      const url = `https://submit.jotform.com/261494455636668?${params.toString()}`;
+      window.open(url, "_blank", "noopener");
+      showToast("📅 Abriendo agendamiento TS GPS · solo falta elegir fecha");
     });
   });
 
