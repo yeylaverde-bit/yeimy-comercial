@@ -763,6 +763,92 @@ Si no puedes leer algún campo, usa "" o 0. Si la imagen no es una factura legib
 });
 
 // ============================================================
+//      CIRCULAR DE PRECIOS — extraer precios desde PDF (Claude Vision)
+// ============================================================
+const CIRCULARES_DIR = path.join(DATA_DIR, "circulares-precios");
+if (!fs.existsSync(CIRCULARES_DIR)) fs.mkdirSync(CIRCULARES_DIR, { recursive: true });
+const uploadCircular = multer({
+  storage: multer.diskStorage({
+    destination: (_req, _file, cb) => cb(null, CIRCULARES_DIR),
+    filename: (_req, file, cb) => cb(null, Date.now() + "-" + file.originalname.replace(/[^a-zA-Z0-9.\-_]/g, "_")),
+  }),
+  limits: { fileSize: 15 * 1024 * 1024 },
+});
+
+app.post("/api/circular-precios/procesar", requireAuth, requireAdmin, uploadCircular.single("archivo"), async (req, res) => {
+  if (!anthropic) return res.status(500).json({ ok: false, error: "ANTHROPIC_API_KEY no configurada" });
+  if (!req.file) return res.status(400).json({ ok: false, error: "Falta archivo PDF de circular" });
+
+  const filepath = path.join(CIRCULARES_DIR, req.file.filename);
+  try {
+    const buf = fs.readFileSync(filepath);
+    const base64 = buf.toString("base64");
+    const mediaType = req.file.mimetype === "application/pdf" ? "application/pdf" : req.file.mimetype;
+    const contentItem = mediaType === "application/pdf"
+      ? { type: "document", source: { type: "base64", media_type: "application/pdf", data: base64 } }
+      : { type: "image", source: { type: "base64", media_type: mediaType, data: base64 } };
+
+    const prompt = `Esta es una circular de precios de Auteco (importador de motocicletas en Colombia: marcas TVS, Victory, Kymco, Benelli, Kawasaki, Ceronte).
+
+Extrae TODOS los modelos con sus precios sugeridos de venta al público. Cada moto puede tener precio en uno o varios años modelo (2025, 2026, 2027).
+
+Devuelve SOLO un JSON válido con este formato exacto, sin texto extra:
+
+{
+  "marca": "TVS" o "VICTORY" o "KYMCO" o "BENELLI" o "CERONTE" (la que corresponda a la circular),
+  "fecha": "Junio 2026" (mes y año de la circular si aparece),
+  "modelos": [
+    {
+      "modelo": "APACHE 160 CARB ABS",
+      "precio_2025": 0,
+      "precio_2026": 9499999,
+      "precio_2027": 9649999,
+      "iva": 19,
+      "impuesto_consumo": 0
+    },
+    ...
+  ]
+}
+
+Reglas:
+- Precios SIN comas ni puntos: 9499999, no "$9.499.999"
+- Si una celda está vacía o tiene guión, usa 0
+- Si la circular tiene varias marcas, devuelve todas en "modelos" — la "marca" del nivel raíz indica la principal
+- iva es 19 o 5 o 0 (según la circular)
+- impuesto_consumo es 0 u 8 (si aparece)
+- modelo en MAYÚSCULAS exactamente como aparece
+
+Si el PDF no es una circular de precios, devuelve {"modelos": []}.`;
+
+    const result = await anthropic.messages.create({
+      model: "claude-sonnet-4-5",
+      max_tokens: 8192,
+      messages: [{
+        role: "user",
+        content: [contentItem, { type: "text", text: prompt }],
+      }],
+    });
+
+    let texto = result.content[0]?.text || "";
+    const jsonMatch = texto.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) throw new Error("Claude no devolvió JSON válido: " + texto.slice(0, 200));
+    const data = JSON.parse(jsonMatch[0]);
+
+    res.json({
+      ok: true,
+      marca: data.marca || "",
+      fecha: data.fecha || "",
+      modelos: data.modelos || [],
+      archivo: req.file.filename,
+      usoTokens: { input: result.usage?.input_tokens, output: result.usage?.output_tokens },
+    });
+  } catch (e) {
+    console.error("Error circular precios:", e);
+    res.status(500).json({ ok: false, error: e.message });
+  }
+});
+
+// ============================================================
 //      GPS — leer IMEI desde foto del sticker (Claude Vision)
 // ============================================================
 const GPS_DIR = path.join(DATA_DIR, "gps-imei");

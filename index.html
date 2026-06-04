@@ -996,11 +996,45 @@
           <span>Notas (opcional)</span>
           <textarea name="notas" rows="2" placeholder="Ej: Lista de precios junio 2026 — incluye nuevo Apache RTR 310"></textarea>
         </label>
-        <div class="form-actions form-field-full">
-          <button type="submit" class="btn-primary">📤 Subir PDF de precios</button>
+        <div class="form-actions form-field-full" style="display:flex;gap:10px;flex-wrap:wrap">
+          <button type="submit" class="btn-primary">📤 Subir PDF al historial</button>
+          <button type="button" class="btn-primary" id="btnProcesarCircular" style="background:linear-gradient(135deg,#a855f7,#7e22ce);border-color:#a855f7">
+            🤖 Procesar con IA (extraer precios)
+          </button>
         </div>
       </form>
       <div id="preciosUploadMsg" class="form-msg" style="display:none"></div>
+
+      <!-- Resultado del procesamiento con IA -->
+      <div id="circularResultado" style="display:none;margin-top:20px">
+        <h3 style="margin:0 0 6px;font-size:14px">📊 Precios extraídos por IA</h3>
+        <p class="muted" style="font-size:12px;margin:0 0 12px">
+          <strong id="circularInfoMarca">—</strong> · <span id="circularInfoFecha">—</span>
+          · <span id="circularInfoTotal">0</span> modelos detectados.
+          Edita si la IA leyó algo mal y descarga el CSV para pegar en el Sheet.
+        </p>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">
+          <button class="btn-secondary" id="btnDescargarCircularCSV" style="padding:6px 12px;font-size:12px">⬇️ Descargar CSV</button>
+          <button class="btn-secondary" id="btnCopiarCircularCSV" style="padding:6px 12px;font-size:12px">📋 Copiar al portapapeles</button>
+          <button class="btn-secondary" id="btnCerrarCircular" style="padding:6px 12px;font-size:12px">Cerrar</button>
+        </div>
+        <div class="table-wrap">
+          <table class="table" id="tblCircular">
+            <thead>
+              <tr>
+                <th>Modelo</th>
+                <th class="num">Precio 2025</th>
+                <th class="num">Precio 2026</th>
+                <th class="num">Precio 2027</th>
+                <th class="num">IVA</th>
+                <th>Comparativa Sheet</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+
       <div style="margin-top:24px">
         <h3 style="margin:0 0 10px;font-size:14px">Historial de actualizaciones</h3>
         <div id="preciosHistorial"></div>

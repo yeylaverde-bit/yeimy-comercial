@@ -2795,6 +2795,140 @@ if (formSubirPrecios) {
   });
 }
 
+// --- Procesar circular con IA (Claude Vision extrae precios) ---
+let circularModelos = [];
+let circularInfo = { marca: "", fecha: "" };
+
+const btnProcesarCircular = document.getElementById("btnProcesarCircular");
+if (btnProcesarCircular) {
+  btnProcesarCircular.addEventListener("click", async () => {
+    const fileInput = formSubirPrecios?.querySelector('input[name="archivo"]');
+    const file = fileInput?.files?.[0];
+    if (!file) { showToast("Primero selecciona el PDF de la circular"); return; }
+    const msg = document.getElementById("preciosUploadMsg");
+    msg.style.display = "block"; msg.className = "form-msg";
+    msg.textContent = "🤖 Claude IA está leyendo el PDF, esto toma 20-40 segundos…";
+    btnProcesarCircular.disabled = true;
+    btnProcesarCircular.textContent = "Procesando…";
+
+    try {
+      const fd = new FormData();
+      fd.append("archivo", file);
+      const r = await fetch("/api/circular-precios/procesar", { method: "POST", body: fd });
+      const data = await r.json();
+      if (!data.ok) {
+        msg.className = "form-msg form-msg-err";
+        msg.textContent = "❌ Error: " + (data.error || "no se pudo procesar");
+        return;
+      }
+      circularModelos = data.modelos || [];
+      circularInfo = { marca: data.marca || "", fecha: data.fecha || "" };
+
+      if (circularModelos.length === 0) {
+        msg.className = "form-msg form-msg-err";
+        msg.textContent = "⚠️ Claude no detectó precios en este PDF. Verifica que sea una circular válida.";
+        return;
+      }
+      msg.style.display = "none";
+      renderCircularResultado();
+    } catch (e) {
+      msg.className = "form-msg form-msg-err";
+      msg.textContent = "Error de red: " + e.message;
+    } finally {
+      btnProcesarCircular.disabled = false;
+      btnProcesarCircular.textContent = "🤖 Procesar con IA (extraer precios)";
+    }
+  });
+}
+
+function renderCircularResultado() {
+  document.getElementById("circularInfoMarca").textContent = circularInfo.marca || "—";
+  document.getElementById("circularInfoFecha").textContent = circularInfo.fecha || "—";
+  document.getElementById("circularInfoTotal").textContent = circularModelos.length;
+  document.getElementById("circularResultado").style.display = "block";
+
+  const tbody = document.querySelector("#tblCircular tbody");
+  tbody.innerHTML = circularModelos.map((m, i) => {
+    // Buscar comparativa con Sheet actual
+    const enSheet = precState.rows.find(r => r.modelo === (m.modelo || "").toUpperCase().trim());
+    let comparativa = `<span class="muted">—</span>`;
+    if (enSheet) {
+      const sheetP2027 = enSheet.precio2027 || 0;
+      const pdfP2027 = m.precio_2027 || 0;
+      if (sheetP2027 === pdfP2027 && sheetP2027 > 0) {
+        comparativa = `<span style="color:#5be58a">✓ Igual</span>`;
+      } else if (sheetP2027 > 0 && pdfP2027 > 0) {
+        const diff = pdfP2027 - sheetP2027;
+        const arrow = diff > 0 ? "↑" : "↓";
+        const color = diff > 0 ? "#f7c272" : "#f87171";
+        comparativa = `<span style="color:${color}">${arrow} ${fmtCOP.format(Math.abs(diff))} vs Sheet</span>`;
+      } else if (sheetP2027 === 0 && pdfP2027 > 0) {
+        comparativa = `<span style="color:#22d3ee">➕ Nuevo precio</span>`;
+      }
+    } else {
+      comparativa = `<span style="color:#22d3ee">⭐ Modelo nuevo</span>`;
+    }
+    const fmt = v => v ? fmtCOP.format(v) : "—";
+    return `<tr data-circ-idx="${i}">
+      <td><input class="celda-edit" data-c="modelo" value="${escapeHtml(m.modelo || '')}" /></td>
+      <td><input class="celda-edit num" data-c="precio_2025" value="${m.precio_2025 || ''}" style="text-align:right" /></td>
+      <td><input class="celda-edit num" data-c="precio_2026" value="${m.precio_2026 || ''}" style="text-align:right" /></td>
+      <td><input class="celda-edit num" data-c="precio_2027" value="${m.precio_2027 || ''}" style="text-align:right;color:#5be58a;font-weight:600" /></td>
+      <td class="num">${m.iva || 19}%</td>
+      <td>${comparativa}</td>
+    </tr>`;
+  }).join("");
+
+  // Recolectar cambios en inputs
+  tbody.querySelectorAll("[data-c]").forEach(inp => {
+    inp.addEventListener("input", (ev) => {
+      const tr = ev.target.closest("tr");
+      const idx = parseInt(tr.dataset.circIdx, 10);
+      const campo = ev.target.dataset.c;
+      let val = ev.target.value;
+      if (campo.startsWith("precio_")) val = parseInt(String(val).replace(/[^0-9]/g, ""), 10) || 0;
+      circularModelos[idx][campo] = val;
+    });
+  });
+}
+
+function generarCircularCSV() {
+  const headers = ["Modelo", "Precio_2025", "Precio_2026", "Precio_2027", "IVA"];
+  const rows = circularModelos.map(m => [
+    (m.modelo || "").replace(/"/g, "''"),
+    m.precio_2025 || "",
+    m.precio_2026 || "",
+    m.precio_2027 || "",
+    m.iva || 19,
+  ]);
+  return [headers.join(","), ...rows.map(r => r.join(","))].join("\n");
+}
+
+document.getElementById("btnDescargarCircularCSV")?.addEventListener("click", () => {
+  const csv = generarCircularCSV();
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  const fechaSlug = (circularInfo.fecha || "circular").replace(/[^a-zA-Z0-9]/g, "_");
+  a.href = url;
+  a.download = `precios_${(circularInfo.marca || "").toLowerCase()}_${fechaSlug}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+});
+
+document.getElementById("btnCopiarCircularCSV")?.addEventListener("click", async () => {
+  const csv = generarCircularCSV();
+  try {
+    await navigator.clipboard.writeText(csv);
+    showToast("📋 CSV copiado al portapapeles · pega en el Sheet");
+  } catch { showToast("No se pudo copiar"); }
+});
+
+document.getElementById("btnCerrarCircular")?.addEventListener("click", () => {
+  document.getElementById("circularResultado").style.display = "none";
+  circularModelos = [];
+});
+
 async function loadHistorialPrecios() {
   const wrap = document.getElementById("preciosHistorial");
   if (!wrap) return;
