@@ -2037,7 +2037,7 @@ function renderTaller() {
   document.getElementById("tallerCount").textContent = fmtNum.format(enTaller.length);
 
   if (enTaller.length === 0) {
-    const colspan = esRolTaller ? 9 : 10;
+    const colspan = esRolTaller ? 10 : 11;
     tbody.innerHTML = `<tr><td colspan="${colspan}" style="text-align:center;color:var(--muted);padding:30px">
       ${esRolTaller ? "✓ ¡Todo al día! Sin motos pendientes de alistar." : 'Sin motos en taller. Mueve una preasignación con el botón <strong>"→ A taller"</strong>.'}
     </td></tr>`;
@@ -2087,6 +2087,12 @@ function renderTaller() {
       // Columna asesor (oculta para taller mediante data-role-only del th)
       const asesorCell = esRolTaller ? "" : `<td>${escapeHtml(p.asesorNombre || "—")}</td>`;
 
+      // Acta de entrega — botón con 2 estados
+      const actaEstado = p.actaEntrega || "pendiente";
+      const actaTag = actaEstado === "lista"
+        ? `<button class="tag tag-contado" data-acta-toggle="${escapeHtml(p.chasis)}" data-acta-actual="lista" title="Click para cambiar a Pendiente" style="cursor:pointer;border:none">✓ Acta lista</button>`
+        : `<button class="tag tag-financiado" data-acta-toggle="${escapeHtml(p.chasis)}" data-acta-actual="pendiente" title="Click para marcar como Lista" style="cursor:pointer;border:none">⏳ Acta pendiente</button>`;
+
       return `<tr ${p.estado === "entregada" ? 'class="row-inactive"' : ""}>
         <td>
           <div style="font-size:12px">${escapeHtml(fechaFmt)}</div>
@@ -2100,9 +2106,34 @@ function renderTaller() {
         ${asesorCell}
         <td>${gpsLabel}</td>
         <td><span class="tag ${estadoCls}">${estadoTexto}</span></td>
+        <td>${actaTag}</td>
         <td>${acciones}</td>
       </tr>`;
     }).join("");
+
+    // Listener — toggle acta de entrega
+    tbody.querySelectorAll("[data-acta-toggle]").forEach(b => {
+      b.addEventListener("click", async (ev) => {
+        ev.stopPropagation();
+        const chasis = b.dataset.actaToggle;
+        const actual = b.dataset.actaActual;
+        const nuevo = actual === "lista" ? "pendiente" : "lista";
+        try {
+          const r = await fetch(`/api/preasignaciones/${encodeURIComponent(chasis)}`, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ actaEntrega: nuevo }),
+          });
+          const data = await r.json();
+          if (data.ok) {
+            showToast(nuevo === "lista" ? "✓ Acta marcada como lista" : "⏳ Acta marcada como pendiente");
+            await loadPreasignaciones();
+          } else {
+            showToast("Error: " + (data.error || "no se pudo actualizar"));
+          }
+        } catch (e) { showToast("Error: " + e.message); }
+      });
+    });
 
   tbody.querySelectorAll("[data-taller-entregar]").forEach(b => {
     b.addEventListener("click", async () => {

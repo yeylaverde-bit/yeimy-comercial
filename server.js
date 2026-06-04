@@ -699,9 +699,14 @@ app.patch("/api/preasignaciones/:chasis", requireAuth, (req, res) => {
     if (req.body.gpsActivadoEn) todas[chasis].gpsActivadoPor = usuario.email;
   } else {
     // Solo permite actualizar ciertos campos
-    const camposPermitidos = ["estado", "gps", "placa", "numCredito", "financiera", "celular", "fechaNacimiento", "imeiGps", "gpsInstalarEvidenciaPath", "gpsActivarEvidenciaPath"];
+    const camposPermitidos = ["estado", "gps", "placa", "numCredito", "financiera", "celular", "fechaNacimiento", "imeiGps", "gpsInstalarEvidenciaPath", "gpsActivarEvidenciaPath", "actaEntrega"];
     for (const c of camposPermitidos) {
       if (req.body[c] !== undefined) todas[chasis][c] = String(req.body[c]).trim();
+    }
+    // Si se cambia el acta, registrar timestamp
+    if (req.body.actaEntrega) {
+      todas[chasis].actaEntregaEn = new Date().toISOString();
+      todas[chasis].actaEntregaPor = usuario.email;
     }
     // Si pasa a en_taller, registrar timestamp de entrada
     if (req.body.estado === "en_taller" && !todas[chasis].entradaTaller) {
