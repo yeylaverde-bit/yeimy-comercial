@@ -2685,14 +2685,14 @@ function renderGpsLista(tipo) {
       const ultimos4 = String(p.chasis || "").slice(-4);
       const modelo = `${p.marca || ""} ${p.modelo || ""}`.trim();
       const asesorNombre = p.asesorNombre || currentUser?.nombre || "";
-      // Construir URL prellenada del JotForm TS GPS
+      // JotForm prefill: usa form.jotform.com (NO submit.) y nombres tipo "escribaUna" (sin q32_)
       const params = new URLSearchParams();
-      if (modelo) params.set("q32_escribaUna", modelo);
-      if (p.placa) params.set("q38_placaDe38", p.placa);
-      if (ultimos4) params.set("q39_numeroDe39", ultimos4);
-      params.set("q41_servicioA", "INSTALACIÓN");
-      if (asesorNombre) params.set("q43_asesorDe43", asesorNombre);
-      const url = `https://submit.jotform.com/261494455636668?${params.toString()}`;
+      if (modelo) params.set("escribaUna", modelo);
+      if (p.placa) params.set("placaDe38", p.placa);
+      if (ultimos4) params.set("numeroDe39", ultimos4);
+      params.set("servicioA", "INSTALACIÓN");
+      if (asesorNombre) params.set("asesorDe43", asesorNombre);
+      const url = `https://form.jotform.com/261494455636668?${params.toString()}`;
       window.open(url, "_blank", "noopener");
       showToast("📅 Abriendo agendamiento TS GPS · solo falta elegir fecha");
     });
