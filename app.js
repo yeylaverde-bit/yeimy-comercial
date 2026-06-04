@@ -3805,6 +3805,103 @@ if (changePassForm) {
 }
 
 // ============================================================
+//          SESIONES ACTIVAS (solo admin)
+// ============================================================
+async function loadSesionesActivas() {
+  if (currentUser?.rol !== "admin") return;
+  try {
+    const r = await fetch("/api/admin/sesiones-activas");
+    if (!r.ok) return;
+    const data = await r.json();
+    if (!data.ok) return;
+    renderSesionesActivas(data.sesiones || [], data.totalEnLinea || 0);
+  } catch (e) { console.warn("[sesiones]", e.message); }
+}
+
+function renderSesionesActivas(sesiones, totalEnLinea) {
+  const tbody = document.querySelector("#tblSesiones tbody");
+  const countEl = document.getElementById("sesionesCount");
+  const badge = document.getElementById("sesionesEnLineaBadge");
+
+  if (countEl) countEl.textContent = `${totalEnLinea} en línea`;
+  if (badge) {
+    if (totalEnLinea > 0) {
+      badge.textContent = totalEnLinea;
+      badge.style.display = "inline-block";
+      badge.title = `${totalEnLinea} usuario(s) en línea`;
+    } else { badge.style.display = "none"; }
+  }
+  if (!tbody) return;
+
+  if (sesiones.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;color:var(--muted);padding:30px">
+      Aún no hay sesiones registradas. Cuando alguien entre, aparecerá aquí.
+    </td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = sesiones.map(s => {
+    const estadoTag = s.enLinea
+      ? `<span class="tag tag-contado">● En línea</span>`
+      : `<span class="tag" style="background:rgba(120,120,140,.2);color:#aaa">○ Inactivo</span>`;
+    const ubicacion = s.ubicacion
+      ? `${escapeHtml(s.ubicacion.ciudad || "—")}${s.ubicacion.region ? ", " + escapeHtml(s.ubicacion.region) : ""}${s.ubicacion.pais ? " · " + escapeHtml(s.ubicacion.pais) : ""}`
+      : `<span class="muted">Resolviendo…</span>`;
+    const isp = s.ubicacion?.isp ? `<div class="muted" style="font-size:10.5px">${escapeHtml(s.ubicacion.isp)}</div>` : "";
+    const minAct = s.minSinActividad === 0 ? "ahora mismo" : s.minSinActividad === 1 ? "hace 1 min" : `hace ${s.minSinActividad} min`;
+    const sesionHrs = Math.floor(s.sesionDuracionMin / 60);
+    const sesionMins = s.sesionDuracionMin % 60;
+    const sesionDur = sesionHrs > 0 ? `${sesionHrs}h ${sesionMins}min` : `${sesionMins} min`;
+    const rolTag = ({
+      admin: '<span class="tag" style="background:rgba(124,92,255,.2);color:#a78bfa">Admin</span>',
+      asesor: '<span class="tag" style="background:rgba(34,211,238,.2);color:#22d3ee">Asesor</span>',
+      contable: '<span class="tag" style="background:rgba(34,197,94,.2);color:#5be58a">Contable</span>',
+      dueno: '<span class="tag" style="background:rgba(59,130,246,.2);color:#60a5fa">Dueño</span>',
+      taller: '<span class="tag" style="background:rgba(249,115,22,.2);color:#fb923c">Taller</span>',
+      gps_instalar: '<span class="tag" style="background:rgba(6,182,212,.2);color:#22d3ee">GPS Inst.</span>',
+      gps_activar: '<span class="tag" style="background:rgba(168,85,247,.2);color:#c084fc">GPS Act.</span>',
+    })[s.rol] || s.rol;
+
+    return `<tr>
+      <td>${estadoTag}</td>
+      <td>
+        <strong>${escapeHtml(s.nombre)} ${escapeHtml(s.apellido || "")}</strong>
+        <div class="muted" style="font-size:11px">${escapeHtml(s.email)}</div>
+      </td>
+      <td>${rolTag}</td>
+      <td>
+        ${ubicacion}
+        ${isp}
+      </td>
+      <td>
+        <code style="font-size:11px;color:var(--accent-2)">${escapeHtml(s.ip || "—")}</code>
+        ${s.ipPrev ? `<div class="muted" style="font-size:10px">Anterior: ${escapeHtml(s.ipPrev)}</div>` : ""}
+      </td>
+      <td>
+        ${escapeHtml(s.dispositivo)}
+        <div class="muted" style="font-size:11px">${escapeHtml(s.navegador)}</div>
+      </td>
+      <td>
+        ${escapeHtml(minAct)}
+        <div class="muted" style="font-size:10.5px">${new Date(s.lastSeen).toLocaleTimeString("es-CO", {hour:"2-digit",minute:"2-digit"})}</div>
+      </td>
+      <td>${escapeHtml(sesionDur)}</td>
+    </tr>`;
+  }).join("");
+}
+
+const btnRefrescarSesiones = document.getElementById("btnRefrescarSesiones");
+if (btnRefrescarSesiones) btnRefrescarSesiones.addEventListener("click", () => {
+  loadSesionesActivas();
+  showToast("↻ Sesiones actualizadas");
+});
+
+// Auto-refresh cada 30 segundos
+setInterval(() => {
+  if (currentUser?.rol === "admin") loadSesionesActivas();
+}, 30 * 1000);
+
+// ============================================================
 //          MÉTRICAS GERENCIALES (admin + dueño)
 // ============================================================
 const metricasState = { mesSeleccionado: "" };
@@ -4021,6 +4118,9 @@ if (btnRefrescarMet) btnRefrescarMet.addEventListener("click", async () => {
   loadPreasignaciones();
   loadLeads();
   loadCodigosImpulsa();
-  if (currentUser?.rol === "admin") loadHistorialPrecios();
+  if (currentUser?.rol === "admin") {
+    loadHistorialPrecios();
+    loadSesionesActivas();
+  }
   attachChasisAutocomplete();
 })();

@@ -227,6 +227,77 @@ setInterval(() => {
   }
 }, 60 * 60 * 1000);
 
+// --- Tracking de sesiones activas (para panel admin) ---
+// Mapa: { email: { ip, ipPrev, lastSeen, userAgent, loginAt } }
+const sesionesActivas = new Map();
+const IP_CACHE_PATH = path.join(DATA_DIR, "ip-cache.json");
+function leerIpCache() {
+  try { if (fs.existsSync(IP_CACHE_PATH)) return JSON.parse(fs.readFileSync(IP_CACHE_PATH, "utf8")); }
+  catch {}
+  return {};
+}
+function guardarIpCache(c) {
+  try { fs.writeFileSync(IP_CACHE_PATH, JSON.stringify(c, null, 2), "utf8"); } catch {}
+}
+async function ubicacionDeIP(ip) {
+  if (!ip || ip === "unknown" || ip.startsWith("192.168.") || ip.startsWith("10.") || ip === "127.0.0.1" || ip === "::1") {
+    return { ciudad: "Red local", region: "", pais: "", isp: "" };
+  }
+  const cache = leerIpCache();
+  // Cache válido 30 días
+  const treintaDiasMs = 30 * 24 * 60 * 60 * 1000;
+  if (cache[ip] && (Date.now() - (cache[ip].ts || 0)) < treintaDiasMs) {
+    return cache[ip];
+  }
+  try {
+    // ip-api.com es gratuito sin api key (45 req/min)
+    const resp = await fetch(`http://ip-api.com/json/${encodeURIComponent(ip)}?fields=status,city,regionName,country,isp,query`);
+    const data = await resp.json();
+    if (data.status === "success") {
+      const ubi = {
+        ciudad: data.city || "",
+        region: data.regionName || "",
+        pais: data.country || "",
+        isp: data.isp || "",
+        ts: Date.now(),
+      };
+      cache[ip] = ubi;
+      guardarIpCache(cache);
+      return ubi;
+    }
+  } catch (e) {
+    console.warn("[ip-api]", e.message);
+  }
+  return null;
+}
+
+// Middleware que actualiza última actividad de cada usuario logueado
+app.use((req, res, next) => {
+  if (req.session?.userEmail) {
+    const ip = ipDeRequest(req);
+    const ahora = Date.now();
+    const previa = sesionesActivas.get(req.session.userEmail);
+    sesionesActivas.set(req.session.userEmail, {
+      email: req.session.userEmail,
+      ip,
+      ipPrev: previa?.ip && previa.ip !== ip ? previa.ip : (previa?.ipPrev || null),
+      lastSeen: ahora,
+      userAgent: req.headers["user-agent"] || "",
+      loginAt: previa?.loginAt || ahora,
+    });
+  }
+  next();
+});
+
+// Limpiar sesiones inactivas cada hora (más de 8h sin actividad)
+setInterval(() => {
+  const ahora = Date.now();
+  const limite = 8 * 60 * 60 * 1000;
+  for (const [email, info] of sesionesActivas.entries()) {
+    if (ahora - info.lastSeen > limite) sesionesActivas.delete(email);
+  }
+}, 60 * 60 * 1000);
+
 // --- Endpoints de auth ---
 app.post("/api/login", async (req, res) => {
   const ip = ipDeRequest(req);
@@ -1083,6 +1154,70 @@ app.post("/api/comisiones/marcar", requireAuth, requireAdmin, (req, res) => {
   }
   guardarComisionesPagadas(data);
   res.json({ ok: true, id, pagada: !!pagada });
+});
+
+// --- Panel admin: sesiones activas ---
+function parsearUserAgent(ua) {
+  if (!ua) return { dispositivo: "—", navegador: "—", esMobile: false };
+  const esMobile = /Mobile|Android|iPhone|iPad/i.test(ua);
+  let so = "Desconocido";
+  if (/Windows NT 10/.test(ua)) so = "Windows 10/11";
+  else if (/Windows NT/.test(ua)) so = "Windows";
+  else if (/iPhone|iPad/i.test(ua)) so = "iOS";
+  else if (/Android/i.test(ua)) so = "Android";
+  else if (/Mac OS X/.test(ua)) so = "macOS";
+  else if (/Linux/.test(ua)) so = "Linux";
+  let nav = "Otro";
+  if (/Edg\//.test(ua)) nav = "Edge";
+  else if (/OPR\//.test(ua) || /Opera/.test(ua)) nav = "Opera";
+  else if (/Firefox/.test(ua)) nav = "Firefox";
+  else if (/Chrome/.test(ua)) nav = "Chrome";
+  else if (/Safari/.test(ua)) nav = "Safari";
+  return { dispositivo: so + (esMobile ? " (móvil)" : ""), navegador: nav, esMobile };
+}
+
+app.get("/api/admin/sesiones-activas", requireAuth, requireAdmin, async (req, res) => {
+  const ahora = Date.now();
+  const ventana = 15 * 60 * 1000; // últimos 15 min cuentan como "en línea"
+  const sesiones = [];
+  for (const [email, info] of sesionesActivas.entries()) {
+    const minSinAct = (ahora - info.lastSeen) / 60000;
+    if (minSinAct > 60) continue; // ocultar después de 1h sin actividad
+    const u = buscarUsuario(email);
+    sesiones.push({
+      email,
+      nombre: u?.nombre || email.split("@")[0].toUpperCase(),
+      apellido: u?.apellido || "",
+      rol: u?.rol || "?",
+      ip: info.ip,
+      ipPrev: info.ipPrev,
+      minSinActividad: Math.floor(minSinAct),
+      enLinea: (ahora - info.lastSeen) < ventana,
+      lastSeen: info.lastSeen,
+      loginAt: info.loginAt,
+      sesionDuracionMin: Math.floor((ahora - info.loginAt) / 60000),
+      ...parsearUserAgent(info.userAgent),
+      userAgentRaw: info.userAgent,
+    });
+  }
+
+  // Resolver ubicación de cada IP única (en paralelo)
+  const ipsUnicas = [...new Set(sesiones.map(s => s.ip).filter(Boolean))];
+  const ubicaciones = {};
+  await Promise.all(ipsUnicas.map(async ip => {
+    ubicaciones[ip] = await ubicacionDeIP(ip);
+  }));
+  for (const s of sesiones) {
+    s.ubicacion = ubicaciones[s.ip] || null;
+  }
+
+  // Ordenar: en línea primero, después por última actividad
+  sesiones.sort((a, b) => {
+    if (a.enLinea !== b.enLinea) return b.enLinea - a.enLinea;
+    return b.lastSeen - a.lastSeen;
+  });
+
+  res.json({ ok: true, sesiones, totalEnLinea: sesiones.filter(s => s.enLinea).length });
 });
 
 // --- Endpoints de gestión de usuarios (solo admin) ---
