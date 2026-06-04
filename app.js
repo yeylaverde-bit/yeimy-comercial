@@ -2455,6 +2455,85 @@ const soatSearchEl = document.getElementById("soatSearch");
 if (soatSearchEl) soatSearchEl.addEventListener("input", e => { soatState.search = e.target.value; renderSoatPendientes(); });
 
 // ============================================================
+//          AGENDAR INSTALACIÓN GPS — panel con datos para JotForm
+// ============================================================
+function abrirPanelAgendarGps(datos) {
+  // Construir URL prellenada del JotForm TS GPS
+  const params = new URLSearchParams();
+  if (datos.modelo) params.set("escribaUna", datos.modelo);
+  if (datos.placa) params.set("placaDe38", datos.placa);
+  if (datos.ultimos4) params.set("numeroDe39", datos.ultimos4);
+  params.set("servicioA", "INSTALACIÓN");
+  if (datos.asesor) params.set("asesorDe43", datos.asesor);
+  const url = `https://form.jotform.com/261494455636668?${params.toString()}`;
+
+  // Crear modal flotante
+  const overlay = document.createElement("div");
+  overlay.style.cssText = "position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px";
+  overlay.innerHTML = `
+    <div style="background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:24px;max-width:540px;width:100%;max-height:90vh;overflow-y:auto">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px">
+        <div>
+          <h2 style="margin:0;font-size:18px;color:#22d3ee">📅 Agendar instalación GPS — TS GPS</h2>
+          <p class="muted" style="margin:4px 0 0;font-size:12.5px">Cliente: <strong>${escapeHtml(datos.cliente)}</strong></p>
+        </div>
+        <button class="btn-secondary" id="btnCerrarAgendarGps" style="padding:4px 10px">✕</button>
+      </div>
+
+      <p class="muted" style="font-size:12.5px;margin:0 0 14px">
+        1️⃣ Click <strong>"Abrir JotForm"</strong> para abrir el formulario en nueva pestaña.<br>
+        2️⃣ Vuelve aquí, copia cada dato con el botón 📋 y pega en JotForm.<br>
+        3️⃣ Elige la fecha en el calendario de JotForm y envía.
+      </p>
+
+      <a href="${url}" target="_blank" rel="noopener" class="btn-primary" style="display:inline-block;padding:10px 16px;font-size:14px;background:#06b6d4;border-color:#06b6d4;text-decoration:none;margin-bottom:18px">
+        🔗 Abrir JotForm en nueva pestaña
+      </a>
+
+      <div style="display:grid;gap:10px">
+        ${renderCampoCopiable("Nombre de la Moto", datos.modelo)}
+        ${renderCampoCopiable("Placa", datos.placa)}
+        ${renderCampoCopiable("Últimos 4 chasis", datos.ultimos4)}
+        ${renderCampoCopiable("Servicio", "INSTALACIÓN")}
+        ${renderCampoCopiable("Asesor", datos.asesor)}
+      </div>
+
+      <p class="muted" style="font-size:11px;margin:14px 0 0">
+        💡 La fecha la eliges directo en el calendario de JotForm.
+      </p>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+
+  // Listeners
+  overlay.querySelector("#btnCerrarAgendarGps").addEventListener("click", () => overlay.remove());
+  overlay.addEventListener("click", (ev) => { if (ev.target === overlay) overlay.remove(); });
+  overlay.querySelectorAll("[data-copiar-campo]").forEach(b => {
+    b.addEventListener("click", async () => {
+      const val = b.dataset.copiarCampo;
+      try {
+        await navigator.clipboard.writeText(val);
+        showToast(`📋 Copiado: ${val}`);
+        b.textContent = "✓ Copiado";
+        b.style.background = "#22c55e";
+        setTimeout(() => { b.textContent = "📋 Copiar"; b.style.background = ""; }, 1500);
+      } catch { showToast("No se pudo copiar"); }
+    });
+  });
+}
+
+function renderCampoCopiable(label, valor) {
+  if (!valor) return "";
+  return `<div style="display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 12px;background:rgba(8,12,28,.55);border:1px solid var(--line);border-radius:8px">
+    <div style="flex:1;min-width:0">
+      <div class="muted" style="font-size:10.5px;text-transform:uppercase;letter-spacing:.06em">${escapeHtml(label)}</div>
+      <div style="font-weight:600;font-size:14px;color:var(--text);word-break:break-all">${escapeHtml(valor)}</div>
+    </div>
+    <button class="btn-mini" data-copiar-campo="${escapeHtml(valor)}" style="background:rgba(124,92,255,.2);border-color:var(--accent);color:var(--text);padding:6px 12px;font-size:12px;white-space:nowrap">📋 Copiar</button>
+  </div>`;
+}
+
+// ============================================================
 //          GPS INSTALAR / ACTIVAR — secciones del instalador
 // ============================================================
 const gpsState = { searchInstalar: "", searchActivar: "" };
@@ -2685,16 +2764,10 @@ function renderGpsLista(tipo) {
       const ultimos4 = String(p.chasis || "").slice(-4);
       const modelo = `${p.marca || ""} ${p.modelo || ""}`.trim();
       const asesorNombre = p.asesorNombre || currentUser?.nombre || "";
-      // JotForm prefill: usa form.jotform.com (NO submit.) y nombres tipo "escribaUna" (sin q32_)
-      const params = new URLSearchParams();
-      if (modelo) params.set("escribaUna", modelo);
-      if (p.placa) params.set("placaDe38", p.placa);
-      if (ultimos4) params.set("numeroDe39", ultimos4);
-      params.set("servicioA", "INSTALACIÓN");
-      if (asesorNombre) params.set("asesorDe43", asesorNombre);
-      const url = `https://form.jotform.com/261494455636668?${params.toString()}`;
-      window.open(url, "_blank", "noopener");
-      showToast("📅 Abriendo agendamiento TS GPS · solo falta elegir fecha");
+      // Mostrar panel con datos para copiar + abrir JotForm
+      abrirPanelAgendarGps({
+        modelo, placa: p.placa || "", ultimos4, asesor: asesorNombre, cliente: p.nombreCliente || ""
+      });
     });
   });
 
