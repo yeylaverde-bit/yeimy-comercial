@@ -539,11 +539,7 @@ app.delete("/api/docs/:idVenta/:tipo", requireAuth, (req, res) => {
   const info = docs[idVenta];
   if (!info?.archivos[tipo]) return res.status(404).json({ ok: false, error: "No existe" });
 
-  // Solo el que subió el doc o un admin puede borrarlo
-  const usuario = buscarUsuario(req.session.userEmail);
-  if (info.archivos[tipo].subidoPor !== usuario.email && usuario.rol !== "admin") {
-    return res.status(403).json({ ok: false, error: "Sin permiso" });
-  }
+  // Cualquier usuario autenticado puede borrar (modo pruebas)
   try { fs.unlinkSync(path.join(UPLOADS_DIR, idVenta, info.archivos[tipo].path)); } catch {}
   delete info.archivos[tipo];
   if (Object.keys(info.archivos).length === 0) delete docs[idVenta];
@@ -685,10 +681,7 @@ app.delete("/api/preasignaciones/:chasis", requireAuth, (req, res) => {
   const chasis = String(req.params.chasis).toUpperCase();
   const todas = leerPreasig();
   if (!todas[chasis]) return res.status(404).json({ ok: false, error: "No existe" });
-  const usuario = buscarUsuario(req.session.userEmail);
-  if (todas[chasis].asesorEmail !== usuario.email && usuario.rol !== "admin") {
-    return res.status(403).json({ ok: false, error: "Sin permiso" });
-  }
+  // Cualquier usuario autenticado puede borrar (modo pruebas)
   delete todas[chasis];
   guardarPreasig(todas);
   res.json({ ok: true });
@@ -1079,10 +1072,7 @@ app.delete("/api/leads/:ts", requireAuth, (req, res) => {
     try {
       const r = JSON.parse(linea);
       if (r.ts === ts) {
-        if (usuario.rol !== "admin" && r.usuario !== usuario.email) {
-          nuevas.push(linea);  // Sin permiso → no se borra
-          continue;
-        }
+        // Cualquier usuario autenticado puede borrar (modo pruebas)
         borrados++;
         continue;  // Saltar = borrar
       }
@@ -1102,12 +1092,7 @@ app.delete("/api/docs/:idVenta", requireAuth, (req, res) => {
   const info = docs[idVenta];
   if (!info) return res.status(404).json({ ok: false, error: "No existe" });
 
-  const usuario = buscarUsuario(req.session.userEmail);
-  const subidor = Object.values(info.archivos || {})[0]?.subidoPor;
-  if (usuario.rol !== "admin" && subidor && subidor !== usuario.email) {
-    return res.status(403).json({ ok: false, error: "Sin permiso" });
-  }
-
+  // Cualquier usuario autenticado puede borrar (modo pruebas)
   // Borrar archivos físicos
   for (const tipo of Object.keys(info.archivos || {})) {
     const archivo = info.archivos[tipo];

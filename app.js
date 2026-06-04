@@ -1544,7 +1544,8 @@ function renderLeads() {
       estado = `<span class="tag" style="background:rgba(239,68,68,.12);color:#fca5a5;border:1px solid rgba(239,68,68,.35)">✗ Error ${l.statusImpulsa || ""}</span>`;
     }
     const showAsesor = currentUser?.rol === "admin" || currentUser?.rol === "contable";
-    const puedeBorrar = currentUser?.rol === "admin" || l.usuario === currentUser?.email;
+    // Modo pruebas: cualquier usuario autenticado puede borrar
+    const puedeBorrar = true;
     return `<tr>
       <td>${fecha}</td>
       <td><strong>${escapeHtml(l.cliente)}</strong></td>
@@ -3038,8 +3039,8 @@ function renderDocs() {
       </label>`;
     }).join("");
 
-    const puedeBorrar = currentUser?.rol === "admin"
-      || Object.values(info.archivos || {})[0]?.subidoPor === currentUser?.email;
+    // Modo pruebas: cualquier usuario autenticado puede borrar
+    const puedeBorrar = true;
     return `<div class="docs-venta-card">
       <div class="docs-venta-head">
         <div>
