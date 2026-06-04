@@ -2285,9 +2285,31 @@ function renderSoatPendientes() {
           ✓ Subir SOAT generado
           <input type="file" data-soat-upload data-id="${escapeHtml(chasis)}" accept="image/*,application/pdf" style="display:none" />
         </label>
+        <button class="btn-secondary" data-soat-borrar-preasig="${escapeHtml(chasis)}" data-cliente="${escapeHtml(cliente)}" title="Eliminar esta preasignación (ej: era una prueba)" style="padding:8px 14px;font-size:13px;background:transparent;border:1px solid rgba(239,68,68,.4);color:#fca5a5;margin-left:auto">
+          🗑️ Eliminar
+        </button>
       </div>
     </div>`;
   }).join("");
+
+  // Listener — borrar preasignación desde la tarjeta SOAT
+  wrap.querySelectorAll("[data-soat-borrar-preasig]").forEach(btn => {
+    btn.addEventListener("click", async () => {
+      const chasis = btn.dataset.soatBorrarPreasig;
+      const cliente = btn.dataset.cliente || "esta moto";
+      if (!confirm(`¿Eliminar la preasignación de "${cliente}" (chasis ${chasis})?\n\nSe borra completa: no aparecerá más en Crear SOAT ni en Taller.`)) return;
+      try {
+        const r = await fetch(`/api/preasignaciones/${encodeURIComponent(chasis)}`, { method: "DELETE" });
+        const data = await r.json();
+        if (data.ok) {
+          showToast(`🗑️ Preasignación de ${cliente} eliminada`);
+          await loadPreasignaciones();
+        } else {
+          showToast("Error: " + (data.error || "no se pudo eliminar"));
+        }
+      } catch (e) { showToast("Error: " + e.message); }
+    });
+  });
 
   // Copy al portapapeles
   wrap.querySelectorAll("[data-copy]").forEach(btn => {
