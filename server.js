@@ -1282,14 +1282,18 @@ function construirObservaciones(form, usuario) {
 }
 
 function construirPayload(form, usuario) {
-  const ts = Date.now();
   const habeas = form.HabeasData === true || form.HabeasData === "on" || form.HabeasData === "true";
   // Defaults por usuario: si no manda Origen/Campanna explícitos, usar nombre del logueado
   const origen = (form.Origen || `Venta ${usuario.nombre}`).slice(0, 50);
   const campanna = (form.Campanna || `Venta ${usuario.nombre}`).slice(0, 50);
+  // IDOportunidadAuteco: Impulsa exige STRING que contenga solo DÍGITOS y sea > 0.
+  // Si el asesor escribió uno (ej. del sistema Auteco), lo limpiamos a dígitos.
+  // Si no, usamos un timestamp único como ID interno (siempre > 0).
+  const idAutecoRaw = String(form.IDOportunidadAuteco || "").replace(/[^0-9]/g, "");
+  const idAuteco = idAutecoRaw && Number(idAutecoRaw) > 0 ? idAutecoRaw : String(Date.now());
   return {
     ID: 0,
-    IDOportunidadAuteco: `${usuario.nombre.replace(/\s+/g, "")}-${ts}`,
+    IDOportunidadAuteco: idAuteco,
     Origen: origen,
     Campanna: campanna,
     Establecimiento: String(ESTABLECIMIENTO),
