@@ -652,6 +652,43 @@ app.post("/api/preasignaciones/crear", requireAuth, (req, res) => {
   res.json({ ok: true, preasignacion: todas[id] });
 });
 
+// --- Subir foto del acta de entrega firmada ---
+const ACTAS_DIR = path.join(DATA_DIR, "actas-entrega");
+if (!fs.existsSync(ACTAS_DIR)) fs.mkdirSync(ACTAS_DIR, { recursive: true });
+const uploadActa = multer({
+  storage: multer.diskStorage({
+    destination: (req, _file, cb) => {
+      const dir = path.join(ACTAS_DIR, idVentaSafe(req.params.chasis));
+      if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+      cb(null, dir);
+    },
+    filename: (_req, file, cb) => cb(null, Date.now() + "-" + file.originalname.replace(/[^a-zA-Z0-9.\-_]/g, "_")),
+  }),
+  limits: { fileSize: 15 * 1024 * 1024 },
+});
+
+app.post("/api/preasignaciones/:chasis/acta-foto", requireAuth, uploadActa.single("archivo"), (req, res) => {
+  const chasis = idVentaSafe(req.params.chasis);
+  if (!req.file) return res.status(400).json({ ok: false, error: "Falta archivo de acta" });
+  const todas = leerPreasig();
+  if (!todas[chasis]) return res.status(404).json({ ok: false, error: "Preasignación no existe" });
+  const usuario = buscarUsuario(req.session.userEmail);
+
+  todas[chasis].actaEntrega = "lista"; // si suben foto, marcar automáticamente como lista
+  todas[chasis].actaEntregaEn = new Date().toISOString();
+  todas[chasis].actaEntregaPor = usuario.email;
+  todas[chasis].actaEntregaArchivo = req.file.filename;
+  guardarPreasig(todas);
+  res.json({ ok: true, archivo: req.file.filename });
+});
+
+// Servir las fotos del acta (requiere auth)
+app.get("/actas-entrega/:chasis/:archivo", requireAuth, (req, res) => {
+  const file = path.join(ACTAS_DIR, idVentaSafe(req.params.chasis), req.params.archivo);
+  if (!fs.existsSync(file)) return res.status(404).send("No encontrado");
+  res.sendFile(file);
+});
+
 app.patch("/api/preasignaciones/:chasis", requireAuth, (req, res) => {
   const chasis = String(req.params.chasis).toUpperCase();
   const todas = leerPreasig();
@@ -699,7 +736,7 @@ app.patch("/api/preasignaciones/:chasis", requireAuth, (req, res) => {
     if (req.body.gpsActivadoEn) todas[chasis].gpsActivadoPor = usuario.email;
   } else {
     // Solo permite actualizar ciertos campos
-    const camposPermitidos = ["estado", "gps", "placa", "numCredito", "financiera", "celular", "fechaNacimiento", "imeiGps", "gpsInstalarEvidenciaPath", "gpsActivarEvidenciaPath", "actaEntrega"];
+    const camposPermitidos = ["estado", "gps", "placa", "numCredito", "financiera", "celular", "fechaNacimiento", "imeiGps", "gpsInstalarEvidenciaPath", "gpsActivarEvidenciaPath", "actaEntrega", "actaEntregaArchivo"];
     for (const c of camposPermitidos) {
       if (req.body[c] !== undefined) todas[chasis][c] = String(req.body[c]).trim();
     }

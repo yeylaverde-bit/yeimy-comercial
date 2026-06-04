@@ -2087,11 +2087,38 @@ function renderTaller() {
       // Columna asesor (oculta para taller mediante data-role-only del th)
       const asesorCell = esRolTaller ? "" : `<td>${escapeHtml(p.asesorNombre || "—")}</td>`;
 
-      // Acta de entrega — botón con 2 estados
+      // Acta de entrega: foto + estado
       const actaEstado = p.actaEntrega || "pendiente";
-      const actaTag = actaEstado === "lista"
-        ? `<button class="tag tag-contado" data-acta-toggle="${escapeHtml(p.chasis)}" data-acta-actual="lista" title="Click para cambiar a Pendiente" style="cursor:pointer;border:none">✓ Acta lista</button>`
-        : `<button class="tag tag-financiado" data-acta-toggle="${escapeHtml(p.chasis)}" data-acta-actual="pendiente" title="Click para marcar como Lista" style="cursor:pointer;border:none">⏳ Acta pendiente</button>`;
+      const tieneFotoActa = !!p.actaEntregaArchivo;
+      let actaTag;
+      if (tieneFotoActa) {
+        // Hay foto del acta → mostrar link + opción de reemplazar
+        actaTag = `<div style="display:flex;flex-direction:column;gap:4px">
+          <a class="tag tag-contado" href="/actas-entrega/${encodeURIComponent(p.chasis)}/${encodeURIComponent(p.actaEntregaArchivo)}" target="_blank" style="text-decoration:none;display:inline-block">📷 Ver acta firmada</a>
+          <label style="cursor:pointer;color:var(--accent);font-size:11px;text-decoration:underline;text-align:center">
+            Reemplazar foto
+            <input type="file" data-acta-foto="${escapeHtml(p.chasis)}" accept="image/*,application/pdf" capture="environment" style="display:none" />
+          </label>
+        </div>`;
+      } else if (actaEstado === "lista") {
+        // Marcada como lista pero sin foto → ofrecer subir foto
+        actaTag = `<div style="display:flex;flex-direction:column;gap:4px">
+          <button class="tag tag-contado" data-acta-toggle="${escapeHtml(p.chasis)}" data-acta-actual="lista" title="Click para cambiar a Pendiente" style="cursor:pointer;border:none">✓ Acta lista</button>
+          <label style="cursor:pointer;color:var(--accent);font-size:11px;text-decoration:underline;text-align:center">
+            📸 Subir foto firmada
+            <input type="file" data-acta-foto="${escapeHtml(p.chasis)}" accept="image/*,application/pdf" capture="environment" style="display:none" />
+          </label>
+        </div>`;
+      } else {
+        // Pendiente → botón toggle + opción de subir foto directamente
+        actaTag = `<div style="display:flex;flex-direction:column;gap:4px">
+          <button class="tag tag-financiado" data-acta-toggle="${escapeHtml(p.chasis)}" data-acta-actual="pendiente" title="Click para marcar como Lista" style="cursor:pointer;border:none">⏳ Acta pendiente</button>
+          <label style="cursor:pointer;color:var(--accent);font-size:11px;text-decoration:underline;text-align:center">
+            📸 Subir foto firmada
+            <input type="file" data-acta-foto="${escapeHtml(p.chasis)}" accept="image/*,application/pdf" capture="environment" style="display:none" />
+          </label>
+        </div>`;
+      }
 
       return `<tr ${p.estado === "entregada" ? 'class="row-inactive"' : ""}>
         <td>
@@ -2111,7 +2138,7 @@ function renderTaller() {
       </tr>`;
     }).join("");
 
-    // Listener — toggle acta de entrega
+    // Listener — toggle acta de entrega (sin foto)
     tbody.querySelectorAll("[data-acta-toggle]").forEach(b => {
       b.addEventListener("click", async (ev) => {
         ev.stopPropagation();
@@ -2130,6 +2157,31 @@ function renderTaller() {
             await loadPreasignaciones();
           } else {
             showToast("Error: " + (data.error || "no se pudo actualizar"));
+          }
+        } catch (e) { showToast("Error: " + e.message); }
+      });
+    });
+
+    // Listener — subir/reemplazar foto del acta firmada
+    tbody.querySelectorAll("input[data-acta-foto]").forEach(inp => {
+      inp.addEventListener("change", async (ev) => {
+        const file = ev.target.files?.[0];
+        if (!file) return;
+        const chasis = inp.dataset.actaFoto;
+        showToast("📸 Subiendo foto del acta…");
+        const fd = new FormData();
+        fd.append("archivo", file);
+        try {
+          const r = await fetch(`/api/preasignaciones/${encodeURIComponent(chasis)}/acta-foto`, {
+            method: "POST",
+            body: fd,
+          });
+          const data = await r.json();
+          if (data.ok) {
+            showToast("✓ Foto del acta subida · Acta marcada como lista");
+            await loadPreasignaciones();
+          } else {
+            showToast("Error: " + (data.error || "no se pudo subir"));
           }
         } catch (e) { showToast("Error: " + e.message); }
       });
