@@ -3170,14 +3170,31 @@ function renderDocsTablaContable() {
     return tb - ta;
   });
 
+  // Etiquetas amigables para cada tipo de documento pendiente
+  const accionPorTipo = {
+    ordenFac: "📄 Subir orden facturación",
+    preaprobado: "💳 Subir preaprobado",
+    cedulaFrente: "🆔 Subir cédula frente",
+    cedulaReverso: "🆔 Subir cédula reverso",
+    comprobante: "💰 Subir comprobante",
+    empadronamiento: "📋 Subir empadronamiento",
+    facturaVenta: "🧾 HACER FACTURA",
+    facturaGps: "📡 Subir factura GPS",
+    soat: "🛡️ HACER SOAT",
+  };
+
   let html = `<div class="table-wrap"><table class="tbl-contable">
     <thead><tr>
-      <th>Cliente</th><th>Moto</th><th>Chasis</th><th>Asesor</th><th>Soportes</th><th></th>
+      <th>Cliente</th><th>Moto</th><th>Chasis</th><th>Asesor</th><th>Próximo paso</th><th></th>
     </tr></thead><tbody>`;
   for (const [id, info] of entradas) {
-    const subidos = tipos.filter(t => info.archivos?.[t]).length;
-    const listo = subidos === totalTipos;
-    const pct = Math.round((subidos / totalTipos) * 100);
+    // Contar como "completado" tanto los subidos como los marcados "No aplica"
+    const completados = tipos.filter(t => info.archivos?.[t]).length;
+    // Lista de tipos que faltan (sin archivo ni marca "no aplica")
+    const tiposPendientes = tipos.filter(t => !info.archivos?.[t]);
+    const listo = tiposPendientes.length === 0;
+    const subidosReal = tipos.filter(t => info.archivos?.[t] && !info.archivos[t].noAplica).length;
+    const noAplican = tipos.filter(t => info.archivos?.[t]?.noAplica).length;
     // Cruzar info desde tres fuentes: docs-ventas, preasignación, leads, inventario Siigo
     const ctx = resolverContextoVenta(id, info);
     const clienteCell = ctx.cliente
@@ -3189,17 +3206,37 @@ function renderDocsTablaContable() {
     const asesorCell = ctx.asesorNombre
       ? `<strong>${escapeHtml(ctx.asesorNombre)}</strong>`
       : `<span class="muted">${escapeHtml(ctx.asesorRaw || "—")}</span>`;
+
+    // Próximo paso descriptivo
+    let proximoPaso;
+    if (listo) {
+      proximoPaso = `<span style="color:#5be58a;font-weight:600">✓ Listo para entregar</span>
+        <div class="muted" style="font-size:10.5px">${subidosReal} docs · ${noAplican} no aplica</div>`;
+    } else if (tiposPendientes.length === 1) {
+      const t = tiposPendientes[0];
+      const tag = accionPorTipo[t] || `Subir ${docState.tiposNombre[t] || t}`;
+      const esContable = (t === "facturaVenta" || t === "soat" || t === "facturaGps");
+      const color = esContable ? "#f7c272" : "#22d3ee";
+      proximoPaso = `<strong style="color:${color}">${tag}</strong>`;
+    } else {
+      // Varios pendientes — destacar el primer crítico de contable si lo hay
+      const criticoContable = tiposPendientes.find(t => t === "facturaVenta" || t === "soat");
+      if (criticoContable) {
+        const tag = accionPorTipo[criticoContable];
+        proximoPaso = `<strong style="color:#f7c272">${tag}</strong>
+          <div class="muted" style="font-size:10.5px">+ ${tiposPendientes.length - 1} más pendientes</div>`;
+      } else {
+        proximoPaso = `<span style="color:#22d3ee">${tiposPendientes.length} docs pendientes</span>
+          <div class="muted" style="font-size:10.5px">Esperando asesor</div>`;
+      }
+    }
+
     html += `<tr class="${listo ? "listo" : ""}" data-detalle-id="${escapeHtml(id)}">
       <td>${clienteCell}</td>
       <td>${motoCell}</td>
       <td><code style="font-size:11px;color:var(--accent-2)">${escapeHtml(id)}</code></td>
       <td>${asesorCell}</td>
-      <td>
-        <span class="progreso ${listo ? "listo" : ""}">
-          ${subidos}/${totalTipos} ${listo ? "✓" : ""}
-          <span class="progreso-bar" style="--prog:${pct}%"></span>
-        </span>
-      </td>
+      <td>${proximoPaso}</td>
       <td><button class="btn-mini" data-detalle-id="${escapeHtml(id)}">Ver detalle</button></td>
     </tr>`;
   }
@@ -3281,6 +3318,21 @@ function abrirDetalleVenta(idVenta) {
   slots.innerHTML = tipos.map(tipo => {
     const a = info.archivos?.[tipo];
     const nombre = docState.tiposNombre[tipo] || tipo;
+    if (a?.noAplica) {
+      // Marcado como "No aplica" — ej: Factura GPS si la moto no lleva GPS
+      const fecha = a.marcadoEn ? new Date(a.marcadoEn).toLocaleDateString("es-CO") : "—";
+      return `<label class="doc-slot subido" style="border-color:rgba(120,120,140,.4);background:rgba(120,120,140,.08)">
+        <div class="doc-slot-titulo">${escapeHtml(nombre)}</div>
+        <div class="doc-slot-estado" style="color:#aaa">∅</div>
+        <div class="doc-slot-acciones">
+          <strong style="color:#aaa">No aplica</strong>
+        </div>
+        <div class="doc-slot-acciones" style="display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-top:4px">
+          <button class="btn-quitar-noaplica" data-quitar-noaplica data-id="${escapeHtml(idVenta)}" data-tipo="${tipo}" style="background:transparent;border:none;color:var(--accent);cursor:pointer;font-size:11px;text-decoration:underline;padding:0">↶ Quitar marca</button>
+        </div>
+        <span class="fecha-pago">marcado ${fecha}</span>
+      </label>`;
+    }
     if (a) {
       const fecha = new Date(a.subidoEn).toLocaleDateString("es-CO");
       return `<label class="doc-slot subido">
@@ -3297,6 +3349,8 @@ function abrirDetalleVenta(idVenta) {
         <span class="fecha-pago">subido ${fecha}</span>
       </label>`;
     }
+    // Slot vacío — para tipos opcionales (facturaGps, soat) ofrecer botón "No aplica"
+    const esOpcional = tipo === "facturaGps" || tipo === "empadronamiento";
     return `<label class="doc-slot vacio">
       <div class="doc-slot-titulo">${escapeHtml(nombre)}</div>
       <div class="doc-slot-estado">⏳</div>
@@ -3304,6 +3358,7 @@ function abrirDetalleVenta(idVenta) {
         <span style="color:var(--accent);text-decoration:underline">Subir archivo</span>
       </div>
       <input type="file" data-upload data-id="${escapeHtml(idVenta)}" data-tipo="${tipo}" accept="image/*,application/pdf" />
+      ${esOpcional ? `<button class="btn-marcar-noaplica" data-marcar-noaplica data-id="${escapeHtml(idVenta)}" data-tipo="${tipo}" style="background:transparent;border:1px solid rgba(120,120,140,.3);color:#aaa;cursor:pointer;font-size:11px;border-radius:4px;padding:3px 8px;margin-top:4px">∅ No aplica</button>` : ""}
     </label>`;
   }).join("");
 
@@ -3338,6 +3393,47 @@ function abrirDetalleVenta(idVenta) {
           }
         } else {
           showToast("Error: " + (data.error || "no se pudo borrar"));
+        }
+      } catch (e) { showToast("Error: " + e.message); }
+    });
+  });
+
+  // Listeners de marcar "No aplica"
+  slots.querySelectorAll("[data-marcar-noaplica]").forEach(btn => {
+    btn.addEventListener("click", async (ev) => {
+      ev.preventDefault();
+      const id = btn.dataset.id;
+      const tipo = btn.dataset.tipo;
+      const nombreDoc = docState.tiposNombre[tipo] || tipo;
+      if (!confirm(`¿Marcar "${nombreDoc}" como NO APLICA?\n\nNo contará como faltante para esta venta.`)) return;
+      try {
+        const r = await fetch(`/api/docs/no-aplica/${encodeURIComponent(id)}/${encodeURIComponent(tipo)}`, { method: "POST" });
+        const data = await r.json();
+        if (data.ok) {
+          showToast(`∅ ${nombreDoc} marcado como no aplica`);
+          await loadDocs();
+          abrirDetalleVenta(id);
+        } else {
+          showToast("Error: " + (data.error || "no se pudo marcar"));
+        }
+      } catch (e) { showToast("Error: " + e.message); }
+    });
+  });
+
+  // Listeners de quitar marca "No aplica"
+  slots.querySelectorAll("[data-quitar-noaplica]").forEach(btn => {
+    btn.addEventListener("click", async (ev) => {
+      ev.preventDefault();
+      const id = btn.dataset.id;
+      const tipo = btn.dataset.tipo;
+      try {
+        const r = await fetch(`/api/docs/no-aplica/${encodeURIComponent(id)}/${encodeURIComponent(tipo)}`, { method: "DELETE" });
+        const data = await r.json();
+        if (data.ok) {
+          showToast(`↶ Marca quitada`);
+          await loadDocs();
+          if (docState.docs?.[id]) abrirDetalleVenta(id);
+          else document.getElementById("modalDetalleVenta")?.classList.remove("show");
         }
       } catch (e) { showToast("Error: " + e.message); }
     });

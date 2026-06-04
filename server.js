@@ -530,6 +530,44 @@ app.get("/api/docs/lista", requireAuth, (req, res) => {
   res.json({ ok: true, docs: out, tipos: TIPOS_DOC, tiposNombre: TIPOS_DOC_NOMBRE, tiposGrupo: TIPOS_DOC_GRUPO });
 });
 
+// Marcar un documento como "No aplica" (ej: Factura GPS para motos sin GPS)
+app.post("/api/docs/no-aplica/:idVenta/:tipo", requireAuth, (req, res) => {
+  const idVenta = idVentaSafe(req.params.idVenta);
+  const { tipo } = req.params;
+  if (!TIPOS_DOC.includes(tipo)) return res.status(400).json({ ok: false, error: "Tipo inválido" });
+  const docs = leerDocsVentas();
+  const usuario = buscarUsuario(req.session.userEmail);
+  if (!docs[idVenta]) {
+    docs[idVenta] = { archivos: {}, cliente: "", modelo: "", creadoEn: new Date().toISOString() };
+  }
+  // Si había archivo subido, borrarlo del disco
+  const existente = docs[idVenta].archivos[tipo];
+  if (existente?.path) {
+    try { fs.unlinkSync(path.join(UPLOADS_DIR, idVenta, existente.path)); } catch {}
+  }
+  docs[idVenta].archivos[tipo] = {
+    noAplica: true,
+    marcadoPor: usuario.email,
+    marcadoEn: new Date().toISOString(),
+  };
+  guardarDocsVentas(docs);
+  res.json({ ok: true });
+});
+
+// Quitar la marca de "No aplica" (volver a estado vacío)
+app.delete("/api/docs/no-aplica/:idVenta/:tipo", requireAuth, (req, res) => {
+  const idVenta = idVentaSafe(req.params.idVenta);
+  const { tipo } = req.params;
+  const docs = leerDocsVentas();
+  if (!docs[idVenta]?.archivos[tipo]?.noAplica) {
+    return res.status(404).json({ ok: false, error: "No estaba marcado como no aplica" });
+  }
+  delete docs[idVenta].archivos[tipo];
+  if (Object.keys(docs[idVenta].archivos).length === 0) delete docs[idVenta];
+  guardarDocsVentas(docs);
+  res.json({ ok: true });
+});
+
 // Borrar un documento específico
 app.delete("/api/docs/:idVenta/:tipo", requireAuth, (req, res) => {
   const idVenta = idVentaSafe(req.params.idVenta);
@@ -540,7 +578,10 @@ app.delete("/api/docs/:idVenta/:tipo", requireAuth, (req, res) => {
   if (!info?.archivos[tipo]) return res.status(404).json({ ok: false, error: "No existe" });
 
   // Cualquier usuario autenticado puede borrar (modo pruebas)
-  try { fs.unlinkSync(path.join(UPLOADS_DIR, idVenta, info.archivos[tipo].path)); } catch {}
+  // Si tiene archivo físico, borrarlo (los "no aplica" no tienen path)
+  if (info.archivos[tipo].path) {
+    try { fs.unlinkSync(path.join(UPLOADS_DIR, idVenta, info.archivos[tipo].path)); } catch {}
+  }
   delete info.archivos[tipo];
   if (Object.keys(info.archivos).length === 0) delete docs[idVenta];
   guardarDocsVentas(docs);
