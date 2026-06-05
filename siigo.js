@@ -410,6 +410,7 @@ async function crearFacturaCompra(datos) {
     supplier: { identification: nitProveedor },
     currency: { code: "COP" },
     items: items.map(it => ({
+      type: "Product",
       code: String(it.code || ""),
       description: String(it.description || ""),
       quantity: 1,
