@@ -423,6 +423,12 @@ async function crearFacturaCompra(datos) {
     }
   }
 
+  // OJO: NO incluir currency en el body.
+  // Siigo Colombia asume COP por defecto en cuentas locales. Si se envía
+  // currency:{code:"COP"} el endpoint /v1/purchases lo rechaza con
+  // "invalid_currency" en cuentas Colombia, y si se manda con exchange_rate
+  // pide más campos. La solución oficial verificada (test directo a la API)
+  // es omitir el campo currency completamente.
   const body = {
     document: { id: tipoFC.id },
     date: fecha,
@@ -431,7 +437,6 @@ async function crearFacturaCompra(datos) {
       prefix: providerPrefix || "FE",
       number: String(providerNumber || numero).replace(/[^0-9]/g, "") || "0",
     },
-    currency: { code: "COP", exchange_rate: 1 },
     items: items.map(it => ({
       type: "Product",
       code: String(it.code || ""),
