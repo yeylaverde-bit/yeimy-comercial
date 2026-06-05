@@ -898,13 +898,21 @@ Extrae dos bloques: (A) datos generales de la factura, y (B) cada moto que apare
 (B) MOTOS (cada fila de la tabla de productos)
 ================================================================
 Por cada moto extrae:
+- referencia (el código numérico de la columna "Referencia / Reference", ej: "60006597")
 - chasis (VIN, 17 caracteres)
 - motor (número del motor, alfanumérico)
-- marca (TVS, VICTORY, KYMCO, BENELLI, KAWASAKI, CERONTE)
-- modelo (ej: APACHE RTR 160, RAIDER 125, NTORQ 125, AGILITY FUSION TK, MRX ARIZONA ABS GP TK, MRX150 TK)
-- color (NEGRO, ROJO, AZUL, GRIS, etc.)
+- marca: INFIERE según el modelo (la factura NO dice la marca explícita, debes deducirla):
+    * AGILITY, NEW AGILITY, X-TOWN, PEOPLE → KYMCO
+    * MRX, MRX150, MRX ARIZONA, MX FACTORY → VICTORY
+    * APACHE, RAIDER, NTORQ, RTR, RADEON, JUPITER, STAR → TVS
+    * TNT, IMPERIALE, LEONCINO, TRK, 502, 752 → BENELLI
+    * NINJA, Z400, Z650, VERSYS, KLR → KAWASAKI
+    * CERONTE → CERONTE
+    * Si no sabes con certeza, usa el primer nombre del modelo en mayúsculas
+- modelo (todo el nombre después de "MOTOCICLETA", ej: "AGILITY FUSION TK", "MRX ARIZONA ABS GP TK", "MRX150 TK")
+- color (extrae el color principal: "NEGRO", "ROJO", "AZUL", "GRIS", "BLANCO". Si dice "NEGRO NEBULOSA" → "NEGRO". Si dice "GRIS GRAFITO NEGRO NEBULOSA" → "GRIS")
 - anio (año modelo, ej: 2027)
-- cilindraje (texto que aparece entre paréntesis después del modelo, ej "124,6CC", "199.5CC")
+- cilindraje (texto que aparece entre paréntesis después del modelo, ej "124,6CC", "199.5CC", "149,2CC")
 - precio (Precio unitario en COP, número sin signos)
 
 ================================================================
@@ -922,10 +930,14 @@ Pistas FUERTES para validar tu lectura:
 3. El motor viene DESPUÉS de la "/" y suele empezar con letras tipo "KN", "ZS", "TS".
 4. NO contiene espacios.
 
-⚠️ ANTI-ALUCINACIÓN (MUY IMPORTANTE):
-La columna chasis/motor tiene letra MUY pequeña en el PDF. Si NO puedes leerla con claridad y certeza, prefiere devolver chasis="" y motor="" antes que inventar valores.
-Inventar un chasis tiene consecuencias graves: se crean productos falsos en el inventario que después hay que borrar manualmente. Es mejor reportar campo vacío y que el humano lo escriba a mano que enviar valores adivinados.
-Si tienes duda de un solo carácter pero la mayoría es legible, igual prefiere dejar vacío que arriesgar.
+⚠️ CHASIS Y MOTOR — equilibrio entre leer e inventar:
+La columna chasis/motor tiene letra pequeña. Hazlo así:
+1. Lee la celda con MUCHO cuidado, carácter por carácter. Acércate visualmente.
+2. Si el chasis empieza con "9FL" (correcto para Auteco) → confías y lo extraes completo.
+3. Si lees algo distinto a "9FL" al inicio (ej "MFL", "OFL", "BFL") → vuelve a mirar, casi seguro estás confundiendo un carácter. Corrige a "9FL" si las demás letras coinciden.
+4. SOLO si la celda está físicamente borrosa, tapada o ilegible → devuelve chasis="" y motor="".
+5. NO devuelvas vacío por exceso de prudencia: si puedes leer el texto y aplicar las pistas, extráelo.
+Inventar un chasis (devolver letras que no están) crea productos basura en Siigo. Pero devolver vacío cuando SÍ se puede leer hace que la humana lo escriba a mano. Busca el punto medio: lee con cuidado, valida con las pistas, extrae lo legible.
 
 ================================================================
 FORMATO DE RESPUESTA (JSON exacto, SIN texto extra)
@@ -942,14 +954,14 @@ FORMATO DE RESPUESTA (JSON exacto, SIN texto extra)
     "condicionPago": "..."
   },
   "motos": [
-    { "chasis": "...", "motor": "...", "marca": "...", "modelo": "...", "color": "...", "anio": "...", "cilindraje": "...", "precio": 0 }
+    { "referencia": "...", "chasis": "...", "motor": "...", "marca": "...", "modelo": "...", "color": "...", "anio": "...", "cilindraje": "...", "precio": 0 }
   ]
 }
 
 Si no puedes leer algún campo, usa "" o 0. Si la imagen no es una factura legible, devuelve {"factura":{}, "motos": []}.`;
 
     const result = await anthropic.messages.create({
-      model: "claude-sonnet-4-5",
+      model: "claude-opus-4-7",
       max_tokens: 4096,
       messages: [{
         role: "user",

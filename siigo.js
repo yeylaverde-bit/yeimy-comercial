@@ -193,6 +193,7 @@ async function crearProducto(datos) {
   const chasis = String(datos.chasis || "").trim().toUpperCase();
   const motor = String(datos.motor || "").trim().toUpperCase();
   const cilindraje = String(datos.cilindraje || "").trim().toUpperCase();
+  const referencia = String(datos.referencia || "").trim();
   const precio = Number(datos.precio) || 0;
 
   if (!chasis || !modelo) {
@@ -207,6 +208,7 @@ async function crearProducto(datos) {
   if (color) descParts.push(color);
   if (anio) descParts.push(anio);
   if (cilindraje) descParts.push(`(${cilindraje})`);
+  if (referencia) descParts.push(`REF ${referencia}`);
   descParts.push("CHASIS", chasis);
   if (motor) descParts.push("MOTOR", motor);
   const description = descParts.join(" ");
@@ -225,7 +227,7 @@ async function crearProducto(datos) {
     unit: { code: "94" },
     unit_label: "unidad",
     description,
-    additional_fields: {},
+    additional_fields: referencia ? { reference: referencia } : {},
   };
 
   // Si trae precio, agregarlo

@@ -2871,6 +2871,7 @@ function renderFacturaMotos(motos) {
   tbody.innerHTML = motos.map((m, i) => `
     <tr data-idx="${i}">
       <td style="text-align:center"><input type="checkbox" class="moto-check" checked data-idx="${i}" title="Marcar para enviar a Siigo" /></td>
+      <td><input class="celda-edit" data-campo="referencia" value="${escapeHtml(m.referencia || '')}" style="font-family:monospace;font-size:11px;width:90px" /></td>
       <td><input class="celda-edit" data-campo="marca" value="${escapeHtml(m.marca || '')}" /></td>
       <td><input class="celda-edit" data-campo="modelo" value="${escapeHtml(m.modelo || '')}" /></td>
       <td><input class="celda-edit" data-campo="color" value="${escapeHtml(m.color || '')}" /></td>
