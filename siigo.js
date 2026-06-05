@@ -448,6 +448,9 @@ async function crearFacturaCompra(datos) {
     payments: [{
       id: paymentTypeId,
       value: total,
+      // due_date: fecha de vencimiento del pago. Para facturas Auteco usamos
+      // misma fecha de la factura (vencimiento inmediato). Siigo lo exige.
+      due_date: fecha,
     }],
     observations: observaciones,
   };
