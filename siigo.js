@@ -288,6 +288,27 @@ async function listarTiposDocumento(type) {
 }
 
 /**
+ * Lista todos los medios de pago de Siigo via /v1/payment-types.
+ * documentType: opcional, ej "FC" para filtrar por tipo
+ */
+async function listarPaymentTypes(documentType) {
+  const jwt = await obtenerToken();
+  const qs = documentType ? `?document_type=${encodeURIComponent(documentType)}` : "";
+  const url = `${SIIGO_BASE}/v1/payment-types${qs}`;
+  const resp = await fetch(url, {
+    headers: {
+      "Authorization": `Bearer ${jwt}`,
+      "Partner-Id": PARTNER_ID,
+    },
+  });
+  if (!resp.ok) {
+    const txt = await resp.text().catch(() => "");
+    throw new Error(`Siigo GET /v1/payment-types ${resp.status}: ${txt.slice(0, 200)}`);
+  }
+  return await resp.json();
+}
+
+/**
  * Obtiene el ID del tipo "Factura de Compra".
  * Prioridad:
  *   1. process.env.SIIGO_FC_DOC_TYPE_ID si esta definido
@@ -345,21 +366,37 @@ async function crearFacturaCompra(datos) {
   let paymentTypeId = datos.paymentTypeId
     || (process.env.SIIGO_FC_PAYMENT_TYPE_ID ? parseInt(process.env.SIIGO_FC_PAYMENT_TYPE_ID, 10) : null);
 
-  // Auto-deteccion: si no hay env var, intentar descubrir un payment_type desde el doc FC
+  // Auto-deteccion: si no hay env var, intentar descubrir un payment_type
+  // Intento 1: payment_types embebidos en el doc FC
   if (!paymentTypeId) {
     try {
       const lista = await listarTiposDocumento("FC");
       const tipos = Array.isArray(lista) ? lista : (lista.results || []);
       const fc = tipos.find(t => t.id === tipoFC.id) || tipos[0];
       if (fc && Array.isArray(fc.payment_types) && fc.payment_types.length > 0) {
-        // Preferir uno que parezca credito (CXP/credito/30dias) sobre los demas
         const credito = fc.payment_types.find(p => /cred|cxp|prove|30/i.test((p.name || "") + " " + (p.code || "")))
           || fc.payment_types[0];
         paymentTypeId = credito.id;
-        console.log(`[siigo] payment_type auto-detectado para FC: "${credito.name || credito.code}" id=${credito.id}`);
+        console.log(`[siigo] payment_type via document-types: "${credito.name || credito.code}" id=${credito.id}`);
       }
     } catch (e) {
-      console.warn("[siigo] auto-deteccion de payment_type fallo:", e.message);
+      console.warn("[siigo] document-types embedded payment_types fallo:", e.message);
+    }
+  }
+
+  // Intento 2: endpoint /v1/payment-types directo
+  if (!paymentTypeId) {
+    try {
+      const lista = await listarPaymentTypes("FC");
+      const pts = Array.isArray(lista) ? lista : (lista.results || []);
+      if (pts.length > 0) {
+        const credito = pts.find(p => /cred|cxp|prove|30/i.test((p.name || "") + " " + (p.code || "")))
+          || pts[0];
+        paymentTypeId = credito.id;
+        console.log(`[siigo] payment_type via /v1/payment-types: "${credito.name || credito.code}" id=${credito.id}`);
+      }
+    } catch (e) {
+      console.warn("[siigo] /v1/payment-types fallo:", e.message);
     }
   }
 
@@ -417,6 +454,7 @@ module.exports = {
   normalizarProducto,
   crearProducto,
   listarTiposDocumento,
+  listarPaymentTypes,
   obtenerTipoFacturaCompra,
   crearFacturaCompra,
 };
