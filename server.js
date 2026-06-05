@@ -754,7 +754,7 @@ app.patch("/api/preasignaciones/:chasis", requireAuth, (req, res) => {
     if (req.body.gpsActivadoEn) todas[chasis].gpsActivadoPor = usuario.email;
   } else {
     // Solo permite actualizar ciertos campos
-    const camposPermitidos = ["estado", "gps", "placa", "numCredito", "financiera", "celular", "fechaNacimiento", "imeiGps", "gpsInstalarEvidenciaPath", "gpsActivarEvidenciaPath", "actaEntrega", "actaEntregaArchivo"];
+    const camposPermitidos = ["estado", "gps", "placa", "numCredito", "financiera", "celular", "fechaNacimiento", "imeiGps", "iccidGps", "gpsInstalarEvidenciaPath", "gpsActivarEvidenciaPath", "actaEntrega", "actaEntregaArchivo"];
     for (const c of camposPermitidos) {
       if (req.body[c] !== undefined) todas[chasis][c] = String(req.body[c]).trim();
     }
@@ -1102,21 +1102,26 @@ app.post("/api/gps/leer-imei", requireAuth, uploadGps.single("archivo"), async (
       : { type: "image", source: { type: "base64", media_type: mediaType, data: base64 } };
 
     const prompt = `Esta es una foto de un sticker pegado a un dispositivo GPS (rastreador vehicular).
-Suele tener un código de barras y un IMEI (número de 15 dígitos que identifica el dispositivo).
+Suele tener códigos de barras y los siguientes números:
+- IMEI: 15 dígitos que identifican el dispositivo (empieza con 86 o 35)
+- ICCID: 19 o 20 dígitos que identifican la SIM (empieza con 89)
+- Serial: número de serie del dispositivo (alfanumérico)
 
-Extrae:
-- imei: el número IMEI (15 dígitos numéricos, generalmente empieza con 86 o 35)
-- serial: número de serie si aparece (puede ser alfanumérico)
-- modelo: marca/modelo del GPS si aparece (ej: TS101, GT06, etc.)
+Extrae TODOS los números que aparezcan:
+- imei: el número IMEI (15 dígitos)
+- iccid: el número ICCID de la SIM (19-20 dígitos, empieza con 89)
+- serial: número de serie si aparece (alfanumérico)
+- modelo: marca/modelo del GPS si aparece (ej: TS101, GT06, Trakku, etc.)
 
 Devuelve SOLO un JSON válido con este formato exacto, sin texto extra:
 {
   "imei": "...",
+  "iccid": "...",
   "serial": "...",
   "modelo": "..."
 }
 
-Si no puedes leer algún campo, usa "". Si la imagen no es un sticker de GPS, devuelve {"imei":"","serial":"","modelo":""}.`;
+Si no puedes leer algún campo, usa "". Si la imagen no es un sticker de GPS, devuelve {"imei":"","iccid":"","serial":"","modelo":""}.`;
 
     const result = await anthropic.messages.create({
       model: "claude-sonnet-4-5",
@@ -1135,6 +1140,7 @@ Si no puedes leer algún campo, usa "". Si la imagen no es un sticker de GPS, de
     res.json({
       ok: true,
       imei: data.imei || "",
+      iccid: data.iccid || "",
       serial: data.serial || "",
       modelo: data.modelo || "",
       archivo: req.file.filename,

@@ -2646,24 +2646,35 @@ function renderGpsLista(tipo) {
       ${tipo === "activar" ? `
       <div style="background:rgba(168,85,247,.08);border:1px solid rgba(168,85,247,.25);border-radius:8px;padding:12px;margin:10px 0;font-size:13px">
         <div style="font-weight:600;color:#c084fc;margin-bottom:8px;font-size:12px;text-transform:uppercase;letter-spacing:.04em">
-          🔧 Activar en Impulsa Trakku — copia cada dato
+          🔧 Registrar Trakku en Impulsa — copia cada dato
         </div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px 14px;font-size:12.5px">
           <div><span class="muted">Cédula:</span> <code>${escapeHtml(p.cedulaCliente || l.documento || "—")}</code> ${(p.cedulaCliente || l.documento) ? `<button class="btn-mini" data-copy="${escapeHtml(p.cedulaCliente || l.documento)}" title="Copiar">📋</button>` : ""}</div>
           <div><span class="muted"># Crédito:</span> <code>${escapeHtml(p.numCredito || "—")}</code> ${p.numCredito ? `<button class="btn-mini" data-copy="${escapeHtml(p.numCredito)}" title="Copiar">📋</button>` : ""}</div>
           <div><span class="muted">Cliente:</span> ${escapeHtml(p.nombreCliente || "—")} ${p.nombreCliente ? `<button class="btn-mini" data-copy="${escapeHtml(p.nombreCliente)}" title="Copiar">📋</button>` : ""}</div>
           <div><span class="muted">Email:</span> ${escapeHtml(l.email || "—")} ${l.email ? `<button class="btn-mini" data-copy="${escapeHtml(l.email)}" title="Copiar">📋</button>` : ""}</div>
-          <div style="grid-column:span 2">
-            <span class="muted">IMEI GPS:</span>
+          <div><span class="muted">Celular:</span> ${escapeHtml(p.celular || l.celular || "—")} ${(p.celular || l.celular) ? `<button class="btn-mini" data-copy="${escapeHtml(p.celular || l.celular)}" title="Copiar">📋</button>` : ""}</div>
+          <div><span class="muted">Placa:</span> <code>${escapeHtml(p.placa || "—")}</code> ${p.placa ? `<button class="btn-mini" data-copy="${escapeHtml(p.placa)}" title="Copiar">📋</button>` : ""}</div>
+          <div style="grid-column:span 2;padding-top:6px;border-top:1px dashed rgba(168,85,247,.2);margin-top:4px">
+            <span class="muted">IMEI:</span>
             ${p.imeiGps
               ? `<code style="color:#22d3ee">${escapeHtml(p.imeiGps)}</code> <button class="btn-mini" data-copy="${escapeHtml(p.imeiGps)}" title="Copiar">📋</button>`
-              : `<label class="btn-secondary" style="padding:4px 10px;font-size:11px;cursor:pointer;margin-left:6px">
-                  📸 Foto sticker GPS
-                  <input type="file" data-gps-imei="${escapeHtml(p.chasis)}" accept="image/*" capture="environment" style="display:none" />
-                </label>`}
+              : `<span class="muted" style="color:#f7c272">⏳ pendiente — usa el botón Foto abajo</span>`}
+          </div>
+          <div style="grid-column:span 2">
+            <span class="muted">ICCID:</span>
+            ${p.iccidGps
+              ? `<code style="color:#22d3ee">${escapeHtml(p.iccidGps)}</code> <button class="btn-mini" data-copy="${escapeHtml(p.iccidGps)}" title="Copiar">📋</button>`
+              : `<span class="muted" style="color:#f7c272">⏳ pendiente</span>`}
+          </div>
+          <div style="grid-column:span 2;margin-top:6px">
+            <label class="btn-secondary" style="padding:6px 12px;font-size:12px;cursor:pointer">
+              📸 Foto sticker GPS (lee IMEI + ICCID)
+              <input type="file" data-gps-imei="${escapeHtml(p.chasis)}" accept="image/*" capture="environment" style="display:none" />
+            </label>
           </div>
         </div>
-        <a href="https://socios.impulsacrm.com" target="_blank" style="display:inline-block;margin-top:10px;padding:6px 12px;background:#a855f7;color:#fff;border-radius:6px;text-decoration:none;font-size:12px;font-weight:600">🔗 Abrir Impulsa Trakku</a>
+        <a href="https://socios.impulsacrm.com/trakku/registrostrakkubuscar.aspx" target="_blank" style="display:inline-block;margin-top:10px;padding:6px 12px;background:#a855f7;color:#fff;border-radius:6px;text-decoration:none;font-size:12px;font-weight:600">🔗 Abrir Trakku en Impulsa</a>
       </div>
       ` : ""}
 
@@ -2698,29 +2709,35 @@ function renderGpsLista(tipo) {
     });
   });
 
-  // Listener — foto del sticker GPS → OCR IMEI
+  // Listener — foto del sticker GPS → OCR IMEI + ICCID (para Trakku)
   wrap.querySelectorAll("input[data-gps-imei]").forEach(inp => {
     inp.addEventListener("change", async (ev) => {
       const file = ev.target.files?.[0];
       if (!file) return;
       const chasis = inp.dataset.gpsImei;
-      showToast("🔎 Leyendo IMEI con IA…");
+      showToast("🔎 Leyendo IMEI + ICCID con IA…");
       const fd = new FormData();
       fd.append("archivo", file);
       try {
         const r = await fetch("/api/gps/leer-imei", { method: "POST", body: fd });
         const data = await r.json();
-        if (!data.ok || !data.imei) {
-          // Permitir entrada manual si OCR falló
-          const imei = prompt(`No pude leer el IMEI claramente.\n\nEscríbelo manualmente (15 dígitos):`, data.imei || "");
-          if (!imei) return;
-          await guardarImei(chasis, imei);
+        if (!data.ok) {
+          showToast("Error: " + (data.error || "OCR falló"));
           return;
         }
-        // Confirmar IMEI con el usuario antes de guardar
-        const imei = prompt(`IMEI detectado:\n\n${data.imei}\n\n¿Es correcto? Edita si hace falta:`, data.imei);
-        if (!imei) return;
-        await guardarImei(chasis, imei);
+        // Confirmar/editar IMEI
+        const imei = prompt(
+          `📡 IMEI detectado: ${data.imei || "(no detectado)"}\n\nEscríbelo manualmente o confirma (15 dígitos):`,
+          data.imei || ""
+        );
+        if (imei === null) return;
+        // Confirmar/editar ICCID
+        const iccid = prompt(
+          `📶 ICCID detectado: ${data.iccid || "(no detectado)"}\n\nEscríbelo manualmente o confirma (19-20 dígitos, empieza con 89):`,
+          data.iccid || ""
+        );
+        if (iccid === null) return;
+        await guardarImeiIccid(chasis, imei.trim(), iccid.trim());
       } catch (e) { showToast("Error: " + e.message); }
     });
   });
@@ -2799,15 +2816,25 @@ function renderGpsLista(tipo) {
 
 // Helper (afuera de renderGpsLista) — guarda IMEI en una preasignación
 async function guardarImei(chasis, imei) {
+  return guardarImeiIccid(chasis, imei, "");
+}
+
+async function guardarImeiIccid(chasis, imei, iccid) {
   try {
+    const body = {};
+    if (imei) body.imeiGps = imei.trim();
+    if (iccid) body.iccidGps = iccid.trim();
     const r = await fetch(`/api/preasignaciones/${encodeURIComponent(chasis)}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ imeiGps: imei.trim() }),
+      body: JSON.stringify(body),
     });
     const data = await r.json();
     if (data.ok) {
-      showToast(`✓ IMEI guardado: ${imei}`);
+      const partes = [];
+      if (imei) partes.push(`IMEI ${imei}`);
+      if (iccid) partes.push(`ICCID ${iccid}`);
+      showToast(`✓ Guardado: ${partes.join(" · ")}`);
       await loadPreasignaciones();
     } else {
       showToast("Error: " + (data.error || "no se pudo guardar"));
