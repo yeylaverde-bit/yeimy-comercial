@@ -404,10 +404,33 @@ async function crearFacturaCompra(datos) {
     throw new Error("No se encontro un medio de pago para Factura de Compra. Configura SIIGO_FC_PAYMENT_TYPE_ID en variables de entorno (Render). Para ver los disponibles abre /api/siigo/payment-types-fc");
   }
 
+  // Parsear el numero de factura del proveedor en {prefix, number}
+  // Ej: "F660057710" -> prefix:"F", number:"660057710"
+  //     "FE-123"    -> prefix:"FE", number:"123"
+  //     "12345"     -> prefix:"", number:"12345"
+  let providerPrefix = "";
+  let providerNumber = numero;
+  const m = String(numero || "").match(/^([A-Za-z]+)[-]?(\d+)$/);
+  if (m) {
+    providerPrefix = m[1].toUpperCase();
+    providerNumber = m[2];
+  } else {
+    // Si no matchea, intentar separar primer bloque alfanumerico no-numerico del resto
+    const m2 = String(numero || "").match(/^([^\d]+)(.+)$/);
+    if (m2) {
+      providerPrefix = m2[1].replace(/[^A-Za-z0-9]/g, "").toUpperCase();
+      providerNumber = m2[2].replace(/[^0-9]/g, "");
+    }
+  }
+
   const body = {
     document: { id: tipoFC.id },
     date: fecha,
     supplier: { identification: nitProveedor },
+    provider_invoice: {
+      prefix: providerPrefix || "FE",
+      number: String(providerNumber || numero).replace(/[^0-9]/g, "") || "0",
+    },
     currency: { code: "COP" },
     items: items.map(it => ({
       type: "Product",
