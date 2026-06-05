@@ -878,40 +878,75 @@ app.post("/api/factura/procesar", requireAuth, uploadFactura.single("archivo"), 
       ? { type: "document", source: { type: "base64", media_type: "application/pdf", data: base64 } }
       : { type: "image", source: { type: "base64", media_type: mediaType, data: base64 } };
 
-    const prompt = `Esta es una factura de Auteco (importador de motocicletas en Colombia: TVS, Victory, Kymco, Benelli, Kawasaki, Ceronte).
+    const prompt = `Esta es una factura electrónica de venta de AUTOTECNICA COLOMBIANA S.A.S. (Auteco — importador de motocicletas en Colombia: TVS, Victory, Kymco, Benelli, Kawasaki, Ceronte).
 
-Por cada moto en la factura, extrae estos datos exactos:
-- chasis (VIN, número de chasis, alfanumérico de ~17 caracteres, suele empezar por 9FL, MFL, MD2, MAT u otros)
+Extrae dos bloques: (A) datos generales de la factura, y (B) cada moto que aparece.
+
+================================================================
+(A) DATOS GENERALES DE LA FACTURA
+================================================================
+- numeroFactura: el número de factura electrónica (suele aparecer como "FACTURA ELECTRONICA DE VENTA No. F660XXXXXX")
+- fechaFactura: formato YYYY-MM-DD (ej: "2026-06-03"). La factura la trae como "FECHA DOCUMENTO" en formato DD.MM.YYYY HH:MM:SS — convierte a ISO.
+- proveedorNit: el NIT del proveedor (Auteco). En esta factura aparece como "NIT 890.900.317-0" arriba a la derecha. Devuelve solo dígitos sin puntos ni guion: "890900317"
+- proveedorNombre: razón social del proveedor: "AUTOTECNICA COLOMBIANA S.A.S."
+- subtotal: el SUBTOTAL en COP (número, sin signos $ ni comas)
+- iva: el IVA 19% en COP (número)
+- total: el TOTAL en COP (número)
+- condicionPago: texto corto, ej "Crédito 30 días"
+
+================================================================
+(B) MOTOS (cada fila de la tabla de productos)
+================================================================
+Por cada moto extrae:
+- chasis (VIN, 17 caracteres)
 - motor (número del motor, alfanumérico)
-- marca (TVS, VICTORY, KYMCO, BENELLI, KAWASAKI, CERONTE, etc.)
-- modelo (ej: APACHE RTR 160, RAIDER 125, NTORQ 125)
+- marca (TVS, VICTORY, KYMCO, BENELLI, KAWASAKI, CERONTE)
+- modelo (ej: APACHE RTR 160, RAIDER 125, NTORQ 125, AGILITY FUSION TK, MRX ARIZONA ABS GP TK, MRX150 TK)
 - color (NEGRO, ROJO, AZUL, GRIS, etc.)
-- año (modelo o cilindraje si aparece, ej: 2026)
-- precio (valor unitario o total por moto, en COP)
+- anio (año modelo, ej: 2027)
+- cilindraje (texto que aparece entre paréntesis después del modelo, ej "124,6CC", "199.5CC")
+- precio (Precio unitario en COP, número sin signos)
 
-IMPORTANTE — formato chasis/motor en facturas Auteco:
-En la columna llamada "Chasis / Motor" (o "Chassis / Engine") los dos valores SIEMPRE vienen juntos en la misma celda. Pueden estar separados de varias formas:
-  (a) Con barra "/": "9FLKNGNE0VHE10752/KN25S2104666" → chasis="9FLKNGNE0VHE10752", motor="KN25S2104666"
-  (b) Con salto de línea o en dos líneas dentro de la celda:
-        9FLKNGNE0VHE10752
-        KN25S2104666
-      → chasis="9FLKNGNE0VHE10752", motor="KN25S2104666"
-  (c) Con espacios: "9FLKNGNE0VHE10752 KN25S2104666" → chasis="9FLKNGNE0VHE10752", motor="KN25S2104666"
+================================================================
+REGLAS CRÍTICAS PARA chasis y motor — LEE CON MUCHO CUIDADO
+================================================================
+La columna se llama "Chasis / Motor (Chassis / Engine)". Cada celda contiene DOS valores separados por "/":
+  Formato: CHASIS/MOTOR
+  Ejemplo real de esta factura fila 1: "9FLKNGNE0VHE10752/KN25S2104666"
+    → chasis = "9FLKNGNE0VHE10752"
+    → motor = "KN25S2104666"
 
-REGLA OBLIGATORIA: el chasis es el VIN de **17 caracteres** (Vehicle Identification Number, estándar internacional). El motor es lo que viene después y suele ser más corto (10-13 caracteres). Si ves un string largo de 27+ caracteres alfanuméricos en esa celda, son DOS valores concatenados: parte los primeros 17 caracteres como chasis, el resto como motor.
+Pistas FUERTES para validar tu lectura:
+1. En facturas de AUTOTECNICA / Auteco, el chasis SIEMPRE empieza con "9FL". Si lees algo distinto (MFL, OFL, 9EL, etc.) probablemente confundiste un carácter — re-mira con cuidado.
+2. El chasis es VIN estándar de exactamente 17 caracteres alfanuméricos.
+3. El motor viene DESPUÉS de la "/" y suele empezar con letras tipo "KN", "ZS", "TS".
+4. NO contiene espacios.
 
-NO pongas el texto completo en chasis. NO dejes motor vacío si en la celda hay claramente dos números. Elimina espacios y barras "/" alrededor de cada valor.
+⚠️ ANTI-ALUCINACIÓN (MUY IMPORTANTE):
+La columna chasis/motor tiene letra MUY pequeña en el PDF. Si NO puedes leerla con claridad y certeza, prefiere devolver chasis="" y motor="" antes que inventar valores.
+Inventar un chasis tiene consecuencias graves: se crean productos falsos en el inventario que después hay que borrar manualmente. Es mejor reportar campo vacío y que el humano lo escriba a mano que enviar valores adivinados.
+Si tienes duda de un solo carácter pero la mayoría es legible, igual prefiere dejar vacío que arriesgar.
 
-Devuelve SOLO un JSON válido con este formato exacto, sin texto extra ni explicación:
-
+================================================================
+FORMATO DE RESPUESTA (JSON exacto, SIN texto extra)
+================================================================
 {
+  "factura": {
+    "numeroFactura": "...",
+    "fechaFactura": "YYYY-MM-DD",
+    "proveedorNit": "...",
+    "proveedorNombre": "...",
+    "subtotal": 0,
+    "iva": 0,
+    "total": 0,
+    "condicionPago": "..."
+  },
   "motos": [
-    { "chasis": "...", "motor": "...", "marca": "...", "modelo": "...", "color": "...", "anio": "...", "precio": 0 },
-    ...
+    { "chasis": "...", "motor": "...", "marca": "...", "modelo": "...", "color": "...", "anio": "...", "cilindraje": "...", "precio": 0 }
   ]
 }
 
-Si no puedes leer algún campo, usa "" o 0. Si la imagen no es una factura legible, devuelve {"motos": []}.`;
+Si no puedes leer algún campo, usa "" o 0. Si la imagen no es una factura legible, devuelve {"factura":{}, "motos": []}.`;
 
     const result = await anthropic.messages.create({
       model: "claude-sonnet-4-5",
@@ -930,6 +965,7 @@ Si no puedes leer algún campo, usa "" o 0. Si la imagen no es una factura legib
 
     res.json({
       ok: true,
+      factura: data.factura || {},
       motos: data.motos || [],
       archivo: req.file.filename,
       usoTokens: { input: result.usage?.input_tokens, output: result.usage?.output_tokens },
