@@ -451,7 +451,10 @@ async function crearFacturaCompra(datos) {
     body.cost_center = parseInt(datos.costCenterId, 10);
   }
 
-  console.log("[siigo] POST /v1/purchases body:", JSON.stringify(body));
+  // Log destacado para verificar que el campo currency está completo
+  console.log("[siigo] === FACTURA DE COMPRA ===");
+  console.log("[siigo] currency enviado:", JSON.stringify(body.currency));
+  console.log("[siigo] POST /v1/purchases body completo:", JSON.stringify(body));
 
   const resp = await fetch(`${SIIGO_BASE}/v1/purchases`, {
     method: "POST",
