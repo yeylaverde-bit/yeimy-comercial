@@ -214,7 +214,7 @@ async function crearProducto(datos) {
   const body = {
     code,
     name: `MOTOCICLETA ${modelo}`,
-    account_group: { id: 743 },
+    account_group: 743,
     type: "Product",
     stock_control: true,
     active: true,
@@ -235,6 +235,8 @@ async function crearProducto(datos) {
       price_list: [{ position: 1, value: precio }],
     }];
   }
+
+  console.log("[siigo] POST /v1/products body:", JSON.stringify(body));
 
   const resp = await fetch(`${SIIGO_BASE}/v1/products`, {
     method: "POST",

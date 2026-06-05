@@ -881,13 +881,26 @@ app.post("/api/factura/procesar", requireAuth, uploadFactura.single("archivo"), 
     const prompt = `Esta es una factura de Auteco (importador de motocicletas en Colombia: TVS, Victory, Kymco, Benelli, Kawasaki, Ceronte).
 
 Por cada moto en la factura, extrae estos datos exactos:
-- chasis (VIN, número de chasis, suele ser alfanumérico de 17 caracteres)
-- motor (número del motor)
+- chasis (VIN, número de chasis, alfanumérico de ~17 caracteres, suele empezar por 9FL, MFL, MD2, MAT u otros)
+- motor (número del motor, alfanumérico)
 - marca (TVS, VICTORY, KYMCO, BENELLI, KAWASAKI, CERONTE, etc.)
 - modelo (ej: APACHE RTR 160, RAIDER 125, NTORQ 125)
 - color (NEGRO, ROJO, AZUL, GRIS, etc.)
 - año (modelo o cilindraje si aparece, ej: 2026)
 - precio (valor unitario o total por moto, en COP)
+
+IMPORTANTE — formato chasis/motor en facturas Auteco:
+En la columna llamada "Chasis / Motor" (o "Chassis / Engine") los dos valores SIEMPRE vienen juntos en la misma celda. Pueden estar separados de varias formas:
+  (a) Con barra "/": "9FLKNGNE0VHE10752/KN25S2104666" → chasis="9FLKNGNE0VHE10752", motor="KN25S2104666"
+  (b) Con salto de línea o en dos líneas dentro de la celda:
+        9FLKNGNE0VHE10752
+        KN25S2104666
+      → chasis="9FLKNGNE0VHE10752", motor="KN25S2104666"
+  (c) Con espacios: "9FLKNGNE0VHE10752 KN25S2104666" → chasis="9FLKNGNE0VHE10752", motor="KN25S2104666"
+
+REGLA OBLIGATORIA: el chasis es el VIN de **17 caracteres** (Vehicle Identification Number, estándar internacional). El motor es lo que viene después y suele ser más corto (10-13 caracteres). Si ves un string largo de 27+ caracteres alfanuméricos en esa celda, son DOS valores concatenados: parte los primeros 17 caracteres como chasis, el resto como motor.
+
+NO pongas el texto completo en chasis. NO dejes motor vacío si en la celda hay claramente dos números. Elimina espacios y barras "/" alrededor de cada valor.
 
 Devuelve SOLO un JSON válido con este formato exacto, sin texto extra ni explicación:
 
