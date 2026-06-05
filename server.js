@@ -1723,6 +1723,7 @@ app.post("/api/siigo/crear-productos", requireAuth, requireAdmin, async (req, re
   // Paso 2: crear Factura de Compra si llegaron datos de cabecera
   let facturaCompra = null;
   let facturaCompraError = null;
+  let facturaCompraDiag = null; // datos de diagnostico para mostrar al admin si falla
   if (factura && factura.numeroFactura && factura.fechaFactura && factura.proveedorNit) {
     if (creados.length === 0) {
       facturaCompraError = "No se creo Factura de Compra porque ningun producto se creo exitosamente";
@@ -1752,6 +1753,37 @@ app.post("/api/siigo/crear-productos", requireAuth, requireAdmin, async (req, re
         };
       } catch (e) {
         facturaCompraError = e.message;
+
+        // Si fallo por falta de payment_type, agregar diagnostico con lo que Siigo
+        // tiene disponible. Asi el admin ve la lista directo en el dashboard.
+        if (/payment_type|medio de pago|SIIGO_FC_PAYMENT_TYPE_ID/i.test(e.message)) {
+          facturaCompraDiag = { paymentTypes: [], errores: {} };
+          try {
+            const lista = await siigo.listarTiposDocumento("FC");
+            const tipos = Array.isArray(lista) ? lista : (lista.results || []);
+            for (const doc of tipos) {
+              const pts = Array.isArray(doc.payment_types) ? doc.payment_types : [];
+              for (const pt of pts) {
+                facturaCompraDiag.paymentTypes.push({
+                  id: pt.id, name: pt.name || "", code: pt.code || "", fuente: `doc ${doc.code || doc.name}`,
+                });
+              }
+            }
+          } catch (e2) {
+            facturaCompraDiag.errores.documentTypes = e2.message;
+          }
+          try {
+            const lista = await siigo.listarPaymentTypes("FC");
+            const pts = Array.isArray(lista) ? lista : (lista.results || []);
+            for (const pt of pts) {
+              facturaCompraDiag.paymentTypes.push({
+                id: pt.id, name: pt.name || "", code: pt.code || "", fuente: "/v1/payment-types",
+              });
+            }
+          } catch (e2) {
+            facturaCompraDiag.errores.paymentTypes = e2.message;
+          }
+        }
       }
     }
   } else if (factura) {
@@ -1765,6 +1797,7 @@ app.post("/api/siigo/crear-productos", requireAuth, requireAdmin, async (req, re
     errores,
     facturaCompra,
     facturaCompraError,
+    facturaCompraDiag,
   });
 });
 

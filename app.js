@@ -2991,6 +2991,26 @@ document.getElementById("btnConfirmarFactura")?.addEventListener("click", async 
       html += `<br>🧾 <strong>Factura de Compra creada en Siigo</strong>: ${escapeHtml(data.facturaCompra.numero || "")} (id ${escapeHtml(String(data.facturaCompra.id || ""))})`;
     } else if (data.facturaCompraError) {
       html += `<br>❌ <strong>Factura de Compra falló</strong>: <code style="font-size:11px">${escapeHtml(data.facturaCompraError)}</code>`;
+      // Si Siigo trajo lista de medios de pago, mostrarla para que el admin elija
+      if (data.facturaCompraDiag && Array.isArray(data.facturaCompraDiag.paymentTypes)) {
+        const pts = data.facturaCompraDiag.paymentTypes;
+        if (pts.length > 0) {
+          html += `<br><br><strong>📋 Medios de pago disponibles en tu Siigo:</strong><br>`;
+          html += `<div style="margin-top:6px;padding:8px 10px;background:rgba(8,12,28,.65);border:1px solid var(--line);border-radius:6px;font-size:12px">`;
+          html += `<table style="width:100%;font-family:monospace;font-size:11.5px"><tr style="color:var(--muted)"><td style="padding:2px 8px 2px 0">ID</td><td style="padding:2px 8px 2px 0">NOMBRE</td><td style="padding:2px 0">FUENTE</td></tr>`;
+          html += pts.map(p => `<tr><td style="padding:2px 8px 2px 0"><strong>${escapeHtml(String(p.id))}</strong></td><td style="padding:2px 8px 2px 0">${escapeHtml(p.name || "(sin nombre)")} ${p.code ? `· ${escapeHtml(p.code)}` : ""}</td><td style="padding:2px 0;color:var(--muted)">${escapeHtml(p.fuente || "")}</td></tr>`).join("");
+          html += `</table><div style="margin-top:8px;font-size:11px;color:var(--muted)">👉 Decime cuál ID corresponde a "Crédito" o "CXP Auteco" y lo configuro en Render</div>`;
+          html += `</div>`;
+        } else {
+          const erroresDiag = data.facturaCompraDiag.errores || {};
+          html += `<br><br><strong>⚠️ Siigo no devolvió ningún medio de pago para Factura de Compra.</strong><br>`;
+          html += `<div style="margin-top:6px;padding:8px 10px;background:rgba(8,12,28,.65);border:1px solid var(--line);border-radius:6px;font-size:11px;color:var(--muted)">`;
+          html += `Esto suele significar que en tu Siigo no hay medios de pago configurados para Factura de Compra (FC). Hay que crearlos en Siigo primero.<br>`;
+          if (erroresDiag.documentTypes) html += `<br>Error document-types: <code>${escapeHtml(erroresDiag.documentTypes)}</code>`;
+          if (erroresDiag.paymentTypes) html += `<br>Error payment-types: <code>${escapeHtml(erroresDiag.paymentTypes)}</code>`;
+          html += `</div>`;
+        }
+      }
     }
 
     const allOk = errCount === 0 && !data.facturaCompraError;
