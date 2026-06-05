@@ -703,14 +703,32 @@ app.patch("/api/preasignaciones/:chasis", requireAuth, (req, res) => {
   if (!esDueno && usuario.rol !== "admin" && !esRolEspecial) {
     return res.status(403).json({ ok: false, error: "Sin permiso" });
   }
-  // Taller solo puede cambiar estado a lista_para_entregar (no otros campos)
+  // Taller puede: cambiar estado a lista_para_entregar, marcar acta de entrega, subir foto del acta
   if (esTaller && !esDueno && usuario.rol !== "admin") {
-    if (req.body.estado !== "lista_para_entregar") {
-      return res.status(403).json({ ok: false, error: "Taller solo puede marcar 'lista_para_entregar'" });
+    const camposTaller = ["estado", "actaEntrega", "actaEntregaArchivo"];
+    let cambioAlgo = false;
+    for (const c of camposTaller) {
+      if (req.body[c] !== undefined) {
+        // Validación específica: si está cambiando estado, solo a lista_para_entregar
+        if (c === "estado" && req.body.estado !== "lista_para_entregar") {
+          return res.status(403).json({ ok: false, error: "Taller solo puede marcar el estado como 'lista_para_entregar'" });
+        }
+        todas[chasis][c] = String(req.body[c]).trim();
+        cambioAlgo = true;
+      }
     }
-    todas[chasis].estado = "lista_para_entregar";
-    todas[chasis].listaEn = new Date().toISOString();
-    todas[chasis].listaPor = usuario.email;
+    if (!cambioAlgo) {
+      return res.status(403).json({ ok: false, error: "Taller solo puede modificar: estado, acta de entrega" });
+    }
+    // Registrar timestamps si aplica
+    if (req.body.estado === "lista_para_entregar") {
+      todas[chasis].listaEn = new Date().toISOString();
+      todas[chasis].listaPor = usuario.email;
+    }
+    if (req.body.actaEntrega) {
+      todas[chasis].actaEntregaEn = new Date().toISOString();
+      todas[chasis].actaEntregaPor = usuario.email;
+    }
   } else if (esGpsInstalar && !esDueno && usuario.rol !== "admin") {
     // GPS instalador solo puede marcar gpsInstaladoEn o gpsInstalarEvidenciaPath
     const camposPermitidosGps = ["gpsInstaladoEn", "gpsInstalarEvidenciaPath"];
