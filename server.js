@@ -1782,6 +1782,50 @@ app.get("/api/siigo/tipos-compra", requireAuth, requireAdmin, async (req, res) =
   }
 });
 
+// --- Siigo: extraer payment_types de los tipos FC en forma simplificada ---
+// Solo admin. GET /api/siigo/payment-types-fc
+// Devuelve una lista plana de {id, name, code, docTypeName} para que el admin
+// pueda elegir el ID correcto a poner en SIIGO_FC_PAYMENT_TYPE_ID.
+app.get("/api/siigo/payment-types-fc", requireAuth, requireAdmin, async (req, res) => {
+  if (!siigo.siigoConfigurado()) {
+    return res.status(503).json({ ok: false, error: "Siigo no configurado" });
+  }
+  try {
+    const lista = await siigo.listarTiposDocumento("FC");
+    const tipos = Array.isArray(lista) ? lista : (lista.results || []);
+    const paymentTypes = [];
+    const vistos = new Set();
+    for (const doc of tipos) {
+      const pts = Array.isArray(doc.payment_types) ? doc.payment_types : [];
+      for (const pt of pts) {
+        const key = `${pt.id}`;
+        if (vistos.has(key)) continue;
+        vistos.add(key);
+        paymentTypes.push({
+          id: pt.id,
+          name: pt.name || "",
+          code: pt.code || "",
+          docTypeName: doc.name || doc.code || "FC",
+        });
+      }
+    }
+    const actualEnv = process.env.SIIGO_FC_PAYMENT_TYPE_ID
+      ? parseInt(process.env.SIIGO_FC_PAYMENT_TYPE_ID, 10)
+      : null;
+    res.json({
+      ok: true,
+      paymentTypes,
+      configActual: {
+        SIIGO_FC_DOC_TYPE_ID: process.env.SIIGO_FC_DOC_TYPE_ID || "(no configurado, se autodetecta)",
+        SIIGO_FC_PAYMENT_TYPE_ID: actualEnv || "(no configurado, se autodetecta)",
+      },
+      instrucciones: "Copia el ID del medio de pago que quieres usar (idealmente uno tipo 'Credito' o 'CXP Proveedores') y configuralo en Render como variable de entorno SIIGO_FC_PAYMENT_TYPE_ID, o dejalo sin configurar para que el sistema lo elija automaticamente.",
+    });
+  } catch (e) {
+    res.status(500).json({ ok: false, error: e.message });
+  }
+});
+
 // --- Health (público, útil para diagnóstico) ---
 app.get("/api/health", (req, res) => {
   res.json({

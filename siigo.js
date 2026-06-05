@@ -342,10 +342,29 @@ async function crearFacturaCompra(datos) {
   if (!nitProveedor) throw new Error("nitProveedor es obligatorio");
   if (items.length === 0) throw new Error("items vacio");
 
-  const paymentTypeId = datos.paymentTypeId
+  let paymentTypeId = datos.paymentTypeId
     || (process.env.SIIGO_FC_PAYMENT_TYPE_ID ? parseInt(process.env.SIIGO_FC_PAYMENT_TYPE_ID, 10) : null);
+
+  // Auto-deteccion: si no hay env var, intentar descubrir un payment_type desde el doc FC
   if (!paymentTypeId) {
-    throw new Error("Falta SIIGO_FC_PAYMENT_TYPE_ID en variables de entorno (ID del medio de pago credito en tu Siigo)");
+    try {
+      const lista = await listarTiposDocumento("FC");
+      const tipos = Array.isArray(lista) ? lista : (lista.results || []);
+      const fc = tipos.find(t => t.id === tipoFC.id) || tipos[0];
+      if (fc && Array.isArray(fc.payment_types) && fc.payment_types.length > 0) {
+        // Preferir uno que parezca credito (CXP/credito/30dias) sobre los demas
+        const credito = fc.payment_types.find(p => /cred|cxp|prove|30/i.test((p.name || "") + " " + (p.code || "")))
+          || fc.payment_types[0];
+        paymentTypeId = credito.id;
+        console.log(`[siigo] payment_type auto-detectado para FC: "${credito.name || credito.code}" id=${credito.id}`);
+      }
+    } catch (e) {
+      console.warn("[siigo] auto-deteccion de payment_type fallo:", e.message);
+    }
+  }
+
+  if (!paymentTypeId) {
+    throw new Error("No se encontro un medio de pago para Factura de Compra. Configura SIIGO_FC_PAYMENT_TYPE_ID en variables de entorno (Render). Para ver los disponibles abre /api/siigo/payment-types-fc");
   }
 
   const body = {
