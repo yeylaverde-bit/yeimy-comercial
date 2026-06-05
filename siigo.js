@@ -431,7 +431,7 @@ async function crearFacturaCompra(datos) {
       prefix: providerPrefix || "FE",
       number: String(providerNumber || numero).replace(/[^0-9]/g, "") || "0",
     },
-    currency: { code: "COP" },
+    currency: { code: "COP", exchange_rate: 1 },
     items: items.map(it => ({
       type: "Product",
       code: String(it.code || ""),
