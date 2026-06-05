@@ -1669,16 +1669,21 @@ app.get("/api/siigo/buscar/:chasis", requireAuth, async (req, res) => {
   }
 });
 
-// --- Siigo: crear productos (motos) en lote desde factura Auteco ---
-// Solo admin. Body esperado: { motos: [{modelo, marca, color, anio, chasis, motor, precio, cilindraje}, ...] }
+// --- Siigo: crear productos (motos) + Factura de Compra desde factura Auteco ---
+// Solo admin. Body esperado:
+//   { motos: [{referencia, modelo, marca, color, anio, chasis, motor, precio, cilindraje}, ...],
+//     factura: {numeroFactura, fechaFactura, proveedorNit, proveedorNombre, subtotal, iva, total, condicionPago} }
 app.post("/api/siigo/crear-productos", requireAuth, requireAdmin, async (req, res) => {
   if (!siigo.siigoConfigurado()) {
     return res.status(503).json({ ok: false, error: "Siigo no configurado" });
   }
   const motos = Array.isArray(req.body?.motos) ? req.body.motos : [];
+  const factura = req.body?.factura && typeof req.body.factura === "object" ? req.body.factura : null;
   if (motos.length === 0) {
     return res.status(400).json({ ok: false, error: "Sin motos para crear" });
   }
+
+  // Paso 1: crear cada moto como Producto en Siigo
   const creados = [];
   const errores = [];
   for (const m of motos) {
@@ -1687,20 +1692,94 @@ app.post("/api/siigo/crear-productos", requireAuth, requireAdmin, async (req, re
       creados.push({
         chasis: m.chasis,
         modelo: m.modelo,
+        referencia: m.referencia,
         id: resultado.id || null,
-        code: resultado.code || null,
+        code: resultado.code || (m.motor || m.chasis),
       });
     } catch (e) {
-      errores.push({
-        chasis: m.chasis,
-        modelo: m.modelo,
-        error: e.message,
-      });
+      // "already_exists" no es error real: el producto ya estaba creado
+      const yaExiste = /already_exists|already exists/i.test(e.message);
+      if (yaExiste) {
+        creados.push({
+          chasis: m.chasis,
+          modelo: m.modelo,
+          referencia: m.referencia,
+          id: null,
+          code: m.motor || m.chasis,
+          yaExistia: true,
+        });
+      } else {
+        errores.push({
+          chasis: m.chasis,
+          modelo: m.modelo,
+          error: e.message,
+        });
+      }
     }
   }
   // Invalidar cache de productos para que la próxima lectura traiga los nuevos
   siigoCache = { data: null, fetchedAt: 0 };
-  res.json({ ok: true, total: motos.length, creados, errores });
+
+  // Paso 2: crear Factura de Compra si llegaron datos de cabecera
+  let facturaCompra = null;
+  let facturaCompraError = null;
+  if (factura && factura.numeroFactura && factura.fechaFactura && factura.proveedorNit) {
+    if (creados.length === 0) {
+      facturaCompraError = "No se creo Factura de Compra porque ningun producto se creo exitosamente";
+    } else {
+      try {
+        // Items para la factura: solo los que se crearon (no los errores)
+        const itemsFactura = creados.map(c => {
+          const moto = motos.find(m => m.chasis === c.chasis) || {};
+          return {
+            code: c.code,
+            description: `MOTOCICLETA ${moto.modelo || ""} ${moto.color || ""} ${moto.anio || ""}`.trim(),
+            price: Number(moto.precio) || 0,
+          };
+        });
+        const resultado = await siigo.crearFacturaCompra({
+          fecha: factura.fechaFactura,
+          numero: factura.numeroFactura,
+          nitProveedor: factura.proveedorNit,
+          items: itemsFactura,
+          total: Number(factura.total) || itemsFactura.reduce((s, i) => s + i.price * 1.19, 0),
+          observaciones: `${factura.numeroFactura} - ${factura.proveedorNombre || "AUTOTECNICA"} - ${factura.condicionPago || ""}`.trim(),
+        });
+        facturaCompra = {
+          id: resultado.id || null,
+          name: resultado.name || null,
+          numero: resultado.number || factura.numeroFactura,
+        };
+      } catch (e) {
+        facturaCompraError = e.message;
+      }
+    }
+  } else if (factura) {
+    facturaCompraError = "Datos incompletos en factura (falta numero, fecha o NIT proveedor)";
+  }
+
+  res.json({
+    ok: true,
+    total: motos.length,
+    creados,
+    errores,
+    facturaCompra,
+    facturaCompraError,
+  });
+});
+
+// --- Siigo: listar tipos de Factura de Compra disponibles (ayuda para configurar IDs) ---
+// Solo admin. GET /api/siigo/tipos-compra
+app.get("/api/siigo/tipos-compra", requireAuth, requireAdmin, async (req, res) => {
+  if (!siigo.siigoConfigurado()) {
+    return res.status(503).json({ ok: false, error: "Siigo no configurado" });
+  }
+  try {
+    const lista = await siigo.listarTiposDocumento("FC");
+    res.json({ ok: true, tipos: lista });
+  } catch (e) {
+    res.status(500).json({ ok: false, error: e.message });
+  }
 });
 
 // --- Health (público, útil para diagnóstico) ---

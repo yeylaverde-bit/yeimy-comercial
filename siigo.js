@@ -258,10 +258,146 @@ async function crearProducto(datos) {
   return await resp.json();
 }
 
+// ============================================================
+//      FACTURA DE COMPRA — POST /v1/purchases
+// ============================================================
+// Cachea el ID del tipo de documento "Factura de Compra" (FC) para no consultarlo
+// en cada llamada. Se invalida cuando arranca el server o cuando falla la autenticacion.
+let tipoFCCache = { id: null, name: null, fetchedAt: 0 };
+const TIPO_FC_TTL_MS = 60 * 60 * 1000; // 1h
+
+/**
+ * Lista los tipos de documento de Siigo, opcionalmente filtrados.
+ * type: "FC" (Factura de Compra), "FV" (Factura Venta), etc.
+ */
+async function listarTiposDocumento(type) {
+  const jwt = await obtenerToken();
+  const qs = type ? `?type=${encodeURIComponent(type)}` : "";
+  const url = `${SIIGO_BASE}/v1/document-types${qs}`;
+  const resp = await fetch(url, {
+    headers: {
+      "Authorization": `Bearer ${jwt}`,
+      "Partner-Id": PARTNER_ID,
+    },
+  });
+  if (!resp.ok) {
+    const txt = await resp.text().catch(() => "");
+    throw new Error(`Siigo GET /v1/document-types ${resp.status}: ${txt.slice(0, 200)}`);
+  }
+  return await resp.json();
+}
+
+/**
+ * Obtiene el ID del tipo "Factura de Compra".
+ * Prioridad:
+ *   1. process.env.SIIGO_FC_DOC_TYPE_ID si esta definido
+ *   2. Cache si todavia es valido
+ *   3. Llamada a Siigo: primer FC activo
+ */
+async function obtenerTipoFacturaCompra() {
+  if (process.env.SIIGO_FC_DOC_TYPE_ID) {
+    return { id: parseInt(process.env.SIIGO_FC_DOC_TYPE_ID, 10), name: "(env)" };
+  }
+  const now = Date.now();
+  if (tipoFCCache.id && tipoFCCache.fetchedAt + TIPO_FC_TTL_MS > now) {
+    return { id: tipoFCCache.id, name: tipoFCCache.name };
+  }
+  const lista = await listarTiposDocumento("FC");
+  const tipos = Array.isArray(lista) ? lista : (lista.results || []);
+  const activo = tipos.find(t => t.active !== false) || tipos[0];
+  if (!activo || !activo.id) {
+    throw new Error("Siigo no devolvio ningun tipo de documento 'FC' (Factura de Compra) activo");
+  }
+  tipoFCCache = { id: activo.id, name: activo.name || activo.code || "FC", fetchedAt: now };
+  return { id: activo.id, name: tipoFCCache.name };
+}
+
+/**
+ * Crea una Factura de Compra en Siigo.
+ *
+ * Required en datos:
+ *   - fecha           "YYYY-MM-DD"
+ *   - numero          ej "F660057710" (solo para observations / trazabilidad)
+ *   - nitProveedor    solo digitos, ej "890900317"
+ *   - items[]         [{ code, description, price }, ...]  cada code debe existir como producto
+ *   - total           numero, valor total de la factura
+ *
+ * Opcionales:
+ *   - observaciones  texto libre
+ *   - paymentTypeId  override del medio de pago (default: process.env.SIIGO_FC_PAYMENT_TYPE_ID)
+ *   - costCenterId   override del centro de costos
+ */
+async function crearFacturaCompra(datos) {
+  const jwt = await obtenerToken();
+  const tipoFC = await obtenerTipoFacturaCompra();
+
+  const fecha = String(datos.fecha || "").trim();
+  const numero = String(datos.numero || "").trim();
+  const nitProveedor = String(datos.nitProveedor || "").trim().replace(/[^0-9]/g, "");
+  const items = Array.isArray(datos.items) ? datos.items : [];
+  const total = Number(datos.total) || 0;
+  const observaciones = String(datos.observaciones || `Factura ${numero} - Auteco`).slice(0, 250);
+
+  if (!fecha) throw new Error("fecha es obligatoria (YYYY-MM-DD)");
+  if (!nitProveedor) throw new Error("nitProveedor es obligatorio");
+  if (items.length === 0) throw new Error("items vacio");
+
+  const paymentTypeId = datos.paymentTypeId
+    || (process.env.SIIGO_FC_PAYMENT_TYPE_ID ? parseInt(process.env.SIIGO_FC_PAYMENT_TYPE_ID, 10) : null);
+  if (!paymentTypeId) {
+    throw new Error("Falta SIIGO_FC_PAYMENT_TYPE_ID en variables de entorno (ID del medio de pago credito en tu Siigo)");
+  }
+
+  const body = {
+    document: { id: tipoFC.id },
+    date: fecha,
+    supplier: { identification: nitProveedor },
+    currency: { code: "COP" },
+    items: items.map(it => ({
+      code: String(it.code || ""),
+      description: String(it.description || ""),
+      quantity: 1,
+      price: Number(it.price) || 0,
+      taxes: [{ id: 7801 }], // IVA 19%
+    })),
+    payments: [{
+      id: paymentTypeId,
+      value: total,
+    }],
+    observations: observaciones,
+  };
+
+  if (datos.costCenterId) {
+    body.cost_center = parseInt(datos.costCenterId, 10);
+  }
+
+  console.log("[siigo] POST /v1/purchases body:", JSON.stringify(body));
+
+  const resp = await fetch(`${SIIGO_BASE}/v1/purchases`, {
+    method: "POST",
+    headers: {
+      "Authorization": `Bearer ${jwt}`,
+      "Partner-Id": PARTNER_ID,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(body),
+  });
+
+  if (!resp.ok) {
+    const txt = await resp.text().catch(() => "");
+    throw new Error(`Siigo POST /v1/purchases ${resp.status}: ${txt.slice(0, 400)}`);
+  }
+
+  return await resp.json();
+}
+
 module.exports = {
   siigoConfigurado,
   obtenerToken,
   obtenerProductos,
   normalizarProducto,
   crearProducto,
+  listarTiposDocumento,
+  obtenerTipoFacturaCompra,
+  crearFacturaCompra,
 };

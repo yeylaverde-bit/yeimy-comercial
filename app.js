@@ -2823,6 +2823,10 @@ if (gpsActivarSearchEl) gpsActivarSearchEl.addEventListener("input", e => { gpsS
 // ============================================================
 //          FACTURA AUTECO — OCR con Claude Vision (solo admin)
 // ============================================================
+// Guardamos los datos de cabecera de la factura procesada para enviarlos a Siigo
+// junto con las motos cuando se confirme.
+let facturaCabeceraActual = null;
+
 const formFactura = document.getElementById("formFactura");
 if (formFactura) {
   formFactura.addEventListener("submit", async (ev) => {
@@ -2836,6 +2840,7 @@ if (formFactura) {
     btn.disabled = true;
     btn.textContent = "Procesando…";
     document.getElementById("facturaResultado").style.display = "none";
+    facturaCabeceraActual = null;
 
     try {
       const r = await fetch("/api/factura/procesar", { method: "POST", body: fd });
@@ -2848,7 +2853,9 @@ if (formFactura) {
         } else {
           msg.className = "form-msg form-msg-ok";
           const tokens = data.usoTokens ? ` · Tokens: ${data.usoTokens.input}+${data.usoTokens.output}` : "";
-          msg.innerHTML = `✅ <strong>${n} ${n === 1 ? 'moto detectada' : 'motos detectadas'}</strong>. Revisa y corrige abajo antes de confirmar.${tokens}`;
+          facturaCabeceraActual = data.factura || null;
+          const cabHtml = renderFacturaCabecera(facturaCabeceraActual);
+          msg.innerHTML = `✅ <strong>${n} ${n === 1 ? 'moto detectada' : 'motos detectadas'}</strong>. Revisa y corrige abajo antes de confirmar.${tokens}${cabHtml}`;
           renderFacturaMotos(data.motos);
           document.getElementById("facturaResultado").style.display = "block";
         }
@@ -2864,6 +2871,19 @@ if (formFactura) {
       btn.textContent = "🤖 Procesar con IA";
     }
   });
+}
+
+function renderFacturaCabecera(f) {
+  if (!f || !f.numeroFactura) return "";
+  const fmtCOP = n => (Number(n) || 0).toLocaleString("es-CO");
+  return `
+    <div style="margin-top:10px;padding:10px 12px;background:rgba(8,12,28,.55);border:1px solid var(--line);border-radius:8px;font-size:12px;line-height:1.6">
+      📄 <strong>Cabecera de la factura</strong> — se usará para crear la Factura de Compra en Siigo:<br>
+      <span style="color:var(--muted)">Número:</span> <code>${escapeHtml(f.numeroFactura || "?")}</code> ·
+      <span style="color:var(--muted)">Fecha:</span> <code>${escapeHtml(f.fechaFactura || "?")}</code> ·
+      <span style="color:var(--muted)">Proveedor:</span> ${escapeHtml(f.proveedorNombre || "?")} (NIT ${escapeHtml(f.proveedorNit || "?")}) ·
+      <span style="color:var(--muted)">Total:</span> $${fmtCOP(f.total)}
+    </div>`;
 }
 
 function renderFacturaMotos(motos) {
@@ -2915,20 +2935,26 @@ document.getElementById("btnCancelarFactura")?.addEventListener("click", () => {
 document.getElementById("btnConfirmarFactura")?.addEventListener("click", async () => {
   const motos = recolectarMotosFactura();
   if (motos.length === 0) { showToast("No hay motos marcadas para enviar"); return; }
-  if (!confirm(`¿Enviar ${motos.length} ${motos.length === 1 ? 'moto' : 'motos'} al inventario de Siigo?\n\nEsto las creará como productos nuevos en Siigo con sus datos (chasis, motor, modelo, precio).`)) return;
+  const conFactura = facturaCabeceraActual && facturaCabeceraActual.numeroFactura;
+  const msgConfirm = conFactura
+    ? `¿Enviar ${motos.length} ${motos.length === 1 ? 'moto' : 'motos'} a Siigo?\n\nSe creará:\n1) ${motos.length} producto(s) en el inventario\n2) Factura de Compra ${facturaCabeceraActual.numeroFactura} a nombre de ${facturaCabeceraActual.proveedorNombre || "AUTOTECNICA"}`
+    : `¿Enviar ${motos.length} ${motos.length === 1 ? 'moto' : 'motos'} al inventario de Siigo?\n\nEsto las creará como productos nuevos en Siigo con sus datos (chasis, motor, modelo, precio).`;
+  if (!confirm(msgConfirm)) return;
 
   const msg = document.getElementById("facturaMsg");
   const btn = document.getElementById("btnConfirmarFactura");
   btn.disabled = true; btn.textContent = "Enviando a Siigo…";
   msg.style.display = "block";
   msg.className = "form-msg";
-  msg.textContent = `🚀 Creando ${motos.length} producto(s) en Siigo...`;
+  msg.textContent = conFactura
+    ? `🚀 Creando ${motos.length} producto(s) + Factura de Compra en Siigo...`
+    : `🚀 Creando ${motos.length} producto(s) en Siigo...`;
 
   try {
     const r = await fetch("/api/siigo/crear-productos", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ motos }),
+      body: JSON.stringify({ motos, factura: facturaCabeceraActual }),
     });
     const data = await r.json();
 
@@ -2940,11 +2966,18 @@ document.getElementById("btnConfirmarFactura")?.addEventListener("click", async 
     }
 
     const okCount = data.creados?.length || 0;
+    const yaExistianCount = (data.creados || []).filter(c => c.yaExistia).length;
+    const realmenteNuevos = okCount - yaExistianCount;
     const errCount = data.errores?.length || 0;
-    let html = `<strong>${okCount} de ${data.total} motos creadas en Siigo.</strong>`;
-    if (okCount > 0) {
-      html += `<br><br>✅ <strong>Creadas:</strong><ul style="margin:6px 0 0 18px;font-size:12px">`;
-      html += data.creados.map(c => `<li>${escapeHtml(c.modelo || "—")} · chasis <code>${escapeHtml(c.chasis || "—")}</code></li>`).join("");
+    let html = `<strong>${okCount} de ${data.total} motos procesadas en Siigo.</strong>`;
+    if (realmenteNuevos > 0) {
+      html += `<br><br>✅ <strong>${realmenteNuevos} creadas:</strong><ul style="margin:6px 0 0 18px;font-size:12px">`;
+      html += data.creados.filter(c => !c.yaExistia).map(c => `<li>${escapeHtml(c.modelo || "—")} · chasis <code>${escapeHtml(c.chasis || "—")}</code>${c.referencia ? " · ref " + escapeHtml(c.referencia) : ""}</li>`).join("");
+      html += `</ul>`;
+    }
+    if (yaExistianCount > 0) {
+      html += `<br>ℹ️ <strong>${yaExistianCount} ya existían en Siigo</strong> (no se duplicaron):<ul style="margin:6px 0 0 18px;font-size:12px;color:#9bb0d6">`;
+      html += data.creados.filter(c => c.yaExistia).map(c => `<li>${escapeHtml(c.modelo || "—")} · chasis <code>${escapeHtml(c.chasis || "—")}</code></li>`).join("");
       html += `</ul>`;
     }
     if (errCount > 0) {
@@ -2953,7 +2986,15 @@ document.getElementById("btnConfirmarFactura")?.addEventListener("click", async 
       html += `</ul>`;
     }
 
-    msg.className = errCount === 0 ? "form-msg form-msg-ok" : "form-msg form-msg-info";
+    // Mostrar resultado de Factura de Compra
+    if (data.facturaCompra) {
+      html += `<br>🧾 <strong>Factura de Compra creada en Siigo</strong>: ${escapeHtml(data.facturaCompra.numero || "")} (id ${escapeHtml(String(data.facturaCompra.id || ""))})`;
+    } else if (data.facturaCompraError) {
+      html += `<br>❌ <strong>Factura de Compra falló</strong>: <code style="font-size:11px">${escapeHtml(data.facturaCompraError)}</code>`;
+    }
+
+    const allOk = errCount === 0 && !data.facturaCompraError;
+    msg.className = allOk ? "form-msg form-msg-ok" : "form-msg form-msg-info";
     msg.innerHTML = html;
 
     // Refrescar inventario en background para mostrar las nuevas
