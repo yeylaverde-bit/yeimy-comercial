@@ -1309,6 +1309,42 @@ app.post("/api/comisiones/marcar", requireAuth, requireAdmin, (req, res) => {
   res.json({ ok: true, id, pagada: !!pagada });
 });
 
+// --- Origen de la venta: "personal" (5%) vs "concesionario" (2%) ---
+// Solo se guardan las "personal" — todas las demás se asumen concesionario por default.
+const ORIGEN_VENTAS_PATH = path.join(DATA_DIR, "origen-ventas.json");
+function leerOrigenVentas() {
+  try { if (fs.existsSync(ORIGEN_VENTAS_PATH)) return JSON.parse(fs.readFileSync(ORIGEN_VENTAS_PATH, "utf8")); }
+  catch (e) { console.warn("[origen-ventas]", e.message); }
+  return {};
+}
+function guardarOrigenVentas(data) {
+  fs.writeFileSync(ORIGEN_VENTAS_PATH, JSON.stringify(data, null, 2), "utf8");
+}
+
+app.get("/api/origen-ventas", requireAuth, requireAdmin, (req, res) => {
+  res.json({ ok: true, origen: leerOrigenVentas() });
+});
+
+app.post("/api/origen-ventas/marcar", requireAuth, requireAdmin, (req, res) => {
+  const { id, origen } = req.body || {};
+  if (!id) return res.status(400).json({ ok: false, error: "Falta id de la venta" });
+  if (origen && !["personal", "concesionario"].includes(origen)) {
+    return res.status(400).json({ ok: false, error: "Origen inválido" });
+  }
+  const data = leerOrigenVentas();
+  if (origen === "personal") {
+    data[String(id)] = {
+      origen: "personal",
+      marcadoEn: new Date().toISOString(),
+      marcadoPor: req.session.userEmail,
+    };
+  } else {
+    delete data[String(id)]; // concesionario es el default, no se guarda
+  }
+  guardarOrigenVentas(data);
+  res.json({ ok: true, id, origen: origen || "concesionario" });
+});
+
 // --- Panel admin: sesiones activas ---
 function parsearUserAgent(ua) {
   if (!ua) return { dispositivo: "—", navegador: "—", esMobile: false };

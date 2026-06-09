@@ -22,7 +22,11 @@ const ASESORES_ACTIVOS = [
 
 // Asesor para la vista "Mis ventas" (Yeimi) — debe coincidir con el nombre en la hoja
 const MI_NOMBRE = "YEIMI";
-const COMISION_PCT = 0.05; // 5% antes de IVA
+// Comisiones según origen de la venta:
+//   personal      → 5% (ventas tuyas, por tus contactos/redes)
+//   concesionario → 2% (ventas que llegan por el concesionario)
+const COMISION_PCT_PERSONAL = 0.05;
+const COMISION_PCT_CONCESIONARIO = 0.02;
 function esActivo(asesor) {
   if (!asesor) return false;
   const n = asesor.trim().toUpperCase();
@@ -37,6 +41,7 @@ const state = {
   filters: { asesor: "", marca: "", medio: "", anio: "", mes: "", search: "" },
   charts: {},
   comisionesPagadas: {}, // { "<id_venta>": { pagada: true, fechaPago: "ISO" } }
+  origenVentas: {},       // { "<id_venta>": { origen: "personal", marcadoEn } } — default concesionario
 };
 
 function idVenta(r) {
@@ -46,6 +51,11 @@ function idVenta(r) {
 async function loadComisionesPagadas() {
   if (!currentUser || currentUser.rol !== "admin") return;
   try {
+    const r0 = await fetch("/api/origen-ventas").catch(() => null);
+    if (r0 && r0.ok) {
+      const d0 = await r0.json();
+      if (d0.ok) state.origenVentas = d0.origen || {};
+    }
     const r = await fetch("/api/comisiones/pagadas");
     if (!r.ok) return;
     const data = await r.json();
@@ -139,7 +149,11 @@ function normalizeRow(raw) {
   // "Antes de IVA" = precio dividido entre 1.19 (sacar la base gravable del 19%)
   // Esto da el mismo resultado que la tabla personal de Yeimi.
   const precioSinIva = monto / 1.19;
-  const comision = precioSinIva * COMISION_PCT;
+  // Determinar origen: si está en state.origenVentas como "personal" → 5%; sino → 2%
+  const facturaId = pick(raw, ["Num_Factura", "Nro._Factura", "Factura"]);
+  const origen = state.origenVentas?.[String(facturaId).trim()]?.origen === "personal" ? "personal" : "concesionario";
+  const pctComision = origen === "personal" ? COMISION_PCT_PERSONAL : COMISION_PCT_CONCESIONARIO;
+  const comision = precioSinIva * pctComision;
   // En la hoja real, la marca está en la columna llamada ":" y el modelo en "LINEA"
   const marca = pick(raw, [":", "Socio_Cormercial", "Socio_Comercial", "Marca"]).toUpperCase();
   const modelo = pick(raw, ["LINEA", "Modelo_Moto_Disponible", "Modelo"]).toUpperCase();
@@ -161,11 +175,38 @@ function normalizeRow(raw) {
 
   return {
     fecha, fechaStr, monto, costoCompra, utilidad, iva, precioSinIva, comision,
+    origen, pctComision,
     marca, modelo, color, chasis, factura, cliente, municipio, canal, placa,
     asesor, medio, medioCls: cls, financiera,
     anio: fecha ? fecha.getFullYear() : null,
     mes: fecha ? `${fecha.getFullYear()}-${String(fecha.getMonth() + 1).padStart(2, "0")}` : null,
   };
+}
+
+// Cambiar origen de una venta (admin only) — toggle entre personal / concesionario
+async function cambiarOrigenVenta(facturaId, nuevoOrigen) {
+  if (!facturaId) return;
+  try {
+    const r = await fetch("/api/origen-ventas/marcar", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id: String(facturaId).trim(), origen: nuevoOrigen }),
+    });
+    const data = await r.json();
+    if (data.ok) {
+      // Actualizar state local
+      if (nuevoOrigen === "personal") {
+        state.origenVentas[String(facturaId).trim()] = { origen: "personal", marcadoEn: new Date().toISOString() };
+      } else {
+        delete state.origenVentas[String(facturaId).trim()];
+      }
+      showToast(nuevoOrigen === "personal" ? "🤝 Marcada como TUYA (5%)" : "🏪 Marcada como CONCESIONARIO (2%)");
+      // Recalcular comisión: re-procesar state.rows
+      await loadData();
+    } else {
+      showToast("Error: " + (data.error || "no se pudo cambiar"));
+    }
+  } catch (e) { showToast("Error: " + e.message); }
 }
 
 function isSold(r) {
@@ -345,6 +386,10 @@ function renderMisVentas() {
     const fechaPagoFmt = isPagada && pagadaInfo.fechaPago
       ? new Date(pagadaInfo.fechaPago).toLocaleDateString("es-CO")
       : "";
+    // Botón toggle de origen (5% mía / 2% concesionario)
+    const esPersonal = r.origen === "personal";
+    const origenBtn = `<button class="btn-origen ${esPersonal ? "es-personal" : "es-concesionario"}" data-origen-fact="${escapeHtml(r.factura || "")}" data-origen-actual="${r.origen}" title="Click para cambiar origen" style="padding:3px 8px;font-size:10.5px;border-radius:6px;cursor:pointer;border:1px solid ${esPersonal ? "rgba(91,229,138,.5)" : "rgba(120,120,140,.4)"};background:${esPersonal ? "rgba(91,229,138,.12)" : "rgba(120,120,140,.12)"};color:${esPersonal ? "#5be58a" : "#aaa"};white-space:nowrap;margin-top:3px">${esPersonal ? "🤝 Mía 5%" : "🏪 Conc 2%"}</button>`;
+
     return `
       <tr class="${isPagada ? 'fila-pagada' : ''}" data-vid="${escapeHtml(id)}">
         <td>${r.fecha ? r.fecha.toLocaleDateString("es-CO") : "—"}</td>
@@ -355,7 +400,10 @@ function renderMisVentas() {
         <td class="num">${fmtCOP.format(r.monto)}</td>
         <td class="num muted-cell">${fmtCOP.format(r.iva)}</td>
         <td class="num">${fmtCOP.format(r.precioSinIva)}</td>
-        <td class="num"><strong data-comision style="color:#5be58a">${fmtCOP.format(r.comision)}</strong></td>
+        <td class="num">
+          <strong data-comision style="color:${esPersonal ? "#5be58a" : "#aaa"}">${fmtCOP.format(r.comision)}</strong>
+          <br>${origenBtn}
+        </td>
         <td style="text-align:center">
           <input type="checkbox" class="chk-pagada" data-vid="${escapeHtml(id)}" ${isPagada ? 'checked' : ''} title="${isPagada ? 'Pagada el ' + fechaPagoFmt : 'Marcar como pagada'}" />
           ${isPagada ? `<span class="fecha-pago">${fechaPagoFmt}</span>` : ''}
@@ -373,6 +421,16 @@ function renderMisVentas() {
       const id = ev.target.dataset.vid;
       const pagada = ev.target.checked;
       marcarComisionPagada(id, pagada);
+    });
+  });
+
+  // Conectar botones de origen (toggle)
+  tbody.querySelectorAll(".btn-origen").forEach(btn => {
+    btn.addEventListener("click", (ev) => {
+      const factura = ev.currentTarget.dataset.origenFact;
+      const actual = ev.currentTarget.dataset.origenActual;
+      const nuevo = actual === "personal" ? "concesionario" : "personal";
+      cambiarOrigenVenta(factura, nuevo);
     });
   });
 }
