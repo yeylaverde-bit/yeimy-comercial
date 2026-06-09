@@ -149,9 +149,10 @@ function normalizeRow(raw) {
   // "Antes de IVA" = precio dividido entre 1.19 (sacar la base gravable del 19%)
   // Esto da el mismo resultado que la tabla personal de Yeimi.
   const precioSinIva = monto / 1.19;
-  // Determinar origen: si está en state.origenVentas como "personal" → 5%; sino → 2%
+  // Determinar origen: DEFAULT es "personal" (5%) porque la mayoría de tus ventas son tuyas.
+  // Si está marcada explícitamente como "concesionario" → 2%.
   const facturaId = pick(raw, ["Num_Factura", "Nro._Factura", "Factura"]);
-  const origen = state.origenVentas?.[String(facturaId).trim()]?.origen === "personal" ? "personal" : "concesionario";
+  const origen = state.origenVentas?.[String(facturaId).trim()]?.origen === "concesionario" ? "concesionario" : "personal";
   const pctComision = origen === "personal" ? COMISION_PCT_PERSONAL : COMISION_PCT_CONCESIONARIO;
   const comision = precioSinIva * pctComision;
   // En la hoja real, la marca está en la columna llamada ":" y el modelo en "LINEA"
@@ -194,9 +195,9 @@ async function cambiarOrigenVenta(facturaId, nuevoOrigen) {
     });
     const data = await r.json();
     if (data.ok) {
-      // Actualizar state local
-      if (nuevoOrigen === "personal") {
-        state.origenVentas[String(facturaId).trim()] = { origen: "personal", marcadoEn: new Date().toISOString() };
+      // Actualizar state local — guardamos solo las "concesionario" (excepciones); personal es default
+      if (nuevoOrigen === "concesionario") {
+        state.origenVentas[String(facturaId).trim()] = { origen: "concesionario", marcadoEn: new Date().toISOString() };
       } else {
         delete state.origenVentas[String(facturaId).trim()];
       }

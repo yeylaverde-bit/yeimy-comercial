@@ -1332,17 +1332,18 @@ app.post("/api/origen-ventas/marcar", requireAuth, requireAdmin, (req, res) => {
     return res.status(400).json({ ok: false, error: "Origen inválido" });
   }
   const data = leerOrigenVentas();
-  if (origen === "personal") {
+  // Default es "personal" (5%) → solo se guardan las marcadas como "concesionario" (excepciones)
+  if (origen === "concesionario") {
     data[String(id)] = {
-      origen: "personal",
+      origen: "concesionario",
       marcadoEn: new Date().toISOString(),
       marcadoPor: req.session.userEmail,
     };
   } else {
-    delete data[String(id)]; // concesionario es el default, no se guarda
+    delete data[String(id)]; // personal es el default, no se guarda
   }
   guardarOrigenVentas(data);
-  res.json({ ok: true, id, origen: origen || "concesionario" });
+  res.json({ ok: true, id, origen: origen || "personal" });
 });
 
 // --- Panel admin: sesiones activas ---
