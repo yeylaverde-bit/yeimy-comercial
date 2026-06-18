@@ -4189,6 +4189,177 @@ async function loadCurrentUser() {
   }
 }
 
+// ============================================================
+//          GESTIÓN DE USUARIOS (solo admin)
+// ============================================================
+async function loadUsuariosAdmin() {
+  if (currentUser?.rol !== "admin") return;
+  try {
+    const r = await fetch("/api/usuarios");
+    if (!r.ok) return;
+    const data = await r.json();
+    if (data.ok) renderUsuariosAdmin(data.usuarios || []);
+  } catch (e) { console.warn("loadUsuariosAdmin:", e.message); }
+}
+
+function renderUsuariosAdmin(usuarios) {
+  const tbody = document.querySelector("#tblUsuarios tbody");
+  if (!tbody) return;
+  const rolTag = (rol) => ({
+    admin: '<span class="tag" style="background:rgba(124,92,255,.2);color:#a78bfa">Admin</span>',
+    asesor: '<span class="tag" style="background:rgba(34,211,238,.2);color:#22d3ee">Asesor</span>',
+    contable: '<span class="tag" style="background:rgba(34,197,94,.2);color:#5be58a">Contable</span>',
+    dueno: '<span class="tag" style="background:rgba(59,130,246,.2);color:#60a5fa">Dueño</span>',
+    taller: '<span class="tag" style="background:rgba(249,115,22,.2);color:#fb923c">Taller</span>',
+    gps_instalar: '<span class="tag" style="background:rgba(6,182,212,.2);color:#22d3ee">GPS Inst.</span>',
+    gps_activar: '<span class="tag" style="background:rgba(168,85,247,.2);color:#c084fc">GPS Act.</span>',
+  })[rol] || rol;
+
+  tbody.innerHTML = usuarios.map(u => {
+    const estadoClave = u.debeChangePass
+      ? '<span class="tag tag-financiado">⚠️ Pendiente cambio</span>'
+      : '<span class="tag tag-contado">✓ Activa</span>';
+    const ultCambio = u.passwordCambiadaEn
+      ? new Date(u.passwordCambiadaEn).toLocaleDateString("es-CO")
+      : (u.creadoEn ? new Date(u.creadoEn).toLocaleDateString("es-CO") + " (creación)" : "—");
+    const esYo = u.email === currentUser?.email;
+    return `<tr>
+      <td><strong>${escapeHtml(u.nombre)} ${escapeHtml(u.apellido || "")}</strong>${esYo ? ' <span style="color:#5be58a;font-size:10px">(yo)</span>' : ""}</td>
+      <td><code style="font-size:11px;color:var(--muted)">${escapeHtml(u.email)}</code></td>
+      <td>${rolTag(u.rol)}</td>
+      <td>${estadoClave}</td>
+      <td style="font-size:12px">${escapeHtml(ultCambio)}</td>
+      <td>
+        <button class="btn-mini" data-resetear-clave="${escapeHtml(u.email)}" title="Generar clave temporal nueva" style="background:rgba(247,194,114,.15);border-color:rgba(247,194,114,.4);color:#f7c272">🔑 Resetear</button>
+        ${esYo ? "" : `<button class="btn-mini" data-borrar-usuario="${escapeHtml(u.email)}" title="Borrar usuario" style="background:rgba(239,68,68,.12);border-color:rgba(239,68,68,.4);color:#fca5a5;margin-left:4px">🗑️</button>`}
+      </td>
+    </tr>`;
+  }).join("");
+
+  // Listener resetear clave
+  tbody.querySelectorAll("[data-resetear-clave]").forEach(b => {
+    b.addEventListener("click", async () => {
+      const email = b.dataset.resetearClave;
+      if (!confirm(`¿Resetear la clave de ${email}?\n\nSe genera una clave temporal nueva. La clave actual deja de funcionar al instante.`)) return;
+      try {
+        const r = await fetch("/api/usuarios/resetear-clave", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email }),
+        });
+        const data = await r.json();
+        if (data.ok) {
+          prompt(`✓ Clave reseteada para:\n${email}\n\nCopia esta clave temporal y pásasela al usuario por canal privado (WhatsApp, en persona).\nEl usuario debe cambiarla al primer login:`, data.claveTemp);
+          await loadUsuariosAdmin();
+        } else {
+          showToast("Error: " + (data.error || "no se pudo resetear"));
+        }
+      } catch (e) { showToast("Error: " + e.message); }
+    });
+  });
+
+  // Listener borrar usuario
+  tbody.querySelectorAll("[data-borrar-usuario]").forEach(b => {
+    b.addEventListener("click", async () => {
+      const email = b.dataset.borrarUsuario;
+      if (!confirm(`¿Borrar el usuario ${email}?\n\nEsta acción no se puede deshacer. El usuario no podrá ingresar más al sistema.`)) return;
+      try {
+        const r = await fetch(`/api/usuarios/${encodeURIComponent(email)}`, { method: "DELETE" });
+        const data = await r.json();
+        if (data.ok) {
+          showToast(`🗑️ Usuario ${email} eliminado`);
+          await loadUsuariosAdmin();
+        } else {
+          showToast("Error: " + (data.error || "no se pudo borrar"));
+        }
+      } catch (e) { showToast("Error: " + e.message); }
+    });
+  });
+}
+
+// --- Modal nuevo usuario ---
+document.getElementById("btnNuevoUsuario")?.addEventListener("click", () => {
+  document.getElementById("formNuevoUsuario").reset();
+  document.getElementById("nuevoUsuarioMsg").className = "modal-msg";
+  document.getElementById("nuevoUsuarioMsg").textContent = "";
+  document.getElementById("modalNuevoUsuario").classList.add("show");
+});
+document.getElementById("btnCancelarNuevoUsuario")?.addEventListener("click", () => {
+  document.getElementById("modalNuevoUsuario").classList.remove("show");
+});
+document.getElementById("formNuevoUsuario")?.addEventListener("submit", async (ev) => {
+  ev.preventDefault();
+  const fd = new FormData(ev.target);
+  const body = Object.fromEntries(fd.entries());
+  const msg = document.getElementById("nuevoUsuarioMsg");
+  msg.className = "modal-msg";
+  msg.textContent = "Creando…";
+  try {
+    const r = await fetch("/api/usuarios/crear", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+    const data = await r.json();
+    if (data.ok) {
+      prompt(`✓ Usuario creado:\n${data.email}\n\nClave temporal (copia y pásala por privado):`, data.claveTemp);
+      document.getElementById("modalNuevoUsuario").classList.remove("show");
+      await loadUsuariosAdmin();
+    } else {
+      msg.className = "modal-msg err";
+      msg.textContent = data.error || "Error";
+    }
+  } catch (e) {
+    msg.className = "modal-msg err";
+    msg.textContent = "Error: " + e.message;
+  }
+});
+
+// --- Modal "cambiar mi clave" (accesible siempre, no solo primer login) ---
+document.getElementById("btnCambiarMiClave")?.addEventListener("click", () => {
+  document.getElementById("formCambiarMiClave").reset();
+  document.getElementById("cambiarMiClaveMsg").className = "modal-msg";
+  document.getElementById("cambiarMiClaveMsg").textContent = "";
+  document.getElementById("modalCambiarMiClave").classList.add("show");
+});
+document.getElementById("btnCancelarCambiarMiClave")?.addEventListener("click", () => {
+  document.getElementById("modalCambiarMiClave").classList.remove("show");
+});
+document.getElementById("formCambiarMiClave")?.addEventListener("submit", async (ev) => {
+  ev.preventDefault();
+  const fd = new FormData(ev.target);
+  const actual = fd.get("passwordActual");
+  const nueva = fd.get("passwordNueva");
+  const confirma = fd.get("passwordConfirma");
+  const msg = document.getElementById("cambiarMiClaveMsg");
+  if (nueva !== confirma) {
+    msg.className = "modal-msg err";
+    msg.textContent = "Las claves nuevas no coinciden";
+    return;
+  }
+  msg.className = "modal-msg";
+  msg.textContent = "Cambiando…";
+  try {
+    const r = await fetch("/api/change-password", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ passwordActual: actual, passwordNueva: nueva }),
+    });
+    const data = await r.json();
+    if (data.ok) {
+      msg.className = "modal-msg ok";
+      msg.textContent = "✓ Clave cambiada exitosamente";
+      setTimeout(() => document.getElementById("modalCambiarMiClave").classList.remove("show"), 1500);
+    } else {
+      msg.className = "modal-msg err";
+      msg.textContent = data.error || "Error";
+    }
+  } catch (e) {
+    msg.className = "modal-msg err";
+    msg.textContent = "Error: " + e.message;
+  }
+});
+
 function aplicarRol(usuario) {
   document.body.classList.remove("role-admin", "role-asesor", "role-contable", "role-dueno", "role-taller", "role-gps_instalar", "role-gps_activar");
   document.body.classList.add("role-" + usuario.rol);
@@ -4613,6 +4784,7 @@ if (btnRefrescarMet) btnRefrescarMet.addEventListener("click", async () => {
   if (currentUser?.rol === "admin") {
     loadHistorialPrecios();
     loadSesionesActivas();
+    loadUsuariosAdmin();
   }
   attachChasisAutocomplete();
 })();

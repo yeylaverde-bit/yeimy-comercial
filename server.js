@@ -1419,8 +1419,79 @@ app.get("/api/usuarios", requireAuth, requireAdmin, (req, res) => {
     rol: u.rol,
     debeChangePass: !!u.debeChangePass,
     creadoEn: u.creadoEn,
+    passwordCambiadaEn: u.passwordCambiadaEn || null,
   }));
   res.json({ ok: true, usuarios });
+});
+
+// Generar clave temporal aleatoria (palabra + 3 dígitos + signo)
+function generarClaveTemp() {
+  const palabras = ["Apache", "Raider", "Bomber", "Ntorq", "Sport", "Hunter", "Switch", "Bet", "Mrx", "Nitro"];
+  const signos = ["!", "@", "#", "*"];
+  const palabra = palabras[Math.floor(Math.random() * palabras.length)];
+  const num = String(Math.floor(Math.random() * 900) + 100);
+  const signo = signos[Math.floor(Math.random() * signos.length)];
+  return palabra + num + signo;
+}
+
+// Resetear clave de un usuario (solo admin). Devuelve clave temporal en TEXTO PLANO
+// para que admin la pase al usuario por canal seguro.
+app.post("/api/usuarios/resetear-clave", requireAuth, requireAdmin, async (req, res) => {
+  const { email } = req.body || {};
+  if (!email) return res.status(400).json({ ok: false, error: "Falta email del usuario" });
+  const usuarios = leerUsuarios();
+  const idx = usuarios.findIndex(u => u.email.toLowerCase() === String(email).toLowerCase());
+  if (idx < 0) return res.status(404).json({ ok: false, error: "Usuario no existe" });
+  const claveTemp = generarClaveTemp();
+  usuarios[idx].passwordHash = await bcrypt.hash(claveTemp, 10);
+  usuarios[idx].debeChangePass = true;
+  usuarios[idx].reseteadoEn = new Date().toISOString();
+  usuarios[idx].reseteadoPor = req.session.userEmail;
+  guardarUsuarios(usuarios);
+  res.json({ ok: true, email, claveTemp });
+});
+
+// Crear usuario nuevo (solo admin)
+app.post("/api/usuarios/crear", requireAuth, requireAdmin, async (req, res) => {
+  const { email, nombre, apellido, rol } = req.body || {};
+  if (!email || !nombre || !rol) {
+    return res.status(400).json({ ok: false, error: "Faltan campos: email, nombre, rol" });
+  }
+  const rolesValidos = ["admin", "asesor", "contable", "dueno", "taller", "gps_instalar", "gps_activar"];
+  if (!rolesValidos.includes(rol)) {
+    return res.status(400).json({ ok: false, error: "Rol inválido. Usar: " + rolesValidos.join(", ") });
+  }
+  const usuarios = leerUsuarios();
+  if (usuarios.some(u => u.email.toLowerCase() === String(email).toLowerCase())) {
+    return res.status(409).json({ ok: false, error: "Ya existe usuario con ese email" });
+  }
+  const claveTemp = generarClaveTemp();
+  usuarios.push({
+    email: String(email).toLowerCase().trim(),
+    nombre: String(nombre).toUpperCase().trim(),
+    apellido: String(apellido || "").trim(),
+    rol,
+    passwordHash: await bcrypt.hash(claveTemp, 10),
+    debeChangePass: true,
+    creadoEn: new Date().toISOString(),
+    creadoPor: req.session.userEmail,
+  });
+  guardarUsuarios(usuarios);
+  res.json({ ok: true, email, claveTemp });
+});
+
+// Borrar usuario (solo admin, no puede borrarse a sí mismo)
+app.delete("/api/usuarios/:email", requireAuth, requireAdmin, (req, res) => {
+  const email = String(req.params.email).toLowerCase();
+  if (email === req.session.userEmail.toLowerCase()) {
+    return res.status(400).json({ ok: false, error: "No puedes borrar tu propio usuario" });
+  }
+  const usuarios = leerUsuarios();
+  const idx = usuarios.findIndex(u => u.email.toLowerCase() === email);
+  if (idx < 0) return res.status(404).json({ ok: false, error: "Usuario no existe" });
+  usuarios.splice(idx, 1);
+  guardarUsuarios(usuarios);
+  res.json({ ok: true });
 });
 
 // --- Log de ventas registradas ---

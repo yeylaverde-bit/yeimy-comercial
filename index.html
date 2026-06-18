@@ -35,6 +35,7 @@
         <div class="user-name" id="userName">Cargando…</div>
         <div class="user-role" id="userRole">—</div>
       </div>
+      <button class="logout-btn" id="btnCambiarMiClave" title="Cambiar mi contraseña" style="margin-right:4px">🔑</button>
       <button class="logout-btn" id="logoutBtn" title="Cerrar sesión">↩</button>
     </div>
 
@@ -101,6 +102,7 @@
       <div class="nav-section-title">Administración</div>
       <nav class="nav">
         <a href="#sesiones">👥 Sesiones activas <span id="sesionesEnLineaBadge" class="badge" style="display:none;background:#22c55e;color:#fff;margin-left:6px;font-size:10px"></span></a>
+        <a href="#usuarios">🔐 Gestión de usuarios</a>
         <a href="#actualizarprecios">📤 Actualizar precios (PDF)</a>
         <a href="#facturaauteco">🧾 Cargar factura Auteco</a>
       </nav>
@@ -1011,6 +1013,87 @@
         </table>
       </div>
     </section>
+
+    <section id="usuarios" class="card" data-role-only="admin">
+      <div class="card-head">
+        <h2>🔐 Gestión de usuarios</h2>
+        <button class="btn-primary" id="btnNuevoUsuario" style="padding:6px 12px;font-size:13px">➕ Nuevo usuario</button>
+      </div>
+      <p class="muted" style="margin:-4px 0 14px;font-size:12.5px">
+        Lista de todos los usuarios del sistema. Puedes resetear claves olvidadas (genera clave temporal que le pasas al usuario por privado), crear nuevos perfiles, o borrar los que ya no se necesiten.
+      </p>
+      <div class="table-wrap">
+        <table class="table" id="tblUsuarios">
+          <thead>
+            <tr>
+              <th>Usuario</th>
+              <th>Email</th>
+              <th>Rol</th>
+              <th>Estado clave</th>
+              <th>Última cambio</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Modal: crear nuevo usuario -->
+    <div id="modalNuevoUsuario" class="modal-backdrop">
+      <div class="modal" style="max-width:560px">
+        <h2>➕ Crear nuevo usuario</h2>
+        <p class="muted">Se genera una clave temporal automática. Te la muestro al final para que se la pases al usuario por canal privado.</p>
+        <div id="nuevoUsuarioMsg" class="modal-msg"></div>
+        <form id="formNuevoUsuario" style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <label style="grid-column:1/-1"><span>Email *</span>
+            <input name="email" type="email" required placeholder="usuario@dominio.com" autocomplete="off" /></label>
+          <label><span>Nombre *</span><input name="nombre" required placeholder="JUAN" /></label>
+          <label><span>Apellido</span><input name="apellido" placeholder="PÉREZ" /></label>
+          <label style="grid-column:1/-1"><span>Rol *</span>
+            <select name="rol" required>
+              <option value="asesor">Asesor</option>
+              <option value="contable">Contable</option>
+              <option value="dueno">Dueño (Gerencia)</option>
+              <option value="taller">Taller</option>
+              <option value="gps_instalar">GPS Instalación</option>
+              <option value="gps_activar">GPS Activación</option>
+              <option value="admin">Administrador</option>
+            </select></label>
+          <div class="modal-actions" style="grid-column:1/-1">
+            <button type="button" class="btn-secondary" id="btnCancelarNuevoUsuario">Cancelar</button>
+            <button type="submit" class="btn-primary">Crear usuario</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Modal: cambiar mi clave -->
+    <div id="modalCambiarMiClave" class="modal-backdrop">
+      <div class="modal" style="max-width:480px">
+        <h2>🔑 Cambiar mi contraseña</h2>
+        <p class="muted">Para tu seguridad necesitas confirmar tu clave actual antes de poner la nueva.</p>
+        <div id="cambiarMiClaveMsg" class="modal-msg"></div>
+        <form id="formCambiarMiClave">
+          <label>
+            <span>Clave actual</span>
+            <input type="password" name="passwordActual" required autocomplete="current-password" />
+          </label>
+          <label>
+            <span>Clave nueva (mínimo 6 caracteres)</span>
+            <input type="password" name="passwordNueva" required minlength="6" autocomplete="new-password" />
+          </label>
+          <label>
+            <span>Repetir clave nueva</span>
+            <input type="password" name="passwordConfirma" required minlength="6" autocomplete="new-password" />
+          </label>
+          <div class="modal-actions">
+            <button type="button" class="btn-secondary" id="btnCancelarCambiarMiClave">Cancelar</button>
+            <button type="submit" class="btn-primary">Guardar nueva clave</button>
+          </div>
+        </form>
+      </div>
+    </div>
 
     <section id="actualizarprecios" class="card" data-role-only="admin">
       <div class="card-head">
