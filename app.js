@@ -2673,14 +2673,16 @@ if (soatSearchEl) soatSearchEl.addEventListener("input", e => { soatState.search
 //          AGENDAR INSTALACIÓN GPS — panel con datos para JotForm
 // ============================================================
 function abrirPanelAgendarGps(datos) {
-  // Construir URL prellenada del JotForm TS GPS
-  const params = new URLSearchParams();
-  if (datos.modelo) params.set("escribaUna", datos.modelo);
-  if (datos.placa) params.set("placaDe38", datos.placa);
-  if (datos.ultimos4) params.set("numeroDe39", datos.ultimos4);
-  params.set("servicioA", "INSTALACIÓN");
-  if (datos.asesor) params.set("asesorDe43", datos.asesor);
-  const url = `https://form.jotform.com/261494455636668?${params.toString()}`;
+  // Función para reconstruir la URL de JotForm con el modelo actual (puede ser editado)
+  const construirUrl = (modeloActual) => {
+    const params = new URLSearchParams();
+    if (modeloActual) params.set("escribaUna", modeloActual);
+    if (datos.placa) params.set("placaDe38", datos.placa);
+    if (datos.ultimos4) params.set("numeroDe39", datos.ultimos4);
+    params.set("servicioA", "INSTALACIÓN");
+    if (datos.asesor) params.set("asesorDe43", datos.asesor);
+    return `https://form.jotform.com/261494455636668?${params.toString()}`;
+  };
 
   // Crear modal flotante
   const overlay = document.createElement("div");
@@ -2691,22 +2693,31 @@ function abrirPanelAgendarGps(datos) {
         <div>
           <h2 style="margin:0;font-size:18px;color:#22d3ee">📅 Agendar instalación GPS — TS GPS</h2>
           <p class="muted" style="margin:4px 0 0;font-size:12.5px">Cliente: <strong>${escapeHtml(datos.cliente)}</strong></p>
+          <p class="muted" style="margin:2px 0 0;font-size:11.5px">Chasis: <code style="color:var(--accent-2)">${escapeHtml(datos.chasis || "")}</code></p>
         </div>
         <button class="btn-secondary" id="btnCerrarAgendarGps" style="padding:4px 10px">✕</button>
       </div>
 
       <p class="muted" style="font-size:12.5px;margin:0 0 14px">
-        1️⃣ Click <strong>"Abrir JotForm"</strong> para abrir el formulario en nueva pestaña.<br>
-        2️⃣ Vuelve aquí, copia cada dato con el botón 📋 y pega en JotForm.<br>
+        1️⃣ Verifica que el <strong>nombre de la moto</strong> esté correcto — si no, edítalo abajo.<br>
+        2️⃣ Click <strong>"Abrir JotForm"</strong> y copia cada dato con 📋.<br>
         3️⃣ Elige la fecha en el calendario de JotForm y envía.
       </p>
 
-      <a href="${url}" target="_blank" rel="noopener" class="btn-primary" style="display:inline-block;padding:10px 16px;font-size:14px;background:#06b6d4;border-color:#06b6d4;text-decoration:none;margin-bottom:18px">
+      <a href="${construirUrl(datos.modelo)}" target="_blank" rel="noopener" id="lnkAbrirJotform" class="btn-primary" style="display:inline-block;padding:10px 16px;font-size:14px;background:#06b6d4;border-color:#06b6d4;text-decoration:none;margin-bottom:18px">
         🔗 Abrir JotForm en nueva pestaña
       </a>
 
       <div style="display:grid;gap:10px">
-        ${renderCampoCopiable("Nombre de la Moto", datos.modelo)}
+        <div style="background:rgba(245,158,11,.08);border:1px solid #f59e0b;border-radius:8px;padding:10px 12px">
+          <div class="muted" style="font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:#f59e0b">Nombre de la Moto (editable)</div>
+          <div style="display:flex;gap:6px;margin-top:6px;align-items:center">
+            <input type="text" id="inpModeloMoto" value="${escapeHtml(datos.modelo || "")}" style="flex:1;padding:8px 10px;background:rgba(8,12,28,.7);border:1px solid var(--line);border-radius:6px;color:var(--text);font-weight:600;font-size:14px" />
+            <button class="btn-mini" id="btnCopiarModelo" style="background:rgba(124,92,255,.2);border-color:var(--accent);color:var(--text);padding:6px 12px;font-size:12px;white-space:nowrap">📋 Copiar</button>
+          </div>
+          <button class="btn-mini" id="btnGuardarCorreccion" style="margin-top:8px;background:#22c55e;border-color:#22c55e;color:#000;padding:6px 12px;font-size:11.5px;display:none">💾 Guardar corrección en la preasignación</button>
+          <p class="muted" style="font-size:10.5px;margin:6px 0 0">Si el nombre está mal (ej: dice NTORQ pero es APACHE), corrígelo aquí y guarda la corrección.</p>
+        </div>
         ${renderCampoCopiable("Placa", datos.placa)}
         ${renderCampoCopiable("Últimos 4 chasis", datos.ultimos4)}
         ${renderCampoCopiable("Servicio", "INSTALACIÓN")}
@@ -2720,9 +2731,73 @@ function abrirPanelAgendarGps(datos) {
   `;
   document.body.appendChild(overlay);
 
-  // Listeners
+  // Listeners — cerrar
   overlay.querySelector("#btnCerrarAgendarGps").addEventListener("click", () => overlay.remove());
   overlay.addEventListener("click", (ev) => { if (ev.target === overlay) overlay.remove(); });
+
+  // Listener — campo modelo editable: detecta cambios y actualiza URL + muestra botón guardar
+  const inpModelo = overlay.querySelector("#inpModeloMoto");
+  const btnGuardar = overlay.querySelector("#btnGuardarCorreccion");
+  const lnkJotform = overlay.querySelector("#lnkAbrirJotform");
+  const modeloOriginal = datos.modelo || "";
+  inpModelo.addEventListener("input", () => {
+    const actual = inpModelo.value.trim();
+    lnkJotform.href = construirUrl(actual);
+    btnGuardar.style.display = actual && actual !== modeloOriginal ? "inline-block" : "none";
+  });
+
+  // Listener — copiar modelo (usa el valor actual del input)
+  overlay.querySelector("#btnCopiarModelo").addEventListener("click", async () => {
+    const val = inpModelo.value.trim();
+    if (!val) { showToast("Escribe un nombre"); return; }
+    try {
+      await navigator.clipboard.writeText(val);
+      showToast(`📋 Copiado: ${val}`);
+      const b = overlay.querySelector("#btnCopiarModelo");
+      b.textContent = "✓ Copiado";
+      b.style.background = "#22c55e";
+      setTimeout(() => { b.textContent = "📋 Copiar"; b.style.background = "rgba(124,92,255,.2)"; }, 1500);
+    } catch { showToast("No se pudo copiar"); }
+  });
+
+  // Listener — guardar corrección en la preasignación
+  btnGuardar.addEventListener("click", async () => {
+    const nuevo = inpModelo.value.trim();
+    if (!nuevo) { showToast("Escribe un nombre válido"); return; }
+    if (!datos.chasis) { showToast("No hay chasis para guardar"); return; }
+    // Separar marca y modelo: primera palabra = marca, resto = modelo
+    // (mejor: dejar todo como modelo y marca vacía, el usuario puede ajustar más adelante)
+    const partes = nuevo.split(/\s+/);
+    const marca = partes.length > 1 ? partes[0] : "";
+    const modeloSolo = partes.length > 1 ? partes.slice(1).join(" ") : nuevo;
+    btnGuardar.disabled = true;
+    btnGuardar.textContent = "Guardando...";
+    try {
+      const r = await fetch(`/api/preasignaciones/${encodeURIComponent(datos.chasis)}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ marca, modelo: modeloSolo }),
+      });
+      const data = await r.json();
+      if (data.ok) {
+        showToast("✓ Nombre corregido en la preasignación");
+        btnGuardar.textContent = "✓ Guardado";
+        btnGuardar.style.background = "#22c55e";
+        await loadPreasignaciones();
+        setTimeout(() => { btnGuardar.style.display = "none"; }, 1500);
+      } else {
+        showToast("Error: " + (data.error || "no se pudo guardar"));
+        btnGuardar.disabled = false;
+        btnGuardar.textContent = "💾 Guardar corrección en la preasignación";
+      }
+    } catch (e) {
+      showToast("Error: " + e.message);
+      btnGuardar.disabled = false;
+      btnGuardar.textContent = "💾 Guardar corrección en la preasignación";
+    }
+  });
+
+  // Listeners — campos fijos copiables
   overlay.querySelectorAll("[data-copiar-campo]").forEach(b => {
     b.addEventListener("click", async () => {
       const val = b.dataset.copiarCampo;
@@ -2998,7 +3073,7 @@ function renderGpsLista(tipo) {
       const asesorNombre = p.asesorNombre || currentUser?.nombre || "";
       // Mostrar panel con datos para copiar + abrir JotForm
       abrirPanelAgendarGps({
-        modelo, placa: p.placa || "", ultimos4, asesor: asesorNombre, cliente: p.nombreCliente || ""
+        modelo, placa: p.placa || "", ultimos4, asesor: asesorNombre, cliente: p.nombreCliente || "", chasis: p.chasis || ""
       });
     });
   });
