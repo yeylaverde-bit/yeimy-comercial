@@ -908,6 +908,52 @@
       <p class="muted" style="margin:-4px 0 12px;font-size:12.5px" data-role-only="taller">
         Motos pendientes de alistamiento, en orden de llegada (más antiguas primero). Cuando termines de alistar una moto, da click en <strong>"✓ Lista para entregar"</strong> para avisar al asesor.
       </p>
+
+      <!-- Panel con KPIs y filtros de fecha -->
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;margin-bottom:12px">
+        <div class="metric-card" style="padding:10px 14px">
+          <div class="metric-label">Total motos</div>
+          <div class="metric-value" id="tallerKpiTotal" style="font-size:20px">0</div>
+        </div>
+        <div class="metric-card warn" style="padding:10px 14px">
+          <div class="metric-label">🛠 En taller</div>
+          <div class="metric-value" id="tallerKpiEnTaller" style="font-size:20px">0</div>
+        </div>
+        <div class="metric-card" style="padding:10px 14px">
+          <div class="metric-label">✓ Listas</div>
+          <div class="metric-value" id="tallerKpiListas" style="font-size:20px;color:#5be58a">0</div>
+        </div>
+        <div class="metric-card good" style="padding:10px 14px">
+          <div class="metric-label">📦 Entregadas</div>
+          <div class="metric-value" id="tallerKpiEntregadas" style="font-size:20px">0</div>
+        </div>
+      </div>
+
+      <!-- Toggle vista (solo rol taller): Pendientes vs Alistadas -->
+      <div data-role-only="taller" style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px;padding:10px 12px;background:rgba(249,115,22,.08);border:1px solid rgba(249,115,22,.3);border-radius:10px">
+        <span style="color:#fb923c;font-size:12px;text-transform:uppercase;letter-spacing:.06em;font-weight:700">🔀 Vista:</span>
+        <button class="btn-mini taller-vista activo" data-taller-vista="pendientes">⏳ Pendientes alistar</button>
+        <button class="btn-mini taller-vista" data-taller-vista="alistadas">✓ Ya alistadas (histórico)</button>
+      </div>
+
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:14px;padding:10px 12px;background:rgba(8,12,28,.4);border:1px solid var(--line);border-radius:10px">
+        <span style="color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.06em;font-weight:600;margin-right:6px">📅 Filtro por fecha:</span>
+        <button class="btn-mini taller-filtro-fecha activo" data-taller-fecha="todos">Todas</button>
+        <button class="btn-mini taller-filtro-fecha" data-taller-fecha="hoy">Hoy</button>
+        <button class="btn-mini taller-filtro-fecha" data-taller-fecha="semana">Última semana</button>
+        <button class="btn-mini taller-filtro-fecha" data-taller-fecha="mes">Este mes</button>
+        <button class="btn-mini taller-filtro-fecha" data-taller-fecha="rango">Rango personalizado</button>
+        <span id="tallerRangoCustom" style="display:none;gap:6px;align-items:center;font-size:12px">
+          <input type="date" id="tallerFechaDesde" style="background:rgba(8,12,28,.7);color:var(--text);border:1px solid var(--line);border-radius:6px;padding:4px 8px;font-size:12px" />
+          <span>a</span>
+          <input type="date" id="tallerFechaHasta" style="background:rgba(8,12,28,.7);color:var(--text);border:1px solid var(--line);border-radius:6px;padding:4px 8px;font-size:12px" />
+        </span>
+        <span style="color:var(--muted);font-size:12px;margin-left:14px">👤 Asesor:</span>
+        <select id="tallerFiltroAsesor" style="background:rgba(8,12,28,.7);color:var(--text);border:1px solid var(--line);border-radius:6px;padding:4px 10px;font-size:12px;min-width:160px">
+          <option value="">Todos los asesores</option>
+        </select>
+      </div>
+
       <div class="table-wrap">
         <table class="table" id="tblTaller">
           <thead>
@@ -918,7 +964,7 @@
               <th>Motor</th>
               <th>Marca · Modelo</th>
               <th>Cliente</th>
-              <th data-role-only="admin asesor dueno">Asesor</th>
+              <th>Asesor</th>
               <th>GPS</th>
               <th>Estado</th>
               <th>Acta entrega</th>

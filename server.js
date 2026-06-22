@@ -709,9 +709,10 @@ app.patch("/api/preasignaciones/:chasis", requireAuth, (req, res) => {
     let cambioAlgo = false;
     for (const c of camposTaller) {
       if (req.body[c] !== undefined) {
-        // Validación específica: si está cambiando estado, solo a lista_para_entregar
-        if (c === "estado" && req.body.estado !== "lista_para_entregar") {
-          return res.status(403).json({ ok: false, error: "Taller solo puede marcar el estado como 'lista_para_entregar'" });
+        // Validación específica: taller puede marcar lista_para_entregar (alistamiento finalizado)
+        // o devolver a en_taller (corrección por error al marcar lista por equivocación).
+        if (c === "estado" && !["lista_para_entregar", "en_taller"].includes(req.body.estado)) {
+          return res.status(403).json({ ok: false, error: "Taller solo puede marcar el estado como 'lista_para_entregar' o devolverla a 'en_taller'" });
         }
         todas[chasis][c] = String(req.body[c]).trim();
         cambioAlgo = true;
@@ -1417,11 +1418,39 @@ app.get("/api/usuarios", requireAuth, requireAdmin, (req, res) => {
     nombre: u.nombre,
     apellido: u.apellido,
     rol: u.rol,
+    telefono: u.telefono || "",
     debeChangePass: !!u.debeChangePass,
     creadoEn: u.creadoEn,
     passwordCambiadaEn: u.passwordCambiadaEn || null,
   }));
   res.json({ ok: true, usuarios });
+});
+
+// Endpoint público (cualquier user autenticado) que devuelve directorio
+// reducido — solo nombre, email, rol, teléfono — para mostrar contactos en Taller, etc.
+app.get("/api/usuarios/directorio", requireAuth, (req, res) => {
+  const usuarios = leerUsuarios().map(u => ({
+    email: u.email,
+    nombre: u.nombre,
+    apellido: u.apellido,
+    rol: u.rol,
+    telefono: u.telefono || "",
+  }));
+  res.json({ ok: true, usuarios });
+});
+
+// Actualizar teléfono u otros datos editables de un usuario (solo admin)
+app.patch("/api/usuarios/:email", requireAuth, requireAdmin, (req, res) => {
+  const email = String(req.params.email).toLowerCase();
+  const usuarios = leerUsuarios();
+  const idx = usuarios.findIndex(u => u.email.toLowerCase() === email);
+  if (idx < 0) return res.status(404).json({ ok: false, error: "Usuario no existe" });
+  const camposPermitidos = ["telefono", "nombre", "apellido"];
+  for (const c of camposPermitidos) {
+    if (req.body[c] !== undefined) usuarios[idx][c] = String(req.body[c]).trim();
+  }
+  guardarUsuarios(usuarios);
+  res.json({ ok: true, usuario: { ...usuarios[idx], passwordHash: undefined } });
 });
 
 // Generar clave temporal aleatoria (palabra + 3 dígitos + signo)

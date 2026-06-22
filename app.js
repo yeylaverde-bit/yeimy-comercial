@@ -2083,23 +2083,107 @@ if (formPreasig) {
 // ============================================================
 //          TALLER — vista de motos en proceso
 // ============================================================
+// Directorio de usuarios (para sacar el teléfono del asesor en Taller)
+const tallerState = {
+  directorio: [],
+  filtroFecha: "todos",
+  fechaDesde: "",
+  fechaHasta: "",
+  vistaTaller: "pendientes",  // "pendientes" (en_taller) | "alistadas" (lista_para_entregar + entregada)
+  filtroAsesor: "",            // email del asesor para filtrar
+};
+
+async function loadDirectorioUsuarios() {
+  try {
+    const r = await fetch("/api/usuarios/directorio");
+    if (!r.ok) return;
+    const data = await r.json();
+    if (data.ok) {
+      tallerState.directorio = data.usuarios || [];
+      // Una vez cargado, poblar el filtro de asesores en Taller
+      try { poblarFiltroAsesoresTaller(); } catch {}
+    }
+  } catch (e) { console.warn("loadDirectorioUsuarios:", e.message); }
+}
+
+function buscarTelefonoAsesor(asesorEmail) {
+  if (!asesorEmail) return "";
+  const u = tallerState.directorio.find(x => x.email?.toLowerCase() === asesorEmail.toLowerCase());
+  return u?.telefono || "";
+}
+
+// Aplica filtro de fecha a una lista de preasignaciones (por entradaTaller)
+function filtrarPorFecha(lista, modo, desde, hasta) {
+  if (modo === "todos") return lista;
+  const ahora = new Date();
+  let limiteDesde = null;
+  let limiteHasta = null;
+  if (modo === "hoy") {
+    limiteDesde = new Date(ahora.getFullYear(), ahora.getMonth(), ahora.getDate());
+  } else if (modo === "semana") {
+    limiteDesde = new Date(ahora.getTime() - 7 * 24 * 60 * 60 * 1000);
+  } else if (modo === "mes") {
+    limiteDesde = new Date(ahora.getFullYear(), ahora.getMonth(), 1);
+  } else if (modo === "rango") {
+    if (desde) limiteDesde = new Date(desde + "T00:00:00");
+    if (hasta) limiteHasta = new Date(hasta + "T23:59:59");
+  }
+  return lista.filter(p => {
+    const fecha = p.entradaTaller || p.actualizadoEn;
+    if (!fecha) return false;
+    const t = new Date(fecha).getTime();
+    if (limiteDesde && t < limiteDesde.getTime()) return false;
+    if (limiteHasta && t > limiteHasta.getTime()) return false;
+    return true;
+  });
+}
+
 function renderTaller() {
   const tbody = document.querySelector("#tblTaller tbody");
   if (!tbody) return;
   const esRolTaller = currentUser?.rol === "taller";
-  // Para el rol taller: mostrar solo las que están en taller (pendientes) — no muestra entregadas ni listas
-  // Para los demás: mostrar en_taller + lista_para_entregar + entregada
-  const enTaller = Object.values(preasigState.preasignaciones).filter(p => {
-    if (esRolTaller) return p.estado === "en_taller"; // solo pendientes para taller
+  // Vista del rol taller: "pendientes" (en_taller) o "alistadas" (lista_para_entregar + entregada)
+  const vista = esRolTaller ? tallerState.vistaTaller : "todas";
+  // Lista cruda según rol y vista
+  const todasTaller = Object.values(preasigState.preasignaciones).filter(p => {
+    if (esRolTaller) {
+      if (vista === "pendientes") return p.estado === "en_taller";
+      if (vista === "alistadas") return p.estado === "lista_para_entregar" || p.estado === "entregada";
+      return p.estado === "en_taller" || p.estado === "lista_para_entregar" || p.estado === "entregada";
+    }
     return p.estado === "en_taller" || p.estado === "lista_para_entregar" || p.estado === "entregada";
   });
+  // Aplicar filtro de fecha y filtro por asesor
+  let enTaller = filtrarPorFecha(todasTaller, tallerState.filtroFecha, tallerState.fechaDesde, tallerState.fechaHasta);
+  if (tallerState.filtroAsesor) {
+    enTaller = enTaller.filter(p => (p.asesorEmail || "").toLowerCase() === tallerState.filtroAsesor.toLowerCase());
+  }
   document.getElementById("tallerCount").textContent = fmtNum.format(enTaller.length);
 
+  // KPIs por estado (para el panel superior)
+  const kpiEnTaller = enTaller.filter(p => p.estado === "en_taller").length;
+  const kpiListas = enTaller.filter(p => p.estado === "lista_para_entregar").length;
+  const kpiEntregadas = enTaller.filter(p => p.estado === "entregada").length;
+  const elKpiEnTaller = document.getElementById("tallerKpiEnTaller");
+  const elKpiListas = document.getElementById("tallerKpiListas");
+  const elKpiEntregadas = document.getElementById("tallerKpiEntregadas");
+  const elKpiTotal = document.getElementById("tallerKpiTotal");
+  if (elKpiEnTaller) elKpiEnTaller.textContent = fmtNum.format(kpiEnTaller);
+  if (elKpiListas) elKpiListas.textContent = fmtNum.format(kpiListas);
+  if (elKpiEntregadas) elKpiEntregadas.textContent = fmtNum.format(kpiEntregadas);
+  if (elKpiTotal) elKpiTotal.textContent = fmtNum.format(enTaller.length);
+
   if (enTaller.length === 0) {
-    const colspan = esRolTaller ? 10 : 11;
-    tbody.innerHTML = `<tr><td colspan="${colspan}" style="text-align:center;color:var(--muted);padding:30px">
-      ${esRolTaller ? "✓ ¡Todo al día! Sin motos pendientes de alistar." : 'Sin motos en taller. Mueve una preasignación con el botón <strong>"→ A taller"</strong>.'}
-    </td></tr>`;
+    const colspan = 11; // todas las columnas (asesor ahora siempre visible)
+    let mensajeVacio;
+    if (esRolTaller && vista === "alistadas") {
+      mensajeVacio = "Aún no has marcado motos como listas. Cuando termines de alistar una, aparecerá acá.";
+    } else if (esRolTaller) {
+      mensajeVacio = "✓ ¡Todo al día! Sin motos pendientes de alistar.";
+    } else {
+      mensajeVacio = 'Sin motos en taller. Mueve una preasignación con el botón <strong>"→ A taller"</strong>.';
+    }
+    tbody.innerHTML = `<tr><td colspan="${colspan}" style="text-align:center;color:var(--muted);padding:30px">${mensajeVacio}</td></tr>`;
     return;
   }
 
@@ -2136,6 +2220,11 @@ function renderTaller() {
       if (esRolTaller && p.estado === "en_taller") {
         // Taller: botón "Lista para entregar"
         acciones = `<button class="btn-primary" data-taller-lista="${escapeHtml(p.chasis)}" style="padding:6px 12px;font-size:12px;background:#22c55e;border-color:#22c55e">✓ Lista para entregar</button>`;
+      } else if (esRolTaller && p.estado === "lista_para_entregar") {
+        // Taller en histórico — botón "Devolver a en taller" (corrección por error)
+        acciones = `<button class="btn-mini" data-taller-devolver="${escapeHtml(p.chasis)}" title="¿Te equivocaste? Devuelve la moto a 'en taller'" style="padding:6px 10px;font-size:11px;background:#f59e0b;color:#000;border-color:#f59e0b">↩ Devolver</button>`;
+      } else if (esRolTaller && p.estado === "entregada") {
+        acciones = `<span class="muted" style="font-size:11px">Entregada al cliente</span>`;
       } else if (!esRolTaller && p.estado === "en_taller") {
         acciones = `<span class="muted" style="font-size:11px">Esperando taller…</span>`;
       } else if (!esRolTaller && p.estado === "lista_para_entregar") {
@@ -2143,8 +2232,17 @@ function renderTaller() {
         acciones = `<button class="btn-primary" data-taller-entregar="${escapeHtml(p.chasis)}" style="padding:6px 12px;font-size:12px">✓ Marcar entregada</button>`;
       }
 
-      // Columna asesor (oculta para taller mediante data-role-only del th)
-      const asesorCell = esRolTaller ? "" : `<td>${escapeHtml(p.asesorNombre || "—")}</td>`;
+      // Columna asesor — ahora visible para TODOS los roles (incluyendo taller)
+      // Con botón WhatsApp si hay teléfono registrado del asesor en users.json
+      const telefonoAsesor = (buscarTelefonoAsesor(p.asesorEmail) || "").replace(/[^0-9]/g, "");
+      const mensajeWa = encodeURIComponent(`Hola ${p.asesorNombre || ""}, tengo una consulta sobre la moto chasis ${p.chasis} (placa ${p.placa || "—"}) del cliente ${p.nombreCliente || "—"}.`);
+      const waBtn = telefonoAsesor
+        ? `<a href="https://wa.me/57${telefonoAsesor}?text=${mensajeWa}" target="_blank" title="WhatsApp ${telefonoAsesor}" style="display:inline-block;margin-left:4px;padding:2px 6px;background:#22c55e;color:#fff;border-radius:4px;text-decoration:none;font-size:10px">📱</a>`
+        : "";
+      const asesorCell = `<td>
+        <strong>${escapeHtml(p.asesorNombre || "—")}</strong>${waBtn}
+        ${telefonoAsesor ? `<div class="muted" style="font-size:10.5px">${escapeHtml(telefonoAsesor)}</div>` : ""}
+      </td>`;
 
       // Acta de entrega: foto + estado
       const actaEstado = p.actaEntrega || "pendiente";
@@ -2259,6 +2357,13 @@ function renderTaller() {
       await cambiarEstadoPreasig(b.dataset.tallerLista, "lista_para_entregar");
     });
   });
+  // Botón "Devolver a en taller" (rol taller, corrección en histórico)
+  tbody.querySelectorAll("[data-taller-devolver]").forEach(b => {
+    b.addEventListener("click", async () => {
+      if (!confirm("¿Devolver esta moto al estado 'En taller'?\n\nÚsalo si te equivocaste al marcarla como lista.")) return;
+      await cambiarEstadoPreasig(b.dataset.tallerDevolver, "en_taller");
+    });
+  });
 
   // Actualizar el badge del sidebar con el conteo de motos listas para entregar
   // (solo aplica para asesor/admin/dueno — para que vean cuántas hay listas)
@@ -2278,6 +2383,57 @@ function renderTaller() {
       badge.style.display = "none";
     }
   }
+}
+
+// Listeners filtros de fecha Taller
+document.querySelectorAll(".taller-filtro-fecha").forEach(btn => {
+  btn.addEventListener("click", () => {
+    const fecha = btn.dataset.tallerFecha;
+    document.querySelectorAll(".taller-filtro-fecha").forEach(b => b.classList.remove("activo"));
+    btn.classList.add("activo");
+    tallerState.filtroFecha = fecha;
+    // Mostrar/ocultar inputs de rango personalizado
+    const rango = document.getElementById("tallerRangoCustom");
+    if (rango) rango.style.display = fecha === "rango" ? "inline-flex" : "none";
+    renderTaller();
+  });
+});
+document.getElementById("tallerFechaDesde")?.addEventListener("change", (ev) => {
+  tallerState.fechaDesde = ev.target.value;
+  renderTaller();
+});
+document.getElementById("tallerFechaHasta")?.addEventListener("change", (ev) => {
+  tallerState.fechaHasta = ev.target.value;
+  renderTaller();
+});
+
+// Listener toggle vista (rol taller): Pendientes vs Alistadas histórico
+document.querySelectorAll(".taller-vista").forEach(btn => {
+  btn.addEventListener("click", () => {
+    const vista = btn.dataset.tallerVista;
+    document.querySelectorAll(".taller-vista").forEach(b => b.classList.remove("activo"));
+    btn.classList.add("activo");
+    tallerState.vistaTaller = vista;
+    renderTaller();
+  });
+});
+
+// Listener filtro por asesor en Taller
+document.getElementById("tallerFiltroAsesor")?.addEventListener("change", (ev) => {
+  tallerState.filtroAsesor = ev.target.value;
+  renderTaller();
+});
+
+// Poblar el select de asesores cuando cargue el directorio
+function poblarFiltroAsesoresTaller() {
+  const sel = document.getElementById("tallerFiltroAsesor");
+  if (!sel) return;
+  // Solo asesores (no admin/taller/contable)
+  const asesores = (tallerState.directorio || []).filter(u => u.rol === "asesor" || u.rol === "admin");
+  const previo = sel.value;
+  sel.innerHTML = `<option value="">Todos los asesores</option>` +
+    asesores.map(u => `<option value="${u.email}">${escapeHtml(u.nombre)} ${escapeHtml(u.apellido || "")}</option>`).join("");
+  if (previo) sel.value = previo;
 }
 
 const tallerVerTodos = document.getElementById("tallerVerTodos");
@@ -4781,6 +4937,7 @@ if (btnRefrescarMet) btnRefrescarMet.addEventListener("click", async () => {
   loadPreasignaciones();
   loadLeads();
   loadCodigosImpulsa();
+  loadDirectorioUsuarios();  // todos pueden ver el directorio para mostrar WhatsApp del asesor
   if (currentUser?.rol === "admin") {
     loadHistorialPrecios();
     loadSesionesActivas();

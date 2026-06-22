@@ -445,11 +445,13 @@ async function crearFacturaCompra(datos) {
       price: Number(it.price) || 0,
       taxes: [{ id: 7801 }], // IVA 19%
     })),
+    // El payment.value debe ser exactamente igual al total que Siigo calcula
+    // internamente desde los items + sus impuestos. Si items.price está sin IVA
+    // y taxes incluye IVA 19%, entonces:
+    //   total_siigo = sum(item.price) * 1.19   (redondeado a 2 decimales)
     payments: [{
       id: paymentTypeId,
-      value: total,
-      // due_date: fecha de vencimiento del pago. Para facturas Auteco usamos
-      // misma fecha de la factura (vencimiento inmediato). Siigo lo exige.
+      value: Math.round(items.reduce((s, it) => s + (Number(it.price) || 0), 0) * 1.19 * 100) / 100,
       due_date: fecha,
     }],
     observations: observaciones,
