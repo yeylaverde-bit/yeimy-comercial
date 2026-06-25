@@ -1767,12 +1767,15 @@ app.get("/api/siigo/buscar/:chasis", requireAuth, async (req, res) => {
       siigoCache = { data: productos, fetchedAt: now };
     }
 
-    // Helper para inferir marca
+    // Helper para inferir marca — heurística por modelo conocido
     function inferirMarca(nombre) {
       const n = (nombre || "").toUpperCase();
-      if (/RAIDER|APACHE|NTORQ|SPORT|STAR|HLX|RTX/.test(n)) return "TVS";
+      if (/RAIDER|APACHE|NTORQ|SPORT|STAR|HLX|RTX|RTR\b/.test(n)) return "TVS";
       if (/KING|VICTORY|NITRO|MOTO\s*CARRO|MRX|XKM|MOBILITY/.test(n)) return "MOBILITY";
-      if (/AKT/.test(n)) return "AKT";
+      if (/\bAKT\b|EVO\s|DYNAMIC|FLEX/.test(n)) return "AKT";
+      if (/\bBET\b|AGILITY|FUSION|NEO|VITALITY|JOCKEY|FLY|SUPER\s*8|KYMCO/.test(n)) return "KYMCO";
+      if (/\bBOXER\b|PULSAR|DOMINAR|DISCOVER|AVENGER|BAJAJ/.test(n)) return "BAJAJ";
+      if (/\bAUTECO\b|VICTORY/.test(n)) return "AUTECO";
       return "OTRO";
     }
 
@@ -1788,17 +1791,22 @@ app.get("/api/siigo/buscar/:chasis", requireAuth, async (req, res) => {
     }
 
     // Mapear a formato estándar (hasta 20 resultados)
-    const lista = matches.slice(0, 20).map(p => ({
-      chasis: p.chasis,
-      motor: p.motor,
-      modelo: (p.nombre || "").replace(/^MOTOCICLET[A]?\s+/i, "").trim(),
-      marca: inferirMarca(p.nombre),
-      color: p.color,
-      anio: p.anio,
-      cilindraje: p.cilindraje,
-      stock: p.stock,
-      codigo: p.codigo,
-    }));
+    // Prioriza modeloParsed (extraído de description, más confiable) sobre p.nombre
+    // (el name puede estar mal escrito en Siigo — ej: name="BET TK" pero description="APACHE RTR 200")
+    const lista = matches.slice(0, 20).map(p => {
+      const modeloLimpio = p.modeloParsed || (p.nombre || "").replace(/^MOTOCICLET[A]?\s+/i, "").trim();
+      return {
+        chasis: p.chasis,
+        motor: p.motor,
+        modelo: modeloLimpio,
+        marca: inferirMarca(modeloLimpio || p.nombre),
+        color: p.color,
+        anio: p.anio,
+        cilindraje: p.cilindraje,
+        stock: p.stock,
+        codigo: p.codigo,
+      };
+    });
 
     // Si solo hay 1 resultado: devolver como única encontrada
     if (lista.length === 1) {

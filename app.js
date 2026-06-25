@@ -1926,15 +1926,17 @@ function attachChasisAutocomplete() {
     const c = chasisInp.value.trim().toUpperCase();
     if (c.length < 3) return;
 
-    // Helper para llenar campos
+    // Helper para llenar campos — SOBRESCRIBE siempre cuando hay match único de Siigo/inventario
+    // (antes solo llenaba si estaban vacíos, pero eso causaba que datos viejos quedaran si el
+    //  usuario cambiaba de chasis sin limpiar el formulario)
     function llenar(m, fuente) {
-      if (!f.querySelector('[name="marca"]').value) f.querySelector('[name="marca"]').value = m.marca || "";
-      if (!f.querySelector('[name="modelo"]').value) f.querySelector('[name="modelo"]').value = m.modelo || "";
-      if (!f.querySelector('[name="color"]').value) f.querySelector('[name="color"]').value = m.color || "";
-      if (m.motor && !f.querySelector('[name="motor"]').value) f.querySelector('[name="motor"]').value = m.motor;
+      if (m.marca) f.querySelector('[name="marca"]').value = m.marca;
+      if (m.modelo) f.querySelector('[name="modelo"]').value = m.modelo;
+      if (m.color) f.querySelector('[name="color"]').value = m.color;
+      if (m.motor) f.querySelector('[name="motor"]').value = m.motor;
       // Reemplazar el chasis parcial por el COMPLETO
       if (m.chasis && m.chasis !== c) chasisInp.value = m.chasis;
-      mostrarMsgAutofill(`✓ Datos prellenados desde ${fuente} · ${m.modelo} ${m.color || ""}${m.stock === 0 ? " · ⚠️ VENDIDA (stock 0)" : ""}`, "ok");
+      mostrarMsgAutofill(`✓ Datos prellenados desde ${fuente} · ${m.modelo || ""} ${m.color || ""}${m.stock === 0 ? " · ⚠️ VENDIDA (stock 0)" : ""}`, "ok");
     }
 
     // 1) Inventario local primero — match exacto o parcial

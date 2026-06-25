@@ -121,19 +121,23 @@ function parseDescripcion(desc) {
   const mCC = desc.match(/\(([\d.]+\s*CC)\)/i);
   if (mCC) out.cilindraje = mCC[1].toUpperCase().replace(/\s+/g, "");
 
-  // Color: lo que está entre el modelo y el año (o CHASIS, lo que aparezca primero)
-  // Estrategia: tomar la parte después de "FI"/"ABS"/"CBS"/"FACELIFT" y antes del año o "CHASIS"
+  // Limpiar descripción: quitar MOTOCICLETA, CHASIS+..., (xCC), año
   const limpio = desc
     .replace(/^MOTOCICLET[A]?\s+/i, "")
     .replace(/\s*CHASIS\s+.*$/i, "")
     .replace(/\s*\([\d.]+\s*CC\)\s*/i, " ")
     .replace(/\b(20\d{2})\b/, "")
     .trim();
-  // Quitar el modelo del inicio (ej "RAIDER 125 FI") — heurística: hasta encontrar
-  // una palabra completamente alfa que sea color común
+  // Partir entre modelo y color: heurística — color empieza con palabras comunes
   const partes = limpio.split(/\s+/);
   const colorIdx = partes.findIndex(w => /^(NEGR|BLANC|ROJ|AZUL|GRIS|VERDE|AMARILL|PLATA|NARANJ|MARRON|DORAD)/i.test(w));
-  if (colorIdx > 0) out.color = partes.slice(colorIdx).join(" ").trim();
+  if (colorIdx > 0) {
+    out.color = partes.slice(colorIdx).join(" ").trim();
+    out.modelo = partes.slice(0, colorIdx).join(" ").trim(); // todo lo previo al color = modelo
+  } else {
+    // No se detectó color → todo el limpio es modelo
+    out.modelo = limpio;
+  }
 
   return out;
 }
@@ -158,6 +162,7 @@ function normalizarProducto(p) {
     descripcion: desc,
     chasis: parsed.chasis || "",
     motor: parsed.motor || "",
+    modeloParsed: parsed.modelo || "",
     color: parsed.color || "",
     anio: parsed.anio || "",
     cilindraje: parsed.cilindraje || "",
