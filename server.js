@@ -1779,11 +1779,18 @@ app.get("/api/siigo/buscar/:chasis", requireAuth, async (req, res) => {
       return "OTRO";
     }
 
-    // Búsqueda parcial: el query puede ser parte del chasis o motor
+    // Búsqueda parcial: el query puede ser parte del chasis, motor, código,
+    // nombre o descripción. Buscar también en nombre/descripción permite
+    // encontrar motos por modelo (ej: "APACHE") aunque la description en Siigo
+    // no tenga la línea "CHASIS XXX" (caso común con productos cargados sin
+    // ese dato — quedan con chasis vacío después del parser).
     const matches = productos.filter(p =>
       (p.chasis || "").toUpperCase().includes(query) ||
       (p.motor || "").toUpperCase().includes(query) ||
-      (p.codigo || "").toUpperCase().includes(query)
+      (p.codigo || "").toUpperCase().includes(query) ||
+      (p.nombre || "").toUpperCase().includes(query) ||
+      (p.descripcion || "").toUpperCase().includes(query) ||
+      (p.modeloParsed || "").toUpperCase().includes(query)
     );
 
     if (matches.length === 0) {

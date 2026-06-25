@@ -1946,8 +1946,8 @@ function attachChasisAutocomplete() {
       return;
     }
     if (motosLocal.length > 1 && motosLocal.length <= 20) {
-      mostrarOpcionesEnDatalist(motosLocal);
-      mostrarMsgAutofill(`📋 ${motosLocal.length} coincidencias — abre el menú o escribe más caracteres`, "info");
+      const info = mostrarOpcionesEnDatalist(motosLocal);
+      mostrarMsgAutofill(`📋 ${motosLocal.length} coincidencias — abre el menú o escribe más caracteres.${info.sumarioSinChasis}`, "info");
       return;
     }
 
@@ -1962,8 +1962,8 @@ function attachChasisAutocomplete() {
       }
       if (data.multiple && data.opciones?.length > 1) {
         // Hay varias motos que matchean — mostrar opciones en el datalist
-        mostrarOpcionesEnDatalist(data.opciones);
-        mostrarMsgAutofill(`📋 ${data.total} coincidencias en Siigo — abre el menú desplegable o escribe más caracteres`, "info");
+        const info = mostrarOpcionesEnDatalist(data.opciones);
+        mostrarMsgAutofill(`📋 ${data.total} coincidencias en Siigo — abre el menú desplegable o escribe más caracteres.${info.sumarioSinChasis}`, "info");
         return;
       }
       const m = data.moto || data.opciones?.[0];
@@ -1973,14 +1973,29 @@ function attachChasisAutocomplete() {
     }
   }
 
+  // Retorna { conChasis, sinChasis, sumarioSinChasis } para que el caller
+  // pueda construir el mensaje completo (los callers ya muestran su propio
+  // mensaje de "N coincidencias"; añadimos al final la pista de motos sin chasis).
   function mostrarOpcionesEnDatalist(motos) {
     const dl = document.getElementById("chasisList");
-    if (!dl) return;
-    dl.innerHTML = motos.slice(0, 20).map(m => {
+    if (!dl) return { conChasis: 0, sinChasis: 0, sumarioSinChasis: "" };
+    const conChasis = motos.filter(m => m.chasis);
+    const sinChasis = motos.filter(m => !m.chasis);
+    dl.innerHTML = conChasis.slice(0, 20).map(m => {
       const estado = m.stock === 0 ? " · VENDIDA" : "";
       const label = `${m.marca || ""} ${m.modelo || ""} · ${m.color || ""}${estado}`.trim();
       return `<option value="${escapeHtml(m.chasis)}">${escapeHtml(label)}</option>`;
     }).join("");
+    let sumarioSinChasis = "";
+    if (sinChasis.length > 0) {
+      const muestra = sinChasis.slice(0, 3).map(m => {
+        const codigo = m.codigo || m.motor || "(sin código)";
+        return `${m.modelo || ""} · ${m.color || ""} · motor ${codigo}`.trim();
+      }).join(" · ");
+      const extra = sinChasis.length > 3 ? ` (+${sinChasis.length - 3} más)` : "";
+      sumarioSinChasis = ` ⚠️ ${sinChasis.length} moto(s) SIN chasis registrado en Siigo: ${muestra}${extra}. Escribe el chasis a mano desde la factura.`;
+    }
+    return { conChasis: conChasis.length, sinChasis: sinChasis.length, sumarioSinChasis };
   }
 
   function mostrarMsgAutofill(texto, tipo) {
