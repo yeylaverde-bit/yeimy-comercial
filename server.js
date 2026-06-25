@@ -1677,7 +1677,7 @@ app.post("/api/registrar-venta", requireAuth, async (req, res) => {
 // --- Siigo: leer inventario de productos ---
 // Cualquier usuario autenticado puede consultar el inventario combinado.
 let siigoCache = { data: null, fetchedAt: 0 };
-const SIIGO_CACHE_MS = 5 * 60 * 1000; // 5 min — evita martillar la API
+const SIIGO_CACHE_MS = 60 * 1000; // 1 min — corto para que cambios en Siigo se reflejen rápido
 
 app.get("/api/siigo/productos", requireAuth, async (req, res) => {
   if (!siigo.siigoConfigurado()) {
@@ -1749,6 +1749,21 @@ app.delete("/api/codigos-impulsa", requireAuth, (req, res) => {
 });
 
 // --- Siigo: buscar un chasis específico para autocompletar formularios ---
+// Forzar refresh manual del cache de productos Siigo (cualquier usuario auth)
+app.post("/api/siigo/refresh-cache", requireAuth, async (req, res) => {
+  if (!siigo.siigoConfigurado()) {
+    return res.status(503).json({ ok: false, error: "Siigo no configurado" });
+  }
+  try {
+    const crudos = await siigo.obtenerProductos();
+    const productos = crudos.map(siigo.normalizarProducto);
+    siigoCache = { data: productos, fetchedAt: Date.now() };
+    res.json({ ok: true, total: productos.length });
+  } catch (e) {
+    res.status(500).json({ ok: false, error: e.message });
+  }
+});
+
 app.get("/api/siigo/buscar/:chasis", requireAuth, async (req, res) => {
   if (!siigo.siigoConfigurado()) {
     return res.status(503).json({ ok: false, error: "Siigo no configurado" });
@@ -1759,9 +1774,11 @@ app.get("/api/siigo/buscar/:chasis", requireAuth, async (req, res) => {
   }
   try {
     // Usa el cache si está fresco (no hace falta refrescar para cada búsqueda)
+    // El usuario puede forzar refresh con ?refresh=1
+    const forceRefresh = req.query.refresh === "1" || req.query.refresh === "true";
     let productos = siigoCache.data;
     const now = Date.now();
-    if (!productos || (now - siigoCache.fetchedAt) > SIIGO_CACHE_MS) {
+    if (!productos || forceRefresh || (now - siigoCache.fetchedAt) > SIIGO_CACHE_MS) {
       const crudos = await siigo.obtenerProductos();
       productos = crudos.map(siigo.normalizarProducto);
       siigoCache = { data: productos, fetchedAt: now };

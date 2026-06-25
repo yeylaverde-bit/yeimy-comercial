@@ -1973,29 +1973,91 @@ function attachChasisAutocomplete() {
     }
   }
 
-  // Retorna { conChasis, sinChasis, sumarioSinChasis } para que el caller
-  // pueda construir el mensaje completo (los callers ya muestran su propio
-  // mensaje de "N coincidencias"; añadimos al final la pista de motos sin chasis).
+  // Llena el dropdown con motos con chasis válido y renderiza un panel
+  // destacado debajo del input con las motos SIN chasis (description en
+  // Siigo no tiene la línea "CHASIS XXX"). Cada moto sin chasis trae un
+  // botón "✓ Usar esta" que pre-llena marca/modelo/color/motor.
   function mostrarOpcionesEnDatalist(motos) {
     const dl = document.getElementById("chasisList");
     if (!dl) return { conChasis: 0, sinChasis: 0, sumarioSinChasis: "" };
     const conChasis = motos.filter(m => m.chasis);
     const sinChasis = motos.filter(m => !m.chasis);
-    dl.innerHTML = conChasis.slice(0, 20).map(m => {
+    dl.innerHTML = conChasis.slice(0, 50).map(m => {
       const estado = m.stock === 0 ? " · VENDIDA" : "";
       const label = `${m.marca || ""} ${m.modelo || ""} · ${m.color || ""}${estado}`.trim();
       return `<option value="${escapeHtml(m.chasis)}">${escapeHtml(label)}</option>`;
     }).join("");
+    // Panel destacado para motos sin chasis registrado
+    renderPanelSinChasis(sinChasis);
     let sumarioSinChasis = "";
     if (sinChasis.length > 0) {
-      const muestra = sinChasis.slice(0, 3).map(m => {
-        const codigo = m.codigo || m.motor || "(sin código)";
-        return `${m.modelo || ""} · ${m.color || ""} · motor ${codigo}`.trim();
-      }).join(" · ");
-      const extra = sinChasis.length > 3 ? ` (+${sinChasis.length - 3} más)` : "";
-      sumarioSinChasis = ` ⚠️ ${sinChasis.length} moto(s) SIN chasis registrado en Siigo: ${muestra}${extra}. Escribe el chasis a mano desde la factura.`;
+      sumarioSinChasis = ` ⬇️ Mira el panel naranja debajo — ${sinChasis.length} moto(s) sin chasis en Siigo.`;
     }
     return { conChasis: conChasis.length, sinChasis: sinChasis.length, sumarioSinChasis };
+  }
+
+  // Renderiza un panel destacado debajo del input chasis con las motos
+  // que no tienen CHASIS XXX en su descripción de Siigo. Cada una tiene un
+  // botón "✓ Usar esta" que pre-llena los campos y deja chasis editable.
+  function renderPanelSinChasis(sinChasis) {
+    const cont = document.getElementById("preasigSinChasisPanel");
+    if (!cont) return;
+    if (!sinChasis || sinChasis.length === 0) {
+      cont.innerHTML = "";
+      cont.style.display = "none";
+      return;
+    }
+    cont.style.display = "block";
+    cont.innerHTML = `
+      <div style="background:rgba(245,158,11,.12);border:2px solid #f59e0b;border-radius:10px;padding:12px;margin:10px 0">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+          <span style="font-size:18px">⚠️</span>
+          <strong style="color:#f59e0b;font-size:13px">${sinChasis.length} moto(s) sin chasis registrado en Siigo</strong>
+        </div>
+        <p class="muted" style="font-size:11.5px;margin:0 0 10px">
+          Estas motos están en Siigo pero les falta la línea "CHASIS XXX" en su descripción.
+          Click <strong>"✓ Usar esta"</strong> para auto-llenar marca/modelo/color y escribe el chasis manual desde la factura.
+        </p>
+        <div style="display:flex;flex-direction:column;gap:6px;max-height:240px;overflow-y:auto">
+          ${sinChasis.slice(0, 20).map((m, i) => {
+            const stockTag = m.stock === 0 ? `<span style="color:#ef4444;font-weight:600">VENDIDA</span>` : `<span style="color:#22c55e">Stock ${m.stock ?? "?"}</span>`;
+            const dataAttr = encodeURIComponent(JSON.stringify({
+              marca: m.marca || "",
+              modelo: m.modelo || "",
+              color: m.color || "",
+              motor: m.motor || "",
+              codigo: m.codigo || "",
+            }));
+            return `<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 10px;background:rgba(8,12,28,.55);border:1px solid var(--line);border-radius:6px">
+              <div style="flex:1;min-width:0">
+                <div style="font-weight:600;font-size:12.5px">${escapeHtml(m.marca || "")} ${escapeHtml(m.modelo || "")}</div>
+                <div class="muted" style="font-size:11px">${escapeHtml(m.color || "")} · motor <code style="color:var(--accent-2)">${escapeHtml(m.codigo || m.motor || "(sin código)")}</code> · ${stockTag}</div>
+              </div>
+              <button class="btn-mini" data-usar-sin-chasis="${dataAttr}" style="background:#f59e0b;border-color:#f59e0b;color:#000;padding:6px 10px;font-size:11.5px;white-space:nowrap;font-weight:600">✓ Usar esta</button>
+            </div>`;
+          }).join("")}
+        </div>
+      </div>
+    `;
+    // Listeners de los botones "Usar esta"
+    cont.querySelectorAll("[data-usar-sin-chasis]").forEach(btn => {
+      btn.addEventListener("click", () => {
+        try {
+          const m = JSON.parse(decodeURIComponent(btn.dataset.usarSinChasis));
+          const f = document.getElementById("formPreasig");
+          if (m.marca) f.querySelector('[name="marca"]').value = m.marca;
+          if (m.modelo) f.querySelector('[name="modelo"]').value = m.modelo;
+          if (m.color) f.querySelector('[name="color"]').value = m.color;
+          if (m.motor) f.querySelector('[name="motor"]').value = m.motor;
+          // Limpiar y enfocar el chasis para que escriba a mano
+          const chasisInp = f.querySelector('[name="chasis"]');
+          chasisInp.value = "";
+          chasisInp.focus();
+          mostrarMsgAutofill(`✓ Datos llenos · escribe el CHASIS de la factura (motor ${m.codigo || m.motor || "?"})`, "ok");
+          cont.style.display = "none";
+        } catch (e) { showToast("Error: " + e.message); }
+      });
+    });
   }
 
   function mostrarMsgAutofill(texto, tipo) {
