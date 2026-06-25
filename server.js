@@ -1779,28 +1779,47 @@ app.get("/api/siigo/buscar/:chasis", requireAuth, async (req, res) => {
       return "OTRO";
     }
 
-    // Búsqueda parcial: el query puede ser parte del chasis, motor, código,
-    // nombre o descripción. Buscar también en nombre/descripción permite
-    // encontrar motos por modelo (ej: "APACHE") aunque la description en Siigo
-    // no tenga la línea "CHASIS XXX" (caso común con productos cargados sin
-    // ese dato — quedan con chasis vacío después del parser).
-    const matches = productos.filter(p =>
-      (p.chasis || "").toUpperCase().includes(query) ||
-      (p.motor || "").toUpperCase().includes(query) ||
-      (p.codigo || "").toUpperCase().includes(query) ||
-      (p.nombre || "").toUpperCase().includes(query) ||
-      (p.descripcion || "").toUpperCase().includes(query) ||
-      (p.modeloParsed || "").toUpperCase().includes(query)
-    );
+    // Búsqueda tokenizada: el query se divide en palabras (por espacios) y
+    // TODAS deben aparecer en algún campo del producto. Así "APACHE 200"
+    // matchea "APACHE RTR 200 4V XC FI ABS" (que NO es substring literal).
+    // Buscar en chasis, motor, código, nombre, descripción y modeloParsed para
+    // encontrar motos aunque la description en Siigo no tenga "CHASIS XXX".
+    const tokens = query.split(/\s+/).filter(t => t.length > 0);
+    function hayHaystack(p) {
+      return [
+        p.chasis || "",
+        p.motor || "",
+        p.codigo || "",
+        p.nombre || "",
+        p.descripcion || "",
+        p.modeloParsed || "",
+      ].join(" ").toUpperCase();
+    }
+    const matches = productos.filter(p => {
+      const hay = hayHaystack(p);
+      return tokens.every(t => hay.includes(t));
+    });
+
+    // Ordenar: chasis o motor exactos primero (más específicos), luego el resto
+    matches.sort((a, b) => {
+      const aExact = (a.chasis || "").toUpperCase() === query || (a.motor || "").toUpperCase() === query || (a.codigo || "").toUpperCase() === query;
+      const bExact = (b.chasis || "").toUpperCase() === query || (b.motor || "").toUpperCase() === query || (b.codigo || "").toUpperCase() === query;
+      if (aExact !== bExact) return aExact ? -1 : 1;
+      // Motos con chasis parseado tienen prioridad sobre las sin chasis (más útiles para el usuario)
+      const aTieneChasis = !!a.chasis, bTieneChasis = !!b.chasis;
+      if (aTieneChasis !== bTieneChasis) return aTieneChasis ? -1 : 1;
+      return 0;
+    });
 
     if (matches.length === 0) {
       return res.json({ ok: false, encontrado: false, mensaje: "Chasis no está en Siigo" });
     }
 
-    // Mapear a formato estándar (hasta 20 resultados)
+    // Mapear a formato estándar (hasta 50 resultados — antes 20, pero con muchas
+    // motos similares el match correcto puede caer fuera del límite)
     // Prioriza modeloParsed (extraído de description, más confiable) sobre p.nombre
     // (el name puede estar mal escrito en Siigo — ej: name="BET TK" pero description="APACHE RTR 200")
-    const lista = matches.slice(0, 20).map(p => {
+    const lista = matches.slice(0, 50).map(p => {
       const modeloLimpio = p.modeloParsed || (p.nombre || "").replace(/^MOTOCICLET[A]?\s+/i, "").trim();
       return {
         chasis: p.chasis,
