@@ -23,6 +23,7 @@ const fs = require("fs");
 const Anthropic = require("@anthropic-ai/sdk");
 require("dotenv").config({ path: path.join(__dirname, ".env") });
 const siigo = require("./siigo");
+const papeleria = require("./lib/papeleria-pdf");
 
 const app = express();
 const PORT = Number(process.env.PORT) || 3000;
@@ -1316,6 +1317,73 @@ Devuelve SOLO el JSON, sin texto adicional.`;
     res.status(500).json({ ok: false, error: e.message });
   }
 });
+
+// POST /api/papeleria/generar — orquesta todo el flujo de papelería.
+// Recibe (multipart):
+//   - datos        (form field, JSON string): datos combinados del cliente y la moto
+//   - empadronamiento (file, opcional): PDF de Auteco
+//   - cedula       (file, opcional): foto/PDF de la cédula
+//   - factura      (file, opcional): PDF de la factura Serviautec
+//   - recibo       (file, opcional): foto del recibo (firma futura)
+//   - prenda       (file, opcional): PDF del contrato de prenda (RODA, Sufi, etc)
+//   - firmaPng     (file, opcional): PNG de la firma ya extraída. Si viene, se estampa.
+// Devuelve: application/pdf con el paquete unido.
+app.post("/api/papeleria/generar", requireAuth, requireAdmin,
+  uploadPapeleria.fields([
+    { name: "empadronamiento", maxCount: 1 },
+    { name: "cedula",          maxCount: 1 },
+    { name: "factura",         maxCount: 1 },
+    { name: "recibo",          maxCount: 1 },
+    { name: "prenda",          maxCount: 1 },
+    { name: "firmaPng",        maxCount: 1 },
+  ]),
+  async (req, res) => {
+    try {
+      let datos = {};
+      try { datos = JSON.parse(req.body.datos || "{}"); }
+      catch { return res.status(400).json({ ok: false, error: "Campo 'datos' debe ser JSON válido" }); }
+
+      const files = req.files || {};
+      const readFile = (key) => files[key]?.[0]
+        ? { bytes: fs.readFileSync(files[key][0].path), mime: files[key][0].mimetype }
+        : null;
+
+      const firmaSrc = readFile("firmaPng");
+      const firmaPng = firmaSrc && /png/i.test(firmaSrc.mime) ? firmaSrc.bytes : null;
+
+      // 1) Generar RUNT y Mandato llenos
+      const runtBytes = await papeleria.llenarRUNT(datos, firmaPng);
+      const mandatoBytes = await papeleria.llenarMandato(datos, firmaPng);
+
+      // 2) Convertir anexos (imágenes/PDFs) a PDF para poder unirlos
+      const emp     = readFile("empadronamiento");
+      const ced     = readFile("cedula");
+      const fac     = readFile("factura");
+      const rec     = readFile("recibo");
+      const prenda  = readFile("prenda");
+
+      const items = [];
+      if (emp) items.push(await papeleria.aPDF(emp.bytes, emp.mime));
+      if (fac) items.push(await papeleria.aPDF(fac.bytes, fac.mime));
+      items.push(runtBytes);
+      items.push(mandatoBytes);
+      if (ced) items.push(await papeleria.aPDF(ced.bytes, ced.mime));
+      if (rec) items.push(await papeleria.aPDF(rec.bytes, rec.mime));
+      if (prenda) items.push(await papeleria.aPDF(prenda.bytes, prenda.mime));
+
+      // 3) Ensamblar paquete único
+      const paquete = await papeleria.ensamblarPaquete(items);
+
+      const safeName = (datos.cc || datos.cliente_cc || "cliente").toString().replace(/\W+/g, "");
+      res.setHeader("Content-Type", "application/pdf");
+      res.setHeader("Content-Disposition", `attachment; filename="papeleria-${safeName}.pdf"`);
+      res.end(Buffer.from(paquete));
+    } catch (e) {
+      console.error("Error /api/papeleria/generar:", e);
+      res.status(500).json({ ok: false, error: e.message });
+    }
+  }
+);
 
 // ============================================================
 //      LEADS REGISTRADOS (lista de los clientes ingresados)

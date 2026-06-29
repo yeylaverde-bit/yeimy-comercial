@@ -11,12 +11,14 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.100.1",
+    "@pdf-lib/fontkit": "^1.1.1",
     "bcryptjs": "^2.4.3",
     "cookie-parser": "^1.4.6",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
     "express-session": "^1.18.0",
     "multer": "^1.4.5-lts.1",
+    "pdf-lib": "^1.17.1",
     "session-file-store": "^1.5.0"
   }
 }

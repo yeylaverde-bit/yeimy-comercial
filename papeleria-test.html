@@ -3,222 +3,277 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Papelería · Test de extracción</title>
+<title>Papelería · Test</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
 <style>
   :root {
-    --bg: #0c0e1a;
-    --panel: #161830;
-    --panel-2: #1f2240;
-    --accent: #7c5cff;
-    --accent-2: #5dd6ff;
-    --ok: #22c55e;
-    --err: #ef4444;
-    --text: #e6e8f3;
-    --muted: #94a3b8;
+    --bg: #0c0e1a; --panel: #161830; --panel-2: #1f2240;
+    --accent: #7c5cff; --accent-2: #5dd6ff;
+    --ok: #22c55e; --err: #ef4444;
+    --text: #e6e8f3; --muted: #94a3b8;
     --border: rgba(255,255,255,0.08);
   }
   * { box-sizing: border-box; }
   body {
     margin: 0; padding: 24px;
     background: linear-gradient(180deg, var(--bg) 0%, #06070f 100%);
-    color: var(--text);
-    font-family: 'Inter', -apple-system, sans-serif;
-    min-height: 100vh;
+    color: var(--text); font-family: 'Inter', sans-serif; min-height: 100vh;
   }
-  .header {
-    max-width: 1100px; margin: 0 auto 24px;
-    display: flex; align-items: center; justify-content: space-between;
-  }
+  .wrap { max-width: 1100px; margin: 0 auto; }
+  .header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
   .header h1 { margin: 0; font-size: 22px; font-weight: 700; }
   .header .sub { color: var(--muted); font-size: 13px; margin-top: 2px; }
-  .back {
-    background: var(--panel-2); color: var(--text);
-    border: 1px solid var(--border);
-    border-radius: 8px; padding: 8px 14px;
-    font-family: inherit; text-decoration: none;
-    transition: all .15s;
-  }
+  .back { background: var(--panel-2); color: var(--text); border: 1px solid var(--border); border-radius: 8px; padding: 8px 14px; text-decoration: none; }
   .back:hover { background: var(--accent); }
-  .grid { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-  @media (max-width: 850px) { .grid { grid-template-columns: 1fr; } }
-  .card {
-    background: var(--panel);
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    padding: 22px;
+  .step {
+    background: var(--panel); border: 1px solid var(--border); border-radius: 14px;
+    padding: 22px; margin-bottom: 18px;
   }
-  .card h2 {
-    margin: 0 0 4px; font-size: 16px; font-weight: 600;
+  .step-head {
+    display: flex; align-items: center; gap: 12px; margin-bottom: 14px;
   }
-  .card .help { color: var(--muted); font-size: 12.5px; margin-bottom: 16px; }
+  .step-num {
+    width: 30px; height: 30px; border-radius: 50%;
+    background: var(--accent); color: white;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700;
+  }
+  .step-num.ok { background: var(--ok); }
+  .step h2 { margin: 0; font-size: 16px; font-weight: 600; }
+  .step .help { color: var(--muted); font-size: 12.5px; margin-top: 2px; }
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 850px) { .row2 { grid-template-columns: 1fr; } }
   .dropzone {
-    border: 2px dashed var(--border);
-    border-radius: 10px;
-    padding: 28px 16px; text-align: center;
-    cursor: pointer; transition: all .15s;
-    color: var(--muted);
+    border: 2px dashed var(--border); border-radius: 10px;
+    padding: 20px 16px; text-align: center; cursor: pointer;
+    color: var(--muted); transition: all .15s;
   }
   .dropzone:hover, .dropzone.drag {
-    border-color: var(--accent); background: rgba(124,92,255,0.06);
-    color: var(--text);
+    border-color: var(--accent); background: rgba(124,92,255,0.06); color: var(--text);
   }
-  .dropzone .icon { font-size: 28px; margin-bottom: 6px; }
+  .dropzone .icon { font-size: 24px; margin-bottom: 4px; }
   .dropzone input { display: none; }
   .file-info {
-    margin-top: 12px; padding: 8px 12px;
-    background: var(--panel-2); border-radius: 8px;
-    font-size: 12.5px; color: var(--text);
-    display: none;
+    margin-top: 10px; padding: 8px 12px; background: var(--panel-2);
+    border-radius: 8px; font-size: 12.5px; display: none;
   }
   .file-info.show { display: block; }
   .btn {
-    width: 100%; margin-top: 14px;
-    background: var(--accent); color: white;
-    border: none; border-radius: 10px;
-    padding: 12px 16px; font-family: inherit; font-weight: 600; font-size: 14px;
-    cursor: pointer; transition: all .15s;
+    background: var(--accent); color: white; border: none; border-radius: 10px;
+    padding: 11px 16px; font-family: inherit; font-weight: 600; font-size: 14px;
+    cursor: pointer; transition: all .15s; width: 100%; margin-top: 12px;
   }
   .btn:disabled { background: var(--panel-2); color: var(--muted); cursor: not-allowed; }
-  .btn:not(:disabled):hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(124,92,255,0.3); }
-  .result {
-    margin-top: 14px; padding: 14px; border-radius: 10px;
-    font-size: 13px;
-    display: none;
-  }
+  .btn:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(124,92,255,0.3); }
+  .btn.secondary { background: var(--panel-2); border: 1px solid var(--border); }
+  .btn.success { background: var(--ok); }
+  .result { margin-top: 12px; padding: 12px; border-radius: 10px; font-size: 13px; display: none; }
   .result.show { display: block; }
   .result.ok { background: rgba(34,197,94,0.08); border: 1px solid rgba(34,197,94,0.25); }
   .result.err { background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.25); color: #fca5a5; }
-  .result h3 { margin: 0 0 8px; font-size: 14px; font-weight: 600; color: var(--ok); }
+  .result h3 { margin: 0 0 8px; font-size: 13px; font-weight: 600; color: var(--ok); }
   .result.err h3 { color: var(--err); }
-  table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
-  table td { padding: 6px 8px; border-bottom: 1px solid var(--border); }
+  table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  table td { padding: 5px 8px; border-bottom: 1px solid var(--border); }
   table td:first-child { color: var(--muted); width: 42%; font-weight: 500; }
-  table td:last-child { color: var(--text); font-family: 'SF Mono', Consolas, monospace; word-break: break-all; }
+  table td:last-child { font-family: 'SF Mono', Consolas, monospace; word-break: break-all; }
   .spinner {
     display: inline-block; width: 14px; height: 14px;
-    border: 2px solid rgba(255,255,255,0.2);
-    border-top-color: white; border-radius: 50%;
-    animation: spin .8s linear infinite;
+    border: 2px solid rgba(255,255,255,0.2); border-top-color: white;
+    border-radius: 50%; animation: spin .8s linear infinite;
     vertical-align: -2px; margin-right: 8px;
   }
   @keyframes spin { to { transform: rotate(360deg); } }
-  .meta { color: var(--muted); font-size: 11px; margin-top: 10px; text-align: right; }
+  label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 4px; }
+  input[type="text"], input[type="date"], select {
+    width: 100%; padding: 9px 12px; background: var(--panel-2);
+    border: 1px solid var(--border); border-radius: 8px;
+    color: var(--text); font-family: inherit; font-size: 13.5px;
+  }
+  input:focus, select:focus { outline: none; border-color: var(--accent); }
+  .field { margin-bottom: 12px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+  @media (max-width: 700px) { .grid-3 { grid-template-columns: 1fr; } }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  @media (max-width: 700px) { .grid-2 { grid-template-columns: 1fr; } }
+  .small-files { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  @media (max-width: 700px) { .small-files { grid-template-columns: 1fr; } }
+  .file-mini { background: var(--panel-2); border-radius: 8px; padding: 10px; font-size: 12.5px; }
+  .file-mini label { margin-bottom: 6px; }
 </style>
 </head>
 <body>
-  <div class="header">
-    <div>
-      <h1>📄 Papelería · Test de extracción</h1>
-      <div class="sub">Verifica que Claude Vision lea correctamente los documentos antes de armar la UI final.</div>
+  <div class="wrap">
+    <div class="header">
+      <div>
+        <h1>📄 Papelería · Generar paquete</h1>
+        <div class="sub">Sube documentos, extrae datos automáticamente, descarga el paquete listo para imprimir.</div>
+      </div>
+      <a href="/" class="back">← Volver</a>
     </div>
-    <a href="/" class="back">← Volver al dashboard</a>
-  </div>
 
-  <div class="grid">
-    <!-- EMPADRONAMIENTO -->
-    <div class="card">
-      <h2>1. Empadronamiento (Certificado de Aduana Auteco)</h2>
-      <div class="help">Sube el PDF que te entrega Auteco con los datos técnicos de la moto.</div>
-
+    <!-- PASO 1: EMPADRONAMIENTO -->
+    <div class="step">
+      <div class="step-head"><div class="step-num" id="num1">1</div>
+        <div><h2>Empadronamiento (Auteco)</h2>
+          <div class="help">PDF del Certificado Individual de Aduanas → datos técnicos de la moto.</div></div>
+      </div>
       <label class="dropzone" id="dzEmp">
         <div class="icon">📂</div>
-        <div>Haz clic o arrastra el PDF aquí</div>
+        <div>Subir empadronamiento</div>
         <input type="file" id="fileEmp" accept="application/pdf,image/*" />
       </label>
       <div class="file-info" id="infoEmp"></div>
-
       <button class="btn" id="btnEmp" disabled>Procesar empadronamiento</button>
       <div class="result" id="resultEmp"></div>
     </div>
 
-    <!-- CEDULA -->
-    <div class="card">
-      <h2>2. Cédula del cliente</h2>
-      <div class="help">Sube una foto clara de la cédula colombiana (anverso).</div>
-
+    <!-- PASO 2: CEDULA -->
+    <div class="step">
+      <div class="step-head"><div class="step-num" id="num2">2</div>
+        <div><h2>Cédula del cliente</h2>
+          <div class="help">Foto del documento → nombres, apellidos, cédula.</div></div>
+      </div>
       <label class="dropzone" id="dzCed">
         <div class="icon">🪪</div>
-        <div>Haz clic o arrastra la foto aquí</div>
+        <div>Subir foto de cédula</div>
         <input type="file" id="fileCed" accept="image/*,application/pdf" />
       </label>
       <div class="file-info" id="infoCed"></div>
-
       <button class="btn" id="btnCed" disabled>Procesar cédula</button>
       <div class="result" id="resultCed"></div>
+    </div>
+
+    <!-- PASO 3: DATOS EXTRA + GENERAR -->
+    <div class="step">
+      <div class="step-head"><div class="step-num" id="num3">3</div>
+        <div><h2>Completar datos y generar paquete</h2>
+          <div class="help">Datos que faltan (dirección, teléfono, placa) + anexos opcionales.</div></div>
+      </div>
+
+      <div class="grid-3">
+        <div class="field"><label>Ciudad</label><input type="text" id="f_ciudad" value="MEDELLIN" /></div>
+        <div class="field"><label>Dirección</label><input type="text" id="f_direccion" placeholder="Calle / Carrera" /></div>
+        <div class="field"><label>Teléfono</label><input type="text" id="f_telefono" /></div>
+      </div>
+
+      <div class="grid-3">
+        <div class="field"><label>Placa - 3 letras</label><input type="text" id="f_placa_letras" maxlength="3" placeholder="KDA" /></div>
+        <div class="field"><label>Placa - 3 (números/letra)</label><input type="text" id="f_placa_numeros" maxlength="3" placeholder="34J" /></div>
+        <div class="field"><label>Trámite</label>
+          <select id="f_tramite">
+            <option>MATRICULA INICIAL</option>
+            <option>TRASPASO</option>
+            <option>CAMBIO DE COLOR</option>
+            <option>DUPLICADO DE TARJETA</option>
+            <option>RADICACION DE MATRICULA</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="grid-3">
+        <div class="field"><label>Día</label><input type="text" id="f_dia" maxlength="2" /></div>
+        <div class="field"><label>Mes (en letra)</label>
+          <select id="f_mes">
+            <option>Enero</option><option>Febrero</option><option>Marzo</option>
+            <option>Abril</option><option>Mayo</option><option>Junio</option>
+            <option>Julio</option><option>Agosto</option><option>Septiembre</option>
+            <option>Octubre</option><option>Noviembre</option><option>Diciembre</option>
+          </select>
+        </div>
+        <div class="field"><label>Año</label><input type="text" id="f_anio" maxlength="4" /></div>
+      </div>
+
+      <div class="field"><label>Observaciones (RUNT)</label>
+        <input type="text" id="f_observ" value="MATRICULA INICIAL - VEHICULO NUEVO" /></div>
+
+      <div style="margin-top: 18px;">
+        <div class="help" style="margin-bottom: 10px; color: var(--text); font-weight: 600;">Anexos opcionales:</div>
+        <div class="small-files">
+          <div class="file-mini">
+            <label>📄 Factura Serviautec (PDF)</label>
+            <input type="file" id="f_factura" accept="application/pdf,image/*" />
+          </div>
+          <div class="file-mini">
+            <label>📸 Recibo de inicial (foto)</label>
+            <input type="file" id="f_recibo" accept="image/*,application/pdf" />
+          </div>
+          <div class="file-mini">
+            <label>📑 Contrato de prenda (PDF)</label>
+            <input type="file" id="f_prenda" accept="application/pdf" />
+          </div>
+          <div class="file-mini">
+            <label>✍️ Firma PNG (opcional, transparente)</label>
+            <input type="file" id="f_firma" accept="image/png" />
+          </div>
+        </div>
+      </div>
+
+      <button class="btn success" id="btnGenerar" disabled>Generar paquete y descargar PDF</button>
+      <div class="result" id="resultGen"></div>
     </div>
   </div>
 
 <script>
+  // Estado global de los datos extraídos
+  const STATE = { empadronamiento: null, cedula: null };
+
   function setupDropzone(dzId, inputId, infoId, btnId) {
     const dz = document.getElementById(dzId);
     const input = document.getElementById(inputId);
     const info = document.getElementById(infoId);
     const btn = document.getElementById(btnId);
-
     const update = (file) => {
       if (file) {
         info.textContent = `📎 ${file.name} (${(file.size/1024).toFixed(0)} KB)`;
-        info.classList.add('show');
-        btn.disabled = false;
+        info.classList.add('show'); btn.disabled = false;
       } else {
-        info.classList.remove('show');
-        btn.disabled = true;
+        info.classList.remove('show'); btn.disabled = true;
       }
     };
-
     input.addEventListener('change', () => update(input.files[0]));
-
-    ['dragover','dragenter'].forEach(ev => {
-      dz.addEventListener(ev, e => { e.preventDefault(); dz.classList.add('drag'); });
-    });
-    ['dragleave','dragend','drop'].forEach(ev => {
-      dz.addEventListener(ev, () => dz.classList.remove('drag'));
-    });
+    ['dragover','dragenter'].forEach(ev => dz.addEventListener(ev, e => { e.preventDefault(); dz.classList.add('drag'); }));
+    ['dragleave','dragend','drop'].forEach(ev => dz.addEventListener(ev, () => dz.classList.remove('drag')));
     dz.addEventListener('drop', e => {
       e.preventDefault();
-      if (e.dataTransfer.files[0]) {
-        input.files = e.dataTransfer.files;
-        update(input.files[0]);
-      }
+      if (e.dataTransfer.files[0]) { input.files = e.dataTransfer.files; update(input.files[0]); }
     });
   }
-
   setupDropzone('dzEmp', 'fileEmp', 'infoEmp', 'btnEmp');
   setupDropzone('dzCed', 'fileCed', 'infoCed', 'btnCed');
 
-  async function procesar(url, fileInputId, btnId, resultId, mapper) {
+  function refreshGenerarHabilitado() {
+    document.getElementById('btnGenerar').disabled = !(STATE.empadronamiento && STATE.cedula);
+  }
+
+  async function procesar(url, fileInputId, btnId, resultId, mapper, storeKey, numEl) {
     const file = document.getElementById(fileInputId).files[0];
     const btn = document.getElementById(btnId);
     const result = document.getElementById(resultId);
     if (!file) return;
-
     btn.disabled = true;
     btn.innerHTML = '<span class="spinner"></span>Procesando con Claude Vision…';
     result.classList.remove('show', 'ok', 'err');
-
-    const fd = new FormData();
-    fd.append('archivo', file);
-
+    const fd = new FormData(); fd.append('archivo', file);
     try {
       const r = await fetch(url, { method: 'POST', body: fd, credentials: 'same-origin' });
       const data = await r.json();
       if (!r.ok || !data.ok) throw new Error(data.error || `HTTP ${r.status}`);
-
       const obj = mapper(data);
+      STATE[storeKey] = obj;
       let html = '<h3>✓ Extracción exitosa</h3><table>';
       for (const [k, v] of Object.entries(obj)) {
         const val = (v === null || v === undefined || v === '') ? '<span style="color:#94a3b8">—</span>' : String(v);
         html += `<tr><td>${k}</td><td>${val}</td></tr>`;
       }
       html += '</table>';
-      if (data.usoTokens) {
-        html += `<div class="meta">Tokens · input ${data.usoTokens.input} · output ${data.usoTokens.output}</div>`;
-      }
       result.innerHTML = html;
       result.classList.add('show', 'ok');
+      document.getElementById(numEl).classList.add('ok');
+      refreshGenerarHabilitado();
+      autocompletarFormulario();
     } catch (e) {
       result.innerHTML = `<h3>✗ Error</h3><div>${e.message}</div>`;
       result.classList.add('show', 'err');
@@ -228,15 +283,100 @@
     }
   }
 
+  function autocompletarFormulario() {
+    // Sugerir fecha de hoy
+    const hoy = new Date();
+    const meses = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
+    if (!document.getElementById('f_dia').value) document.getElementById('f_dia').value = String(hoy.getDate());
+    if (!document.getElementById('f_mes').value) document.getElementById('f_mes').value = meses[hoy.getMonth()];
+    if (!document.getElementById('f_anio').value) document.getElementById('f_anio').value = String(hoy.getFullYear());
+  }
+
   document.getElementById('btnEmp').addEventListener('click', () =>
     procesar('/api/empadronamiento/procesar', 'fileEmp', 'btnEmp', 'resultEmp',
-      data => data.empadronamiento || {})
+      data => data.empadronamiento || {}, 'empadronamiento', 'num1')
   );
-
   document.getElementById('btnCed').addEventListener('click', () =>
     procesar('/api/cedula/procesar', 'fileCed', 'btnCed', 'resultCed',
-      data => data.cedula || {})
+      data => data.cedula || {}, 'cedula', 'num2')
   );
+
+  document.getElementById('btnGenerar').addEventListener('click', async () => {
+    const btn = document.getElementById('btnGenerar');
+    const result = document.getElementById('resultGen');
+    result.classList.remove('show', 'ok', 'err');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span>Generando paquete…';
+
+    // Construir datos combinados
+    const emp = STATE.empadronamiento || {};
+    const ced = STATE.cedula || {};
+    const datos = {
+      primer_apellido:  ced.primer_apellido || "",
+      segundo_apellido: ced.segundo_apellido || "",
+      nombres:          ced.nombres || "",
+      cc:               ced.numero_cedula || "",
+      ciudad:           document.getElementById('f_ciudad').value,
+      direccion:        document.getElementById('f_direccion').value,
+      telefono:         document.getElementById('f_telefono').value,
+      clase_vehiculo:   emp.clase_vehiculo || "MOTOCICLETA",
+      marca:            emp.marca || "",
+      linea:            emp.linea || "",
+      modelo:           emp.anio_modelo || "",
+      cilindrada:       emp.cilindrada_cc ? Math.round(parseFloat(emp.cilindrada_cc)).toString() : "",
+      potencia:         emp.potencia_hp ? Math.round(parseFloat(emp.potencia_hp)).toString() : "",
+      color:            emp.color || "",
+      motor:            emp.motor || "",
+      chasis:           emp.chasis || emp.vin || "",
+      combustible:      emp.tipo_combustible || "GASOLINA",
+      tipo_servicio:    emp.tipo_servicio || "PARTICULAR",
+      placa_letras:     document.getElementById('f_placa_letras').value.toUpperCase(),
+      placa_numeros:    document.getElementById('f_placa_numeros').value.toUpperCase(),
+      observaciones:    document.getElementById('f_observ').value,
+      fecha_dia:        document.getElementById('f_dia').value,
+      fecha_mes_letra:  document.getElementById('f_mes').value,
+      fecha_anio:       document.getElementById('f_anio').value,
+      tramite:          document.getElementById('f_tramite').value,
+    };
+
+    const fd = new FormData();
+    fd.append('datos', JSON.stringify(datos));
+    const adjuntos = [
+      ['empadronamiento', 'fileEmp'],
+      ['cedula', 'fileCed'],
+      ['factura', 'f_factura'],
+      ['recibo', 'f_recibo'],
+      ['prenda', 'f_prenda'],
+      ['firmaPng', 'f_firma'],
+    ];
+    for (const [field, inputId] of adjuntos) {
+      const f = document.getElementById(inputId).files[0];
+      if (f) fd.append(field, f);
+    }
+
+    try {
+      const r = await fetch('/api/papeleria/generar', { method: 'POST', body: fd, credentials: 'same-origin' });
+      if (!r.ok) {
+        const err = await r.json().catch(() => ({}));
+        throw new Error(err.error || `HTTP ${r.status}`);
+      }
+      const blob = await r.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = `papeleria-${datos.cc || 'cliente'}.pdf`;
+      a.click();
+      URL.revokeObjectURL(url);
+      result.innerHTML = '<h3>✓ Paquete generado y descargado</h3><div>Revisa tus descargas. Si algo se ve mal, vuelve y ajusta.</div>';
+      result.classList.add('show', 'ok');
+      document.getElementById('num3').classList.add('ok');
+    } catch (e) {
+      result.innerHTML = `<h3>✗ Error</h3><div>${e.message}</div>`;
+      result.classList.add('show', 'err');
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = 'Generar paquete y descargar PDF';
+    }
+  });
 </script>
 </body>
 </html>

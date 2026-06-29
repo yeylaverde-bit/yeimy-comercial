@@ -1,6 +1,9 @@
 node_modules/
 .env
 sessions.db
+sessions/
+papeleria/
+papeleria-test-out/
 *.log
 *.bak
 .DS_Store
