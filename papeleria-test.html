@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Papelería · Test</title>
+<title>Papelería</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -16,166 +16,150 @@
     --border: rgba(255,255,255,0.08);
   }
   * { box-sizing: border-box; }
-  body {
-    margin: 0; padding: 24px;
-    background: linear-gradient(180deg, var(--bg) 0%, #06070f 100%);
-    color: var(--text); font-family: 'Inter', sans-serif; min-height: 100vh;
-  }
+  body { margin: 0; padding: 24px; background: linear-gradient(180deg, var(--bg) 0%, #06070f 100%); color: var(--text); font-family: 'Inter', sans-serif; min-height: 100vh; }
   .wrap { max-width: 1100px; margin: 0 auto; }
   .header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
   .header h1 { margin: 0; font-size: 22px; font-weight: 700; }
   .header .sub { color: var(--muted); font-size: 13px; margin-top: 2px; }
   .back { background: var(--panel-2); color: var(--text); border: 1px solid var(--border); border-radius: 8px; padding: 8px 14px; text-decoration: none; }
   .back:hover { background: var(--accent); }
-  .step {
-    background: var(--panel); border: 1px solid var(--border); border-radius: 14px;
-    padding: 22px; margin-bottom: 18px;
-  }
-  .step-head {
-    display: flex; align-items: center; gap: 12px; margin-bottom: 14px;
-  }
-  .step-num {
-    width: 30px; height: 30px; border-radius: 50%;
-    background: var(--accent); color: white;
-    display: flex; align-items: center; justify-content: center;
-    font-weight: 700;
-  }
+  .step { background: var(--panel); border: 1px solid var(--border); border-radius: 14px; padding: 22px; margin-bottom: 18px; }
+  .step-head { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+  .step-num { width: 30px; height: 30px; border-radius: 50%; background: var(--accent); color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; }
   .step-num.ok { background: var(--ok); }
   .step h2 { margin: 0; font-size: 16px; font-weight: 600; }
   .step .help { color: var(--muted); font-size: 12.5px; margin-top: 2px; }
-  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-  @media (max-width: 850px) { .row2 { grid-template-columns: 1fr; } }
-  .dropzone {
-    border: 2px dashed var(--border); border-radius: 10px;
-    padding: 20px 16px; text-align: center; cursor: pointer;
-    color: var(--muted); transition: all .15s;
-  }
-  .dropzone:hover, .dropzone.drag {
-    border-color: var(--accent); background: rgba(124,92,255,0.06); color: var(--text);
-  }
-  .dropzone .icon { font-size: 24px; margin-bottom: 4px; }
-  .dropzone input { display: none; }
-  .file-info {
-    margin-top: 10px; padding: 8px 12px; background: var(--panel-2);
-    border-radius: 8px; font-size: 12.5px; display: none;
-  }
-  .file-info.show { display: block; }
-  .btn {
-    background: var(--accent); color: white; border: none; border-radius: 10px;
-    padding: 11px 16px; font-family: inherit; font-weight: 600; font-size: 14px;
-    cursor: pointer; transition: all .15s; width: 100%; margin-top: 12px;
-  }
+  .btn { background: var(--accent); color: white; border: none; border-radius: 10px; padding: 11px 16px; font-family: inherit; font-weight: 600; font-size: 14px; cursor: pointer; transition: all .15s; }
   .btn:disabled { background: var(--panel-2); color: var(--muted); cursor: not-allowed; }
   .btn:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(124,92,255,0.3); }
-  .btn.secondary { background: var(--panel-2); border: 1px solid var(--border); }
+  .btn.block { width: 100%; margin-top: 12px; }
   .btn.success { background: var(--ok); }
+  .btn.success:hover:not(:disabled) { box-shadow: 0 6px 16px rgba(34,197,94,0.3); }
   .result { margin-top: 12px; padding: 12px; border-radius: 10px; font-size: 13px; display: none; }
   .result.show { display: block; }
   .result.ok { background: rgba(34,197,94,0.08); border: 1px solid rgba(34,197,94,0.25); }
   .result.err { background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.25); color: #fca5a5; }
   .result h3 { margin: 0 0 8px; font-size: 13px; font-weight: 600; color: var(--ok); }
   .result.err h3 { color: var(--err); }
-  table { width: 100%; border-collapse: collapse; font-size: 12px; }
-  table td { padding: 5px 8px; border-bottom: 1px solid var(--border); }
-  table td:first-child { color: var(--muted); width: 42%; font-weight: 500; }
-  table td:last-child { font-family: 'SF Mono', Consolas, monospace; word-break: break-all; }
-  .spinner {
-    display: inline-block; width: 14px; height: 14px;
-    border: 2px solid rgba(255,255,255,0.2); border-top-color: white;
-    border-radius: 50%; animation: spin .8s linear infinite;
-    vertical-align: -2px; margin-right: 8px;
-  }
+  .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.2); border-top-color: white; border-radius: 50%; animation: spin .8s linear infinite; vertical-align: -2px; margin-right: 8px; }
   @keyframes spin { to { transform: rotate(360deg); } }
-  label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 4px; }
-  input[type="text"], input[type="date"], select {
-    width: 100%; padding: 9px 12px; background: var(--panel-2);
-    border: 1px solid var(--border); border-radius: 8px;
-    color: var(--text); font-family: inherit; font-size: 13.5px;
-  }
+  label { display: block; font-size: 11.5px; color: var(--muted); margin-bottom: 4px; text-transform: uppercase; letter-spacing: .03em; font-weight: 500; }
+  input[type="text"], input[type="date"], select { width: 100%; padding: 9px 12px; background: var(--panel-2); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-family: inherit; font-size: 13.5px; }
   input:focus, select:focus { outline: none; border-color: var(--accent); }
   .field { margin-bottom: 12px; }
   .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
-  @media (max-width: 700px) { .grid-3 { grid-template-columns: 1fr; } }
   .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-  @media (max-width: 700px) { .grid-2 { grid-template-columns: 1fr; } }
-  .small-files { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-  @media (max-width: 700px) { .small-files { grid-template-columns: 1fr; } }
-  .file-mini { background: var(--panel-2); border-radius: 8px; padding: 10px; font-size: 12.5px; }
-  .file-mini label { margin-bottom: 6px; }
+  @media (max-width: 700px) { .grid-3, .grid-2 { grid-template-columns: 1fr; } }
+  .leads-list {
+    margin-top: 12px; max-height: 360px; overflow-y: auto;
+    border: 1px solid var(--border); border-radius: 10px;
+    display: none; background: var(--panel-2);
+  }
+  .leads-list.show { display: block; }
+  .lead-item {
+    padding: 10px 14px; border-bottom: 1px solid var(--border); cursor: pointer; transition: background .15s;
+    display: grid; grid-template-columns: 1fr auto; gap: 8px; align-items: center;
+  }
+  .lead-item:hover { background: rgba(124,92,255,0.1); }
+  .lead-item:last-child { border-bottom: none; }
+  .lead-item .name { font-weight: 600; font-size: 13.5px; }
+  .lead-item .meta { font-size: 11.5px; color: var(--muted); margin-top: 2px; }
+  .lead-item .pill { font-size: 10.5px; padding: 2px 8px; border-radius: 99px; background: rgba(124,92,255,0.2); color: var(--accent-2); white-space: nowrap; }
+  .selected-banner {
+    background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.3);
+    padding: 12px 14px; border-radius: 10px; margin-bottom: 14px; display: none;
+    font-size: 13px;
+  }
+  .selected-banner.show { display: flex; justify-content: space-between; align-items: center; }
+  .selected-banner strong { color: var(--ok); }
+  .clear-btn {
+    background: transparent; border: 1px solid var(--border); color: var(--muted);
+    border-radius: 6px; padding: 4px 10px; cursor: pointer; font-size: 12px;
+  }
+  .clear-btn:hover { color: var(--text); border-color: var(--text); }
+  .anexos { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+  @media (max-width: 700px) { .anexos { grid-template-columns: 1fr; } }
+  .anexo { background: var(--panel-2); border-radius: 8px; padding: 10px; font-size: 12.5px; }
+  .anexo label { margin-bottom: 6px; }
+  .opcional { color: var(--muted); font-weight: 400; text-transform: none; letter-spacing: 0; font-size: 11px; }
+  .row-search { display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: end; }
 </style>
 </head>
 <body>
   <div class="wrap">
     <div class="header">
       <div>
-        <h1>📄 Papelería · Generar paquete</h1>
-        <div class="sub">Sube documentos, extrae datos automáticamente, descarga el paquete listo para imprimir.</div>
+        <h1>📄 Papelería</h1>
+        <div class="sub">Selecciona un cliente registrado → el sistema llena el paquete completo.</div>
       </div>
       <a href="/" class="back">← Volver</a>
     </div>
 
-    <!-- PASO 1: EMPADRONAMIENTO -->
+    <!-- PASO 1: SELECCIONAR CLIENTE -->
     <div class="step">
       <div class="step-head"><div class="step-num" id="num1">1</div>
-        <div><h2>Empadronamiento (Auteco)</h2>
-          <div class="help">PDF del Certificado Individual de Aduanas → datos técnicos de la moto.</div></div>
-      </div>
-      <label class="dropzone" id="dzEmp">
-        <div class="icon">📂</div>
-        <div>Subir empadronamiento</div>
-        <input type="file" id="fileEmp" accept="application/pdf,image/*" />
-      </label>
-      <div class="file-info" id="infoEmp"></div>
-      <button class="btn" id="btnEmp" disabled>Procesar empadronamiento</button>
-      <div class="result" id="resultEmp"></div>
-    </div>
-
-    <!-- PASO 2: CEDULA -->
-    <div class="step">
-      <div class="step-head"><div class="step-num" id="num2">2</div>
-        <div><h2>Cédula del cliente</h2>
-          <div class="help">Foto del documento → nombres, apellidos, cédula.</div></div>
-      </div>
-      <label class="dropzone" id="dzCed">
-        <div class="icon">🪪</div>
-        <div>Subir foto de cédula</div>
-        <input type="file" id="fileCed" accept="image/*,application/pdf" />
-      </label>
-      <div class="file-info" id="infoCed"></div>
-      <button class="btn" id="btnCed" disabled>Procesar cédula</button>
-      <div class="result" id="resultCed"></div>
-    </div>
-
-    <!-- PASO 3: DATOS EXTRA + GENERAR -->
-    <div class="step">
-      <div class="step-head"><div class="step-num" id="num3">3</div>
-        <div><h2>Completar datos y generar paquete</h2>
-          <div class="help">Datos que faltan (dirección, teléfono, placa) + anexos opcionales.</div></div>
+        <div><h2>Selecciona el cliente</h2>
+          <div class="help">Busca por nombre, cédula, chasis o placa. Los datos ya están en tu sistema.</div></div>
       </div>
 
-      <div class="grid-3">
-        <div class="field"><label>Ciudad</label><input type="text" id="f_ciudad" value="MEDELLIN" /></div>
-        <div class="field"><label>Dirección</label><input type="text" id="f_direccion" placeholder="Calle / Carrera" /></div>
-        <div class="field"><label>Teléfono</label><input type="text" id="f_telefono" /></div>
-      </div>
-
-      <div class="grid-3">
-        <div class="field"><label>Placa - 3 letras</label><input type="text" id="f_placa_letras" maxlength="3" placeholder="KDA" /></div>
-        <div class="field"><label>Placa - 3 (números/letra)</label><input type="text" id="f_placa_numeros" maxlength="3" placeholder="34J" /></div>
-        <div class="field"><label>Trámite</label>
-          <select id="f_tramite">
-            <option>MATRICULA INICIAL</option>
-            <option>TRASPASO</option>
-            <option>CAMBIO DE COLOR</option>
-            <option>DUPLICADO DE TARJETA</option>
-            <option>RADICACION DE MATRICULA</option>
-          </select>
+      <div class="row-search">
+        <div class="field" style="margin-bottom:0">
+          <label>Buscar</label>
+          <input type="text" id="searchInput" placeholder="Carmen, 3740196, 9FL..., KCQ..." />
         </div>
+        <button class="btn" id="btnBuscar">Buscar</button>
+      </div>
+
+      <div class="selected-banner" id="selectedBanner">
+        <div>✓ Cliente seleccionado: <strong id="selectedName">—</strong> · <span id="selectedDoc">—</span></div>
+        <button class="clear-btn" id="clearSelected">Cambiar</button>
+      </div>
+
+      <div class="leads-list" id="leadsList"></div>
+    </div>
+
+    <!-- PASO 2: REVISAR Y COMPLETAR -->
+    <div class="step" id="step2" style="display:none">
+      <div class="step-head"><div class="step-num" id="num2">2</div>
+        <div><h2>Revisa los datos del paquete</h2>
+          <div class="help">Si falta algo (línea, cilindrada, etc) puedes subir el empadronamiento abajo para completarlo automático.</div></div>
       </div>
 
       <div class="grid-3">
+        <div class="field"><label>Primer apellido</label><input type="text" id="f_primer" /></div>
+        <div class="field"><label>Segundo apellido</label><input type="text" id="f_segundo" /></div>
+        <div class="field"><label>Nombres</label><input type="text" id="f_nombres" /></div>
+      </div>
+      <div class="grid-3">
+        <div class="field"><label>Cédula</label><input type="text" id="f_cc" /></div>
+        <div class="field"><label>Teléfono</label><input type="text" id="f_telefono" /></div>
+        <div class="field"><label>Ciudad</label><input type="text" id="f_ciudad" value="MEDELLIN" /></div>
+      </div>
+      <div class="field"><label>Dirección</label><input type="text" id="f_direccion" /></div>
+
+      <div class="grid-3" style="margin-top:14px">
+        <div class="field"><label>Marca</label><input type="text" id="f_marca" /></div>
+        <div class="field"><label>Línea</label><input type="text" id="f_linea" /></div>
+        <div class="field"><label>Color</label><input type="text" id="f_color" /></div>
+      </div>
+      <div class="grid-3">
+        <div class="field"><label>Año modelo</label><input type="text" id="f_modelo" /></div>
+        <div class="field"><label>Cilindrada</label><input type="text" id="f_cilindrada" /></div>
+        <div class="field"><label>Potencia (kW)</label><input type="text" id="f_potencia" /></div>
+      </div>
+      <div class="grid-3">
+        <div class="field"><label>Chasis</label><input type="text" id="f_chasis" /></div>
+        <div class="field"><label>Motor</label><input type="text" id="f_motor" /></div>
+        <div class="field"><label>Combustible</label><input type="text" id="f_combustible" value="GASOLINA" /></div>
+      </div>
+      <div class="grid-2">
+        <div class="field"><label>Placa - 3 letras</label><input type="text" id="f_placa_letras" maxlength="3" /></div>
+        <div class="field"><label>Placa - 3 (números/letra)</label><input type="text" id="f_placa_numeros" maxlength="3" /></div>
+      </div>
+
+      <div class="grid-3" style="margin-top:14px">
         <div class="field"><label>Día</label><input type="text" id="f_dia" maxlength="2" /></div>
-        <div class="field"><label>Mes (en letra)</label>
+        <div class="field"><label>Mes</label>
           <select id="f_mes">
             <option>Enero</option><option>Febrero</option><option>Marzo</option>
             <option>Abril</option><option>Mayo</option><option>Junio</option>
@@ -186,120 +170,207 @@
         <div class="field"><label>Año</label><input type="text" id="f_anio" maxlength="4" /></div>
       </div>
 
-      <div class="field"><label>Observaciones (RUNT)</label>
+      <div class="field"><label>Trámite</label>
+        <select id="f_tramite">
+          <option>MATRICULA INICIAL</option>
+          <option>TRASPASO</option>
+          <option>CAMBIO DE COLOR</option>
+          <option>DUPLICADO DE TARJETA</option>
+          <option>RADICACION DE MATRICULA</option>
+        </select>
+      </div>
+      <div class="field"><label>Observaciones</label>
         <input type="text" id="f_observ" value="MATRICULA INICIAL - VEHICULO NUEVO" /></div>
+    </div>
 
-      <div style="margin-top: 18px;">
-        <div class="help" style="margin-bottom: 10px; color: var(--text); font-weight: 600;">Anexos opcionales:</div>
-        <div class="small-files">
-          <div class="file-mini">
-            <label>📄 Factura Serviautec (PDF)</label>
-            <input type="file" id="f_factura" accept="application/pdf,image/*" />
-          </div>
-          <div class="file-mini">
-            <label>📸 Recibo de inicial (foto)</label>
-            <input type="file" id="f_recibo" accept="image/*,application/pdf" />
-          </div>
-          <div class="file-mini">
-            <label>📑 Contrato de prenda (PDF)</label>
-            <input type="file" id="f_prenda" accept="application/pdf" />
-          </div>
-          <div class="file-mini">
-            <label>✍️ Firma PNG (opcional, transparente)</label>
-            <input type="file" id="f_firma" accept="image/png" />
-          </div>
+    <!-- PASO 3: ANEXOS Y GENERAR -->
+    <div class="step" id="step3" style="display:none">
+      <div class="step-head"><div class="step-num" id="num3">3</div>
+        <div><h2>Anexos y firma</h2>
+          <div class="help">Adjunta los PDFs/fotos que van en el paquete. Todos opcionales.</div></div>
+      </div>
+
+      <div class="anexos">
+        <div class="anexo">
+          <label>📄 Empadronamiento Auteco <span class="opcional">(PDF) — completa cilindrada, potencia y tipo combustible si faltan</span></label>
+          <input type="file" id="f_empadronamiento" accept="application/pdf,image/*" />
+          <div id="empadronamiento_status" style="margin-top:6px; font-size:11.5px; color:var(--muted)"></div>
+        </div>
+        <div class="anexo">
+          <label>🪪 Foto cédula <span class="opcional">(imagen / PDF)</span></label>
+          <input type="file" id="f_cedula" accept="image/*,application/pdf" />
+        </div>
+        <div class="anexo">
+          <label>📄 Factura Serviautec <span class="opcional">(PDF)</span></label>
+          <input type="file" id="f_factura" accept="application/pdf,image/*" />
+        </div>
+        <div class="anexo">
+          <label>📸 Recibo de inicial <span class="opcional">(foto)</span></label>
+          <input type="file" id="f_recibo" accept="image/*,application/pdf" />
+        </div>
+        <div class="anexo">
+          <label>📑 Contrato de prenda <span class="opcional">(PDF, solo si financiada)</span></label>
+          <input type="file" id="f_prenda" accept="application/pdf" />
+        </div>
+        <div class="anexo">
+          <label>✍️ Firma PNG <span class="opcional">(transparente, opcional)</span></label>
+          <input type="file" id="f_firma" accept="image/png" />
         </div>
       </div>
 
-      <button class="btn success" id="btnGenerar" disabled>Generar paquete y descargar PDF</button>
+      <button class="btn block success" id="btnGenerar">Generar paquete y descargar PDF</button>
       <div class="result" id="resultGen"></div>
     </div>
   </div>
 
 <script>
-  // Estado global de los datos extraídos
-  const STATE = { empadronamiento: null, cedula: null };
+  const STATE = { leads: [], selected: null };
 
-  function setupDropzone(dzId, inputId, infoId, btnId) {
-    const dz = document.getElementById(dzId);
-    const input = document.getElementById(inputId);
-    const info = document.getElementById(infoId);
-    const btn = document.getElementById(btnId);
-    const update = (file) => {
-      if (file) {
-        info.textContent = `📎 ${file.name} (${(file.size/1024).toFixed(0)} KB)`;
-        info.classList.add('show'); btn.disabled = false;
-      } else {
-        info.classList.remove('show'); btn.disabled = true;
-      }
-    };
-    input.addEventListener('change', () => update(input.files[0]));
-    ['dragover','dragenter'].forEach(ev => dz.addEventListener(ev, e => { e.preventDefault(); dz.classList.add('drag'); }));
-    ['dragleave','dragend','drop'].forEach(ev => dz.addEventListener(ev, () => dz.classList.remove('drag')));
-    dz.addEventListener('drop', e => {
-      e.preventDefault();
-      if (e.dataTransfer.files[0]) { input.files = e.dataTransfer.files; update(input.files[0]); }
-    });
-  }
-  setupDropzone('dzEmp', 'fileEmp', 'infoEmp', 'btnEmp');
-  setupDropzone('dzCed', 'fileCed', 'infoCed', 'btnCed');
-
-  function refreshGenerarHabilitado() {
-    document.getElementById('btnGenerar').disabled = !(STATE.empadronamiento && STATE.cedula);
-  }
-
-  async function procesar(url, fileInputId, btnId, resultId, mapper, storeKey, numEl) {
-    const file = document.getElementById(fileInputId).files[0];
-    const btn = document.getElementById(btnId);
-    const result = document.getElementById(resultId);
-    if (!file) return;
-    btn.disabled = true;
-    btn.innerHTML = '<span class="spinner"></span>Procesando con Claude Vision…';
-    result.classList.remove('show', 'ok', 'err');
-    const fd = new FormData(); fd.append('archivo', file);
+  async function cargarLeads() {
     try {
-      const r = await fetch(url, { method: 'POST', body: fd, credentials: 'same-origin' });
-      const data = await r.json();
-      if (!r.ok || !data.ok) throw new Error(data.error || `HTTP ${r.status}`);
-      const obj = mapper(data);
-      STATE[storeKey] = obj;
-      let html = '<h3>✓ Extracción exitosa</h3><table>';
-      for (const [k, v] of Object.entries(obj)) {
-        const val = (v === null || v === undefined || v === '') ? '<span style="color:#94a3b8">—</span>' : String(v);
-        html += `<tr><td>${k}</td><td>${val}</td></tr>`;
-      }
-      html += '</table>';
-      result.innerHTML = html;
-      result.classList.add('show', 'ok');
-      document.getElementById(numEl).classList.add('ok');
-      refreshGenerarHabilitado();
-      autocompletarFormulario();
+      const r = await fetch('/api/leads/lista', { credentials: 'same-origin' });
+      const d = await r.json();
+      if (!d.ok) throw new Error(d.error || 'Error cargando leads');
+      STATE.leads = d.leads || [];
     } catch (e) {
-      result.innerHTML = `<h3>✗ Error</h3><div>${e.message}</div>`;
-      result.classList.add('show', 'err');
-    } finally {
-      btn.disabled = false;
-      btn.innerHTML = btnId === 'btnEmp' ? 'Procesar empadronamiento' : 'Procesar cédula';
+      console.error('cargarLeads', e);
+      STATE.leads = [];
     }
   }
+  cargarLeads();
 
-  function autocompletarFormulario() {
-    // Sugerir fecha de hoy
-    const hoy = new Date();
-    const meses = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
-    if (!document.getElementById('f_dia').value) document.getElementById('f_dia').value = String(hoy.getDate());
-    if (!document.getElementById('f_mes').value) document.getElementById('f_mes').value = meses[hoy.getMonth()];
-    if (!document.getElementById('f_anio').value) document.getElementById('f_anio').value = String(hoy.getFullYear());
+  document.getElementById('btnBuscar').addEventListener('click', buscar);
+  document.getElementById('searchInput').addEventListener('keydown', e => { if (e.key === 'Enter') buscar(); });
+
+  function buscar() {
+    const q = document.getElementById('searchInput').value.trim().toUpperCase();
+    const list = document.getElementById('leadsList');
+    if (!q) { list.classList.remove('show'); return; }
+    const matches = STATE.leads.filter(l => {
+      const hay = [l.cliente, l.documento, l.chasis, l.motor, l.placa, l.celular].join(' ').toUpperCase();
+      return hay.includes(q);
+    }).slice(0, 30);
+    if (matches.length === 0) {
+      list.innerHTML = '<div class="lead-item"><div><div class="name" style="color:var(--muted)">Sin resultados</div></div></div>';
+    } else {
+      list.innerHTML = matches.map(l => `
+        <div class="lead-item" data-ts="${l.ts}">
+          <div>
+            <div class="name">${escapeHtml(l.cliente || '—')}</div>
+            <div class="meta">
+              ${escapeHtml(l.tipoDocumento || '')} ${escapeHtml(l.documento || '—')}
+              · ${escapeHtml(l.marca || '')} ${escapeHtml(l.modelo || '')}
+              ${l.placa ? '· placa ' + escapeHtml(l.placa) : ''}
+            </div>
+          </div>
+          ${l.tienePreasignacion ? '<div class="pill">preasig ✓</div>' : ''}
+        </div>
+      `).join('');
+      list.querySelectorAll('.lead-item').forEach(el => {
+        el.addEventListener('click', () => seleccionar(el.dataset.ts));
+      });
+    }
+    list.classList.add('show');
   }
 
-  document.getElementById('btnEmp').addEventListener('click', () =>
-    procesar('/api/empadronamiento/procesar', 'fileEmp', 'btnEmp', 'resultEmp',
-      data => data.empadronamiento || {}, 'empadronamiento', 'num1')
-  );
-  document.getElementById('btnCed').addEventListener('click', () =>
-    procesar('/api/cedula/procesar', 'fileCed', 'btnCed', 'resultCed',
-      data => data.cedula || {}, 'cedula', 'num2')
-  );
+  function escapeHtml(s) {
+    return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+
+  function seleccionar(ts) {
+    const lead = STATE.leads.find(l => l.ts === ts);
+    if (!lead) return;
+    STATE.selected = lead;
+    document.getElementById('leadsList').classList.remove('show');
+    document.getElementById('selectedName').textContent = lead.cliente;
+    document.getElementById('selectedDoc').textContent = `${lead.tipoDocumento} ${lead.documento}`;
+    document.getElementById('selectedBanner').classList.add('show');
+    document.getElementById('num1').classList.add('ok');
+    llenarFormulario(lead);
+    document.getElementById('step2').style.display = '';
+    document.getElementById('step3').style.display = '';
+  }
+
+  function llenarFormulario(lead) {
+    // Cliente — partir nombre completo
+    const partes = (lead.cliente || '').trim().split(/\s+/);
+    let primer = '', segundo = '', nombres = '';
+    if (partes.length >= 4) { nombres = partes.slice(0, -2).join(' '); primer = partes[partes.length-2]; segundo = partes[partes.length-1]; }
+    else if (partes.length === 3) { nombres = partes[0]; primer = partes[1]; segundo = partes[2]; }
+    else if (partes.length === 2) { nombres = partes[0]; primer = partes[1]; }
+    else nombres = lead.cliente || '';
+
+    document.getElementById('f_primer').value = primer;
+    document.getElementById('f_segundo').value = segundo;
+    document.getElementById('f_nombres').value = nombres;
+    document.getElementById('f_cc').value = lead.documento || '';
+    document.getElementById('f_telefono').value = lead.celular || '';
+    document.getElementById('f_direccion').value = lead.direccion || '';
+
+    document.getElementById('f_marca').value = lead.marca || '';
+    document.getElementById('f_linea').value = lead.modelo || '';
+    // El color en preasignación a veces viene con texto extra; intentar limpiar
+    const colorRaw = (lead.color || '').toUpperCase();
+    const colorLimpio = colorRaw.split(/\s*(CALCOMANIA|CBS|CHASIS|MOTOR)\s*/)[0].trim();
+    document.getElementById('f_color').value = colorLimpio;
+    document.getElementById('f_chasis').value = lead.chasis || '';
+    document.getElementById('f_motor').value = lead.motor || '';
+
+    // Placa: separar letras y números (formato típico 3 letras + 2 dígitos + 1 letra)
+    const placa = (lead.placa || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+    if (placa.length >= 6) {
+      document.getElementById('f_placa_letras').value = placa.slice(0, 3);
+      document.getElementById('f_placa_numeros').value = placa.slice(3);
+    }
+
+    // Fecha de hoy
+    const hoy = new Date();
+    const meses = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
+    document.getElementById('f_dia').value = String(hoy.getDate());
+    document.getElementById('f_mes').value = meses[hoy.getMonth()];
+    document.getElementById('f_anio').value = String(hoy.getFullYear());
+  }
+
+  document.getElementById('clearSelected').addEventListener('click', () => {
+    STATE.selected = null;
+    document.getElementById('selectedBanner').classList.remove('show');
+    document.getElementById('step2').style.display = 'none';
+    document.getElementById('step3').style.display = 'none';
+    document.getElementById('num1').classList.remove('ok');
+    document.getElementById('searchInput').value = '';
+    document.getElementById('searchInput').focus();
+  });
+
+  // Empadronamiento: si lo suben, llamamos al endpoint y rellenamos los campos vacíos
+  document.getElementById('f_empadronamiento').addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const status = document.getElementById('empadronamiento_status');
+    status.innerHTML = '<span class="spinner"></span>Leyendo empadronamiento…';
+    const fd = new FormData(); fd.append('archivo', file);
+    try {
+      const r = await fetch('/api/empadronamiento/procesar', { method: 'POST', body: fd, credentials: 'same-origin' });
+      const d = await r.json();
+      if (!d.ok) throw new Error(d.error || 'Error');
+      const emp = d.empadronamiento || {};
+      const setIfEmpty = (id, val) => {
+        const el = document.getElementById(id);
+        if (val && !el.value) el.value = val;
+      };
+      setIfEmpty('f_marca', emp.marca);
+      setIfEmpty('f_linea', emp.linea);
+      setIfEmpty('f_color', emp.color);
+      setIfEmpty('f_modelo', emp.anio_modelo);
+      setIfEmpty('f_cilindrada', emp.cilindrada_cc ? String(Math.round(parseFloat(emp.cilindrada_cc))) : '');
+      setIfEmpty('f_potencia', emp.potencia_hp ? String(Math.round(parseFloat(emp.potencia_hp))) : '');
+      setIfEmpty('f_chasis', emp.chasis || emp.vin);
+      setIfEmpty('f_motor', emp.motor);
+      setIfEmpty('f_combustible', emp.tipo_combustible);
+      status.innerHTML = '<span style="color:var(--ok)">✓ Datos técnicos completados desde el empadronamiento</span>';
+    } catch (err) {
+      status.innerHTML = `<span style="color:var(--err)">Error: ${err.message}</span>`;
+    }
+  });
 
   document.getElementById('btnGenerar').addEventListener('click', async () => {
     const btn = document.getElementById('btnGenerar');
@@ -308,28 +379,25 @@
     btn.disabled = true;
     btn.innerHTML = '<span class="spinner"></span>Generando paquete…';
 
-    // Construir datos combinados
-    const emp = STATE.empadronamiento || {};
-    const ced = STATE.cedula || {};
     const datos = {
-      primer_apellido:  ced.primer_apellido || "",
-      segundo_apellido: ced.segundo_apellido || "",
-      nombres:          ced.nombres || "",
-      cc:               ced.numero_cedula || "",
+      primer_apellido:  document.getElementById('f_primer').value.toUpperCase(),
+      segundo_apellido: document.getElementById('f_segundo').value.toUpperCase(),
+      nombres:          document.getElementById('f_nombres').value.toUpperCase(),
+      cc:               document.getElementById('f_cc').value,
       ciudad:           document.getElementById('f_ciudad').value,
       direccion:        document.getElementById('f_direccion').value,
       telefono:         document.getElementById('f_telefono').value,
-      clase_vehiculo:   emp.clase_vehiculo || "MOTOCICLETA",
-      marca:            emp.marca || "",
-      linea:            emp.linea || "",
-      modelo:           emp.anio_modelo || "",
-      cilindrada:       emp.cilindrada_cc ? Math.round(parseFloat(emp.cilindrada_cc)).toString() : "",
-      potencia:         emp.potencia_hp ? Math.round(parseFloat(emp.potencia_hp)).toString() : "",
-      color:            emp.color || "",
-      motor:            emp.motor || "",
-      chasis:           emp.chasis || emp.vin || "",
-      combustible:      emp.tipo_combustible || "GASOLINA",
-      tipo_servicio:    emp.tipo_servicio || "PARTICULAR",
+      clase_vehiculo:   "MOTOCICLETA",
+      marca:            document.getElementById('f_marca').value,
+      linea:            document.getElementById('f_linea').value,
+      color:            document.getElementById('f_color').value,
+      modelo:           document.getElementById('f_modelo').value,
+      cilindrada:       document.getElementById('f_cilindrada').value,
+      potencia:         document.getElementById('f_potencia').value,
+      chasis:           document.getElementById('f_chasis').value,
+      motor:            document.getElementById('f_motor').value,
+      combustible:      document.getElementById('f_combustible').value,
+      tipo_servicio:    "PARTICULAR",
       placa_letras:     document.getElementById('f_placa_letras').value.toUpperCase(),
       placa_numeros:    document.getElementById('f_placa_numeros').value.toUpperCase(),
       observaciones:    document.getElementById('f_observ').value,
@@ -342,8 +410,8 @@
     const fd = new FormData();
     fd.append('datos', JSON.stringify(datos));
     const adjuntos = [
-      ['empadronamiento', 'fileEmp'],
-      ['cedula', 'fileCed'],
+      ['empadronamiento', 'f_empadronamiento'],
+      ['cedula', 'f_cedula'],
       ['factura', 'f_factura'],
       ['recibo', 'f_recibo'],
       ['prenda', 'f_prenda'],
@@ -366,8 +434,9 @@
       a.href = url; a.download = `papeleria-${datos.cc || 'cliente'}.pdf`;
       a.click();
       URL.revokeObjectURL(url);
-      result.innerHTML = '<h3>✓ Paquete generado y descargado</h3><div>Revisa tus descargas. Si algo se ve mal, vuelve y ajusta.</div>';
+      result.innerHTML = '<h3>✓ Paquete generado y descargado</h3><div>Revisa tus descargas y abre el PDF.</div>';
       result.classList.add('show', 'ok');
+      document.getElementById('num2').classList.add('ok');
       document.getElementById('num3').classList.add('ok');
     } catch (e) {
       result.innerHTML = `<h3>✗ Error</h3><div>${e.message}</div>`;
