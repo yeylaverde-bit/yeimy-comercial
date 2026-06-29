@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Papelería · Test de extracción</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #0c0e1a;
+    --panel: #161830;
+    --panel-2: #1f2240;
+    --accent: #7c5cff;
+    --accent-2: #5dd6ff;
+    --ok: #22c55e;
+    --err: #ef4444;
+    --text: #e6e8f3;
+    --muted: #94a3b8;
+    --border: rgba(255,255,255,0.08);
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 24px;
+    background: linear-gradient(180deg, var(--bg) 0%, #06070f 100%);
+    color: var(--text);
+    font-family: 'Inter', -apple-system, sans-serif;
+    min-height: 100vh;
+  }
+  .header {
+    max-width: 1100px; margin: 0 auto 24px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .header h1 { margin: 0; font-size: 22px; font-weight: 700; }
+  .header .sub { color: var(--muted); font-size: 13px; margin-top: 2px; }
+  .back {
+    background: var(--panel-2); color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 8px; padding: 8px 14px;
+    font-family: inherit; text-decoration: none;
+    transition: all .15s;
+  }
+  .back:hover { background: var(--accent); }
+  .grid { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  @media (max-width: 850px) { .grid { grid-template-columns: 1fr; } }
+  .card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 22px;
+  }
+  .card h2 {
+    margin: 0 0 4px; font-size: 16px; font-weight: 600;
+  }
+  .card .help { color: var(--muted); font-size: 12.5px; margin-bottom: 16px; }
+  .dropzone {
+    border: 2px dashed var(--border);
+    border-radius: 10px;
+    padding: 28px 16px; text-align: center;
+    cursor: pointer; transition: all .15s;
+    color: var(--muted);
+  }
+  .dropzone:hover, .dropzone.drag {
+    border-color: var(--accent); background: rgba(124,92,255,0.06);
+    color: var(--text);
+  }
+  .dropzone .icon { font-size: 28px; margin-bottom: 6px; }
+  .dropzone input { display: none; }
+  .file-info {
+    margin-top: 12px; padding: 8px 12px;
+    background: var(--panel-2); border-radius: 8px;
+    font-size: 12.5px; color: var(--text);
+    display: none;
+  }
+  .file-info.show { display: block; }
+  .btn {
+    width: 100%; margin-top: 14px;
+    background: var(--accent); color: white;
+    border: none; border-radius: 10px;
+    padding: 12px 16px; font-family: inherit; font-weight: 600; font-size: 14px;
+    cursor: pointer; transition: all .15s;
+  }
+  .btn:disabled { background: var(--panel-2); color: var(--muted); cursor: not-allowed; }
+  .btn:not(:disabled):hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(124,92,255,0.3); }
+  .result {
+    margin-top: 14px; padding: 14px; border-radius: 10px;
+    font-size: 13px;
+    display: none;
+  }
+  .result.show { display: block; }
+  .result.ok { background: rgba(34,197,94,0.08); border: 1px solid rgba(34,197,94,0.25); }
+  .result.err { background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.25); color: #fca5a5; }
+  .result h3 { margin: 0 0 8px; font-size: 14px; font-weight: 600; color: var(--ok); }
+  .result.err h3 { color: var(--err); }
+  table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+  table td { padding: 6px 8px; border-bottom: 1px solid var(--border); }
+  table td:first-child { color: var(--muted); width: 42%; font-weight: 500; }
+  table td:last-child { color: var(--text); font-family: 'SF Mono', Consolas, monospace; word-break: break-all; }
+  .spinner {
+    display: inline-block; width: 14px; height: 14px;
+    border: 2px solid rgba(255,255,255,0.2);
+    border-top-color: white; border-radius: 50%;
+    animation: spin .8s linear infinite;
+    vertical-align: -2px; margin-right: 8px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .meta { color: var(--muted); font-size: 11px; margin-top: 10px; text-align: right; }
+</style>
+</head>
+<body>
+  <div class="header">
+    <div>
+      <h1>📄 Papelería · Test de extracción</h1>
+      <div class="sub">Verifica que Claude Vision lea correctamente los documentos antes de armar la UI final.</div>
+    </div>
+    <a href="/" class="back">← Volver al dashboard</a>
+  </div>
+
+  <div class="grid">
+    <!-- EMPADRONAMIENTO -->
+    <div class="card">
+      <h2>1. Empadronamiento (Certificado de Aduana Auteco)</h2>
+      <div class="help">Sube el PDF que te entrega Auteco con los datos técnicos de la moto.</div>
+
+      <label class="dropzone" id="dzEmp">
+        <div class="icon">📂</div>
+        <div>Haz clic o arrastra el PDF aquí</div>
+        <input type="file" id="fileEmp" accept="application/pdf,image/*" />
+      </label>
+      <div class="file-info" id="infoEmp"></div>
+
+      <button class="btn" id="btnEmp" disabled>Procesar empadronamiento</button>
+      <div class="result" id="resultEmp"></div>
+    </div>
+
+    <!-- CEDULA -->
+    <div class="card">
+      <h2>2. Cédula del cliente</h2>
+      <div class="help">Sube una foto clara de la cédula colombiana (anverso).</div>
+
+      <label class="dropzone" id="dzCed">
+        <div class="icon">🪪</div>
+        <div>Haz clic o arrastra la foto aquí</div>
+        <input type="file" id="fileCed" accept="image/*,application/pdf" />
+      </label>
+      <div class="file-info" id="infoCed"></div>
+
+      <button class="btn" id="btnCed" disabled>Procesar cédula</button>
+      <div class="result" id="resultCed"></div>
+    </div>
+  </div>
+
+<script>
+  function setupDropzone(dzId, inputId, infoId, btnId) {
+    const dz = document.getElementById(dzId);
+    const input = document.getElementById(inputId);
+    const info = document.getElementById(infoId);
+    const btn = document.getElementById(btnId);
+
+    const update = (file) => {
+      if (file) {
+        info.textContent = `📎 ${file.name} (${(file.size/1024).toFixed(0)} KB)`;
+        info.classList.add('show');
+        btn.disabled = false;
+      } else {
+        info.classList.remove('show');
+        btn.disabled = true;
+      }
+    };
+
+    input.addEventListener('change', () => update(input.files[0]));
+
+    ['dragover','dragenter'].forEach(ev => {
+      dz.addEventListener(ev, e => { e.preventDefault(); dz.classList.add('drag'); });
+    });
+    ['dragleave','dragend','drop'].forEach(ev => {
+      dz.addEventListener(ev, () => dz.classList.remove('drag'));
+    });
+    dz.addEventListener('drop', e => {
+      e.preventDefault();
+      if (e.dataTransfer.files[0]) {
+        input.files = e.dataTransfer.files;
+        update(input.files[0]);
+      }
+    });
+  }
+
+  setupDropzone('dzEmp', 'fileEmp', 'infoEmp', 'btnEmp');
+  setupDropzone('dzCed', 'fileCed', 'infoCed', 'btnCed');
+
+  async function procesar(url, fileInputId, btnId, resultId, mapper) {
+    const file = document.getElementById(fileInputId).files[0];
+    const btn = document.getElementById(btnId);
+    const result = document.getElementById(resultId);
+    if (!file) return;
+
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span>Procesando con Claude Vision…';
+    result.classList.remove('show', 'ok', 'err');
+
+    const fd = new FormData();
+    fd.append('archivo', file);
+
+    try {
+      const r = await fetch(url, { method: 'POST', body: fd, credentials: 'same-origin' });
+      const data = await r.json();
+      if (!r.ok || !data.ok) throw new Error(data.error || `HTTP ${r.status}`);
+
+      const obj = mapper(data);
+      let html = '<h3>✓ Extracción exitosa</h3><table>';
+      for (const [k, v] of Object.entries(obj)) {
+        const val = (v === null || v === undefined || v === '') ? '<span style="color:#94a3b8">—</span>' : String(v);
+        html += `<tr><td>${k}</td><td>${val}</td></tr>`;
+      }
+      html += '</table>';
+      if (data.usoTokens) {
+        html += `<div class="meta">Tokens · input ${data.usoTokens.input} · output ${data.usoTokens.output}</div>`;
+      }
+      result.innerHTML = html;
+      result.classList.add('show', 'ok');
+    } catch (e) {
+      result.innerHTML = `<h3>✗ Error</h3><div>${e.message}</div>`;
+      result.classList.add('show', 'err');
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = btnId === 'btnEmp' ? 'Procesar empadronamiento' : 'Procesar cédula';
+    }
+  }
+
+  document.getElementById('btnEmp').addEventListener('click', () =>
+    procesar('/api/empadronamiento/procesar', 'fileEmp', 'btnEmp', 'resultEmp',
+      data => data.empadronamiento || {})
+  );
+
+  document.getElementById('btnCed').addEventListener('click', () =>
+    procesar('/api/cedula/procesar', 'fileCed', 'btnCed', 'resultCed',
+      data => data.cedula || {})
+  );
+</script>
+</body>
+</html>

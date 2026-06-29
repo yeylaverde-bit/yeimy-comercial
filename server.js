@@ -1153,6 +1153,171 @@ Si no puedes leer algún campo, usa "". Si la imagen no es un sticker de GPS, de
 });
 
 // ============================================================
+//      PAPELERIA — EMPADRONAMIENTO AUTECO (Claude Vision)
+//      Lee el Certificado Individual de Aduanas y extrae datos de la moto
+// ============================================================
+const PAPELERIA_DIR = path.join(DATA_DIR, "papeleria");
+if (!fs.existsSync(PAPELERIA_DIR)) fs.mkdirSync(PAPELERIA_DIR, { recursive: true });
+
+const uploadPapeleria = multer({
+  storage: multer.diskStorage({
+    destination: (_req, _file, cb) => cb(null, PAPELERIA_DIR),
+    filename: (_req, file, cb) => {
+      const ext = path.extname(file.originalname).toLowerCase() || ".pdf";
+      const slug = (file.fieldname || "archivo").replace(/[^a-z0-9]/gi, "");
+      cb(null, `${slug}-${Date.now()}${ext}`);
+    },
+  }),
+  limits: { fileSize: 20 * 1024 * 1024 },
+  fileFilter: (_req, file, cb) => {
+    const ok = /^(image\/(jpe?g|png|webp|heic)|application\/pdf)$/.test(file.mimetype);
+    cb(ok ? null : new Error("Solo imágenes (JPG/PNG/WebP/HEIC) o PDF"), ok);
+  },
+});
+
+// POST /api/empadronamiento/procesar — recibe Certificado Individual de Aduanas, devuelve JSON
+app.post("/api/empadronamiento/procesar", requireAuth, requireAdmin, uploadPapeleria.single("archivo"), async (req, res) => {
+  if (!anthropic) return res.status(500).json({ ok: false, error: "ANTHROPIC_API_KEY no configurada" });
+  if (!req.file) return res.status(400).json({ ok: false, error: "Falta el PDF del empadronamiento" });
+
+  const filepath = path.join(PAPELERIA_DIR, req.file.filename);
+  try {
+    const buf = fs.readFileSync(filepath);
+    const base64 = buf.toString("base64");
+    const mediaType = req.file.mimetype === "application/pdf" ? "application/pdf" : req.file.mimetype;
+
+    const contentItem = mediaType === "application/pdf"
+      ? { type: "document", source: { type: "base64", media_type: "application/pdf", data: base64 } }
+      : { type: "image", source: { type: "base64", media_type: mediaType, data: base64 } };
+
+    const prompt = `Esta es un CERTIFICADO INDIVIDUAL DE ADUANAS de AUTOTECNICA COLOMBIANA S.A.S. (Auteco), también llamado "empadronamiento" en el mundo de motos en Colombia.
+
+Es un documento oficial con formato fijo que certifica los datos técnicos de una motocicleta importada/ensamblada.
+
+Extrae TODOS los siguientes campos. El formato es muy consistente: cada campo aparece como ETIQUETA seguida de VALOR.
+
+================================================================
+CAMPOS A EXTRAER (JSON exacto, sin texto extra)
+================================================================
+{
+  "clase_vehiculo": "valor de CLASE VEHICULO (típicamente MOTOCICLETA)",
+  "marca": "valor de MARCA (TVS, KYMCO, VICTORY, BENELLI, KAWASAKI, CERONTE, etc)",
+  "linea": "valor de LINEA (ej: APACHE 160 FI ABS NG)",
+  "vin": "valor de VIN No (17 caracteres alfanuméricos)",
+  "chasis": "valor de CHASIS No. (debe coincidir con VIN)",
+  "serie": "valor de SERIE No. (también suele coincidir con VIN)",
+  "motor": "valor de MOTOR No. (alfanumérico, ej: HE5AV2XA2372)",
+  "anio_modelo": "valor de AÑO DEL MODELO (4 dígitos, ej: 2027)",
+  "cilindrada_cc": "valor de CILINDRADA(cc) (número con decimales, ej: 159.70)",
+  "potencia_hp": "valor de POTENCIA(hp) (número, ej: 17.31)",
+  "color": "valor de COLOR (texto, ej: NEGRO NEBULOSA)",
+  "tipo_servicio": "valor de TIPO SERVICIO (típicamente PARTICULAR)",
+  "tipo_combustible": "valor de TIPO COMBUSTIBLE (GASOLINA, ELECTRICO)",
+  "peso_bruto_kg": "valor de PESO BRUTO VEHICULAR(Kg) (ej: 146.000)",
+  "no_pasajeros": "valor de No.PASAJEROS (ej: 2)",
+  "no_aceptacion": "valor de No.ACEPTACION DECLARACION (número largo, ej: 482026000386315)",
+  "no_levante": "valor de No.LEVANTE (número largo)",
+  "fecha_aceptacion": "valor de FECHA ACEPTACION en formato DD/MM/YYYY",
+  "fecha_levante": "valor de FECHA LEVANTE en formato DD/MM/YYYY",
+  "fecha_emision_doc": "fecha del documento (ej: '25 de Junio de 2026' → convertir a YYYY-MM-DD: '2026-06-25')"
+}
+
+REGLAS:
+1. VIN, CHASIS y SERIE en muchas Auteco son el MISMO valor — eso es normal, devuélvelo en los tres campos.
+2. Si un campo no es legible, usa "" (cadena vacía) — NO inventes valores.
+3. Los números (anio_modelo, no_pasajeros, no_aceptacion, no_levante) déjalos como string para preservar ceros iniciales.
+4. cilindrada_cc y potencia_hp: preserva los decimales exactamente como aparecen (159.70, no 159.7).
+5. Si la imagen NO es un Certificado de Aduanas de Auteco, devuelve {} vacío.
+
+Devuelve SOLO el JSON, sin texto adicional, sin markdown.`;
+
+    const result = await anthropic.messages.create({
+      model: "claude-opus-4-7",
+      max_tokens: 2048,
+      messages: [{
+        role: "user",
+        content: [contentItem, { type: "text", text: prompt }],
+      }],
+    });
+
+    let texto = result.content[0]?.text || "";
+    const jsonMatch = texto.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) throw new Error("Claude no devolvió JSON válido. Respuesta: " + texto.slice(0, 200));
+    const data = JSON.parse(jsonMatch[0]);
+
+    res.json({
+      ok: true,
+      empadronamiento: data,
+      archivo: req.file.filename,
+      usoTokens: { input: result.usage?.input_tokens, output: result.usage?.output_tokens },
+    });
+  } catch (e) {
+    console.error("Error empadronamiento:", e);
+    res.status(500).json({ ok: false, error: e.message });
+  }
+});
+
+// POST /api/cedula/procesar — recibe foto de cédula colombiana, devuelve nombre + CC
+app.post("/api/cedula/procesar", requireAuth, requireAdmin, uploadPapeleria.single("archivo"), async (req, res) => {
+  if (!anthropic) return res.status(500).json({ ok: false, error: "ANTHROPIC_API_KEY no configurada" });
+  if (!req.file) return res.status(400).json({ ok: false, error: "Falta foto de la cédula" });
+
+  const filepath = path.join(PAPELERIA_DIR, req.file.filename);
+  try {
+    const buf = fs.readFileSync(filepath);
+    const base64 = buf.toString("base64");
+    const mediaType = req.file.mimetype === "application/pdf" ? "application/pdf" : req.file.mimetype;
+
+    const contentItem = mediaType === "application/pdf"
+      ? { type: "document", source: { type: "base64", media_type: "application/pdf", data: base64 } }
+      : { type: "image", source: { type: "base64", media_type: mediaType, data: base64 } };
+
+    const prompt = `Esta es una foto de la cédula de ciudadanía colombiana (anverso y/o reverso).
+
+Extrae:
+{
+  "numero_cedula": "número (solo dígitos, sin puntos)",
+  "primer_apellido": "PRIMER APELLIDO en mayúsculas",
+  "segundo_apellido": "SEGUNDO APELLIDO en mayúsculas (si hay, sino '')",
+  "nombres": "NOMBRES COMPLETOS en mayúsculas (puede ser uno o más)",
+  "lugar_expedicion": "ciudad de expedición si es visible, sino ''",
+  "fecha_nacimiento": "DD/MM/YYYY si es visible, sino ''"
+}
+
+Reglas:
+- El número de cédula puede tener puntos separadores (ej: "1.383.115") → devuélvelo SIN puntos ("1383115").
+- Si lees algún campo borroso o no estás seguro, déjalo "".
+- Si la imagen NO es una cédula colombiana, devuelve {}.
+
+Devuelve SOLO el JSON, sin texto adicional.`;
+
+    const result = await anthropic.messages.create({
+      model: "claude-opus-4-7",
+      max_tokens: 1024,
+      messages: [{
+        role: "user",
+        content: [contentItem, { type: "text", text: prompt }],
+      }],
+    });
+
+    let texto = result.content[0]?.text || "";
+    const jsonMatch = texto.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) throw new Error("Claude no devolvió JSON válido. Respuesta: " + texto.slice(0, 200));
+    const data = JSON.parse(jsonMatch[0]);
+
+    res.json({
+      ok: true,
+      cedula: data,
+      archivo: req.file.filename,
+      usoTokens: { input: result.usage?.input_tokens, output: result.usage?.output_tokens },
+    });
+  } catch (e) {
+    console.error("Error cédula:", e);
+    res.status(500).json({ ok: false, error: e.message });
+  }
+});
+
+// ============================================================
 //      LEADS REGISTRADOS (lista de los clientes ingresados)
 // ============================================================
 app.get("/api/leads/lista", requireAuth, (req, res) => {
