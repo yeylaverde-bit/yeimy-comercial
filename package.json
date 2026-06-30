@@ -17,6 +17,7 @@
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
     "express-session": "^1.18.0",
+    "jimp": "^0.22.12",
     "multer": "^1.4.5-lts.1",
     "pdf-lib": "^1.17.1",
     "session-file-store": "^1.5.0"

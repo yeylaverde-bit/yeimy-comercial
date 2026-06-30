@@ -1348,8 +1348,19 @@ app.post("/api/papeleria/generar", requireAuth, requireAdmin,
         ? { bytes: fs.readFileSync(files[key][0].path), mime: files[key][0].mimetype }
         : null;
 
+      // Firma: prioridad al PNG manual; si no hay, intenta extraerla del recibo
+      let firmaPng = null;
       const firmaSrc = readFile("firmaPng");
-      const firmaPng = firmaSrc && /png/i.test(firmaSrc.mime) ? firmaSrc.bytes : null;
+      if (firmaSrc && /png/i.test(firmaSrc.mime)) {
+        firmaPng = firmaSrc.bytes;
+      } else {
+        const reciboParaFirma = readFile("recibo");
+        if (reciboParaFirma && /^image\//i.test(reciboParaFirma.mime)) {
+          firmaPng = await papeleria.extraerFirma(reciboParaFirma.bytes, reciboParaFirma.mime);
+          if (firmaPng) console.log("[papeleria] firma extraída del recibo OK");
+          else console.warn("[papeleria] no se logró extraer firma del recibo");
+        }
+      }
 
       // 1) Generar RUNT y Mandato llenos
       const runtBytes = await papeleria.llenarRUNT(datos, firmaPng);
