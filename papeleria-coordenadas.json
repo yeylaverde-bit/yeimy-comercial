@@ -15,14 +15,14 @@
         "h": 31.0
       },
       "R2": {
-        "campo": "observaciones",
+        "campo": null,
         "x": 454.33,
         "y": 397.67,
         "w": 223.33,
         "h": 18.0
       },
       "R3": {
-        "campo": null,
+        "campo": "direccion",
         "x": 298.33,
         "y": 456.33,
         "w": 185.33,
@@ -43,28 +43,28 @@
         "h": 14.33
       },
       "R6": {
-        "campo": "motor",
+        "campo": "chasis",
         "x": 1334.67,
         "y": 658.33,
         "w": 103.33,
         "h": 22.67
       },
       "R7": {
-        "campo": "chasis",
+        "campo": "motor",
         "x": 1355.33,
         "y": 718.67,
         "w": 100.0,
         "h": 16.33
       },
       "R8": {
-        "campo": "numero_documento",
+        "campo": "ciudad",
         "x": 485.0,
         "y": 456.0,
         "w": 95.0,
         "h": 13.33
       },
       "R9": {
-        "campo": null,
+        "campo": "telefono",
         "x": 676.0,
         "y": 466.0,
         "w": 110.67,
@@ -78,7 +78,7 @@
         "h": 14.33
       },
       "R11": {
-        "campo": "cilindrada",
+        "campo": "modelo",
         "x": 1455.33,
         "y": 864.33,
         "w": 94.33,
@@ -92,14 +92,14 @@
         "h": 21.67
       },
       "R13": {
-        "campo": "combustible",
+        "campo": "marca",
         "x": 932.33,
         "y": 892.33,
         "w": 84.67,
         "h": 19.0
       },
       "R14": {
-        "campo": "tipo_servicio",
+        "campo": "numero_documento",
         "x": 742.67,
         "y": 508.33,
         "w": 61.0,
@@ -113,7 +113,7 @@
         "h": 18.0
       },
       "R16": {
-        "campo": "modelo",
+        "campo": "cilindrada",
         "x": 1551.0,
         "y": 859.33,
         "w": 53.67,
@@ -141,7 +141,7 @@
         "h": 12.0
       },
       "R20": {
-        "campo": "marca",
+        "campo": null,
         "x": 161.0,
         "y": 877.33,
         "w": 64.67,
@@ -169,7 +169,7 @@
         "h": 2.33
       },
       "R24": {
-        "campo": "modelo_alt",
+        "campo": null,
         "x": 963.67,
         "y": 885.67,
         "w": 50.33,
@@ -198,10 +198,22 @@
       }
     },
     "firma_propietario": {
-      "x": 200,
-      "y": 380,
+      "x": 230,
+      "y": 400,
       "w": 200,
-      "h": 55
+      "h": 50
+    },
+    "campos_extra": {
+      "color": {
+        "x": 620,
+        "y": 838,
+        "size": 11
+      },
+      "observaciones": {
+        "x": 1115,
+        "y": 263,
+        "size": 9
+      }
     }
   },
   "mandato": {
