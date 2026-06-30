@@ -4700,12 +4700,22 @@ function aplicarRol(usuario) {
   const bn = document.getElementById("bannerName");
   if (bn) bn.textContent = usuario.nombre;
 
-  // Si es asesor, el item activo del sidebar debe ser Registrar (no Mis ventas que no ve)
-  if (usuario.rol === "asesor") {
+  // Sección por defecto según el rol — para que cada perfil aterrice
+  // en su área de trabajo y no en una pantalla oculta para él.
+  const seccionPorRol = {
+    asesor: "registrar",
+    contable: "ordenfac",
+    dueno: "metricas",
+    taller: "taller",
+    gps_instalar: "gpsinstalar",
+    gps_activar: "gpsactivar",
+  };
+  const seccionDefault = seccionPorRol[usuario.rol];
+  if (seccionDefault) {
     document.querySelectorAll(".nav a").forEach(a => a.classList.remove("active"));
-    const asesorDefault = document.querySelector('.nav a[href="#registrar"]');
-    if (asesorDefault) asesorDefault.classList.add("active");
-    document.getElementById("registrar")?.scrollIntoView({ behavior: "instant", block: "start" });
+    const linkDefault = document.querySelector(`.nav a[href="#${seccionDefault}"]`);
+    if (linkDefault) linkDefault.classList.add("active");
+    document.getElementById(seccionDefault)?.scrollIntoView({ behavior: "instant", block: "start" });
   }
 }
 
