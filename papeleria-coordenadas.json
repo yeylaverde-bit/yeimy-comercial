@@ -205,9 +205,9 @@
     },
     "campos_extra": {
       "color": {
-        "x": 860,
-        "y": 862,
-        "size": 14
+        "x": 980,
+        "y": 858,
+        "size": 13
       },
       "observaciones": {
         "x": 1115,
@@ -239,22 +239,27 @@
       },
       "nombre_arriba": {
         "x": 195,
-        "y": 655,
+        "y": 648,
         "size": 11
       },
       "ciudad_arriba": {
-        "x": 98,
-        "y": 640,
+        "x": 100,
+        "y": 633,
         "size": 11
       },
       "cc_arriba": {
-        "x": 445,
-        "y": 640,
+        "x": 450,
+        "y": 633,
         "size": 11
       },
       "tramite": {
-        "x": 230,
-        "y": 465,
+        "x": 40,
+        "y": 456,
+        "size": 11
+      },
+      "placa_clausula": {
+        "x": 100,
+        "y": 441,
         "size": 11
       },
       "acepto_x": {
