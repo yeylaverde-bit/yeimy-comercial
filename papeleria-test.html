@@ -361,8 +361,8 @@
       setIfEmpty('f_linea', emp.linea);
       setIfEmpty('f_color', emp.color);
       setIfEmpty('f_modelo', emp.anio_modelo);
-      setIfEmpty('f_cilindrada', emp.cilindrada_cc ? String(Math.round(parseFloat(emp.cilindrada_cc))) : '');
-      setIfEmpty('f_potencia', emp.potencia_hp ? String(Math.round(parseFloat(emp.potencia_hp))) : '');
+      setIfEmpty('f_cilindrada', emp.cilindrada_cc || '');
+      setIfEmpty('f_potencia', emp.potencia_hp || '');
       setIfEmpty('f_chasis', emp.chasis || emp.vin);
       setIfEmpty('f_motor', emp.motor);
       setIfEmpty('f_combustible', emp.tipo_combustible);
