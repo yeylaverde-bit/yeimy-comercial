@@ -239,22 +239,22 @@
       },
       "nombre_arriba": {
         "x": 195,
-        "y": 659,
+        "y": 655,
         "size": 11
       },
       "ciudad_arriba": {
         "x": 98,
-        "y": 644,
+        "y": 640,
         "size": 11
       },
       "cc_arriba": {
         "x": 445,
-        "y": 644,
+        "y": 640,
         "size": 11
       },
       "tramite": {
-        "x": 40,
-        "y": 470,
+        "x": 230,
+        "y": 465,
         "size": 11
       },
       "acepto_x": {
