@@ -205,14 +205,14 @@
     },
     "campos_extra": {
       "color": {
-        "x": 620,
-        "y": 838,
-        "size": 11
+        "x": 580,
+        "y": 833,
+        "size": 14
       },
       "observaciones": {
         "x": 1115,
         "y": 263,
-        "size": 9
+        "size": 11
       }
     }
   },
