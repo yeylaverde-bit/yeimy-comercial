@@ -122,9 +122,10 @@ app.use(session({
   secret: SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
+  rolling: true, // cada request renueva el maxAge — sesión activa nunca expira
   store: new FileStore({
     path: SESSIONS_DIR,
-    ttl: 8 * 60 * 60,           // 8h en segundos
+    ttl: 30 * 24 * 60 * 60,     // 30 días en segundos (antes 8h)
     reapInterval: 60 * 60,      // limpiar expiradas cada 1h
     retries: 1,
     logFn: () => {},            // silenciar logs de FileStore
@@ -133,7 +134,7 @@ app.use(session({
     httpOnly: true,
     secure: IS_PROD,         // HTTPS solo en producción
     sameSite: "lax",
-    maxAge: 1000 * 60 * 60 * 8, // 8 horas
+    maxAge: 1000 * 60 * 60 * 24 * 30, // 30 días (antes 8h) — con rolling se renueva por uso
   },
 }));
 
