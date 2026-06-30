@@ -3061,10 +3061,13 @@ function renderGpsLista(tipo) {
                 <input type="file" data-gps-video="${escapeHtml(p.chasis)}" accept="video/*,image/*" style="display:none" />
               </label>`
             : ""}
-        <button class="btn-primary" data-gps-completar="${escapeHtml(p.chasis)}" data-gps-tipo="${tipo}" style="padding:6px 12px;font-size:12px;background:#22c55e;border-color:#22c55e">
-          ✓ GPS ${titulo}
-        </button>
       </div>
+
+      <!-- Botón principal: OK / GPS instalada — grande, separado, imposible de no ver -->
+      <button class="btn-primary" data-gps-completar="${escapeHtml(p.chasis)}" data-gps-tipo="${tipo}"
+              style="width:100%;margin-top:12px;padding:14px;font-size:15px;font-weight:700;background:#22c55e;border-color:#22c55e;color:#000;border-radius:10px;letter-spacing:.02em;box-shadow:0 4px 12px rgba(34,197,94,.25)">
+        ✓ OK — GPS ${titulo} (sacar de la lista)
+      </button>
     </div>`;
   }).join("");
 
@@ -3162,9 +3165,19 @@ function renderGpsLista(tipo) {
     b.addEventListener("click", async () => {
       const tipoBtn = b.dataset.gpsTipo;
       const verbo = tipoBtn === "instalar" ? "instalada" : "activada";
-      if (!confirm(`¿Marcar el GPS de esta moto como ${verbo}?`)) return;
+      if (!confirm(`¿Marcar el GPS de esta moto como ${verbo}?\n\nLa moto saldrá de la lista de pendientes.`)) return;
       const chasis = b.dataset.gpsCompletar;
       const campo = tipoBtn === "instalar" ? "gpsInstaladoEn" : "gpsActivadoEn";
+      // Animar salida inmediata para feedback rápido al instalador
+      const card = b.closest(".card");
+      if (card) {
+        card.style.transition = "opacity 0.4s, transform 0.4s, max-height 0.5s";
+        card.style.maxHeight = card.offsetHeight + "px";
+        // Forzar reflow para que el transition tome el maxHeight inicial
+        void card.offsetHeight;
+        card.style.opacity = "0.4";
+        card.style.transform = "translateX(40px)";
+      }
       try {
         const r = await fetch(`/api/preasignaciones/${encodeURIComponent(chasis)}`, {
           method: "PATCH",
@@ -3174,11 +3187,30 @@ function renderGpsLista(tipo) {
         const data = await r.json();
         if (data.ok) {
           showToast(`✓ GPS ${verbo}`);
+          if (card) {
+            card.style.maxHeight = "0";
+            card.style.opacity = "0";
+            card.style.padding = "0";
+            card.style.margin = "0";
+          }
           await loadPreasignaciones();
         } else {
+          // Revertir animación si hubo error
+          if (card) {
+            card.style.opacity = "1";
+            card.style.transform = "";
+            card.style.maxHeight = "";
+          }
           showToast("Error: " + (data.error || "no se pudo guardar"));
         }
-      } catch (e) { showToast("Error: " + e.message); }
+      } catch (e) {
+        if (card) {
+          card.style.opacity = "1";
+          card.style.transform = "";
+          card.style.maxHeight = "";
+        }
+        showToast("Error: " + e.message);
+      }
     });
   });
 }
