@@ -2170,6 +2170,7 @@ const tallerState = {
   fechaHasta: "",
   vistaTaller: "pendientes",  // "pendientes" (en_taller) | "alistadas" (lista_para_entregar + entregada)
   filtroAsesor: "",            // email del asesor para filtrar
+  busqueda: "",                // texto libre (chasis, placa, cliente, motor)
 };
 
 async function loadDirectorioUsuarios() {
@@ -2236,6 +2237,14 @@ function renderTaller() {
   let enTaller = filtrarPorFecha(todasTaller, tallerState.filtroFecha, tallerState.fechaDesde, tallerState.fechaHasta);
   if (tallerState.filtroAsesor) {
     enTaller = enTaller.filter(p => (p.asesorEmail || "").toLowerCase() === tallerState.filtroAsesor.toLowerCase());
+  }
+  // Búsqueda libre: chasis, placa, cliente, motor, cédula
+  const q = (tallerState.busqueda || "").trim().toLowerCase();
+  if (q) {
+    enTaller = enTaller.filter(p =>
+      [p.chasis, p.placa, p.nombreCliente, p.motor, p.cedulaCliente, p.marca, p.modelo]
+        .some(v => String(v || "").toLowerCase().includes(q))
+    );
   }
   document.getElementById("tallerCount").textContent = fmtNum.format(enTaller.length);
 
@@ -2589,6 +2598,12 @@ document.querySelectorAll(".taller-vista").forEach(btn => {
 // Listener filtro por asesor en Taller
 document.getElementById("tallerFiltroAsesor")?.addEventListener("change", (ev) => {
   tallerState.filtroAsesor = ev.target.value;
+  renderTaller();
+});
+
+// Listener búsqueda en Taller (chasis / placa / cliente / motor)
+document.getElementById("tallerBusqueda")?.addEventListener("input", (ev) => {
+  tallerState.busqueda = ev.target.value;
   renderTaller();
 });
 
