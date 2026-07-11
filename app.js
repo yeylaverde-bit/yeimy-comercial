@@ -2364,7 +2364,10 @@ function renderTaller() {
         <td><strong>${escapeHtml(p.placa || "—")}</strong></td>
         <td><code style="font-size:11px;color:var(--accent-2)">${escapeHtml(p.chasis)}</code></td>
         <td><code style="font-size:11px;color:var(--muted)">${escapeHtml(p.motor || "—")}</code></td>
-        <td><strong>${escapeHtml(p.marca || "")} ${escapeHtml(p.modelo || "")}</strong></td>
+        <td>
+          <strong>${escapeHtml(p.marca || "")} ${escapeHtml(p.modelo || "")}</strong>
+          <button class="btn-mini" data-editar-preasig="${escapeHtml(p.chasis)}" title="Editar marca / modelo / motor / color" style="margin-left:6px;padding:2px 6px;font-size:11px;background:transparent;border:1px solid var(--line);color:var(--accent)">✏️</button>
+        </td>
         <td>${escapeHtml(p.nombreCliente || "—")}</td>
         ${asesorCell}
         <td>${gpsLabel}</td>
@@ -2443,6 +2446,15 @@ function renderTaller() {
       await cambiarEstadoPreasig(b.dataset.tallerDevolver, "en_taller");
     });
   });
+  // Botón "✏️ Editar" — abre modal para corregir marca/modelo/motor/color
+  tbody.querySelectorAll("[data-editar-preasig]").forEach(b => {
+    b.addEventListener("click", () => {
+      const chasis = b.dataset.editarPreasig;
+      const p = preasigState.preasignaciones[chasis];
+      if (!p) { showToast("No se encontró la preasignación"); return; }
+      abrirModalEditarPreasig(p);
+    });
+  });
 
   // Actualizar el badge del sidebar con el conteo de motos listas para entregar
   // (solo aplica para asesor/admin/dueno — para que vean cuántas hay listas)
@@ -2462,6 +2474,83 @@ function renderTaller() {
       badge.style.display = "none";
     }
   }
+}
+
+// Modal para editar marca/modelo/motor/color de una preasignación
+// (útil cuando el auto-fill de Siigo dejó datos mal registrados)
+function abrirModalEditarPreasig(p) {
+  const overlay = document.createElement("div");
+  overlay.style.cssText = "position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px";
+  overlay.innerHTML = `
+    <div style="background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:24px;max-width:520px;width:100%;max-height:90vh;overflow-y:auto">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px">
+        <div>
+          <h2 style="margin:0;font-size:18px;color:#f59e0b">✏️ Corregir datos de la moto</h2>
+          <p class="muted" style="margin:4px 0 0;font-size:12.5px">Cliente: <strong>${escapeHtml(p.nombreCliente || "—")}</strong></p>
+          <p class="muted" style="margin:2px 0 0;font-size:11.5px">Chasis: <code style="color:var(--accent-2)">${escapeHtml(p.chasis)}</code></p>
+        </div>
+        <button class="btn-secondary" id="btnCerrarEditarPreasig" style="padding:4px 10px">✕</button>
+      </div>
+      <p class="muted" style="font-size:12px;margin:0 0 14px">
+        Si el modelo o marca están mal (ejemplo: dice RAIDER pero es APACHE), corrígelos y guarda.
+      </p>
+      <form id="formEditarPreasig" style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <label style="grid-column:1/-1"><span>Placa</span><input name="placa" value="${escapeHtml(p.placa || "")}" /></label>
+        <label><span>Marca</span><input name="marca" value="${escapeHtml(p.marca || "")}" placeholder="TVS" /></label>
+        <label><span>Modelo</span><input name="modelo" value="${escapeHtml(p.modelo || "")}" placeholder="APACHE RTR 200 4V XC FI ABS" /></label>
+        <label><span>Motor</span><input name="motor" value="${escapeHtml(p.motor || "")}" /></label>
+        <label><span>Color</span><input name="color" value="${escapeHtml(p.color || "")}" placeholder="NEGRO NEBULOSA" /></label>
+        <label style="grid-column:1/-1"><span>Año</span><input name="anio" value="${escapeHtml(p.anio || "")}" placeholder="2027" /></label>
+        <div style="grid-column:1/-1;display:flex;justify-content:flex-end;gap:8px;margin-top:8px">
+          <button type="button" class="btn-secondary" id="btnCancelarEditarPreasig">Cancelar</button>
+          <button type="submit" class="btn-primary" style="background:#22c55e;border-color:#22c55e;color:#000;font-weight:700">💾 Guardar corrección</button>
+        </div>
+      </form>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+
+  const cerrar = () => overlay.remove();
+  overlay.querySelector("#btnCerrarEditarPreasig").addEventListener("click", cerrar);
+  overlay.querySelector("#btnCancelarEditarPreasig").addEventListener("click", cerrar);
+  overlay.addEventListener("click", (ev) => { if (ev.target === overlay) cerrar(); });
+
+  overlay.querySelector("#formEditarPreasig").addEventListener("submit", async (ev) => {
+    ev.preventDefault();
+    const fd = new FormData(ev.target);
+    const cambios = {
+      placa: String(fd.get("placa") || "").trim(),
+      marca: String(fd.get("marca") || "").trim().toUpperCase(),
+      modelo: String(fd.get("modelo") || "").trim().toUpperCase(),
+      motor: String(fd.get("motor") || "").trim().toUpperCase(),
+      color: String(fd.get("color") || "").trim().toUpperCase(),
+      anio: String(fd.get("anio") || "").trim(),
+    };
+    const btn = ev.target.querySelector('button[type="submit"]');
+    btn.disabled = true;
+    btn.textContent = "Guardando…";
+    try {
+      const r = await fetch(`/api/preasignaciones/${encodeURIComponent(p.chasis)}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(cambios),
+      });
+      const data = await r.json();
+      if (data.ok) {
+        showToast("✓ Datos corregidos");
+        await loadPreasignaciones();
+        cerrar();
+      } else {
+        btn.disabled = false;
+        btn.textContent = "💾 Guardar corrección";
+        showToast("Error: " + (data.error || "no se pudo guardar"));
+      }
+    } catch (e) {
+      btn.disabled = false;
+      btn.textContent = "💾 Guardar corrección";
+      showToast("Error: " + e.message);
+    }
+  });
 }
 
 // Listeners filtros de fecha Taller
