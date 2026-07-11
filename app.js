@@ -2607,6 +2607,140 @@ function poblarFiltroAsesoresTaller() {
 const tallerVerTodos = document.getElementById("tallerVerTodos");
 if (tallerVerTodos) tallerVerTodos.addEventListener("change", e => { preasigState.verTodos = e.target.checked; loadPreasignaciones(); });
 
+// Botón "Auditar chasis vs Siigo" — muestra motos con marca/modelo mal registrados
+const btnAuditarSiigo = document.getElementById("btnAuditarSiigo");
+if (btnAuditarSiigo) btnAuditarSiigo.addEventListener("click", async () => {
+  const cont = document.getElementById("auditoriaResultado");
+  const original = btnAuditarSiigo.textContent;
+  btnAuditarSiigo.disabled = true;
+  btnAuditarSiigo.textContent = "🔎 Auditando…";
+  if (cont) {
+    cont.style.display = "block";
+    cont.innerHTML = `<div class="muted" style="padding:12px">🔎 Comparando ${Object.keys(preasigState.preasignaciones || {}).length} preasignaciones contra Siigo…</div>`;
+  }
+  try {
+    const r = await fetch("/api/preasignaciones/auditar-siigo");
+    const data = await r.json();
+    btnAuditarSiigo.disabled = false;
+    btnAuditarSiigo.textContent = original;
+    if (!data.ok) {
+      cont.innerHTML = `<div style="color:var(--bad);padding:12px">Error: ${escapeHtml(data.error || "no se pudo auditar")}</div>`;
+      return;
+    }
+    renderAuditoriaSiigo(data);
+  } catch (e) {
+    btnAuditarSiigo.disabled = false;
+    btnAuditarSiigo.textContent = original;
+    if (cont) cont.innerHTML = `<div style="color:var(--bad);padding:12px">Error: ${escapeHtml(e.message)}</div>`;
+  }
+});
+
+function renderAuditoriaSiigo(data) {
+  const cont = document.getElementById("auditoriaResultado");
+  if (!cont) return;
+  const { total, verificadas, correctas, mismatches, sinChasisSiigo } = data;
+  if (!mismatches || mismatches.length === 0) {
+    cont.innerHTML = `
+      <div style="background:rgba(34,197,94,.12);border:2px solid #22c55e;border-radius:10px;padding:14px">
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:22px">✅</span>
+          <strong style="color:#22c55e;font-size:14px">Todo bien — no hay motos con datos incorrectos</strong>
+        </div>
+        <p class="muted" style="font-size:12px;margin:6px 0 0">
+          Verificadas ${verificadas} de ${total} preasignaciones · ${correctas} correctas · ${sinChasisSiigo} sin chasis en Siigo (no se pudo verificar)
+        </p>
+      </div>`;
+    return;
+  }
+  cont.innerHTML = `
+    <div style="background:rgba(239,68,68,.10);border:2px solid #ef4444;border-radius:10px;padding:14px;margin-bottom:8px">
+      <div style="display:flex;align-items:center;gap:8px">
+        <span style="font-size:22px">⚠️</span>
+        <strong style="color:#ef4444;font-size:15px">${mismatches.length} moto(s) con marca/modelo que NO coincide con Siigo</strong>
+      </div>
+      <p class="muted" style="font-size:12px;margin:6px 0 0">
+        Verificadas ${verificadas} de ${total} · ${data.correctas} correctas · ${sinChasisSiigo} sin chasis en Siigo (no se pudo verificar) · Click <strong>"✏️ Corregir a lo de Siigo"</strong> para arreglar cada una.
+      </p>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:8px;max-height:420px;overflow-y:auto">
+      ${mismatches.map((m, i) => `
+        <div style="background:rgba(8,12,28,.55);border:1px solid var(--line);border-radius:8px;padding:12px">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:8px">
+            <div style="min-width:0;flex:1">
+              <div style="font-size:13px;font-weight:600">${escapeHtml(m.cliente || "(sin cliente)")}</div>
+              <div class="muted" style="font-size:11.5px">
+                Chasis <code style="color:var(--accent-2)">${escapeHtml(m.chasis)}</code>
+                ${m.motor ? ` · Motor <code>${escapeHtml(m.motor)}</code>` : ""}
+                ${m.asesorNombre ? ` · Asesor ${escapeHtml(m.asesorNombre)}` : ""}
+              </div>
+            </div>
+            <button class="btn-primary" data-corregir-siigo="${escapeHtml(m.chasis)}" style="padding:6px 12px;font-size:12px;background:#22c55e;border-color:#22c55e;color:#000;font-weight:600;white-space:nowrap">
+              ✏️ Corregir a lo de Siigo
+            </button>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:12px">
+            <div style="background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.3);border-radius:6px;padding:8px">
+              <div style="font-size:10.5px;text-transform:uppercase;color:#ef4444;font-weight:600;margin-bottom:4px">❌ Actual (mal)</div>
+              <div><strong>${escapeHtml(m.actual.marca)} ${escapeHtml(m.actual.modelo)}</strong></div>
+              ${m.actual.color ? `<div class="muted" style="font-size:11px">${escapeHtml(m.actual.color)}</div>` : ""}
+            </div>
+            <div style="background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.3);border-radius:6px;padding:8px">
+              <div style="font-size:10.5px;text-transform:uppercase;color:#22c55e;font-weight:600;margin-bottom:4px">✅ Correcto (Siigo)</div>
+              <div><strong>${escapeHtml(m.siigo.marca)} ${escapeHtml(m.siigo.modelo)}</strong></div>
+              ${m.siigo.color ? `<div class="muted" style="font-size:11px">${escapeHtml(m.siigo.color)}</div>` : ""}
+            </div>
+          </div>
+        </div>
+      `).join("")}
+    </div>
+  `;
+  // Listeners para el botón "Corregir a lo de Siigo"
+  cont.querySelectorAll("[data-corregir-siigo]").forEach(btn => {
+    btn.addEventListener("click", async () => {
+      const chasis = btn.dataset.corregirSiigo;
+      const m = mismatches.find(x => x.chasis === chasis);
+      if (!m) return;
+      const okConfirm = confirm(`Corregir esta moto según Siigo?\n\nActual: ${m.actual.marca} ${m.actual.modelo}\nCorrecto: ${m.siigo.marca} ${m.siigo.modelo}\n\nSe guardará automáticamente.`);
+      if (!okConfirm) return;
+      btn.disabled = true;
+      btn.textContent = "Guardando…";
+      try {
+        const cambios = {
+          marca: m.siigo.marca,
+          modelo: m.siigo.modelo,
+          color: m.siigo.color || undefined,
+          motor: m.siigo.motor || undefined,
+          anio: m.siigo.anio || undefined,
+        };
+        // Limpiar undefined
+        Object.keys(cambios).forEach(k => cambios[k] === undefined && delete cambios[k]);
+        const r = await fetch(`/api/preasignaciones/${encodeURIComponent(chasis)}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(cambios),
+        });
+        const data = await r.json();
+        if (data.ok) {
+          showToast("✓ Corregida");
+          await loadPreasignaciones();
+          // Marcar como corregida en la UI
+          btn.textContent = "✓ Corregida";
+          btn.style.background = "#16a34a";
+          btn.disabled = true;
+        } else {
+          btn.disabled = false;
+          btn.textContent = "✏️ Corregir a lo de Siigo";
+          showToast("Error: " + (data.error || "no se pudo guardar"));
+        }
+      } catch (e) {
+        btn.disabled = false;
+        btn.textContent = "✏️ Corregir a lo de Siigo";
+        showToast("Error: " + e.message);
+      }
+    });
+  });
+}
+
 // ============================================================
 //          SOAT — pendientes de crear (vista contabilidad)
 // ============================================================

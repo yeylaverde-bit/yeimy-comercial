@@ -897,12 +897,16 @@
         <h2>🛠️ Taller · motos en proceso</h2>
         <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
           <span class="badge" id="tallerCount">0</span>
+          <button class="btn-secondary" id="btnAuditarSiigo" data-role-only="admin asesor dueno" style="padding:6px 12px;font-size:12px;background:rgba(245,158,11,.15);border-color:#f59e0b;color:#f59e0b" title="Compara chasis con Siigo y muestra las motos que tienen marca/modelo mal registrados">
+            🔍 Auditar chasis vs Siigo
+          </button>
           <label class="toggle" data-role-only="admin">
             <input type="checkbox" id="tallerVerTodos" />
             <span>Ver todos los asesores</span>
           </label>
         </div>
       </div>
+      <div id="auditoriaResultado" style="display:none;margin:6px 0 14px"></div>
       <p class="muted" style="margin:-4px 0 12px;font-size:12.5px" data-role-only="admin asesor dueno">
         Motos que pasaron de preasignación a taller. Cambia el estado a <strong>"Lista"</strong> o <strong>"Entregada"</strong> cuando corresponda.
       </p>

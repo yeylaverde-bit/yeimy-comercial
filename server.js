@@ -2108,6 +2108,122 @@ app.get("/api/siigo/buscar/:chasis", requireAuth, async (req, res) => {
   }
 });
 
+// Auditar preasignaciones vs Siigo — encuentra motos con marca/modelo que
+// no corresponden al chasis/motor real en Siigo (source of truth).
+app.get("/api/preasignaciones/auditar-siigo", requireAuth, async (req, res) => {
+  if (!siigo.siigoConfigurado()) {
+    return res.status(503).json({ ok: false, error: "Siigo no configurado" });
+  }
+  try {
+    // Refrescar productos Siigo si el cache está viejo
+    let productos = siigoCache.data;
+    const now = Date.now();
+    if (!productos || (now - siigoCache.fetchedAt) > SIIGO_CACHE_MS) {
+      const crudos = await siigo.obtenerProductos();
+      productos = crudos.map(siigo.normalizarProducto);
+      siigoCache = { data: productos, fetchedAt: now };
+    }
+
+    // Helper inferir marca (misma heurística que /siigo/buscar)
+    function inferirMarca(nombre) {
+      const n = (nombre || "").toUpperCase();
+      if (/RAIDER|APACHE|NTORQ|SPORT|STAR|HLX|RTX|RTR\b/.test(n)) return "TVS";
+      if (/KING|VICTORY|NITRO|MOTO\s*CARRO|MRX|XKM|MOBILITY/.test(n)) return "MOBILITY";
+      if (/\bAKT\b|EVO\s|DYNAMIC|FLEX/.test(n)) return "AKT";
+      if (/\bBET\b|AGILITY|FUSION|NEO|VITALITY|JOCKEY|FLY|SUPER\s*8|KYMCO/.test(n)) return "KYMCO";
+      if (/\bBOXER\b|PULSAR|DOMINAR|DISCOVER|AVENGER|BAJAJ/.test(n)) return "BAJAJ";
+      if (/\bAUTECO\b|VICTORY/.test(n)) return "AUTECO";
+      return "OTRO";
+    }
+
+    // Comparar tokens principales del modelo — exige coincidencia en un
+    // token ALFABÉTICO (el nombre del modelo: RAIDER, APACHE, NTORQ…),
+    // no solo el cilindraje (125, 200) que muchas motos comparten.
+    function coinciden(a, b) {
+      if (!a || !b) return false;
+      const clean = s => String(s).toUpperCase().replace(/[^A-Z0-9\s]/g, " ").split(/\s+/).filter(Boolean);
+      const tokensA = clean(a);
+      const tokensB = new Set(clean(b));
+      // Token alfabético = solo letras, ≥ 4 caracteres (RAIDER, APACHE, NTORQ, BOXER, PULSAR, BET no cumple pero PULSAR sí)
+      const alfaLargo = t => /^[A-Z]{4,}$/.test(t);
+      let alfaComun = false;
+      let alfaCortoComun = 0; // BET, HLX, RTR, etc.
+      for (const t of tokensA) {
+        if (!tokensB.has(t)) continue;
+        if (alfaLargo(t)) alfaComun = true;
+        else if (/^[A-Z]{2,3}$/.test(t)) alfaCortoComun++;
+      }
+      // Coincide si comparten al menos un token alfabético largo,
+      // o dos tokens alfabéticos cortos (ej: BET TK, HLX)
+      return alfaComun || alfaCortoComun >= 2;
+    }
+
+    const todas = leerPreasig();
+    const mismatches = [];
+    let sinChasisSiigo = 0; // preasigs cuyo chasis no está en Siigo
+    let verificadas = 0;
+    let ok = 0;
+
+    for (const [id, p] of Object.entries(todas)) {
+      if (!p.chasis) continue;
+      // Buscar producto Siigo por chasis exacto, luego por motor exacto
+      const chasisU = String(p.chasis).toUpperCase();
+      const motorU = String(p.motor || "").toUpperCase();
+      let match = productos.find(s => (s.chasis || "").toUpperCase() === chasisU);
+      if (!match && motorU) {
+        match = productos.find(s =>
+          (s.motor || "").toUpperCase() === motorU ||
+          (s.codigo || "").toUpperCase() === motorU
+        );
+      }
+      if (!match) { sinChasisSiigo++; continue; }
+      verificadas++;
+
+      const siigoModelo = match.modeloParsed || (match.nombre || "").replace(/^MOTOCICLET[A]?\s+/i, "").trim();
+      const siigoMarca = inferirMarca(siigoModelo || match.nombre);
+      const preasigModelo = p.modelo || "";
+      const preasigMarca = p.marca || "";
+
+      // Es mismatch si el modelo actual no coincide con el de Siigo
+      if (!coinciden(preasigModelo, siigoModelo)) {
+        mismatches.push({
+          chasis: p.chasis,
+          motor: p.motor || "",
+          cliente: p.nombreCliente || "",
+          asesorNombre: p.asesorNombre || "",
+          estado: p.estado || "",
+          actual: {
+            marca: preasigMarca,
+            modelo: preasigModelo,
+            color: p.color || "",
+          },
+          siigo: {
+            marca: siigoMarca,
+            modelo: siigoModelo,
+            color: match.color || "",
+            motor: match.motor || "",
+            codigo: match.codigo || "",
+            anio: match.anio || "",
+          },
+        });
+      } else {
+        ok++;
+      }
+    }
+
+    res.json({
+      ok: true,
+      total: Object.keys(todas).length,
+      verificadas,
+      correctas: ok,
+      mismatches,
+      sinChasisSiigo,
+    });
+  } catch (e) {
+    res.status(500).json({ ok: false, error: e.message });
+  }
+});
+
 // --- Siigo: crear productos (motos) + Factura de Compra desde factura Auteco ---
 // Solo admin. Body esperado:
 //   { motos: [{referencia, modelo, marca, color, anio, chasis, motor, precio, cilindraje}, ...],
