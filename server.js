@@ -630,7 +630,10 @@ app.post("/api/preasignaciones/crear", requireAuth, (req, res) => {
 
   const todas = leerPreasig();
   const id = String(b.chasis).trim().toUpperCase();
-  todas[id] = {
+  const existente = todas[id]; // si ya existe, preservamos todo el flujo (taller/GPS/acta)
+
+  // Campos que SÍ vienen del formulario y sí queremos actualizar
+  const camposForm = {
     chasis: id,
     motor: String(b.motor || "").trim(),
     marca: String(b.marca || "").trim().toUpperCase(),
@@ -642,16 +645,26 @@ app.post("/api/preasignaciones/crear", requireAuth, (req, res) => {
     celular: String(b.celular || "").trim(),
     numCredito: String(b.numCredito || "").trim(),
     financiera: String(b.financiera || "").trim().toUpperCase(),
-    gps: String(b.gps || "sin").trim(),  // "instalar" | "activar" | "sin"
+    gps: String(b.gps || (existente?.gps) || "sin").trim(),
     placa: String(b.placa || "").trim().toUpperCase(),
-    estado: "preasignada",  // preasignada | en_taller | entregada
-    asesorEmail: usuario.email,
-    asesorNombre: usuario.nombre,
-    creadoEn: todas[id]?.creadoEn || new Date().toISOString(),
     actualizadoEn: new Date().toISOString(),
   };
+
+  if (existente) {
+    // EDICIÓN — merge que preserva el flujo completo (estado taller/GPS/acta/asesor original)
+    todas[id] = { ...existente, ...camposForm };
+  } else {
+    // CREACIÓN — nuevo registro con defaults
+    todas[id] = {
+      ...camposForm,
+      estado: "preasignada",
+      asesorEmail: usuario.email,
+      asesorNombre: usuario.nombre,
+      creadoEn: new Date().toISOString(),
+    };
+  }
   guardarPreasig(todas);
-  res.json({ ok: true, preasignacion: todas[id] });
+  res.json({ ok: true, preasignacion: todas[id], modo: existente ? "editado" : "creado" });
 });
 
 // --- Subir foto del acta de entrega firmada ---
