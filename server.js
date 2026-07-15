@@ -810,6 +810,11 @@ app.delete("/api/preasignaciones/:chasis", requireAuth, (req, res) => {
 const PDFS_PRECIOS_DIR = path.join(DATA_DIR, "uploads-precios");
 if (!fs.existsSync(PDFS_PRECIOS_DIR)) fs.mkdirSync(PDFS_PRECIOS_DIR, { recursive: true });
 
+const MIMES_PRECIOS = new Set([
+  "application/pdf",
+  "image/jpeg", "image/jpg", "image/png", "image/webp", "image/heic", "image/heif",
+]);
+
 const uploadPrecios = multer({
   storage: multer.diskStorage({
     destination: (_req, _file, cb) => cb(null, PDFS_PRECIOS_DIR),
@@ -819,11 +824,14 @@ const uploadPrecios = multer({
     },
   }),
   limits: { fileSize: 20 * 1024 * 1024 },  // 20 MB
-  fileFilter: (_req, file, cb) => cb(file.mimetype === "application/pdf" ? null : new Error("Solo PDF"), file.mimetype === "application/pdf"),
+  fileFilter: (_req, file, cb) => {
+    if (MIMES_PRECIOS.has(file.mimetype)) return cb(null, true);
+    cb(new Error("Solo PDF o imagen (JPG/PNG/WEBP)"), false);
+  },
 });
 
 app.post("/api/precios/upload", requireAuth, requireAdmin, uploadPrecios.single("archivo"), (req, res) => {
-  if (!req.file) return res.status(400).json({ ok: false, error: "Falta archivo PDF" });
+  if (!req.file) return res.status(400).json({ ok: false, error: "Falta archivo (PDF o imagen)" });
   const meta = {
     archivo: req.file.filename,
     originalName: req.file.originalname,

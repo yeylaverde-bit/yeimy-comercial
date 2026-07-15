@@ -104,7 +104,7 @@
       <nav class="nav">
         <a href="#sesiones">👥 Sesiones activas <span id="sesionesEnLineaBadge" class="badge" style="display:none;background:#22c55e;color:#fff;margin-left:6px;font-size:10px"></span></a>
         <a href="#usuarios">🔐 Gestión de usuarios</a>
-        <a href="#actualizarprecios">📤 Actualizar precios (PDF)</a>
+        <a href="#actualizarprecios">📤 Actualizar precios (PDF/foto)</a>
         <a href="#facturaauteco">🧾 Cargar factura Auteco</a>
       </nav>
     </div>
@@ -1151,23 +1151,23 @@
 
     <section id="actualizarprecios" class="card" data-role-only="admin">
       <div class="card-head">
-        <h2>📤 Actualizar precios · subir PDF de la empresa</h2>
+        <h2>📤 Actualizar precios · subir PDF o foto</h2>
       </div>
       <p class="muted" style="margin:-4px 0 14px;font-size:12.5px">
-        Cuando la empresa envía la actualización mensual de precios en PDF, súbelo aquí.
-        Queda guardado en el historial para que cualquier asesor lo consulte.
+        Cuando la empresa envía la actualización de precios (PDF o foto de la lista impresa), súbela aquí.
+        Queda guardada en el historial para que cualquier asesor la consulte.
       </p>
       <form id="formSubirPrecios" class="form-grid" style="grid-template-columns:1fr 1fr;gap:14px">
         <label class="form-field form-field-full">
-          <span>Archivo PDF de precios *</span>
-          <input type="file" name="archivo" accept="application/pdf" required style="background:rgba(8,12,28,.55);border:1px solid var(--line);color:var(--text);border-radius:10px;padding:10px 12px" />
+          <span>Archivo (PDF o foto JPG/PNG) *</span>
+          <input type="file" name="archivo" accept="application/pdf,image/jpeg,image/png,image/webp,image/heic,image/heif" capture="environment" required style="background:rgba(8,12,28,.55);border:1px solid var(--line);color:var(--text);border-radius:10px;padding:10px 12px" />
         </label>
         <label class="form-field form-field-full">
           <span>Notas (opcional)</span>
           <textarea name="notas" rows="2" placeholder="Ej: Lista de precios junio 2026 — incluye nuevo Apache RTR 310"></textarea>
         </label>
         <div class="form-actions form-field-full" style="display:flex;gap:10px;flex-wrap:wrap">
-          <button type="submit" class="btn-primary">📤 Subir PDF al historial</button>
+          <button type="submit" class="btn-primary">📤 Subir al historial</button>
           <button type="button" class="btn-primary" id="btnProcesarCircular" style="background:linear-gradient(135deg,#a855f7,#7e22ce);border-color:#a855f7">
             🤖 Procesar con IA (extraer precios)
           </button>
