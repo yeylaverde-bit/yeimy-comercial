@@ -770,7 +770,7 @@ app.patch("/api/preasignaciones/:chasis", requireAuth, (req, res) => {
     if (req.body.gpsActivadoEn) todas[chasis].gpsActivadoPor = usuario.email;
   } else {
     // Solo permite actualizar ciertos campos
-    const camposPermitidos = ["estado", "gps", "placa", "numCredito", "financiera", "celular", "fechaNacimiento", "imeiGps", "iccidGps", "gpsInstalarEvidenciaPath", "gpsActivarEvidenciaPath", "actaEntrega", "actaEntregaArchivo", "marca", "modelo", "motor", "color", "anio"];
+    const camposPermitidos = ["estado", "gps", "placa", "numCredito", "financiera", "celular", "fechaNacimiento", "imeiGps", "iccidGps", "gpsInstaladoEn", "gpsActivadoEn", "gpsInstalarEvidenciaPath", "gpsActivarEvidenciaPath", "actaEntrega", "actaEntregaArchivo", "marca", "modelo", "motor", "color", "anio"];
     for (const c of camposPermitidos) {
       if (req.body[c] !== undefined) todas[chasis][c] = String(req.body[c]).trim();
     }
