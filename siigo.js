@@ -489,14 +489,72 @@ async function crearFacturaCompra(datos) {
   return await resp.json();
 }
 
+/**
+ * Extrae el nombre del vendedor REAL de las observaciones de una factura de venta.
+ * En Siigo el campo `seller` es solo quien digita la factura (la administrativa);
+ * el vendedor de piso se escribe a mano en observations con el formato:
+ *   "Tipo de Documento:\nVendedor: LOREN"
+ * → "LOREN"  (null si no hay patrón "Vendedor:")
+ */
+function vendedorDesdeObservaciones(obs) {
+  if (!obs || typeof obs !== "string") return null;
+  const m = obs.match(/Vendedor:\s*(.+)/i);
+  if (!m) return null;
+  return m[1].trim().replace(/\s+/g, " ").toUpperCase() || null;
+}
+
+/**
+ * Lista facturas de VENTA (FV) paginando /v1/invoices hasta agotar o `maxPaginas`.
+ * Retorna array plano de facturas crudas (cada una trae seller, observations, items[], customer…).
+ */
+async function obtenerFacturasVenta({ pageSize = 100, maxPaginas = 50 } = {}) {
+  const jwt = await obtenerToken();
+  const facturas = [];
+  let page = 1;
+
+  while (page <= maxPaginas) {
+    const url = `${SIIGO_BASE}/v1/invoices?page=${page}&page_size=${pageSize}`;
+    const resp = await fetch(url, {
+      headers: { "Authorization": `Bearer ${jwt}`, "Partner-Id": PARTNER_ID },
+    });
+
+    if (resp.status === 401) {
+      tokenCache = { jwt: null, expiresAt: 0 };
+      if (page === 1) return obtenerFacturasVenta({ pageSize, maxPaginas });
+      throw new Error("Siigo 401 después de renovar token");
+    }
+    if (resp.status === 429) { // rate limit: esperar y reintentar la misma página
+      await new Promise(r => setTimeout(r, 1500));
+      continue;
+    }
+    if (!resp.ok) {
+      const txt = await resp.text().catch(() => "");
+      throw new Error(`Siigo /v1/invoices ${resp.status}: ${txt.slice(0, 200)}`);
+    }
+
+    const data = await resp.json();
+    const results = Array.isArray(data) ? data : (data.results || data.data || []);
+    if (!results.length) break;
+    facturas.push(...results);
+
+    if (results.length < pageSize) break; // última página
+    page++;
+  }
+
+  return facturas;
+}
+
 module.exports = {
   siigoConfigurado,
   obtenerToken,
   obtenerProductos,
   normalizarProducto,
+  parseDescripcion,
   crearProducto,
   listarTiposDocumento,
   listarPaymentTypes,
   obtenerTipoFacturaCompra,
   crearFacturaCompra,
+  obtenerFacturasVenta,
+  vendedorDesdeObservaciones,
 };

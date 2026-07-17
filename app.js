@@ -2369,6 +2369,7 @@ function renderTaller() {
         <td>
           <div style="font-size:12px">${escapeHtml(fechaFmt)}</div>
           ${tiempoLleva ? `<div class="muted" style="font-size:10.5px">hace ${tiempoLleva}</div>` : ""}
+          ${p.montadaTallerNombre ? `<div class="muted" style="font-size:10.5px">📥 montó ${escapeHtml(p.montadaTallerNombre)}</div>` : ""}
         </td>
         <td><strong>${escapeHtml(p.placa || "—")}</strong></td>
         <td><code style="font-size:11px;color:var(--accent-2)">${escapeHtml(p.chasis)}</code></td>
@@ -2754,6 +2755,110 @@ function renderAuditoriaSiigo(data) {
       }
     });
   });
+}
+
+// Botón "¿Quién no hace proceso?" — cruza ventas de Siigo (vendedor real) vs taller
+const btnAuditarProceso = document.getElementById("btnAuditarProceso");
+if (btnAuditarProceso) btnAuditarProceso.addEventListener("click", async () => {
+  const cont = document.getElementById("auditoriaProcesoResultado");
+  const original = btnAuditarProceso.textContent;
+  btnAuditarProceso.disabled = true;
+  btnAuditarProceso.textContent = "🔎 Cruzando…";
+  if (cont) {
+    cont.style.display = "block";
+    cont.innerHTML = `<div class="muted" style="padding:12px">🔎 Comparando ventas de Siigo contra el proceso de taller… (puede tardar unos segundos)</div>`;
+  }
+  try {
+    const r = await fetch("/api/taller/auditar-proceso?dias=60");
+    const data = await r.json();
+    btnAuditarProceso.disabled = false;
+    btnAuditarProceso.textContent = original;
+    if (!data.ok) {
+      cont.innerHTML = `<div style="color:var(--bad);padding:12px">Error: ${escapeHtml(data.error || "no se pudo auditar")}</div>`;
+      return;
+    }
+    renderAuditoriaProceso(data);
+  } catch (e) {
+    btnAuditarProceso.disabled = false;
+    btnAuditarProceso.textContent = original;
+    if (cont) cont.innerHTML = `<div style="color:var(--bad);padding:12px">Error: ${escapeHtml(e.message)}</div>`;
+  }
+});
+
+function renderAuditoriaProceso(data) {
+  const cont = document.getElementById("auditoriaProcesoResultado");
+  if (!cont) return;
+  const { dias, totalVendidas, totalPendientes, resumen, detalleSinProceso } = data;
+
+  const catLabel = {
+    sin_registro: `<span style="color:#ef4444;font-weight:600">🔴 Sin registrar</span>`,
+    registrada_sin_taller: `<span style="color:#f59e0b;font-weight:600">🟡 Registrada, sin pasar a taller</span>`,
+  };
+
+  // Encabezado
+  const banner = totalPendientes === 0
+    ? `<div style="background:rgba(34,197,94,.12);border:2px solid #22c55e;border-radius:10px;padding:14px;margin-bottom:8px">
+         <div style="display:flex;align-items:center;gap:8px"><span style="font-size:22px">✅</span>
+         <strong style="color:#22c55e;font-size:14px">Todo al día — cada moto vendida tiene su proceso en taller</strong></div>
+         <p class="muted" style="font-size:12px;margin:6px 0 0">${totalVendidas} motos vendidas en los últimos ${dias} días.</p>
+       </div>`
+    : `<div style="background:rgba(59,130,246,.10);border:2px solid #3b82f6;border-radius:10px;padding:14px;margin-bottom:8px">
+         <div style="display:flex;align-items:center;gap:8px"><span style="font-size:22px">🕵️</span>
+         <strong style="color:#60a5fa;font-size:15px">${totalPendientes} de ${totalVendidas} motos vendidas NO están en proceso de taller</strong></div>
+         <p class="muted" style="font-size:12px;margin:6px 0 0">
+           Ventana: últimos <strong>${dias} días</strong> · El "vendedor" viene del campo <em>Vendedor:</em> de la factura en Siigo (el vendedor real, no quien digitó).
+         </p>
+       </div>`;
+
+  // Tabla resumen por vendedor
+  const filas = resumen.map(v => `
+    <tr style="${v.pendientes > 0 ? "background:rgba(239,68,68,.06)" : ""}">
+      <td style="padding:7px 10px;font-weight:600">${escapeHtml(v.vendedor)}</td>
+      <td style="padding:7px 10px;text-align:center">${v.vendidas}</td>
+      <td style="padding:7px 10px;text-align:center;color:#ef4444;font-weight:${v.sinRegistro ? "700" : "400"}">${v.sinRegistro || "—"}</td>
+      <td style="padding:7px 10px;text-align:center;color:#f59e0b;font-weight:${v.registradaSinTaller ? "700" : "400"}">${v.registradaSinTaller || "—"}</td>
+      <td style="padding:7px 10px;text-align:center">${v.enTaller || "—"}</td>
+      <td style="padding:7px 10px;text-align:center">${v.lista || "—"}</td>
+      <td style="padding:7px 10px;text-align:center;color:#22c55e">${v.entregada || "—"}</td>
+      <td style="padding:7px 10px;text-align:center;font-weight:700;color:${v.pendientes ? "#ef4444" : "#22c55e"}">${v.pendientes}</td>
+    </tr>`).join("");
+
+  const tabla = `
+    <div style="overflow-x:auto;margin-bottom:12px">
+      <table style="width:100%;border-collapse:collapse;font-size:12px;min-width:640px">
+        <thead>
+          <tr style="border-bottom:2px solid var(--line);text-align:center;color:var(--muted);font-size:10.5px;text-transform:uppercase">
+            <th style="padding:7px 10px;text-align:left">Vendedor</th>
+            <th style="padding:7px 10px">Vendidas</th>
+            <th style="padding:7px 10px">🔴 Sin registrar</th>
+            <th style="padding:7px 10px">🟡 Sin taller</th>
+            <th style="padding:7px 10px">🛠 En taller</th>
+            <th style="padding:7px 10px">✓ Lista</th>
+            <th style="padding:7px 10px">Entregada</th>
+            <th style="padding:7px 10px">Pendientes</th>
+          </tr>
+        </thead>
+        <tbody>${filas}</tbody>
+      </table>
+    </div>`;
+
+  // Detalle de motos sin proceso
+  const detalle = detalleSinProceso.length === 0 ? "" : `
+    <div style="font-size:11px;text-transform:uppercase;color:var(--muted);font-weight:600;margin:4px 0 6px">Motos vendidas pendientes de proceso</div>
+    <div style="display:flex;flex-direction:column;gap:6px;max-height:420px;overflow-y:auto">
+      ${detalleSinProceso.map(m => `
+        <div style="background:rgba(8,12,28,.55);border:1px solid var(--line);border-radius:8px;padding:10px 12px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap">
+          <div style="min-width:0;flex:1">
+            <div style="font-size:12.5px;font-weight:600">${escapeHtml(m.modelo || "(moto)")} · <code style="color:var(--accent-2)">${escapeHtml(m.chasis)}</code></div>
+            <div class="muted" style="font-size:11px">
+              Vendedor <strong>${escapeHtml(m.vendedor)}</strong> · Factura ${escapeHtml(m.factura)} · ${escapeHtml(m.fecha)} · Cliente ${escapeHtml(m.cliente || "—")}
+            </div>
+          </div>
+          <div style="align-self:center;font-size:11px;white-space:nowrap">${catLabel[m.categoria] || escapeHtml(m.categoria)}</div>
+        </div>`).join("")}
+    </div>`;
+
+  cont.innerHTML = banner + tabla + detalle;
 }
 
 // ============================================================

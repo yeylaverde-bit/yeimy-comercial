@@ -779,9 +779,11 @@ app.patch("/api/preasignaciones/:chasis", requireAuth, (req, res) => {
       todas[chasis].actaEntregaEn = new Date().toISOString();
       todas[chasis].actaEntregaPor = usuario.email;
     }
-    // Si pasa a en_taller, registrar timestamp de entrada
+    // Si pasa a en_taller, registrar timestamp de entrada y QUIÉN la montó a taller
     if (req.body.estado === "en_taller" && !todas[chasis].entradaTaller) {
       todas[chasis].entradaTaller = new Date().toISOString();
+      todas[chasis].montadaTallerPor = usuario.email;
+      todas[chasis].montadaTallerNombre = usuario.nombre || usuario.email;
     }
     // Si pasa a lista_para_entregar, registrar timestamp
     if (req.body.estado === "lista_para_entregar") {
@@ -2239,6 +2241,111 @@ app.get("/api/preasignaciones/auditar-siigo", requireAuth, async (req, res) => {
       correctas: ok,
       mismatches,
       sinChasisSiigo,
+    });
+  } catch (e) {
+    res.status(500).json({ ok: false, error: e.message });
+  }
+});
+
+// ─────────────────────────────────────────────────────────────────
+//   AUDITAR PROCESO DE TALLER vs VENTAS REALES DE SIIGO
+//   Cruza lo VENDIDO en Siigo (con el vendedor REAL de las observaciones)
+//   contra las preasignaciones del dashboard, para saber qué motos se
+//   vendieron pero NADIE metió al proceso de taller — y de qué vendedor son.
+// ─────────────────────────────────────────────────────────────────
+let facturasCache = { data: null, fetchedAt: 0 };
+const FACTURAS_CACHE_MS = 5 * 60 * 1000; // 5 min
+
+app.get("/api/taller/auditar-proceso", requireAuth, async (req, res) => {
+  if (!siigo.siigoConfigurado()) {
+    return res.status(503).json({ ok: false, error: "Siigo no configurado" });
+  }
+  try {
+    // Ventana de tiempo (por defecto 60 días) para no arrastrar ventas viejas
+    const dias = Math.max(1, Math.min(365, parseInt(req.query.dias, 10) || 60));
+    const corte = new Date(Date.now() - dias * 24 * 60 * 60 * 1000);
+
+    // 1) Facturas de venta de Siigo (con cache corto)
+    const now = Date.now();
+    let facturas = facturasCache.data;
+    if (!facturas || (now - facturasCache.fetchedAt) > FACTURAS_CACHE_MS) {
+      facturas = await siigo.obtenerFacturasVenta();
+      facturasCache = { data: facturas, fetchedAt: now };
+    }
+
+    // 2) Mapa chasis → { vendedor real, factura, fecha, cliente, modelo }
+    //    Solo ítems que son motos (los que traen chasis en la descripción).
+    const vendidas = {}; // CHASIS(upper) → info
+    for (const f of facturas) {
+      if (f.date && new Date(f.date) < corte) continue; // fuera de la ventana
+      const vendedor = siigo.vendedorDesdeObservaciones(f.observations) || "(sin vendedor)";
+      const cliente = f.customer ? (f.customer.identification || "") : "";
+      for (const it of (f.items || [])) {
+        const descNorm = String(it.description || "").replace(/CHAISIS/gi, "CHASIS");
+        const parsed = siigo.parseDescripcion(descNorm);
+        if (!parsed.chasis) continue; // no es moto (accesorio, GPS, etc.)
+        const ch = parsed.chasis.toUpperCase();
+        if (vendidas[ch]) continue; // primera factura gana
+        vendidas[ch] = {
+          chasis: ch,
+          vendedor,
+          factura: f.name || `${f.prefix || ""}-${f.number}`,
+          fecha: f.date || "",
+          cliente,
+          modelo: (parsed.modelo || "").trim(),
+        };
+      }
+    }
+
+    // 3) Preasignaciones actuales (estado del proceso de taller)
+    const preasig = leerPreasig();
+    const estadoPorChasis = {};
+    for (const [id, p] of Object.entries(preasig)) {
+      estadoPorChasis[String(p.chasis || id).toUpperCase()] = p.estado || "preasignada";
+    }
+
+    // 4) Clasificar cada moto vendida según su avance en el proceso
+    //    "no hace proceso" = vendida pero sin registrar, o registrada pero sin pasar a taller.
+    const resumen = {}; // vendedor → contadores
+    const detalleSinProceso = []; // motos pendientes de proceso
+    const V = () => ({ vendidas: 0, sinRegistro: 0, registradaSinTaller: 0, enTaller: 0, lista: 0, entregada: 0 });
+
+    for (const info of Object.values(vendidas)) {
+      const vend = info.vendedor;
+      if (!resumen[vend]) resumen[vend] = V();
+      resumen[vend].vendidas++;
+
+      const estado = estadoPorChasis[info.chasis]; // undefined = no existe preasignación
+      let categoria;
+      if (!estado)                             { resumen[vend].sinRegistro++;         categoria = "sin_registro"; }
+      else if (estado === "preasignada")       { resumen[vend].registradaSinTaller++; categoria = "registrada_sin_taller"; }
+      else if (estado === "en_taller")         { resumen[vend].enTaller++;            categoria = "en_taller"; }
+      else if (estado === "lista_para_entregar"){ resumen[vend].lista++;              categoria = "lista"; }
+      else if (estado === "entregada")         { resumen[vend].entregada++;           categoria = "entregada"; }
+      else                                     { resumen[vend].registradaSinTaller++; categoria = "registrada_sin_taller"; }
+
+      if (categoria === "sin_registro" || categoria === "registrada_sin_taller") {
+        detalleSinProceso.push({ ...info, categoria });
+      }
+    }
+
+    // 5) Ordenar: vendedores con más pendientes primero
+    const resumenArr = Object.entries(resumen).map(([vendedor, c]) => ({
+      vendedor,
+      ...c,
+      pendientes: c.sinRegistro + c.registradaSinTaller,
+    })).sort((a, b) => b.pendientes - a.pendientes || b.vendidas - a.vendidas);
+
+    detalleSinProceso.sort((a, b) =>
+      a.vendedor.localeCompare(b.vendedor) || (a.fecha < b.fecha ? 1 : -1));
+
+    res.json({
+      ok: true,
+      dias,
+      totalVendidas: Object.keys(vendidas).length,
+      totalPendientes: detalleSinProceso.length,
+      resumen: resumenArr,
+      detalleSinProceso,
     });
   } catch (e) {
     res.status(500).json({ ok: false, error: e.message });
