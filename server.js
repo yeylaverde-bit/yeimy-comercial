@@ -2605,6 +2605,12 @@ app.get(PUBLIC_FILES, (req, res) => {
   res.sendFile(path.join(__dirname, file));
 });
 
+// --- Catálogo público (link branded para compartir a clientes por WhatsApp) ---
+// Va ANTES de requireAuth: no exige login. Solo el perfil de Yeimy.
+app.get("/catalogo", (req, res) => res.sendFile(path.join(__dirname, "catalogo.html")));
+app.get("/catalogo.json", (req, res) => res.sendFile(path.join(__dirname, "catalogo.json")));
+app.use("/catalogo-fotos", express.static(path.join(__dirname, "catalogo-fotos")));
+
 // Todo lo demás (incluyendo /) requiere sesión
 app.use(requireAuth);
 app.use(express.static(__dirname));

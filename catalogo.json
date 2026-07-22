@@ -1,0 +1,4794 @@
+{
+  "generado": "2026-07-21",
+  "asesora": "Yeimy Laverde",
+  "telefono": "+57 302 126 6110",
+  "whatsapp": "573021266110",
+  "dominio": "www.yeimylaverde.com",
+  "total": 34,
+  "motos": [
+    {
+      "modelo": "APACHE 160 CARBURADA",
+      "marca": "TVS",
+      "categoria": "Deportivas",
+      "cilindraje": "159.7 CC",
+      "precio": 10527999,
+      "inicial": 2100000,
+      "colores": [
+        {
+          "nombre": "NEGRO NEBULOSA VERDE",
+          "hex": "#1a1a1a"
+        }
+      ],
+      "specs": [
+        [
+          "CILINDRAJE",
+          "159.7 CC"
+        ],
+        [
+          "POTENCIA MÁXIMA",
+          "16.3 HP @ 8000 rpm"
+        ],
+        [
+          "SISTEMA DE FRENOS",
+          "ABS"
+        ],
+        [
+          "CAPACIDAD DEL TANQUE (Incluyendo la reserva)",
+          "12 L (3.17 GAL)"
+        ],
+        [
+          "MOTOR",
+          "4 tiempos, monocilíndrico"
+        ],
+        [
+          "TORQUE MÁXIMO",
+          "14.8 Nm @ 6500 RPM"
+        ],
+        [
+          "TRANSMISIÓN",
+          "Mecánica 5 velocidades"
+        ],
+        [
+          "COMBUSTIBLE",
+          "Corriente"
+        ],
+        [
+          "RELACIÓN DE COMPRESIÓN",
+          "10.15:1"
+        ],
+        [
+          "SISTEMA DE ALIMENTACIÓN",
+          "Carburador"
+        ],
+        [
+          "PESO NETO",
+          "145 KG"
+        ],
+        [
+          "SUSPENSIÓN DELANTERA",
+          "HORQUILLA TELESCÓPICA"
+        ],
+        [
+          "SISTEMA DE ENCENDIDO",
+          "TCI"
+        ],
+        [
+          "DIÁMETRO POR CARRERA",
+          "62 X 52.9 mm"
+        ],
+        [
+          "REFRIGERACIÓN",
+          "Aire/Aceite"
+        ],
+        [
+          "ARRANQUE",
+          "Eléctrico"
+        ],
+        [
+          "SUSPENSIÓN TRASERA",
+          "Monoamortiguador, ajustable en precarga"
+        ],
+        [
+          "FRENO DELANTERO",
+          "Disco (270 mm), pinza plotante de 2 émbolos"
+        ],
+        [
+          "FRENO TRASERO",
+          "Disco (200 mm), pinza flotante de 1 émbolo"
+        ],
+        [
+          "RINES",
+          "Aspas"
+        ],
+        [
+          "LLANTA DELANTERA",
+          "90/90 R17"
+        ],
+        [
+          "LLANTA TRASERA",
+          "130/70 R17"
+        ],
+        [
+          "ABS",
+          "Si"
+        ],
+        [
+          "LARGO TOTAL",
+          "2050 mm"
+        ],
+        [
+          "ALTURA TOTAL",
+          "1050 mm"
+        ],
+        [
+          "ANCHO TOTAL",
+          "790 mm"
+        ],
+        [
+          "DISTANCIA ENTRE EJES",
+          "1357 mm"
+        ],
+        [
+          "ALTURA AL SILLÍN",
+          "810 mm"
+        ],
+        [
+          "PESO EN SECO",
+          "132 kg"
+        ]
+      ],
+      "manual_url": "https://media.autecomobility.com/recursos/marcas/tvs/manuales/usuario/manual-usuario-apache-rtr-160-4V-ABS.pdf",
+      "descripcion": "Algo nunca antes visto en su categoría.",
+      "foto": "tvs_apache_160_carburada.jpg",
+      "foto_hero": "tvs_apache_160_carburada_hero.jpg"
+    },
+    {
+      "modelo": "APACHE 200 CARB ABS",
+      "marca": "TVS",
+      "categoria": "Deportivas",
+      "cilindraje": "197.75 CC",
+      "precio": 13129999,
+      "inicial": 2500000,
+      "colores": [
+        {
+          "nombre": "NEGRO NEBULOSA DORADA",
+          "hex": "#1a1a1a"
+        }
+      ],
+      "specs": [
+        [
+          "CILINDRAJE",
+          "197.75 CC"
+        ],
+        [
+          "POTENCIA MÁXIMA",
+          "20.24 HP @ 8000 rpm"
+        ],
+        [
+          "SISTEMA DE FRENOS",
+          "ABS"
+        ],
+        [
+          "CAPACIDAD DEL TANQUE (Incluyendo la reserva)",
+          "12 l (3.17 gal)"
+        ],
+        [
+          "MOTOR",
+          "4 tiempos, monocilíndrico"
+        ],
+        [
+          "TORQUE MÁXIMO",
+          "18.1 Nm @ 7000 rpm"
+        ],
+        [
+          "TRANSMISIÓN",
+          "Mecánica 5 velocidades"
+        ],
+        [
+          "COMBUSTIBLE",
+          "Corriente"
+        ],
+        [
+          "RELACIÓN DE COMPRESIÓN",
+          "9.7:1"
+        ],
+        [
+          "SISTEMA DE ALIMENTACIÓN",
+          "Carburador"
+        ],
+        [
+          "SUSPENSIÓN DELANTERA",
+          "Horquilla telescópica Kayaba, recorrido de 105 mm"
+        ],
+        [
+          "SISTEMA DE ENCENDIDO",
+          "TCI"
+        ],
+        [
+          "DIÁMETRO POR CARRERA",
+          "66 x 57.8 mm"
+        ],
+        [
+          "REFRIGERACIÓN",
+          "Aire/Aceite"
+        ],
+        [
+          "ARRANQUE",
+          "Eléctrico"
+        ],
+        [
+          "SUSPENSIÓN TRASERA",
+          "Monoamortiguador Kayaba, ajustable en precarga"
+        ],
+        [
+          "FRENO DELANTERO",
+          "Disco (270 mm), pinza flotante de 2 émbolos"
+        ],
+        [
+          "FRENO TRASERO",
+          "Disco (240 mm), pinza flotante de 1 émbolo"
+        ],
+        [
+          "RINES",
+          "Aspas de Aleación"
+        ],
+        [
+          "LLANTA DELANTERA",
+          "90/90 R17"
+        ],
+        [
+          "LLANTA TRASERA",
+          "130/70 R17"
+        ],
+        [
+          "ABS",
+          "Si"
+        ],
+        [
+          "LARGO TOTAL",
+          "2050 mm"
+        ],
+        [
+          "ALTURA TOTAL",
+          "1080 mm"
+        ],
+        [
+          "ANCHO TOTAL",
+          "790 mm"
+        ],
+        [
+          "DISTANCIA ENTRE EJES",
+          "1353 mm"
+        ],
+        [
+          "ALTURA AL SILLÍN",
+          "800 mm"
+        ],
+        [
+          "PESO EN SECO",
+          "140 kg"
+        ],
+        [
+          "TABLERO",
+          "DIGITAL"
+        ]
+      ],
+      "manual_url": "https://media.autecomobility.com/recursos/marcas/tvs/manuales/usuario/Manual-usuario-apache-RTR-200-4V-ABS.pdf",
+      "descripcion": "Algo nunca antes visto en su categoría. La Apache RTR 200 4V regresa más imponente que nunca: cómoda, conectada y lista para darte una experiencia de manejo que conquista cualquier carretera.",
+      "foto": "tvs_apache_200_carb_abs.jpg",
+      "foto_hero": "tvs_apache_200_carb_abs_hero.jpg"
+    },
+    {
+      "modelo": "APACHE RTR 160 4V XC FI",
+      "marca": "TVS",
+      "categoria": "Deportivas",
+      "cilindraje": "159.7 CC",
+      "precio": 11877999,
+      "inicial": 2100000,
+      "colores": [
+        {
+          "nombre": "AZUL CUARZO NEGRO NEBULOSA ROJA",
+          "hex": "#1a1a1a"
+        }
+      ],
+      "specs": [
+        [
+          "CILINDRAJE",
+          "159.7 CC"
+        ],
+        [
+          "POTENCIA MÁXIMA",
+          "17.3 HP @ 9250 rpm"
+        ],
+        [
+          "Normativa control de emisiones",
+          "Euro V Aplica únicamente para las versiones OBD2"
+        ],
+        [
+          "CAPACIDAD DEL TANQUE (Incluyendo la reserva)",
+          "12 l (3.17 gal)"
+        ],
+        [
+          "MOTOR",
+          "4 TIEMPOS, MONOCILÍNDRICO"
+        ],
+        [
+          "TORQUE MÁXIMO",
+          "14.7 Nm @ 7250 rpm (MODO SPORT) 14.1 Nm @ 7250 rpm (MODO URBAN - LLUVIA)\""
+        ],
+        [
+          "TRANSMISIÓN",
+          "Transmisión Mecánica de 5 velocidades - Sistema de arrastre de Cadena ORING y piñones con guardas"
+        ],
+        [
+          "COMBUSTIBLE",
+          "Gasolina"
+        ],
+        [
+          "RELACIÓN DE COMPRESIÓN",
+          "10.15:1"
+        ],
+        [
+          "SISTEMA DE ALIMENTACIÓN",
+          "Inyección electrónica"
+        ],
+        [
+          "SUSPENSIÓN DELANTERA",
+          "HORQUILLA TELESCÓPICA CONVENCIONAL"
+        ],
+        [
+          "SISTEMA DE ENCENDIDO",
+          "ECU"
+        ],
+        [
+          "DIÁMETRO POR CARRERA",
+          "62 X 52.9 mm"
+        ],
+        [
+          "REFRIGERACIÓN",
+          "Aire/Aceite"
+        ],
+        [
+          "ARRANQUE",
+          "Eléctrico"
+        ],
+        [
+          "SUSPENSIÓN TRASERA",
+          "Monoamortiguador hidráulico con ajustes de precarga"
+        ],
+        [
+          "FRENO DELANTERO",
+          "Disco (270 mm)  pinza flotante de 2 émbolos"
+        ],
+        [
+          "FRENO TRASERO",
+          "Disco (200 mm), pinza flotante de 1 émbolo"
+        ],
+        [
+          "RINES",
+          "Aspas"
+        ],
+        [
+          "LLANTA DELANTERA",
+          "90/90 R17"
+        ],
+        [
+          "LLANTA TRASERA",
+          "130/70 R17"
+        ],
+        [
+          "LARGO TOTAL",
+          "2035 mm"
+        ],
+        [
+          "ALTURA TOTAL",
+          "1050 mm"
+        ],
+        [
+          "ANCHO TOTAL",
+          "790 mm (850 mm con handsavers)"
+        ],
+        [
+          "DISTANCIA ENTRE EJES",
+          "1357 mm"
+        ],
+        [
+          "ALTURA AL SILLÍN",
+          "810 mm"
+        ],
+        [
+          "PESO EN SECO",
+          "132 kg"
+        ],
+        [
+          "TIPO DE CHASIS",
+          "Doble cuna dividida y sincronizadas (DCSSS)"
+        ],
+        [
+          "EMBRAGUE",
+          "Multidisco bañado en aceite +  embrague antirebote"
+        ],
+        [
+          "TABLERO",
+          "Digital con medidor de combustible y check engine Conectividad Bluetooth mediante TVS connect"
+        ]
+      ],
+      "manual_url": "https://media.autecomobility.com/recursos/marcas/tvs/manuales/manual-garantia-apache160fi-nuevo.pdf",
+      "descripcion": "La nueva Apache RTR 160 4V FI ABS no tiene competencia en su segmento, con su increíble potencia de 17.3HP. ¡Ninguna de su segmento le gana! Además, cuenta con modos de manejo, RT-FI, frenos ABS y SmartXConnect, tecnología racing exclusiva de TVS, para que disfrutes su ecosistema de conexión, telemetría en ruta, alerta y asistencia en navegación",
+      "foto": "tvs_apache_rtr_160_4v_xc_fi.jpg",
+      "foto_hero": "tvs_apache_rtr_160_4v_xc_fi_hero.jpg"
+    },
+    {
+      "modelo": "APACHE RTR 160 4V XC FI ABS",
+      "marca": "TVS",
+      "categoria": "Deportivas",
+      "cilindraje": "159.7 CC",
+      "precio": 11877999,
+      "inicial": 2100000,
+      "colores": [
+        {
+          "nombre": "AZUL MATE NEGRO NEBULOSA DORADA",
+          "hex": "#1a1a1a"
+        },
+        {
+          "nombre": "GRIS GRAFITO NEGRO VERDE NEON",
+          "hex": "#101010"
+        }
+      ],
+      "specs": [
+        [
+          "CILINDRAJE",
+          "159.7 CC"
+        ],
+        [
+          "POTENCIA MÁXIMA",
+          "17.3 HP @ 9250 rpm"
+        ],
+        [
+          "Normativa control de emisiones",
+          "Euro V Aplica únicamente para las versiones OBD2"
+        ],
+        [
+          "CAPACIDAD DEL TANQUE (Incluyendo la reserva)",
+          "12 l (3.17 gal)"
+        ],
+        [
+          "MOTOR",
+          "4 TIEMPOS, MONOCILÍNDRICO"
+        ],
+        [
+          "TORQUE MÁXIMO",
+          "14.7 Nm @ 7250 rpm (MODO SPORT) 14.1 Nm @ 7250 rpm (MODO URBAN - LLUVIA)\""
+        ],
+        [
+          "TRANSMISIÓN",
+          "Transmisión Mecánica de 5 velocidades - Sistema de arrastre de Cadena ORING y piñones con guardas"
+        ],
+        [
+          "COMBUSTIBLE",
+          "Gasolina"
+        ],
+        [
+          "RELACIÓN DE COMPRESIÓN",
+          "10.15:1"
+        ],
+        [
+          "SISTEMA DE ALIMENTACIÓN",
+          "Inyección electrónica"
+        ],
+        [
+          "SUSPENSIÓN DELANTERA",
+          "HORQUILLA TELESCÓPICA CONVENCIONAL"
+        ],
+        [
+          "SISTEMA DE ENCENDIDO",
+          "ECU"
+        ],
+        [
+          "DIÁMETRO POR CARRERA",
+          "62 X 52.9 mm"
+        ],
+        [
+          "REFRIGERACIÓN",
+          "Aire/Aceite"
+        ],
+        [
+          "ARRANQUE",
+          "Eléctrico"
+        ],
+        [
+          "SUSPENSIÓN TRASERA",
+          "Monoamortiguador hidráulico con ajustes de precarga"
+        ],
+        [
+          "FRENO DELANTERO",
+          "Disco (270 mm)  pinza flotante de 2 émbolos"
+        ],
+        [
+          "FRENO TRASERO",
+          "Disco (200 mm), pinza flotante de 1 émbolo"
+        ],
+        [
+          "RINES",
+          "Aspas"
+        ],
+        [
+          "LLANTA DELANTERA",
+          "90/90 R17"
+        ],
+        [
+          "LLANTA TRASERA",
+          "130/70 R17"
+        ],
+        [
+          "LARGO TOTAL",
+          "2035 mm"
+        ],
+        [
+          "ALTURA TOTAL",
+          "1050 mm"
+        ],
+        [
+          "ANCHO TOTAL",
+          "790 mm (850 mm con handsavers)"
+        ],
+        [
+          "DISTANCIA ENTRE EJES",
+          "1357 mm"
+        ],
+        [
+          "ALTURA AL SILLÍN",
+          "810 mm"
+        ],
+        [
+          "PESO EN SECO",
+          "132 kg"
+        ],
+        [
+          "TIPO DE CHASIS",
+          "Doble cuna dividida y sincronizadas (DCSSS)"
+        ],
+        [
+          "EMBRAGUE",
+          "Multidisco bañado en aceite +  embrague antirebote"
+        ],
+        [
+          "TABLERO",
+          "Digital con medidor de combustible y check engine Conectividad Bluetooth mediante TVS connect"
+        ]
+      ],
+      "manual_url": "https://media.autecomobility.com/recursos/marcas/tvs/manuales/manual-garantia-apache160fi-nuevo.pdf",
+      "descripcion": "La nueva Apache RTR 160 4V FI ABS no tiene competencia en su segmento, con su increíble potencia de 17.3HP. ¡Ninguna de su segmento le gana! Además, cuenta con modos de manejo, RT-FI, frenos ABS y SmartXConnect, tecnología racing exclusiva de TVS, para que disfrutes su ecosistema de conexión, telemetría en ruta, alerta y asistencia en navegación",
+      "foto": "tvs_apache_rtr_160_4v_xc_fi_abs.jpg",
+      "foto_hero": "tvs_apache_rtr_160_4v_xc_fi_abs_hero.jpg"
+    },
+    {
+      "modelo": "APACHE RTR 160 4V XC FI ABS E5",
+      "marca": "TVS",
+      "categoria": "Deportivas",
+      "cilindraje": "159.7 CC",
+      "precio": 11877999,
+      "inicial": 2100000,
+      "colores": [
+        {
+          "nombre": "NEGRA NEBULOSA GRIS CARBONO DORADA",
+          "hex": "#1a1a1a"
+        }
+      ],
+      "specs": [
+        [
+          "CILINDRAJE",
+          "159.7 CC"
+        ],
+        [
+          "POTENCIA MÁXIMA",
+          "17.3 HP @ 9250 rpm"
+        ],
+        [
+          "Normativa control de emisiones",
+          "Euro V Aplica únicamente para las versiones OBD2"
+        ],
+        [
+          "CAPACIDAD DEL TANQUE (Incluyendo la reserva)",
+          "12 l (3.17 gal)"
+        ],
+        [
+          "MOTOR",
+          "4 TIEMPOS, MONOCILÍNDRICO"
+        ],
+        [
+          "TORQUE MÁXIMO",
+          "14.7 Nm @ 7250 rpm (MODO SPORT) 14.1 Nm @ 7250 rpm (MODO URBAN - LLUVIA)\""
+        ],
+        [
+          "TRANSMISIÓN",
+          "Transmisión Mecánica de 5 velocidades - Sistema de arrastre de Cadena ORING y piñones con guardas"
+        ],
+        [
+          "COMBUSTIBLE",
+          "Gasolina"
+        ],
+        [
+          "RELACIÓN DE COMPRESIÓN",
+          "10.15:1"
+        ],
+        [
+          "SISTEMA DE ALIMENTACIÓN",
+          "Inyección electrónica"
+        ],
+        [
+          "SUSPENSIÓN DELANTERA",
+          "HORQUILLA TELESCÓPICA CONVENCIONAL"
+        ],
+        [
+          "SISTEMA DE ENCENDIDO",
+          "ECU"
+        ],
+        [
+          "DIÁMETRO POR CARRERA",
+          "62 X 52.9 mm"
+        ],
+        [
+          "REFRIGERACIÓN",
+          "Aire/Aceite"
+        ],
+        [
+          "ARRANQUE",
+          "Eléctrico"
+        ],
+        [
+          "SUSPENSIÓN TRASERA",
+          "Monoamortiguador hidráulico con ajustes de precarga"
+        ],
+        [
+          "FRENO DELANTERO",
+          "Disco (270 mm)  pinza flotante de 2 émbolos"
+        ],
+        [
+          "FRENO TRASERO",
+          "Disco (200 mm), pinza flotante de 1 émbolo"
+        ],
+        [
+          "RINES",
+          "Aspas"
+        ],
+        [
+          "LLANTA DELANTERA",
+          "90/90 R17"
+        ],
+        [
+          "LLANTA TRASERA",
+          "130/70 R17"
+        ],
+        [
+          "LARGO TOTAL",
+          "2035 mm"
+        ],
+        [
+          "ALTURA TOTAL",
+          "1050 mm"
+        ],
+        [
+          "ANCHO TOTAL",
+          "790 mm (850 mm con handsavers)"
+        ],
+        [
+          "DISTANCIA ENTRE EJES",
+          "1357 mm"
+        ],
+        [
+          "ALTURA AL SILLÍN",
+          "810 mm"
+        ],
+        [
+          "PESO EN SECO",
+          "132 kg"
+        ],
+        [
+          "TIPO DE CHASIS",
+          "Doble cuna dividida y sincronizadas (DCSSS)"
+        ],
+        [
+          "EMBRAGUE",
+          "Multidisco bañado en aceite +  embrague antirebote"
+        ],
+        [
+          "TABLERO",
+          "Digital con medidor de combustible y check engine Conectividad Bluetooth mediante TVS connect"
+        ]
+      ],
+      "manual_url": "https://media.autecomobility.com/recursos/marcas/tvs/manuales/manual-garantia-apache160fi-nuevo.pdf",
+      "descripcion": "La nueva Apache RTR 160 4V FI ABS no tiene competencia en su segmento, con su increíble potencia de 17.3HP. ¡Ninguna de su segmento le gana! Además, cuenta con modos de manejo, RT-FI, frenos ABS y SmartXConnect, tecnología racing exclusiva de TVS, para que disfrutes su ecosistema de conexión, telemetría en ruta, alerta y asistencia en navegación",
+      "foto": "tvs_apache_rtr_160_4v_xc_fi_abs_e5.jpg",
+      "foto_hero": "tvs_apache_rtr_160_4v_xc_fi_abs_e5_hero.jpg"
+    },
+    {
+      "modelo": "APACHE RTR 160 4V XC FI RACING",
+      "marca": "TVS",
+      "categoria": "Deportivas",
+      "cilindraje": "159.7 cc",
+      "precio": 11877999,
+      "inicial": 2100000,
+      "colores": [
+        {
+          "nombre": "AZUL CUARZO NEGRO ROJA",
+          "hex": "#101010"
+        }
+      ],
+      "specs": [
+        [
+          "CILINDRAJE",
+          "159.7 cc"
+        ],
+        [
+          "POTENCIA MÁXIMA",
+          "16.3 HP @ 8000 rpm"
+        ],
+        [
+          "CAPACIDAD DEL TANQUE (Incluyendo la reserva)",
+          "12 l (3.17 gal)"
+        ],
+        [
+          "MOTOR",
+          "4 tiempos, monocilíndrico"
+        ],
+        [
+          "TORQUE MÁXIMO",
+          "14.8 Nm @ 6500 rpm"
+        ],
+        [
+          "TRANSMISIÓN",
+          "Mecánica 5 velocidades"
+        ],
+        [
+          "COMBUSTIBLE",
+          "Gasolina corriente"
+        ],
+        [
+          "RELACIÓN DE COMPRESIÓN",
+          "10.15:1"
+        ],
+        [
+          "SISTEMA DE ALIMENTACIÓN",
+          "Inyección electrónica"
+        ],
+        [
+          "PESO NETO",
+          "145 kg"
+        ],
+        [
+          "SUSPENSIÓN DELANTERA",
+          "Horquilla telescópica"
+        ],
+        [
+          "SISTEMA DE ENCENDIDO",
+          "TCI"
+        ],
+        [
+          "DIÁMETRO POR CARRERA",
+          "62 x 52.9 mm"
+        ],
+        [
+          "REFRIGERACIÓN",
+          "Aire/Aceite"
+        ],
+        [
+          "ARRANQUE",
+          "Eléctrico"
+        ],
+        [
+          "SUSPENSIÓN TRASERA",
+          "Monoamortiguador, ajustable en precarga"
+        ],
+        [
+          "FRENO DELANTERO",
+          "Disco (270 mm), pinza plotante de 2 émbolos"
+        ],
+        [
+          "FRENO TRASERO",
+          "Disco (200 mm), pinza flotante de 1 émbolo"
+        ],
+        [
+          "RINES",
+          "Aspas"
+        ],
+        [
+          "LLANTA DELANTERA",
+          "90/90 R17"
+        ],
+        [
+          "LLANTA TRASERA",
+          "130/70 R17"
+        ],
+        [
+          "LARGO TOTAL",
+          "2050 mm"
+        ],
+        [
+          "ALTURA TOTAL",
+          "1050 mm"
+        ],
+        [
+          "ANCHO TOTAL",
+          "790 mm"
+        ],
+        [
+          "DISTANCIA ENTRE EJES",
+          "1357 mm"
+        ],
+        [
+          "ALTURA AL SILLÍN",
+          "810 mm"
+        ],
+        [
+          "PESO EN SECO",
+          "145 kg"
+        ],
+        [
+          "EMBRAGUE",
+          "Multidisco bañado en aceite +  embrague antirebote"
+        ]
+      ],
+      "manual_url": "https://media.autecomobility.com/recursos/marcas/tvs/manuales/manual-garantia-apache160fi-racing.pdf",
+      "descripcion": "La nueva Apache RTR 160 4V FI ABS no tiene competencia en su segmento, con su increíble potencia de 17.3HP. ¡Ninguna de su segmento le gana! Además, cuenta con modos de manejo, RT-FI, frenos ABS y SmartXConnect, tecnología racing exclusiva de TVS",
+      "foto": "tvs_apache_rtr_160_4v_xc_fi_racing.jpg",
+      "foto_hero": "tvs_apache_rtr_160_4v_xc_fi_racing_hero.jpg"
+    },
+    {
+      "modelo": "APACHE RTR 200 4V XC",
+      "marca": "TVS",
+      "categoria": "Deportivas",
+      "cilindraje": "197.75 cc",
+      "precio": 13952999,
+      "inicial": 2500000,
+      "colores": [
+        {
+          "nombre": "NEGRA NEBULOSA AZUL",
+          "hex": "#1a1a1a"
+        }
+      ],
+      "specs": [
+        [
+          "CILINDRAJE",
+          "197.75 cc"
+        ],
+        [
+          "POTENCIA MÁXIMA",
+          "20.54 HP @ 9000 rpm"
+        ],
+        [
+          "Normativa control de emisiones",
+          "Euro V Aplica únicamente para las versiones OBD2"
+        ],
+        [
+          "CAPACIDAD DEL TANQUE (Incluyendo la reserva)",
+          "12 L (3.17 GAL)"
+        ],
+        [
+          "MOTOR",
+          "4 TIEMPOS, MONOCILÍNDRICO"
+        ],
+        [
+          "TORQUE MÁXIMO",
+          "17.25 Nm @ 7250 rpm"
+        ],
+        [
+          "TRANSMISIÓN",
+          "Transmisión Mecánica de 5 velocidades - Sistema de arrastre de Cadena ORING y piñones con guardas"
+        ],
+        [
+          "COMBUSTIBLE",
+          "Gasolina"
+        ],
+        [
+          "RELACIÓN DE COMPRESIÓN",
+          "10:1"
+        ],
+        [
+          "SISTEMA DE ALIMENTACIÓN",
+          "Inyección electrónica"
+        ],
+        [
+          "SUSPENSIÓN DELANTERA",
+          "Horquilla telescópica graduable en dureza"
+        ],
+        [
+          "SISTEMA DE ENCENDIDO",
+          "ECU"
+        ],
+        [
+          "DIÁMETRO POR CARRERA",
+          "66 X 57.8 mm"
+        ],
+        [
+          "REFRIGERACIÓN",
+          "Aire/Aceite"
+        ],
+        [
+          "ARRANQUE",
+          "Eléctrico"
+        ],
+        [
+          "SUSPENSIÓN TRASERA",
+          "Monoamortiguador hidráulico con ajustes de precarga"
+        ],
+        [
+          "FRENO DELANTERO",
+          "Disco lobulado (270 mm), pinza flotante de 2 émbolos"
+        ],
+        [
+          "FRENO TRASERO",
+          "Disco lobulado (240 mm), pinza flotante de 1 émbolo"
+        ],
+        [
+          "RINES",
+          "Aspas de Aleación"
+        ],
+        [
+          "LLANTA DELANTERA",
+          "90/90 R17"
+        ],
+        [
+          "LLANTA TRASERA",
+          "130/70 R17"
+        ],
+        [
+          "ABS",
+          "Si"
+        ],
+        [
+          "LARGO TOTAL",
+          "2050 mm"
+        ],
+        [
+          "ALTURA TOTAL",
+          "1050 mm"
+        ],
+        [
+          "ANCHO TOTAL",
+          "790 mm"
+        ],
+        [
+          "SEÑORITERA",
+          "No"
+        ],
+        [
+          "DISTANCIA ENTRE EJES",
+          "1353 mm"
+        ],
+        [
+          "ALTURA AL SILLÍN",
+          "800 mm"
+        ],
+        [
+          "PESO EN SECO",
+          "140 kg"
+        ],
+        [
+          "APTA PARA PRIMERA MOTO",
+          "No"
+        ],
+        [
+          "MOTO PARA",
+          "Hombre"
+        ],
+        [
+          "TIPO DE CHASIS",
+          "Doble cuna dividida y sincronizadas (DCSSS)"
+        ],
+        [
+          "EMBRAGUE",
+          "Multidisco bañado en aceite + slipper Clutch o embrague antirebote"
+        ],
+        [
+          "TABLERO",
+          "Digital con medidor de combustible y check engine Conectividad Bluetooth mediante TVS connect"
+        ]
+      ],
+      "manual_url": "https://media.autecomobility.com/recursos/marcas/tvs/manuales/manual-garantia-apache200fi-nuevo.pdf",
+      "descripcion": "¡La 200 más completa llega a la familia Apache! La Apache 200 FI ABS es la moto más completa en su categoría que está equipada de 3 modos de manejo, RT-FI, conectividad SmartXConnect, frenos ABS y mucho más. Y cuenta con el respaldo de Auteco.",
+      "foto": "tvs_apache_rtr_200_4v_xc.jpg",
+      "foto_hero": "tvs_apache_rtr_200_4v_xc_hero.jpg"
+    },
+    {
+      "modelo": "APACHE RTR 200 4V XC FI ABS",
+      "marca": "TVS",
+      "categoria": "Deportivas",
+      "cilindraje": "197.75 cc",
+      "precio": 13952999,
+      "inicial": 2500000,
+      "colores": [
+        {
+          "nombre": "GRIS GRAFITO NEGRO COBRE",
+          "hex": "#101010"
+        }
+      ],
+      "specs": [
+        [
+          "CILINDRAJE",
+          "197.75 cc"
+        ],
+        [
+          "POTENCIA MÁXIMA",
+          "20.54 HP @ 9000 rpm"
+        ],
+        [
+          "Normativa control de emisiones",
+          "Euro V Aplica únicamente para las versiones OBD2"
+        ],
+        [
+          "CAPACIDAD DEL TANQUE (Incluyendo la reserva)",
+          "12 L (3.17 GAL)"
+        ],
+        [
+          "MOTOR",
+          "4 TIEMPOS, MONOCILÍNDRICO"
+        ],
+        [
+          "TORQUE MÁXIMO",
+          "17.25 Nm @ 7250 rpm"
+        ],
+        [
+          "TRANSMISIÓN",
+          "Transmisión Mecánica de 5 velocidades - Sistema de arrastre de Cadena ORING y piñones con guardas"
+        ],
+        [
+          "COMBUSTIBLE",
+          "Gasolina"
+        ],
+        [
+          "RELACIÓN DE COMPRESIÓN",
+          "10:1"
+        ],
+        [
+          "SISTEMA DE ALIMENTACIÓN",
+          "Inyección electrónica"
+        ],
+        [
+          "SUSPENSIÓN DELANTERA",
+          "Horquilla telescópica graduable en dureza"
+        ],
+        [
+          "SISTEMA DE ENCENDIDO",
+          "ECU"
+        ],
+        [
+          "DIÁMETRO POR CARRERA",
+          "66 X 57.8 mm"
+        ],
+        [
+          "REFRIGERACIÓN",
+          "Aire/Aceite"
+        ],
+        [
+          "ARRANQUE",
+          "Eléctrico"
+        ],
+        [
+          "SUSPENSIÓN TRASERA",
+          "Monoamortiguador hidráulico con ajustes de precarga"
+        ],
+        [
+          "FRENO DELANTERO",
+          "Disco lobulado (270 mm), pinza flotante de 2 émbolos"
+        ],
+        [
+          "FRENO TRASERO",
+          "Disco lobulado (240 mm), pinza flotante de 1 émbolo"
+        ],
+        [
+          "RINES",
+          "Aspas de Aleación"
+        ],
+        [
+          "LLANTA DELANTERA",
+          "90/90 R17"
+        ],
+        [
+          "LLANTA TRASERA",
+          "130/70 R17"
+        ],
+        [
+          "ABS",
+          "Si"
+        ],
+        [
+          "LARGO TOTAL",
+          "2050 mm"
+        ],
+        [
+          "ALTURA TOTAL",
+          "1050 mm"
+        ],
+        [
+          "ANCHO TOTAL",
+          "790 mm"
+        ],
+        [
+          "SEÑORITERA",
+          "No"
+        ],
+        [
+          "DISTANCIA ENTRE EJES",
+          "1353 mm"
+        ],
+        [
+          "ALTURA AL SILLÍN",
+          "800 mm"
+        ],
+        [
+          "PESO EN SECO",
+          "140 kg"
+        ],
+        [
+          "APTA PARA PRIMERA MOTO",
+          "No"
+        ],
+        [
+          "MOTO PARA",
+          "Hombre"
+        ],
+        [
+          "TIPO DE CHASIS",
+          "Doble cuna dividida y sincronizadas (DCSSS)"
+        ],
+        [
+          "EMBRAGUE",
+          "Multidisco bañado en aceite + slipper Clutch o embrague antirebote"
+        ],
+        [
+          "TABLERO",
+          "Digital con medidor de combustible y check engine Conectividad Bluetooth mediante TVS connect"
+        ]
+      ],
+      "manual_url": "https://media.autecomobility.com/recursos/marcas/tvs/manuales/manual-garantia-apache200fi-nuevo.pdf",
+      "descripcion": "¡La 200 más completa llega a la familia Apache! La Apache 200 FI ABS es la moto más completa en su categoría que está equipada de 3 modos de manejo, RT-FI, conectividad SmartXConnect, frenos ABS y mucho más. Y cuenta con el respaldo de Auteco.",
+      "foto": "tvs_apache_rtr_200_4v_xc_fi_abs.jpg",
+      "foto_hero": "tvs_apache_rtr_200_4v_xc_fi_abs_hero.jpg"
+    },
+    {
+      "modelo": "RAIDER 125",
+      "marca": "TVS",
+      "categoria": "Deportivas",
+      "cilindraje": "124.79 CC",
+      "precio": 8721999,
+      "inicial": 1650000,
+      "colores": [
+        {
+          "nombre": "AZUL ARLEQUIN",
+          "hex": "#1d4ed8"
+        },
+        {
+          "nombre": "GRIS CARBONO",
+          "hex": "#4a4a4a"
+        },
+        {
+          "nombre": "NEGRO GRIS",
+          "hex": "#101010"
+        },
+        {
+          "nombre": "NEGRO NEBULOSA",
+          "hex": "#1a1a1a"
+        }
+      ],
+      "specs": [
+        [
+          "CILINDRAJE",
+          "124.79 CC"
+        ],
+        [
+          "POTENCIA MÁXIMA",
+          "12.73 HP @ 8000 rpm"
+        ],
+        [
+          "CAPACIDAD DEL TANQUE (Incluyendo la reserva)",
+          "10 l (2.64  gal)."
+        ],
+        [
+          "MOTOR",
+          "4 TIEMPOS, MONOCILÍNDRICO"
+        ],
+        [
+          "TORQUE MÁXIMO",
+          "11.5 Nm @ 6500 rpm"
+        ],
+        [
+          "TRANSMISIÓN",
+          "Mecánica 5 velocidades"
+        ],
+        [
+          "COMBUSTIBLE",
+          "Gasolina corriente"
+        ],
+        [
+          "RELACIÓN DE COMPRESIÓN",
+          "10.0:1"
+        ],
+        [
+          "SISTEMA DE ALIMENTACIÓN",
+          "Carburador"
+        ],
+        [
+          "SUSPENSIÓN DELANTERA",
+          "Horquilla telescopica"
+        ],
+        [
+          "SISTEMA DE ENCENDIDO",
+          "TCI"
+        ],
+        [
+          "DIÁMETRO POR CARRERA",
+          "53.5 x 55.5 mm"
+        ],
+        [
+          "REFRIGERACIÓN",
+          "Aire"
+        ],
+        [
+          "ARRANQUE",
+          "Eléctrico ISG"
+        ],
+        [
+          "SUSPENSIÓN TRASERA",
+          "Monoamortiguador con ajuste de precarga"
+        ],
+        [
+          "FRENO DELANTERO",
+          "DISCO (240 MM), PINZA FLOTANTE DE 2 ÉMOBOLOS"
+        ],
+        [
+          "FRENO TRASERO",
+          "TAMBOR (130 MM)"
+        ],
+        [
+          "RINES",
+          "Aspas"
+        ],
+        [
+          "LLANTA DELANTERA",
+          "80/100 - R17 46P"
+        ],
+        [
+          "LLANTA TRASERA",
+          "100/90 - R17 65P"
+        ],
+        [
+          "LARGO TOTAL",
+          "2067 mm"
+        ],
+        [
+          "ALTURA TOTAL",
+          "1236 mm"
+        ],
+        [
+          "ANCHO TOTAL",
+          "767 mm"
+        ],
+        [
+          "DISTANCIA ENTRE EJES",
+          "1326 mm"
+        ],
+        [
+          "ALTURA AL SILLÍN",
+          "781 mm"
+        ],
+        [
+          "PESO EN SECO",
+          "113 kg"
+        ]
+      ],
+      "manual_url": "https://media.autecomobility.com/recursos/marcas/tvs/manuales/manual-garantia-raider-125.pdf",
+      "descripcion": "¡Bienvenidos a la nueva Generación! La TVS Raider 125 viene a cambiar las reglas del juego, es perfecta para una nueva generación retadora, exigente y sin límites que siempre quiere lo mejor.",
+      "foto": "tvs_raider_125.jpg",
+      "foto_hero": "tvs_raider_125_hero.jpg"
+    },
+    {
+      "modelo": "RAIDER 125 ACC",
+      "marca": "TVS",
+      "categoria": "Deportivas",
+      "cilindraje": "124.79 CC",
+      "precio": 8721999,
+      "inicial": 1650000,
+      "colores": [
+        {
+          "nombre": "AZUL ARLEQUIN",
+          "hex": "#1d4ed8"
+        },
+        {
+          "nombre": "GRIS CARBONO",
+          "hex": "#4a4a4a"
+        },
+        {
+          "nombre": "NEGRA NEBULOSA",
+          "hex": "#1a1a1a"
+        }
+      ],
+      "specs": [
+        [
+          "CILINDRAJE",
+          "124.79 CC"
+        ],
+        [
+          "POTENCIA MÁXIMA",
+          "12.73 HP @ 8000 rpm"
+        ],
+        [
+          "CAPACIDAD DEL TANQUE (Incluyendo la reserva)",
+          "10 l (2.64  gal)."
+        ],
+        [
+          "MOTOR",
+          "4 TIEMPOS, MONOCILÍNDRICO"
+        ],
+        [
+          "TORQUE MÁXIMO",
+          "11.5 Nm @ 6500 rpm"
+        ],
+        [
+          "TRANSMISIÓN",
+          "Mecánica 5 velocidades"
+        ],
+        [
+          "COMBUSTIBLE",
+          "Gasolina corriente"
+        ],
+        [
+          "RELACIÓN DE COMPRESIÓN",
+          "10.0:1"
+        ],
+        [
+          "SISTEMA DE ALIMENTACIÓN",
+          "Carburador"
+        ],
+        [
+          "SUSPENSIÓN DELANTERA",
+          "Horquilla telescopica"
+        ],
+        [
+          "SISTEMA DE ENCENDIDO",
+          "TCI"
+        ],
+        [
+          "DIÁMETRO POR CARRERA",
+          "53.5 x 55.5 mm"
+        ],
+        [
+          "REFRIGERACIÓN",
+          "Aire"
+        ],
+        [
+          "ARRANQUE",
+          "Eléctrico ISG"
+        ],
+        [
+          "SUSPENSIÓN TRASERA",
+          "Monoamortiguador con ajuste de precarga"
+        ],
+        [
+          "FRENO DELANTERO",
+          "DISCO (240 MM), PINZA FLOTANTE DE 2 ÉMOBOLOS"
+        ],
+        [
+          "FRENO TRASERO",
+          "TAMBOR (130 MM)"
+        ],
+        [
+          "RINES",
+          "Aspas"
+        ],
+        [
+          "LLANTA DELANTERA",
+          "80/100 - R17 46P"
+        ],
+        [
+          "LLANTA TRASERA",
+          "100/90 - R17 65P"
+        ],
+        [
+          "LARGO TOTAL",
+          "2067 mm"
+        ],
+        [
+          "ALTURA TOTAL",
+          "1236 mm"
+        ],
+        [
+          "ANCHO TOTAL",
+          "767 mm"
+        ],
+        [
+          "DISTANCIA ENTRE EJES",
+          "1326 mm"
+        ],
+        [
+          "ALTURA AL SILLÍN",
+          "781 mm"
+        ],
+        [
+          "PESO EN SECO",
+          "113 kg"
+        ]
+      ],
+      "manual_url": "https://media.autecomobility.com/recursos/marcas/tvs/manuales/manual-garantia-raider-125.pdf",
+      "descripcion": "¡Bienvenidos a la nueva Generación! La TVS Raider 125 viene a cambiar las reglas del juego, es perfecta para una nueva generación retadora, exigente y sin límites que siempre quiere lo mejor.",
+      "foto": "tvs_raider_125_acc.jpg",
+      "foto_hero": "tvs_raider_125_acc_hero.jpg"
+    },
+    {
+      "modelo": "RAIDER 125 ACC SBT",
+      "marca": "TVS",
+      "categoria": "Deportivas",
+      "cilindraje": "124.79 CC",
+      "precio": 8521999,
+      "inicial": 1650000,
+      "colores": [
+        {
+          "nombre": "GRIS CARBONO",
+          "hex": "#4a4a4a"
+        },
+        {
+          "nombre": "NEGRO NEBULOSA",
+          "hex": "#1a1a1a"
+        }
+      ],
+      "specs": [
+        [
+          "CILINDRAJE",
+          "124.79 CC"
+        ],
+        [
+          "POTENCIA MÁXIMA",
+          "12.73 HP @ 8000 rpm"
+        ],
+        [
+          "CAPACIDAD DEL TANQUE (Incluyendo la reserva)",
+          "10 l (2.64  gal)."
+        ],
+        [
+          "MOTOR",
+          "4 TIEMPOS, MONOCILÍNDRICO"
+        ],
+        [
+          "TORQUE MÁXIMO",
+          "11.5 Nm @ 6500 rpm"
+        ],
+        [
+          "TRANSMISIÓN",
+          "Mecánica 5 velocidades"
+        ],
+        [
+          "COMBUSTIBLE",
+          "Gasolina corriente"
+        ],
+        [
+          "RELACIÓN DE COMPRESIÓN",
+          "10.0:1"
+        ],
+        [
+          "SISTEMA DE ALIMENTACIÓN",
+          "Carburador"
+        ],
+        [
+          "SUSPENSIÓN DELANTERA",
+          "Horquilla telescopica"
+        ],
+        [
+          "SISTEMA DE ENCENDIDO",
+          "TCI"
+        ],
+        [
+          "DIÁMETRO POR CARRERA",
+          "53.5 x 55.5 mm"
+        ],
+        [
+          "REFRIGERACIÓN",
+          "Aire"
+        ],
+        [
+          "ARRANQUE",
+          "Eléctrico ISG"
+        ],
+        [
+          "SUSPENSIÓN TRASERA",
+          "Monoamortiguador con ajuste de precarga"
+        ],
+        [
+          "FRENO DELANTERO",
+          "DISCO (240 MM), PINZA FLOTANTE DE 2 ÉMOBOLOS"
+        ],
+        [
+          "FRENO TRASERO",
+          "TAMBOR (130 MM)"
+        ],
+        [
+          "RINES",
+          "Aspas"
+        ],
+        [
+          "LLANTA DELANTERA",
+          "80/100 - R17 46P"
+        ],
+        [
+          "LLANTA TRASERA",
+          "100/90 - R17 65P"
+        ],
+        [
+          "LARGO TOTAL",
+          "2067 mm"
+        ],
+        [
+          "ALTURA TOTAL",
+          "1236 mm"
+        ],
+        [
+          "ANCHO TOTAL",
+          "767 mm"
+        ],
+        [
+          "DISTANCIA ENTRE EJES",
+          "1326 mm"
+        ],
+        [
+          "ALTURA AL SILLÍN",
+          "781 mm"
+        ],
+        [
+          "PESO EN SECO",
+          "113 kg"
+        ]
+      ],
+      "manual_url": "https://media.autecomobility.com/recursos/marcas/tvs/manuales/manual-garantia-raider-125.pdf",
+      "descripcion": "¡Bienvenidos a la nueva Generación! La TVS Raider 125 viene a cambiar las reglas del juego, es perfecta para una nueva generación retadora, exigente y sin límites que siempre quiere lo mejor.",
+      "foto": "tvs_raider_125_acc_sbt.jpg",
+      "foto_hero": "tvs_raider_125_acc_sbt_hero.jpg"
+    },
+    {
+      "modelo": "RAIDER 125 FI",
+      "marca": "TVS",
+      "categoria": "Deportivas",
+      "cilindraje": "124.8 cc",
+      "precio": 9471999,
+      "inicial": 1700000,
+      "colores": [
+        {
+          "nombre": "AZUL FORZA GRIS",
+          "hex": "#7a7a7a"
+        },
+        {
+          "nombre": "GRIS CALIFORNIA DORADA",
+          "hex": "#5e5e5e"
+        },
+        {
+          "nombre": "NEGRO NEBULOSA GRIS",
+          "hex": "#1a1a1a"
+        }
+      ],
+      "specs": [
+        [
+          "CILINDRAJE",
+          "124.8 cc"
+        ],
+        [
+          "POTENCIA MÁXIMA",
+          "11.22 HP @ 7500 rpm"
+        ],
+        [
+          "CAPACIDAD DEL TANQUE (Incluyendo la reserva)",
+          "10 l (2.64 gal)"
+        ],
+        [
+          "MOTOR",
+          "Monocilíndrico, 4 Tiempos"
+        ],
+        [
+          "TORQUE MÁXIMO",
+          "11.2 Nm @ 6000 rpm"
+        ],
+        [
+          "TRANSMISIÓN",
+          "Mecánica 5 velocidades"
+        ],
+        [
+          "COMBUSTIBLE",
+          "Corriente"
+        ],
+        [
+          "RELACIÓN DE COMPRESIÓN",
+          "10.3:1"
+        ],
+        [
+          "SISTEMA DE ALIMENTACIÓN",
+          "Inyección electrónica"
+        ],
+        [
+          "SUSPENSIÓN DELANTERA",
+          "HORQUILLA TELESCÓPICA"
+        ],
+        [
+          "SISTEMA DE ENCENDIDO",
+          "CDI"
+        ],
+        [
+          "DIÁMETRO POR CARRERA",
+          "53.5 x 55..5 mm"
+        ],
+        [
+          "REFRIGERACIÓN",
+          "Aire"
+        ],
+        [
+          "ARRANQUE",
+          "Eléctrico ISG"
+        ],
+        [
+          "SUSPENSIÓN TRASERA",
+          "Monoamortiguador"
+        ],
+        [
+          "FRENO DELANTERO",
+          "Disco de 240 mm, SBT"
+        ],
+        [
+          "FRENO TRASERO",
+          "Tambor de 130 mm, SBT"
+        ],
+        [
+          "RINES",
+          "Aspas"
+        ],
+        [
+          "LLANTA DELANTERA",
+          "80/100-17 Tubeless"
+        ],
+        [
+          "LLANTA TRASERA",
+          "100/90-17 Tubeless"
+        ],
+        [
+          "LARGO TOTAL",
+          "2070 mm"
+        ],
+        [
+          "ALTURA TOTAL",
+          "1028 mm"
+        ],
+        [
+          "ANCHO TOTAL",
+          "785 mm"
+        ],
+        [
+          "DISTANCIA ENTRE EJES",
+          "1326 mm"
+        ],
+        [
+          "ALTURA AL SILLÍN",
+          "180 mm"
+        ],
+        [
+          "PESO EN SECO",
+          "123 KG"
+        ]
+      ],
+      "manual_url": "https://media.autecomobility.com/recursos/marcas/tvs/manuales/manual-garantia-raider-125FI.pdf",
+      "descripcion": "Bienvenido a la generación imparable: la nueva Raider Fi viene inyectada de poder con su tecnología de vanguardia FI, que brinda una mezcla perfecta",
+      "foto": "tvs_raider_125_fi.jpg",
+      "foto_hero": "tvs_raider_125_fi_hero.jpg"
+    },
+    {
+      "modelo": "RAIDER 125 FI NEBULOSA",
+      "marca": "TVS",
+      "categoria": "Deportivas",
+      "cilindraje": "124.8 cc",
+      "precio": 9471999,
+      "inicial": 1700000,
+      "colores": [
+        {
+          "nombre": "NEGRO GRIS",
+          "hex": "#101010"
+        }
+      ],
+      "specs": [
+        [
+          "CILINDRAJE",
+          "124.8 cc"
+        ],
+        [
+          "POTENCIA MÁXIMA",
+          "11.22 HP @ 7500 rpm"
+        ],
+        [
+          "CAPACIDAD DEL TANQUE (Incluyendo la reserva)",
+          "10 l (2.64 gal)"
+        ],
+        [
+          "MOTOR",
+          "Monocilíndrico, 4 Tiempos"
+        ],
+        [
+          "TORQUE MÁXIMO",
+          "11.2 Nm @ 6000 rpm"
+        ],
+        [
+          "TRANSMISIÓN",
+          "Mecánica 5 velocidades"
+        ],
+        [
+          "COMBUSTIBLE",
+          "Corriente"
+        ],
+        [
+          "RELACIÓN DE COMPRESIÓN",
+          "10.3:1"
+        ],
+        [
+          "SISTEMA DE ALIMENTACIÓN",
+          "Inyección electrónica"
+        ],
+        [
+          "SUSPENSIÓN DELANTERA",
+          "HORQUILLA TELESCÓPICA"
+        ],
+        [
+          "SISTEMA DE ENCENDIDO",
+          "CDI"
+        ],
+        [
+          "DIÁMETRO POR CARRERA",
+          "53.5 x 55..5 mm"
+        ],
+        [
+          "REFRIGERACIÓN",
+          "Aire"
+        ],
+        [
+          "ARRANQUE",
+          "Eléctrico ISG"
+        ],
+        [
+          "SUSPENSIÓN TRASERA",
+          "Monoamortiguador"
+        ],
+        [
+          "FRENO DELANTERO",
+          "Disco de 240 mm, SBT"
+        ],
+        [
+          "FRENO TRASERO",
+          "Tambor de 130 mm, SBT"
+        ],
+        [
+          "RINES",
+          "Aspas"
+        ],
+        [
+          "LLANTA DELANTERA",
+          "80/100-17 Tubeless"
+        ],
+        [
+          "LLANTA TRASERA",
+          "100/90-17 Tubeless"
+        ],
+        [
+          "LARGO TOTAL",
+          "2070 mm"
+        ],
+        [
+          "ALTURA TOTAL",
+          "1028 mm"
+        ],
+        [
+          "ANCHO TOTAL",
+          "785 mm"
+        ],
+        [
+          "DISTANCIA ENTRE EJES",
+          "1326 mm"
+        ],
+        [
+          "ALTURA AL SILLÍN",
+          "180 mm"
+        ],
+        [
+          "PESO EN SECO",
+          "123 KG"
+        ]
+      ],
+      "manual_url": "https://media.autecomobility.com/recursos/marcas/tvs/manuales/manual-garantia-raider-125FI.pdf",
+      "descripcion": "Bienvenido a la generación imparable: la nueva Raider Fi viene inyectada de poder con su tecnología de vanguardia FI, que brinda una mezcla perfecta",
+      "foto": "tvs_raider_125_fi_nebulosa.jpg",
+      "foto_hero": "tvs_raider_125_fi_nebulosa_hero.jpg"
+    },
+    {
+      "modelo": "RAIDER 125 FI NEGRO NEBULOSA",
+      "marca": "TVS",
+      "categoria": "Deportivas",
+      "cilindraje": "124.8 cc",
+      "precio": 9471999,
+      "inicial": 1700000,
+      "colores": [
+        {
+          "nombre": "NEGRO GRIS",
+          "hex": "#101010"
+        }
+      ],
+      "specs": [
+        [
+          "CILINDRAJE",
+          "124.8 cc"
+        ],
+        [
+          "POTENCIA MÁXIMA",
+          "11.22 HP @ 7500 rpm"
+        ],
+        [
+          "CAPACIDAD DEL TANQUE (Incluyendo la reserva)",
+          "10 l (2.64 gal)"
+        ],
+        [
+          "MOTOR",
+          "Monocilíndrico, 4 Tiempos"
+        ],
+        [
+          "TORQUE MÁXIMO",
+          "11.2 Nm @ 6000 rpm"
+        ],
+        [
+          "TRANSMISIÓN",
+          "Mecánica 5 velocidades"
+        ],
+        [
+          "COMBUSTIBLE",
+          "Corriente"
+        ],
+        [
+          "RELACIÓN DE COMPRESIÓN",
+          "10.3:1"
+        ],
+        [
+          "SISTEMA DE ALIMENTACIÓN",
+          "Inyección electrónica"
+        ],
+        [
+          "SUSPENSIÓN DELANTERA",
+          "HORQUILLA TELESCÓPICA"
+        ],
+        [
+          "SISTEMA DE ENCENDIDO",
+          "CDI"
+        ],
+        [
+          "DIÁMETRO POR CARRERA",
+          "53.5 x 55..5 mm"
+        ],
+        [
+          "REFRIGERACIÓN",
+          "Aire"
+        ],
+        [
+          "ARRANQUE",
+          "Eléctrico ISG"
+        ],
+        [
+          "SUSPENSIÓN TRASERA",
+          "Monoamortiguador"
+        ],
+        [
+          "FRENO DELANTERO",
+          "Disco de 240 mm, SBT"
+        ],
+        [
+          "FRENO TRASERO",
+          "Tambor de 130 mm, SBT"
+        ],
+        [
+          "RINES",
+          "Aspas"
+        ],
+        [
+          "LLANTA DELANTERA",
+          "80/100-17 Tubeless"
+        ],
+        [
+          "LLANTA TRASERA",
+          "100/90-17 Tubeless"
+        ],
+        [
+          "LARGO TOTAL",
+          "2070 mm"
+        ],
+        [
+          "ALTURA TOTAL",
+          "1028 mm"
+        ],
+        [
+          "ANCHO TOTAL",
+          "785 mm"
+        ],
+        [
+          "DISTANCIA ENTRE EJES",
+          "1326 mm"
+        ],
+        [
+          "ALTURA AL SILLÍN",
+          "180 mm"
+        ],
+        [
+          "PESO EN SECO",
+          "123 KG"
+        ]
+      ],
+      "manual_url": "https://media.autecomobility.com/recursos/marcas/tvs/manuales/manual-garantia-raider-125FI.pdf",
+      "descripcion": "Bienvenido a la generación imparable: la nueva Raider Fi viene inyectada de poder con su tecnología de vanguardia FI, que brinda una mezcla perfecta",
+      "foto": "tvs_raider_125_fi_negro_nebulosa.jpg",
+      "foto_hero": "tvs_raider_125_fi_negro_nebulosa_hero.jpg"
+    },
+    {
+      "modelo": "RAIDER 125 RAC",
+      "marca": "TVS",
+      "categoria": "Deportivas",
+      "cilindraje": "124.79 cc",
+      "precio": 8771999,
+      "inicial": 1650000,
+      "colores": [
+        {
+          "nombre": "GRIS CALIFORNIA",
+          "hex": "#5e5e5e"
+        }
+      ],
+      "specs": [
+        [
+          "CILINDRAJE",
+          "124.79 cc"
+        ],
+        [
+          "POTENCIA MÁXIMA",
+          "12.73 HP @ 8000 rpm"
+        ],
+        [
+          "CAPACIDAD DEL TANQUE (Incluyendo la reserva)",
+          "10 l (2.64 gal)"
+        ],
+        [
+          "MOTOR",
+          "4 TIEMPOS, MONOCILÍNDRICO"
+        ],
+        [
+          "TORQUE MÁXIMO",
+          "11.5 Nm @ 6500 rpm"
+        ],
+        [
+          "TRANSMISIÓN",
+          "Mecánica 5 velocidades"
+        ],
+        [
+          "COMBUSTIBLE",
+          "Gasolina corriente"
+        ],
+        [
+          "RELACIÓN DE COMPRESIÓN",
+          "10.0:1"
+        ],
+        [
+          "SISTEMA DE ALIMENTACIÓN",
+          "Carburador"
+        ],
+        [
+          "SUSPENSIÓN DELANTERA",
+          "Horquilla telescopica"
+        ],
+        [
+          "SISTEMA DE ENCENDIDO",
+          "TCI"
+        ],
+        [
+          "DIÁMETRO POR CARRERA",
+          "53.5 x 55.5 mm"
+        ],
+        [
+          "REFRIGERACIÓN",
+          "Aire"
+        ],
+        [
+          "ARRANQUE",
+          "Eléctrico ISG"
+        ],
+        [
+          "SUSPENSIÓN TRASERA",
+          "Monoamortiguador con ajuste de precarga"
+        ],
+        [
+          "FRENO DELANTERO",
+          "DISCO (240 MM), PINZA FLOTANTE DE 2 ÉMOBOLOS"
+        ],
+        [
+          "FRENO TRASERO",
+          "TAMBOR (130 MM)"
+        ],
+        [
+          "RINES",
+          "Aspas"
+        ],
+        [
+          "LLANTA DELANTERA",
+          "80/100 - R17 46P"
+        ],
+        [
+          "LLANTA TRASERA",
+          "100/90 - R17 65P"
+        ],
+        [
+          "LARGO TOTAL",
+          "2067 mm"
+        ],
+        [
+          "ALTURA TOTAL",
+          "1236 mm"
+        ],
+        [
+          "ANCHO TOTAL",
+          "767 mm"
+        ],
+        [
+          "DISTANCIA ENTRE EJES",
+          "1326 mm"
+        ],
+        [
+          "ALTURA AL SILLÍN",
+          "781 mm"
+        ],
+        [
+          "PESO EN SECO",
+          "113 kg"
+        ]
+      ],
+      "manual_url": "https://media.autecomobility.com/recursos/marcas/tvs/manuales/manual-garantia-125-racing.pdf",
+      "descripcion": "Te invitamos a ser parte de la Nueva Generación que se impone en Diseño, Tecnología y Seguridad. ¡Una moto que no se parece a ninguna, por eso es la moto del año en Colombia!",
+      "foto": "tvs_raider_125_rac.jpg",
+      "foto_hero": "tvs_raider_125_rac_hero.jpg"
+    },
+    {
+      "modelo": "RAIDER 125 RACING",
+      "marca": "TVS",
+      "categoria": "Deportivas",
+      "cilindraje": "124.79 cc",
+      "precio": 8771999,
+      "inicial": 1650000,
+      "colores": [
+        {
+          "nombre": "GRIS CALIFORNIA ROJA",
+          "hex": "#5e5e5e"
+        }
+      ],
+      "specs": [
+        [
+          "CILINDRAJE",
+          "124.79 cc"
+        ],
+        [
+          "POTENCIA MÁXIMA",
+          "12.73 HP @ 8000 rpm"
+        ],
+        [
+          "CAPACIDAD DEL TANQUE (Incluyendo la reserva)",
+          "10 l (2.64 gal)"
+        ],
+        [
+          "MOTOR",
+          "4 TIEMPOS, MONOCILÍNDRICO"
+        ],
+        [
+          "TORQUE MÁXIMO",
+          "11.5 Nm @ 6500 rpm"
+        ],
+        [
+          "TRANSMISIÓN",
+          "Mecánica 5 velocidades"
+        ],
+        [
+          "COMBUSTIBLE",
+          "Gasolina corriente"
+        ],
+        [
+          "RELACIÓN DE COMPRESIÓN",
+          "10.0:1"
+        ],
+        [
+          "SISTEMA DE ALIMENTACIÓN",
+          "Carburador"
+        ],
+        [
+          "SUSPENSIÓN DELANTERA",
+          "Horquilla telescopica"
+        ],
+        [
+          "SISTEMA DE ENCENDIDO",
+          "TCI"
+        ],
+        [
+          "DIÁMETRO POR CARRERA",
+          "53.5 x 55.5 mm"
+        ],
+        [
+          "REFRIGERACIÓN",
+          "Aire"
+        ],
+        [
+          "ARRANQUE",
+          "Eléctrico ISG"
+        ],
+        [
+          "SUSPENSIÓN TRASERA",
+          "Monoamortiguador con ajuste de precarga"
+        ],
+        [
+          "FRENO DELANTERO",
+          "DISCO (240 MM), PINZA FLOTANTE DE 2 ÉMOBOLOS"
+        ],
+        [
+          "FRENO TRASERO",
+          "TAMBOR (130 MM)"
+        ],
+        [
+          "RINES",
+          "Aspas"
+        ],
+        [
+          "LLANTA DELANTERA",
+          "80/100 - R17 46P"
+        ],
+        [
+          "LLANTA TRASERA",
+          "100/90 - R17 65P"
+        ],
+        [
+          "LARGO TOTAL",
+          "2067 mm"
+        ],
+        [
+          "ALTURA TOTAL",
+          "1236 mm"
+        ],
+        [
+          "ANCHO TOTAL",
+          "767 mm"
+        ],
+        [
+          "DISTANCIA ENTRE EJES",
+          "1326 mm"
+        ],
+        [
+          "ALTURA AL SILLÍN",
+          "781 mm"
+        ],
+        [
+          "PESO EN SECO",
+          "113 kg"
+        ]
+      ],
+      "manual_url": "https://media.autecomobility.com/recursos/marcas/tvs/manuales/manual-garantia-125-racing.pdf",
+      "descripcion": "Te invitamos a ser parte de la Nueva Generación que se impone en Diseño, Tecnología y Seguridad. ¡Una moto que no se parece a ninguna, por eso es la moto del año en Colombia!",
+      "foto": "tvs_raider_125_racing.jpg",
+      "foto_hero": "tvs_raider_125_racing_hero.jpg"
+    },
+    {
+      "modelo": "RAIDER 125 TK",
+      "marca": "TVS",
+      "categoria": "Deportivas",
+      "cilindraje": "124.79 CC",
+      "precio": 8721999,
+      "inicial": 1650000,
+      "colores": [
+        {
+          "nombre": "NEGRO",
+          "hex": "#101010"
+        }
+      ],
+      "specs": [
+        [
+          "CILINDRAJE",
+          "124.79 CC"
+        ],
+        [
+          "POTENCIA MÁXIMA",
+          "12.73 HP @ 8000 rpm"
+        ],
+        [
+          "CAPACIDAD DEL TANQUE (Incluyendo la reserva)",
+          "10 l (2.64  gal)."
+        ],
+        [
+          "MOTOR",
+          "4 TIEMPOS, MONOCILÍNDRICO"
+        ],
+        [
+          "TORQUE MÁXIMO",
+          "11.5 Nm @ 6500 rpm"
+        ],
+        [
+          "TRANSMISIÓN",
+          "Mecánica 5 velocidades"
+        ],
+        [
+          "COMBUSTIBLE",
+          "Gasolina corriente"
+        ],
+        [
+          "RELACIÓN DE COMPRESIÓN",
+          "10.0:1"
+        ],
+        [
+          "SISTEMA DE ALIMENTACIÓN",
+          "Carburador"
+        ],
+        [
+          "SUSPENSIÓN DELANTERA",
+          "Horquilla telescopica"
+        ],
+        [
+          "SISTEMA DE ENCENDIDO",
+          "TCI"
+        ],
+        [
+          "DIÁMETRO POR CARRERA",
+          "53.5 x 55.5 mm"
+        ],
+        [
+          "REFRIGERACIÓN",
+          "Aire"
+        ],
+        [
+          "ARRANQUE",
+          "Eléctrico ISG"
+        ],
+        [
+          "SUSPENSIÓN TRASERA",
+          "Monoamortiguador con ajuste de precarga"
+        ],
+        [
+          "FRENO DELANTERO",
+          "DISCO (240 MM), PINZA FLOTANTE DE 2 ÉMOBOLOS"
+        ],
+        [
+          "FRENO TRASERO",
+          "TAMBOR (130 MM)"
+        ],
+        [
+          "RINES",
+          "Aspas"
+        ],
+        [
+          "LLANTA DELANTERA",
+          "80/100 - R17 46P"
+        ],
+        [
+          "LLANTA TRASERA",
+          "100/90 - R17 65P"
+        ],
+        [
+          "LARGO TOTAL",
+          "2067 mm"
+        ],
+        [
+          "ALTURA TOTAL",
+          "1236 mm"
+        ],
+        [
+          "ANCHO TOTAL",
+          "767 mm"
+        ],
+        [
+          "DISTANCIA ENTRE EJES",
+          "1326 mm"
+        ],
+        [
+          "ALTURA AL SILLÍN",
+          "781 mm"
+        ],
+        [
+          "PESO EN SECO",
+          "113 kg"
+        ]
+      ],
+      "manual_url": "https://media.autecomobility.com/recursos/marcas/tvs/manuales/manual-garantia-raider-125.pdf",
+      "descripcion": "¡Bienvenidos a la nueva Generación! La TVS Raider 125 viene a cambiar las reglas del juego, es perfecta para una nueva generación retadora, exigente y sin límites que siempre quiere lo mejor.",
+      "foto": "tvs_raider_125_tk.jpg",
+      "foto_hero": "tvs_raider_125_tk_hero.jpg"
+    },
+    {
+      "modelo": "AGILITY FUSION (124.6CC)",
+      "marca": "KYMCO",
+      "categoria": "Automáticas o Scooter",
+      "cilindraje": "124.6 cc",
+      "precio": 10621000,
+      "inicial": 1800000,
+      "colores": [
+        {
+          "nombre": "GRIS GRAFITO AZUL",
+          "hex": "#3a3a3a"
+        }
+      ],
+      "specs": [
+        [
+          "CILINDRAJE",
+          "124.6 cc"
+        ],
+        [
+          "POTENCIA MÁXIMA",
+          "9.3 HP @ 7000 rpm"
+        ],
+        [
+          "SISTEMA DE FRENOS",
+          "CBS"
+        ],
+        [
+          "CAPACIDAD DEL TANQUE (Incluyendo la reserva)",
+          "5 l (1,32 gal)"
+        ],
+        [
+          "MOTOR",
+          "4 tiempos, monocilíndrico"
+        ],
+        [
+          "TORQUE MÁXIMO",
+          "9.1 Nm @ 6500 rpm"
+        ],
+        [
+          "TRANSMISIÓN",
+          "Automática centrífuga (CVT)"
+        ],
+        [
+          "COMBUSTIBLE",
+          "Corriente"
+        ],
+        [
+          "RELACIÓN DE COMPRESIÓN",
+          "9.6 +/- 0.2:1"
+        ],
+        [
+          "SISTEMA DE ALIMENTACIÓN",
+          "Carburador"
+        ],
+        [
+          "SUSPENSIÓN DELANTERA",
+          "Telescópica hidráulica"
+        ],
+        [
+          "SISTEMA DE ENCENDIDO",
+          "CDI"
+        ],
+        [
+          "DIÁMETRO POR CARRERA",
+          "52.4 x 57.8 mm"
+        ],
+        [
+          "REFRIGERACIÓN",
+          "Aire forzado"
+        ],
+        [
+          "ARRANQUE",
+          "Eléctrico y pedal"
+        ],
+        [
+          "SUSPENSIÓN TRASERA",
+          "Monoamortiguardor hidráulico"
+        ],
+        [
+          "FRENO DELANTERO",
+          "Disco 200 mm Doble pistón"
+        ],
+        [
+          "TEST DRIVE",
+          "Si"
+        ],
+        [
+          "FRENO TRASERO",
+          "Disco"
+        ],
+        [
+          "RINES",
+          "Aspas de Aleación"
+        ],
+        [
+          "URL TEST DRIVE",
+          "https://testdrive.autecomobility.com/vehiculo/11135"
+        ],
+        [
+          "LLANTA DELANTERA",
+          "120/70 - 12"
+        ],
+        [
+          "LLANTA TRASERA",
+          "130/70 - 12"
+        ],
+        [
+          "LARGO TOTAL",
+          "1940 mm"
+        ],
+        [
+          "ALTURA TOTAL",
+          "1130 mm"
+        ],
+        [
+          "ANCHO TOTAL",
+          "685 mm"
+        ],
+        [
+          "SEÑORITERA",
+          "Si"
+        ],
+        [
+          "DISTANCIA ENTRE EJES",
+          "1330 mm"
+        ],
+        [
+          "ALTURA AL SILLÍN",
+          "780 mm"
+        ],
+        [
+          "PESO EN SECO",
+          "116 kg"
+        ]
+      ],
+      "manual_url": "https://media.autecomobility.com/recursos/marcas/kymco/manuales-actualizados-diciembre-2025/Manual-de-garantia-y-mantenimiento-Agility-Fusion.pdf",
+      "descripcion": "",
+      "foto": "kymco_agility_fusion_124_6cc.jpg",
+      "foto_hero": "kymco_agility_fusion_124_6cc_hero.jpg"
+    },
+    {
+      "modelo": "NTORQ 125",
+      "marca": "TVS",
+      "categoria": "Automáticas o Scooter",
+      "cilindraje": "124.79 CC",
+      "precio": 8921999,
+      "inicial": 1800000,
+      "colores": [
+        {
+          "nombre": "NEGRO MATE DORADA",
+          "hex": "#222222"
+        }
+      ],
+      "specs": [
+        [
+          "CILINDRAJE",
+          "124.79 CC"
+        ],
+        [
+          "POTENCIA MÁXIMA",
+          "9.25 @ 7500 rpm"
+        ],
+        [
+          "CAPACIDAD DEL TANQUE (Incluyendo la reserva)",
+          "5 L (1.32 GAL)"
+        ],
+        [
+          "MOTOR",
+          "4 tiempos, monocilíndrico"
+        ],
+        [
+          "TORQUE MÁXIMO",
+          "10.5 Nm @ 5500 rpm"
+        ],
+        [
+          "TRANSMISIÓN",
+          "Automática"
+        ],
+        [
+          "COMBUSTIBLE",
+          "Gasolina corriente"
+        ],
+        [
+          "RELACIÓN DE COMPRESIÓN",
+          "9.8:1"
+        ],
+        [
+          "SISTEMA DE ALIMENTACIÓN",
+          "Carburador"
+        ],
+        [
+          "SUSPENSIÓN DELANTERA",
+          "HORQUILLA TELESCÓPICA"
+        ],
+        [
+          "SISTEMA DE ENCENDIDO",
+          "TCI"
+        ],
+        [
+          "DIÁMETRO POR CARRERA",
+          "53.5 X 55.5 mm"
+        ],
+        [
+          "REFRIGERACIÓN",
+          "Aire forzado"
+        ],
+        [
+          "ARRANQUE",
+          "Eléctrico y pedal"
+        ],
+        [
+          "SUSPENSIÓN TRASERA",
+          "MONOAMORTIGUADOR"
+        ],
+        [
+          "FRENO DELANTERO",
+          "Disco (220 mm) pinza fija de 1 émbolo"
+        ],
+        [
+          "FRENO TRASERO",
+          "TAMBOR (130 MM)"
+        ],
+        [
+          "RINES",
+          "Aspas de Aleación"
+        ],
+        [
+          "LLANTA DELANTERA",
+          "100/80 R12"
+        ],
+        [
+          "LLANTA TRASERA",
+          "110/80 R12"
+        ],
+        [
+          "LARGO TOTAL",
+          "1865 mm"
+        ],
+        [
+          "ALTURA TOTAL",
+          "1160 mm"
+        ],
+        [
+          "ANCHO TOTAL",
+          "710 mm"
+        ],
+        [
+          "DISTANCIA ENTRE EJES",
+          "1285 mm"
+        ],
+        [
+          "ALTURA AL SILLÍN",
+          "790 mm"
+        ],
+        [
+          "PESO EN SECO",
+          "111 kg"
+        ]
+      ],
+      "manual_url": "https://media.autecomobility.com/recursos/marcas/tvs/manuales/manual-ntorq-nuevo.pdf",
+      "descripcion": "Diseñada para ser un ícono urbano, la TVS Ntorq 125 está lista para sorprenderte al ser la scooter más conectada de Colombia. Disfruta de su impresionante tecnología SmartXConnect y de su potencia inigualable que te hará destacar en cada recorrido.",
+      "foto": "tvs_ntorq_125.jpg",
+      "foto_hero": "tvs_ntorq_125_hero.jpg"
+    },
+    {
+      "modelo": "NTORQ 125 XCONNECT",
+      "marca": "TVS",
+      "categoria": "Automáticas o Scooter",
+      "cilindraje": "124.79 CC",
+      "precio": 10921999,
+      "inicial": 1800000,
+      "colores": [
+        {
+          "nombre": "AZUL PETROLEO COBRE",
+          "hex": "#0c4a6e"
+        },
+        {
+          "nombre": "NEGRO MATE DORADA",
+          "hex": "#222222"
+        }
+      ],
+      "specs": [
+        [
+          "CILINDRAJE",
+          "124.79 CC"
+        ],
+        [
+          "POTENCIA MÁXIMA",
+          "9.25 @ 7500 rpm"
+        ],
+        [
+          "CAPACIDAD DEL TANQUE (Incluyendo la reserva)",
+          "5 L (1.32 GAL)"
+        ],
+        [
+          "MOTOR",
+          "4 tiempos, monocilíndrico"
+        ],
+        [
+          "TORQUE MÁXIMO",
+          "10.5 Nm @ 5500 rpm"
+        ],
+        [
+          "TRANSMISIÓN",
+          "Automática"
+        ],
+        [
+          "COMBUSTIBLE",
+          "Gasolina corriente"
+        ],
+        [
+          "RELACIÓN DE COMPRESIÓN",
+          "9.8:1"
+        ],
+        [
+          "SISTEMA DE ALIMENTACIÓN",
+          "Carburador"
+        ],
+        [
+          "SUSPENSIÓN DELANTERA",
+          "HORQUILLA TELESCÓPICA"
+        ],
+        [
+          "SISTEMA DE ENCENDIDO",
+          "TCI"
+        ],
+        [
+          "DIÁMETRO POR CARRERA",
+          "53.5 X 55.5 mm"
+        ],
+        [
+          "REFRIGERACIÓN",
+          "Aire forzado"
+        ],
+        [
+          "ARRANQUE",
+          "Eléctrico y pedal"
+        ],
+        [
+          "SUSPENSIÓN TRASERA",
+          "MONOAMORTIGUADOR"
+        ],
+        [
+          "FRENO DELANTERO",
+          "Disco (220 mm) pinza fija de 1 émbolo"
+        ],
+        [
+          "FRENO TRASERO",
+          "TAMBOR (130 MM)"
+        ],
+        [
+          "RINES",
+          "Aspas de Aleación"
+        ],
+        [
+          "LLANTA DELANTERA",
+          "100/80 R12"
+        ],
+        [
+          "LLANTA TRASERA",
+          "110/80 R12"
+        ],
+        [
+          "LARGO TOTAL",
+          "1865 mm"
+        ],
+        [
+          "ALTURA TOTAL",
+          "1160 mm"
+        ],
+        [
+          "ANCHO TOTAL",
+          "710 mm"
+        ],
+        [
+          "DISTANCIA ENTRE EJES",
+          "1285 mm"
+        ],
+        [
+          "ALTURA AL SILLÍN",
+          "790 mm"
+        ],
+        [
+          "PESO EN SECO",
+          "111 kg"
+        ]
+      ],
+      "manual_url": "https://media.autecomobility.com/recursos/marcas/tvs/manuales/manual-ntorq-nuevo.pdf",
+      "descripcion": "Diseñada para ser un ícono urbano, la TVS Ntorq 125 está lista para sorprenderte al ser la scooter más conectada de Colombia. Disfruta de su impresionante tecnología SmartXConnect y de su potencia inigualable que te hará destacar en cada recorrido.",
+      "foto": "tvs_ntorq_125_xconnect.jpg",
+      "foto_hero": "tvs_ntorq_125_xconnect_hero.jpg"
+    },
+    {
+      "modelo": "NEW LIFE 125 TK",
+      "marca": "VICTORY",
+      "categoria": "Automáticas o Scooter",
+      "cilindraje": "124,6 cc",
+      "precio": 8371000,
+      "inicial": 1550000,
+      "colores": [
+        {
+          "nombre": "NEGRA MATE MULTICOLOR",
+          "hex": "#222222"
+        },
+        {
+          "nombre": "NEGRO NEBULOSA NEGRO MATE NARANJA",
+          "hex": "#1a1a1a"
+        }
+      ],
+      "specs": [
+        [
+          "CILINDRAJE",
+          "124,6 cc"
+        ],
+        [
+          "POTENCIA MÁXIMA",
+          "8.4 HP @ 7500 rpm"
+        ],
+        [
+          "SISTEMA DE FRENOS",
+          "CBS"
+        ],
+        [
+          "CAPACIDAD DEL TANQUE (Incluyendo la reserva)",
+          "5,35 L (1,41 gal)"
+        ],
+        [
+          "MOTOR",
+          "4 tiempos, monocilíndrico"
+        ],
+        [
+          "TORQUE MÁXIMO",
+          "8,7 Nm @ 6500rpm"
+        ],
+        [
+          "TRANSMISIÓN",
+          "Automática centrífuga (CVT)"
+        ],
+        [
+          "COMBUSTIBLE",
+          "Gasolina corriente"
+        ],
+        [
+          "RELACIÓN DE COMPRESIÓN",
+          "9,5:1"
+        ],
+        [
+          "SISTEMA DE ALIMENTACIÓN",
+          "Carburador"
+        ],
+        [
+          "SUSPENSIÓN DELANTERA",
+          "Telecópica hidráulica"
+        ],
+        [
+          "SISTEMA DE ENCENDIDO",
+          "CDI"
+        ],
+        [
+          "DIÁMETRO POR CARRERA",
+          "52,4 X 57,8 mm"
+        ],
+        [
+          "REFRIGERACIÓN",
+          "Aire forzado"
+        ],
+        [
+          "ARRANQUE",
+          "Eléctrico y pedal"
+        ],
+        [
+          "SUSPENSIÓN TRASERA",
+          "Mono amortiguador"
+        ],
+        [
+          "FRENO DELANTERO",
+          "Disco, pinza doble pistón"
+        ],
+        [
+          "TEST DRIVE",
+          "Si"
+        ],
+        [
+          "FRENO TRASERO",
+          "Disco central"
+        ],
+        [
+          "RINES",
+          "Aspas de Aleación"
+        ],
+        [
+          "LLANTA DELANTERA",
+          "120/70 - R12"
+        ],
+        [
+          "LLANTA TRASERA",
+          "120/70 - R12"
+        ],
+        [
+          "ABS",
+          "No"
+        ],
+        [
+          "LARGO TOTAL",
+          "1775 mm"
+        ],
+        [
+          "ALTURA TOTAL",
+          "1170 mm"
+        ],
+        [
+          "ANCHO TOTAL",
+          "670 mm"
+        ],
+        [
+          "SEÑORITERA",
+          "No"
+        ],
+        [
+          "DISTANCIA ENTRE EJES",
+          "1285 mm"
+        ],
+        [
+          "ALTURA AL SILLÍN",
+          "810 mm"
+        ],
+        [
+          "PESO EN SECO",
+          "107 kg"
+        ],
+        [
+          "APTA PARA PRIMERA MOTO",
+          "Si"
+        ],
+        [
+          "MOTO PARA",
+          "Hombre"
+        ],
+        [
+          "IMPUESTOS",
+          "No paga impuestos de rodamiento"
+        ]
+      ],
+      "manual_url": "https://media.autecomobility.com/recursos//pdf/manuales/Victory/manuales-2025/Manual-de-garantia-y-mantenimiento-new-life-125-cbs-diciembre-2025.pdf",
+      "descripcion": "",
+      "foto": "victory_new_life_125_tk.jpg",
+      "foto_hero": "victory_new_life_125_tk_hero.jpg"
+    },
+    {
+      "modelo": "MRX 125 TK",
+      "marca": "VICTORY",
+      "categoria": "Todo Terreno",
+      "cilindraje": "124,7 cc",
+      "precio": 9139000,
+      "inicial": 1800000,
+      "colores": [
+        {
+          "nombre": "GRIS GRAFITO NEGRO NEBULOSA VERDE",
+          "hex": "#1a1a1a"
+        }
+      ],
+      "specs": [
+        [
+          "CILINDRAJE",
+          "124,7 cc"
+        ],
+        [
+          "POTENCIA MÁXIMA",
+          "9.7 HP @ 7500 rpm"
+        ],
+        [
+          "SISTEMA DE FRENOS",
+          "CBS"
+        ],
+        [
+          "Normativa control de emisiones",
+          "Euro3"
+        ],
+        [
+          "CAPACIDAD DEL TANQUE (Incluyendo la reserva)",
+          "11 L (2.90 gal)"
+        ],
+        [
+          "MOTOR",
+          "4 tiempos, monocilíndrico"
+        ],
+        [
+          "TORQUE MÁXIMO",
+          "9.2 Nm@ 6000 rpm"
+        ],
+        [
+          "TRANSMISIÓN",
+          "Mecánica 5 velocidades"
+        ],
+        [
+          "COMBUSTIBLE",
+          "Gasolina corriente"
+        ],
+        [
+          "RELACIÓN DE COMPRESIÓN",
+          "9.5:1"
+        ],
+        [
+          "SISTEMA DE ALIMENTACIÓN",
+          "Carburador"
+        ],
+        [
+          "PESO NETO",
+          "117"
+        ],
+        [
+          "SUSPENSIÓN DELANTERA",
+          "Telescópica hidráulica"
+        ],
+        [
+          "SISTEMA DE ENCENDIDO",
+          "CDI"
+        ],
+        [
+          "DIÁMETRO POR CARRERA",
+          "52.4 x 57.8 mm"
+        ],
+        [
+          "REFRIGERACIÓN",
+          "Aire"
+        ],
+        [
+          "ARRANQUE",
+          "Eléctrico y pedal"
+        ],
+        [
+          "SUSPENSIÓN TRASERA",
+          "Mono amortiguador"
+        ],
+        [
+          "FRENO DELANTERO",
+          "Disco 267 mm"
+        ],
+        [
+          "FRENO TRASERO",
+          "Disco"
+        ],
+        [
+          "RINES",
+          "Radios"
+        ],
+        [
+          "URL TEST DRIVE",
+          "https://testdrive.autecomobility.com/vehiculo/3341"
+        ],
+        [
+          "LLANTA DELANTERA",
+          "90/90 R19"
+        ],
+        [
+          "LLANTA TRASERA",
+          "110/90 R17"
+        ],
+        [
+          "LARGO TOTAL",
+          "2060 mm"
+        ],
+        [
+          "ALTURA TOTAL",
+          "1160 mm"
+        ],
+        [
+          "URL VIDEO",
+          "https://www.youtube.com/watch?v=0lnfSkFzfjA"
+        ],
+        [
+          "ANCHO TOTAL",
+          "830 mm"
+        ],
+        [
+          "SEÑORITERA",
+          "No"
+        ],
+        [
+          "DISTANCIA ENTRE EJES",
+          "1340 mm"
+        ],
+        [
+          "ALTURA AL SILLÍN",
+          "840 mm"
+        ],
+        [
+          "PESO EN SECO",
+          "117 kg"
+        ],
+        [
+          "APTA PARA PRIMERA MOTO",
+          "No"
+        ],
+        [
+          "MOTO PARA",
+          "Hombre"
+        ],
+        [
+          "IMPUESTOS",
+          "No paga impuestos de rodamiento"
+        ],
+        [
+          "Trakku (La verdadera conectividad)",
+          "Si incluye"
+        ]
+      ],
+      "manual_url": "https://media.autecomobility.com/recursos/pdf/manuales/Victory/Manual-Victory-MRX-125-150.pdf",
+      "descripcion": "",
+      "foto": "victory_mrx_125_tk.jpg",
+      "foto_hero": "victory_mrx_125_tk_hero.jpg"
+    },
+    {
+      "modelo": "MRX 200",
+      "marca": "VICTORY",
+      "categoria": "Todo Terreno",
+      "cilindraje": "199,6 cc",
+      "precio": 13014000,
+      "inicial": 2500000,
+      "colores": [
+        {
+          "nombre": "GRIS GRAFITO NEGRO NEBULOSA GRIS",
+          "hex": "#1a1a1a"
+        }
+      ],
+      "specs": [
+        [
+          "CILINDRAJE",
+          "199,6 cc"
+        ],
+        [
+          "POTENCIA MÁXIMA",
+          "17,4 HP @ 8000 rpm"
+        ],
+        [
+          "SISTEMA DE FRENOS",
+          "ABS"
+        ],
+        [
+          "Normativa control de emisiones",
+          "Euro3"
+        ],
+        [
+          "CAPACIDAD DEL TANQUE (Incluyendo la reserva)",
+          "10 L (2,64 gal)"
+        ],
+        [
+          "MOTOR",
+          "Monocilíndrico 4 tiempos SOHC de 2 válvulas (PR 200)"
+        ],
+        [
+          "TORQUE MÁXIMO",
+          "17 Nm @ 6000 rpm"
+        ],
+        [
+          "TRANSMISIÓN",
+          "Mecánica 6 velocidades"
+        ],
+        [
+          "COMBUSTIBLE",
+          "Gasolina corriente"
+        ],
+        [
+          "RELACIÓN DE COMPRESIÓN",
+          "9,0 : 1"
+        ],
+        [
+          "SISTEMA DE ALIMENTACIÓN",
+          "Carburador"
+        ],
+        [
+          "SUSPENSIÓN DELANTERA",
+          "Barras invertidas de 37 mm"
+        ],
+        [
+          "SISTEMA DE ENCENDIDO",
+          "CDI"
+        ],
+        [
+          "DIÁMETRO POR CARRERA",
+          "67 x 56,6 mm"
+        ],
+        [
+          "REFRIGERACIÓN",
+          "Aire"
+        ],
+        [
+          "ARRANQUE",
+          "Eléctrico"
+        ],
+        [
+          "SUSPENSIÓN TRASERA",
+          "Mono amortiguador ajustable en precarga"
+        ],
+        [
+          "FRENO DELANTERO",
+          "Disco de 265 mm"
+        ],
+        [
+          "FRENO TRASERO",
+          "Disco de 220 mm"
+        ],
+        [
+          "RINES",
+          "Radios"
+        ],
+        [
+          "LLANTA DELANTERA",
+          "90/90-19"
+        ],
+        [
+          "LLANTA TRASERA",
+          "110/90-17"
+        ],
+        [
+          "LARGO TOTAL",
+          "2210 mm"
+        ],
+        [
+          "ALTURA TOTAL",
+          "1230 mm"
+        ],
+        [
+          "ANCHO TOTAL",
+          "830 mm"
+        ],
+        [
+          "SEÑORITERA",
+          "No"
+        ],
+        [
+          "DISTANCIA ENTRE EJES",
+          "1360 mm"
+        ],
+        [
+          "ALTURA AL SILLÍN",
+          "860 mm"
+        ],
+        [
+          "PESO EN SECO",
+          "129 Kg"
+        ],
+        [
+          "APTA PARA PRIMERA MOTO",
+          "No"
+        ],
+        [
+          "MOTO PARA",
+          "Hombre"
+        ],
+        [
+          "IMPUESTOS",
+          "Debe pagar impuestos de rodamiento"
+        ],
+        [
+          "Trakku (La verdadera conectividad)",
+          "Si Incluye"
+        ]
+      ],
+      "manual_url": "https://media.autecomobility.com/recursos/pdf/manuales/Victory/manuales-2025/Manual-de-garantia-y-mantenimiento-Victory-MRX-200-ABS-diciembre-2025.pdf",
+      "descripcion": "",
+      "foto": "victory_mrx_200.jpg",
+      "foto_hero": "victory_mrx_200_hero.jpg"
+    },
+    {
+      "modelo": "MRX ARIZONA",
+      "marca": "VICTORY",
+      "categoria": "Todo Terreno",
+      "cilindraje": "199,5 cc",
+      "precio": 13514000,
+      "inicial": 2500000,
+      "colores": [
+        {
+          "nombre": "NEGRO MATE NEGRO NEBULOSA NEGRA",
+          "hex": "#1a1a1a"
+        }
+      ],
+      "specs": [
+        [
+          "CILINDRAJE",
+          "199,5 cc"
+        ],
+        [
+          "POTENCIA MÁXIMA",
+          "17,4 HP @ 8000 rpm"
+        ],
+        [
+          "SISTEMA DE FRENOS",
+          "ABS"
+        ],
+        [
+          "Normativa control de emisiones",
+          "Euro3"
+        ],
+        [
+          "CAPACIDAD DEL TANQUE (Incluyendo la reserva)",
+          "16 L (4,2 gal)"
+        ],
+        [
+          "MOTOR",
+          "Monocilíndrico 4 tiempos SOHC de 2 válvulas"
+        ],
+        [
+          "TORQUE MÁXIMO",
+          "17 Nm @ 6000 rpm"
+        ],
+        [
+          "TRANSMISIÓN",
+          "Mecánica 6 velocidades"
+        ],
+        [
+          "COMBUSTIBLE",
+          "Gasolina corriente"
+        ],
+        [
+          "RELACIÓN DE COMPRESIÓN",
+          "9,0 : 1"
+        ],
+        [
+          "SISTEMA DE ALIMENTACIÓN",
+          "Carburador"
+        ],
+        [
+          "SUSPENSIÓN DELANTERA",
+          "Telescópica hidráulica"
+        ],
+        [
+          "SISTEMA DE ENCENDIDO",
+          "CDI"
+        ],
+        [
+          "DIÁMETRO POR CARRERA",
+          "67 x 56,6 mm"
+        ],
+        [
+          "REFRIGERACIÓN",
+          "Aire"
+        ],
+        [
+          "ARRANQUE",
+          "Eléctrico"
+        ],
+        [
+          "SUSPENSIÓN TRASERA",
+          "Mono amortiguador ajustable en precarga"
+        ],
+        [
+          "FRENO DELANTERO",
+          "Disco de 280 mm"
+        ],
+        [
+          "FRENO TRASERO",
+          "Disco de 210 mm"
+        ],
+        [
+          "RINES",
+          "Radios"
+        ],
+        [
+          "LLANTA DELANTERA",
+          "90/90-19"
+        ],
+        [
+          "LLANTA TRASERA",
+          "110/90-17"
+        ],
+        [
+          "LARGO TOTAL",
+          "2140 mm"
+        ],
+        [
+          "ALTURA TOTAL",
+          "1325 mm"
+        ],
+        [
+          "ANCHO TOTAL",
+          "945 mm"
+        ],
+        [
+          "SEÑORITERA",
+          "No"
+        ],
+        [
+          "DISTANCIA ENTRE EJES",
+          "1330 mm"
+        ],
+        [
+          "ALTURA AL SILLÍN",
+          "860 mm"
+        ],
+        [
+          "PESO EN SECO",
+          "134 Kg"
+        ],
+        [
+          "APTA PARA PRIMERA MOTO",
+          "No"
+        ],
+        [
+          "MOTO PARA",
+          "Hombre"
+        ],
+        [
+          "IMPUESTOS",
+          "Debe pagar impuestos de rodamiento"
+        ],
+        [
+          "Trakku (La verdadera conectividad)",
+          "Si incluye"
+        ]
+      ],
+      "manual_url": "https://media.autecomobility.com/recursos/pdf/manuales/Victory/manuales-2025/Manual-de-garantia-y-mantenimiento-Victory-MRX-Arizona-ABS-diciembre-2025.pdf",
+      "descripcion": "",
+      "foto": "victory_mrx_arizona.jpg",
+      "foto_hero": "victory_mrx_arizona_hero.jpg"
+    },
+    {
+      "modelo": "MRX ARIZONA FOX TK",
+      "marca": "VICTORY",
+      "categoria": "Todo Terreno",
+      "cilindraje": "199,5 cc",
+      "precio": 13514000,
+      "inicial": 2500000,
+      "colores": [
+        {
+          "nombre": "GRIS CALIFORNIA NEGRO NEBULOSA ROJA",
+          "hex": "#1a1a1a"
+        }
+      ],
+      "specs": [
+        [
+          "CILINDRAJE",
+          "199,5 cc"
+        ],
+        [
+          "POTENCIA MÁXIMA",
+          "17,4 HP @ 8000 rpm"
+        ],
+        [
+          "SISTEMA DE FRENOS",
+          "ABS"
+        ],
+        [
+          "Normativa control de emisiones",
+          "Euro3"
+        ],
+        [
+          "CAPACIDAD DEL TANQUE (Incluyendo la reserva)",
+          "16 L (4,2 gal)"
+        ],
+        [
+          "MOTOR",
+          "Monocilíndrico 4 tiempos SOHC de 2 válvulas"
+        ],
+        [
+          "TORQUE MÁXIMO",
+          "17 Nm @ 6000 rpm"
+        ],
+        [
+          "TRANSMISIÓN",
+          "Mecánica 6 velocidades"
+        ],
+        [
+          "COMBUSTIBLE",
+          "Gasolina corriente"
+        ],
+        [
+          "RELACIÓN DE COMPRESIÓN",
+          "9,0 : 1"
+        ],
+        [
+          "SISTEMA DE ALIMENTACIÓN",
+          "Carburador"
+        ],
+        [
+          "SUSPENSIÓN DELANTERA",
+          "Telescópica hidráulica"
+        ],
+        [
+          "SISTEMA DE ENCENDIDO",
+          "CDI"
+        ],
+        [
+          "DIÁMETRO POR CARRERA",
+          "67 x 56,6 mm"
+        ],
+        [
+          "REFRIGERACIÓN",
+          "Aire"
+        ],
+        [
+          "ARRANQUE",
+          "Eléctrico"
+        ],
+        [
+          "SUSPENSIÓN TRASERA",
+          "Mono amortiguador ajustable en precarga"
+        ],
+        [
+          "FRENO DELANTERO",
+          "Disco de 280 mm"
+        ],
+        [
+          "FRENO TRASERO",
+          "Disco de 210 mm"
+        ],
+        [
+          "RINES",
+          "Radios"
+        ],
+        [
+          "LLANTA DELANTERA",
+          "90/90-19"
+        ],
+        [
+          "LLANTA TRASERA",
+          "110/90-17"
+        ],
+        [
+          "LARGO TOTAL",
+          "2140 mm"
+        ],
+        [
+          "ALTURA TOTAL",
+          "1325 mm"
+        ],
+        [
+          "ANCHO TOTAL",
+          "945 mm"
+        ],
+        [
+          "SEÑORITERA",
+          "No"
+        ],
+        [
+          "DISTANCIA ENTRE EJES",
+          "1330 mm"
+        ],
+        [
+          "ALTURA AL SILLÍN",
+          "860 mm"
+        ],
+        [
+          "PESO EN SECO",
+          "134 Kg"
+        ],
+        [
+          "APTA PARA PRIMERA MOTO",
+          "No"
+        ],
+        [
+          "MOTO PARA",
+          "Hombre"
+        ],
+        [
+          "IMPUESTOS",
+          "Debe pagar impuestos de rodamiento"
+        ],
+        [
+          "Trakku (La verdadera conectividad)",
+          "Si incluye"
+        ]
+      ],
+      "manual_url": "https://media.autecomobility.com/recursos/pdf/manuales/Victory/manuales-2025/Manual-de-garantia-y-mantenimiento-Victory-MRX-Arizona-ABS-diciembre-2025.pdf",
+      "descripcion": "",
+      "foto": "victory_mrx_arizona_fox_tk.jpg",
+      "foto_hero": "victory_mrx_arizona_fox_tk_hero.jpg"
+    },
+    {
+      "modelo": "MRX ARIZONA XPLORE",
+      "marca": "VICTORY",
+      "categoria": "Todo Terreno",
+      "cilindraje": "199,5 cc",
+      "precio": 13514000,
+      "inicial": 2500000,
+      "colores": [
+        {
+          "nombre": "NEGRO NEBULOSA GRIS PIEDRA ROJA",
+          "hex": "#1a1a1a"
+        }
+      ],
+      "specs": [
+        [
+          "CILINDRAJE",
+          "199,5 cc"
+        ],
+        [
+          "POTENCIA MÁXIMA",
+          "17,4 HP @ 8000 rpm"
+        ],
+        [
+          "SISTEMA DE FRENOS",
+          "CBS"
+        ],
+        [
+          "Normativa control de emisiones",
+          "Euro3"
+        ],
+        [
+          "CAPACIDAD DEL TANQUE (Incluyendo la reserva)",
+          "16 L (4,2 gal)"
+        ],
+        [
+          "MOTOR",
+          "Monocilíndrico 4 tiempos SOHC de 2 válvulas"
+        ],
+        [
+          "TORQUE MÁXIMO",
+          "17 Nm @ 6000 rpm"
+        ],
+        [
+          "TRANSMISIÓN",
+          "Mecánica 6 velocidades"
+        ],
+        [
+          "COMBUSTIBLE",
+          "Gasolina corriente"
+        ],
+        [
+          "RELACIÓN DE COMPRESIÓN",
+          "9,0 : 1"
+        ],
+        [
+          "SISTEMA DE ALIMENTACIÓN",
+          "Carburador"
+        ],
+        [
+          "SUSPENSIÓN DELANTERA",
+          "Telescópica hidráulica"
+        ],
+        [
+          "SISTEMA DE ENCENDIDO",
+          "CDI"
+        ],
+        [
+          "DIÁMETRO POR CARRERA",
+          "67 x 56,6 mm"
+        ],
+        [
+          "REFRIGERACIÓN",
+          "Aire"
+        ],
+        [
+          "ARRANQUE",
+          "Eléctrico"
+        ],
+        [
+          "SUSPENSIÓN TRASERA",
+          "Mono amortiguador ajustable en precarga"
+        ],
+        [
+          "FRENO DELANTERO",
+          "Disco de 280 mm"
+        ],
+        [
+          "FRENO TRASERO",
+          "Disco de 210 mm"
+        ],
+        [
+          "RINES",
+          "Radios"
+        ],
+        [
+          "LLANTA DELANTERA",
+          "90/90-19"
+        ],
+        [
+          "LLANTA TRASERA",
+          "110/90-17"
+        ],
+        [
+          "ABS",
+          "No"
+        ],
+        [
+          "LARGO TOTAL",
+          "2140 mm"
+        ],
+        [
+          "ALTURA TOTAL",
+          "1325 mm"
+        ],
+        [
+          "ANCHO TOTAL",
+          "945 mm"
+        ],
+        [
+          "SEÑORITERA",
+          "No"
+        ],
+        [
+          "DISTANCIA ENTRE EJES",
+          "1330 mm"
+        ],
+        [
+          "ALTURA AL SILLÍN",
+          "860 mm"
+        ],
+        [
+          "PESO EN SECO",
+          "134 Kg"
+        ],
+        [
+          "APTA PARA PRIMERA MOTO",
+          "No"
+        ],
+        [
+          "MOTO PARA",
+          "Hombre"
+        ],
+        [
+          "IMPUESTOS",
+          "Debe pagar impuestos de rodamiento"
+        ],
+        [
+          "Trakku (La verdadera conectividad)",
+          "Sí incluye"
+        ]
+      ],
+      "manual_url": "https://media.autecomobility.com/recursos/pdf/manuales/manuales-combustion-septiembre-2025/Manual-de-garantia-y-mantenimiento-MRX-Arizona.pdf",
+      "descripcion": "",
+      "foto": "victory_mrx_arizona_xplore.jpg",
+      "foto_hero": "victory_mrx_arizona_xplore_hero.jpg"
+    },
+    {
+      "modelo": "MRX125 FOX TK",
+      "marca": "VICTORY",
+      "categoria": "Todo Terreno",
+      "cilindraje": "124,7 cc",
+      "precio": 10512000,
+      "inicial": 1800000,
+      "colores": [
+        {
+          "nombre": "GRIS CALIFORNIA NEGRO NEBULOSA ROJA",
+          "hex": "#1a1a1a"
+        }
+      ],
+      "specs": [
+        [
+          "CILINDRAJE",
+          "124,7 cc"
+        ],
+        [
+          "POTENCIA MÁXIMA",
+          "9.7 HP @ 7500 rpm"
+        ],
+        [
+          "SISTEMA DE FRENOS",
+          "CBS"
+        ],
+        [
+          "Normativa control de emisiones",
+          "Euro3"
+        ],
+        [
+          "CAPACIDAD DEL TANQUE (Incluyendo la reserva)",
+          "11 L (2.90 gal)"
+        ],
+        [
+          "MOTOR",
+          "4 tiempos, monocilíndrico"
+        ],
+        [
+          "TORQUE MÁXIMO",
+          "9.2 Nm@ 6000 rpm"
+        ],
+        [
+          "TRANSMISIÓN",
+          "Mecánica 5 velocidades"
+        ],
+        [
+          "COMBUSTIBLE",
+          "Gasolina corriente"
+        ],
+        [
+          "RELACIÓN DE COMPRESIÓN",
+          "9.5:1"
+        ],
+        [
+          "SISTEMA DE ALIMENTACIÓN",
+          "Carburador"
+        ],
+        [
+          "PESO NETO",
+          "117"
+        ],
+        [
+          "SUSPENSIÓN DELANTERA",
+          "Telescópica hidráulica"
+        ],
+        [
+          "SISTEMA DE ENCENDIDO",
+          "CDI"
+        ],
+        [
+          "DIÁMETRO POR CARRERA",
+          "52.4 x 57.8 mm"
+        ],
+        [
+          "REFRIGERACIÓN",
+          "Aire"
+        ],
+        [
+          "ARRANQUE",
+          "Eléctrico y pedal"
+        ],
+        [
+          "SUSPENSIÓN TRASERA",
+          "Mono amortiguador"
+        ],
+        [
+          "FRENO DELANTERO",
+          "Disco 267 mm"
+        ],
+        [
+          "FRENO TRASERO",
+          "Disco"
+        ],
+        [
+          "RINES",
+          "Radios"
+        ],
+        [
+          "URL TEST DRIVE",
+          "https://testdrive.autecomobility.com/vehiculo/3341"
+        ],
+        [
+          "LLANTA DELANTERA",
+          "90/90 R19"
+        ],
+        [
+          "LLANTA TRASERA",
+          "110/90 R17"
+        ],
+        [
+          "LARGO TOTAL",
+          "2060 mm"
+        ],
+        [
+          "ALTURA TOTAL",
+          "1160 mm"
+        ],
+        [
+          "URL VIDEO",
+          "https://www.youtube.com/watch?v=0lnfSkFzfjA"
+        ],
+        [
+          "ANCHO TOTAL",
+          "830 mm"
+        ],
+        [
+          "SEÑORITERA",
+          "No"
+        ],
+        [
+          "DISTANCIA ENTRE EJES",
+          "1340 mm"
+        ],
+        [
+          "ALTURA AL SILLÍN",
+          "840 mm"
+        ],
+        [
+          "PESO EN SECO",
+          "117 kg"
+        ],
+        [
+          "APTA PARA PRIMERA MOTO",
+          "No"
+        ],
+        [
+          "MOTO PARA",
+          "Hombre"
+        ],
+        [
+          "IMPUESTOS",
+          "No paga impuestos de rodamiento"
+        ],
+        [
+          "Trakku (La verdadera conectividad)",
+          "Si incluye"
+        ]
+      ],
+      "manual_url": "https://media.autecomobility.com/recursos/pdf/manuales/Victory/Manual-Victory-MRX-125-150.pdf",
+      "descripcion": "",
+      "foto": "victory_mrx125_fox_tk.jpg",
+      "foto_hero": "victory_mrx125_fox_tk_hero.jpg"
+    },
+    {
+      "modelo": "MRX125 TK",
+      "marca": "VICTORY",
+      "categoria": "Todo Terreno",
+      "cilindraje": "124,7 cc",
+      "precio": 9139000,
+      "inicial": 1800000,
+      "colores": [
+        {
+          "nombre": "GRIS GRAFITO NEGRO NEBULOSA VERDE",
+          "hex": "#1a1a1a"
+        }
+      ],
+      "specs": [
+        [
+          "CILINDRAJE",
+          "124,7 cc"
+        ],
+        [
+          "POTENCIA MÁXIMA",
+          "9.7 HP @ 7500 rpm"
+        ],
+        [
+          "SISTEMA DE FRENOS",
+          "CBS"
+        ],
+        [
+          "Normativa control de emisiones",
+          "Euro3"
+        ],
+        [
+          "CAPACIDAD DEL TANQUE (Incluyendo la reserva)",
+          "11 L (2.90 gal)"
+        ],
+        [
+          "MOTOR",
+          "4 tiempos, monocilíndrico"
+        ],
+        [
+          "TORQUE MÁXIMO",
+          "9.2 Nm@ 6000 rpm"
+        ],
+        [
+          "TRANSMISIÓN",
+          "Mecánica 5 velocidades"
+        ],
+        [
+          "COMBUSTIBLE",
+          "Gasolina corriente"
+        ],
+        [
+          "RELACIÓN DE COMPRESIÓN",
+          "9.5:1"
+        ],
+        [
+          "SISTEMA DE ALIMENTACIÓN",
+          "Carburador"
+        ],
+        [
+          "PESO NETO",
+          "117"
+        ],
+        [
+          "SUSPENSIÓN DELANTERA",
+          "Telescópica hidráulica"
+        ],
+        [
+          "SISTEMA DE ENCENDIDO",
+          "CDI"
+        ],
+        [
+          "DIÁMETRO POR CARRERA",
+          "52.4 x 57.8 mm"
+        ],
+        [
+          "REFRIGERACIÓN",
+          "Aire"
+        ],
+        [
+          "ARRANQUE",
+          "Eléctrico y pedal"
+        ],
+        [
+          "SUSPENSIÓN TRASERA",
+          "Mono amortiguador"
+        ],
+        [
+          "FRENO DELANTERO",
+          "Disco 267 mm"
+        ],
+        [
+          "FRENO TRASERO",
+          "Disco"
+        ],
+        [
+          "RINES",
+          "Radios"
+        ],
+        [
+          "URL TEST DRIVE",
+          "https://testdrive.autecomobility.com/vehiculo/3341"
+        ],
+        [
+          "LLANTA DELANTERA",
+          "90/90 R19"
+        ],
+        [
+          "LLANTA TRASERA",
+          "110/90 R17"
+        ],
+        [
+          "LARGO TOTAL",
+          "2060 mm"
+        ],
+        [
+          "ALTURA TOTAL",
+          "1160 mm"
+        ],
+        [
+          "URL VIDEO",
+          "https://www.youtube.com/watch?v=0lnfSkFzfjA"
+        ],
+        [
+          "ANCHO TOTAL",
+          "830 mm"
+        ],
+        [
+          "SEÑORITERA",
+          "No"
+        ],
+        [
+          "DISTANCIA ENTRE EJES",
+          "1340 mm"
+        ],
+        [
+          "ALTURA AL SILLÍN",
+          "840 mm"
+        ],
+        [
+          "PESO EN SECO",
+          "117 kg"
+        ],
+        [
+          "APTA PARA PRIMERA MOTO",
+          "No"
+        ],
+        [
+          "MOTO PARA",
+          "Hombre"
+        ],
+        [
+          "IMPUESTOS",
+          "No paga impuestos de rodamiento"
+        ],
+        [
+          "Trakku (La verdadera conectividad)",
+          "Si incluye"
+        ]
+      ],
+      "manual_url": "https://media.autecomobility.com/recursos/pdf/manuales/Victory/Manual-Victory-MRX-125-150.pdf",
+      "descripcion": "",
+      "foto": "victory_mrx125_tk.jpg",
+      "foto_hero": "victory_mrx125_tk_hero.jpg"
+    },
+    {
+      "modelo": "MRX150 FOX TK",
+      "marca": "VICTORY",
+      "categoria": "Todo Terreno",
+      "cilindraje": "149,2 cc",
+      "precio": 11241000,
+      "inicial": 2300000,
+      "colores": [
+        {
+          "nombre": "GRIS CALIFORNIA NEGRO NEBULOSA ROJA",
+          "hex": "#1a1a1a"
+        }
+      ],
+      "specs": [
+        [
+          "CILINDRAJE",
+          "97 cc"
+        ],
+        [
+          "POTENCIA MÁXIMA",
+          "5.9 HP @  7500 rpm"
+        ],
+        [
+          "SISTEMA DE FRENOS",
+          "CBS"
+        ],
+        [
+          "CAPACIDAD DEL TANQUE (Incluyendo la reserva)",
+          "3.0  L (0,8 gal)"
+        ],
+        [
+          "MOTOR",
+          "4 tiempos, monocilíndrico"
+        ],
+        [
+          "TORQUE MÁXIMO",
+          "6.5 Nm @ 5000 rpm"
+        ],
+        [
+          "TRANSMISIÓN",
+          "Semiautomática 4 velocidades"
+        ],
+        [
+          "COMBUSTIBLE",
+          "Gasolina corriente"
+        ],
+        [
+          "RELACIÓN DE COMPRESIÓN",
+          "8.6:1"
+        ],
+        [
+          "SISTEMA DE ALIMENTACIÓN",
+          "Carburador"
+        ],
+        [
+          "SUSPENSIÓN DELANTERA",
+          "Telescópica Hidráulica"
+        ],
+        [
+          "SISTEMA DE ENCENDIDO",
+          "CDI"
+        ],
+        [
+          "DIÁMETRO POR CARRERA",
+          "50 x 49.5 mm"
+        ],
+        [
+          "REFRIGERACIÓN",
+          "Aire"
+        ],
+        [
+          "ARRANQUE",
+          "Eléctrico y pedal"
+        ],
+        [
+          "SUSPENSIÓN TRASERA",
+          "Doble amortiguador hidráulico"
+        ],
+        [
+          "FRENO DELANTERO",
+          "Disco (220 mm) doble pistón"
+        ],
+        [
+          "TEST DRIVE",
+          "Si"
+        ],
+        [
+          "FRENO TRASERO",
+          "Tambor (110 mm)"
+        ],
+        [
+          "RINES",
+          "Radios"
+        ],
+        [
+          "URL TEST DRIVE",
+          "https://testdrive.autecomobility.com/vehiculo/108"
+        ],
+        [
+          "LLANTA DELANTERA",
+          "2.50 - 17"
+        ],
+        [
+          "LLANTA TRASERA",
+          "2.75 - 17"
+        ],
+        [
+          "LARGO TOTAL",
+          "1910 mm"
+        ],
+        [
+          "ALTURA TOTAL",
+          "1110 mm"
+        ],
+        [
+          "ANCHO TOTAL",
+          "680 mm"
+        ],
+        [
+          "SEÑORITERA",
+          "Si"
+        ],
+        [
+          "DISTANCIA ENTRE EJES",
+          "1210 mm"
+        ],
+        [
+          "ALTURA AL SILLÍN",
+          "750 mm"
+        ],
+        [
+          "VIDEO",
+          "Si"
+        ],
+        [
+          "PESO EN SECO",
+          "94 kg"
+        ],
+        [
+          "APTA PARA PRIMERA MOTO",
+          "Si"
+        ],
+        [
+          "MOTO PARA",
+          "Hombre"
+        ],
+        [
+          "IMPUESTOS",
+          "No paga impuestos de rodamiento"
+        ],
+        [
+          "Trakku (La verdadera conectividad)",
+          "Sí incluye"
+        ]
+      ],
+      "manual_url": "https://media.autecomobility.com/recursos/pdf/manuales/Victory/manuales-2026/Manual-de-garantia-y-mantenimiento-Victory-ONE-MP-CBS-marzo-2026.pdf",
+      "descripcion": "",
+      "foto": "victory_mrx150_fox_tk.jpg",
+      "foto_hero": "victory_mrx150_fox_tk_hero.jpg"
+    },
+    {
+      "modelo": "MRX150 TK",
+      "marca": "VICTORY",
+      "categoria": "Todo Terreno",
+      "cilindraje": "149,2 cc",
+      "precio": 10741000,
+      "inicial": 2300000,
+      "colores": [
+        {
+          "nombre": "GRIS GRAFITO NEGRO NEBULOSA ROJA",
+          "hex": "#1a1a1a"
+        }
+      ],
+      "specs": [
+        [
+          "CILINDRAJE",
+          "97 cc"
+        ],
+        [
+          "POTENCIA MÁXIMA",
+          "5.9 HP @  7500 rpm"
+        ],
+        [
+          "SISTEMA DE FRENOS",
+          "CBS"
+        ],
+        [
+          "CAPACIDAD DEL TANQUE (Incluyendo la reserva)",
+          "3.0  L (0,8 gal)"
+        ],
+        [
+          "MOTOR",
+          "4 tiempos, monocilíndrico"
+        ],
+        [
+          "TORQUE MÁXIMO",
+          "6.5 Nm @ 5000 rpm"
+        ],
+        [
+          "TRANSMISIÓN",
+          "Semiautomática 4 velocidades"
+        ],
+        [
+          "COMBUSTIBLE",
+          "Gasolina corriente"
+        ],
+        [
+          "RELACIÓN DE COMPRESIÓN",
+          "8.6:1"
+        ],
+        [
+          "SISTEMA DE ALIMENTACIÓN",
+          "Carburador"
+        ],
+        [
+          "SUSPENSIÓN DELANTERA",
+          "Telescópica Hidráulica"
+        ],
+        [
+          "SISTEMA DE ENCENDIDO",
+          "CDI"
+        ],
+        [
+          "DIÁMETRO POR CARRERA",
+          "50 x 49.5 mm"
+        ],
+        [
+          "REFRIGERACIÓN",
+          "Aire"
+        ],
+        [
+          "ARRANQUE",
+          "Eléctrico y pedal"
+        ],
+        [
+          "SUSPENSIÓN TRASERA",
+          "Doble amortiguador hidráulico"
+        ],
+        [
+          "FRENO DELANTERO",
+          "Disco (220 mm) doble pistón"
+        ],
+        [
+          "TEST DRIVE",
+          "Si"
+        ],
+        [
+          "FRENO TRASERO",
+          "Tambor (110 mm)"
+        ],
+        [
+          "RINES",
+          "Radios"
+        ],
+        [
+          "URL TEST DRIVE",
+          "https://testdrive.autecomobility.com/vehiculo/108"
+        ],
+        [
+          "LLANTA DELANTERA",
+          "2.50 - 17"
+        ],
+        [
+          "LLANTA TRASERA",
+          "2.75 - 17"
+        ],
+        [
+          "LARGO TOTAL",
+          "1910 mm"
+        ],
+        [
+          "ALTURA TOTAL",
+          "1110 mm"
+        ],
+        [
+          "ANCHO TOTAL",
+          "680 mm"
+        ],
+        [
+          "SEÑORITERA",
+          "Si"
+        ],
+        [
+          "DISTANCIA ENTRE EJES",
+          "1210 mm"
+        ],
+        [
+          "ALTURA AL SILLÍN",
+          "750 mm"
+        ],
+        [
+          "VIDEO",
+          "Si"
+        ],
+        [
+          "PESO EN SECO",
+          "94 kg"
+        ],
+        [
+          "APTA PARA PRIMERA MOTO",
+          "Si"
+        ],
+        [
+          "MOTO PARA",
+          "Hombre"
+        ],
+        [
+          "IMPUESTOS",
+          "No paga impuestos de rodamiento"
+        ],
+        [
+          "Trakku (La verdadera conectividad)",
+          "Sí incluye"
+        ]
+      ],
+      "manual_url": "https://media.autecomobility.com/recursos/pdf/manuales/Victory/manuales-2026/Manual-de-garantia-y-mantenimiento-Victory-ONE-MP-CBS-marzo-2026.pdf",
+      "descripcion": "",
+      "foto": "victory_mrx150_tk.jpg",
+      "foto_hero": "victory_mrx150_tk_hero.jpg"
+    },
+    {
+      "modelo": "SPORT 100 ELS SP",
+      "marca": "TVS",
+      "categoria": "de Trabajo y Transporte",
+      "cilindraje": "99.7 cc",
+      "precio": 6379999,
+      "inicial": null,
+      "colores": [
+        {
+          "nombre": "GRIS DORADA DORADA",
+          "hex": "#a6967c"
+        }
+      ],
+      "specs": [
+        [
+          "CILINDRAJE",
+          "99.7 cc"
+        ],
+        [
+          "POTENCIA MÁXIMA",
+          "7.38 HP @ 7500 rpm"
+        ],
+        [
+          "CAPACIDAD DEL TANQUE (Incluyendo la reserva)",
+          "11 L (2.64 GAL)"
+        ],
+        [
+          "MOTOR",
+          "4 tiempos, monocilíndrico"
+        ],
+        [
+          "TORQUE MÁXIMO",
+          "7.5 Nm @ 5000 rpm"
+        ],
+        [
+          "TRANSMISIÓN",
+          "Mecánica 4 velocidades"
+        ],
+        [
+          "COMBUSTIBLE",
+          "Gasolina corriente"
+        ],
+        [
+          "RELACIÓN DE COMPRESIÓN",
+          "9.15:1"
+        ],
+        [
+          "SISTEMA DE ALIMENTACIÓN",
+          "Carburador"
+        ],
+        [
+          "SUSPENSIÓN DELANTERA",
+          "HORQUILLA TELESCÓPICA"
+        ],
+        [
+          "SISTEMA DE ENCENDIDO",
+          "TCI"
+        ],
+        [
+          "DIÁMETRO POR CARRERA",
+          "51 X 48.8 mm"
+        ],
+        [
+          "REFRIGERACIÓN",
+          "Aire"
+        ],
+        [
+          "ARRANQUE",
+          "Eléctrico y pedal"
+        ],
+        [
+          "SUSPENSIÓN TRASERA",
+          "DOBLE AMORTIGUADOR"
+        ],
+        [
+          "FRENO DELANTERO",
+          "TAMBOR, 130 MM"
+        ],
+        [
+          "FRENO TRASERO",
+          "TAMBOR, 110 MM"
+        ],
+        [
+          "RINES",
+          "Aspas"
+        ],
+        [
+          "LLANTA DELANTERA",
+          "2.75 X 17? 41P 4PR"
+        ],
+        [
+          "LLANTA TRASERA",
+          "3-17 50P 6PR"
+        ],
+        [
+          "LARGO TOTAL",
+          "1950 mm"
+        ],
+        [
+          "ALTURA TOTAL",
+          "1080 mm"
+        ],
+        [
+          "ANCHO TOTAL",
+          "705 mm"
+        ],
+        [
+          "DISTANCIA ENTRE EJES",
+          "1236 mm"
+        ],
+        [
+          "ALTURA AL SILLÍN",
+          "780 mm"
+        ],
+        [
+          "PESO EN SECO",
+          "100 kg"
+        ]
+      ],
+      "manual_url": "https://media.autecomobility.com/recursos/marcas/tvs/manuales/manual-garantia.port100-els-nuevo.pdf",
+      "descripcion": "La TVS SPORT 100 es insignia en calidad, economía y comodidad, su motor de 99 cc con tecnología Duralife provee un transporte confiable y eficiente, ahora con todo el respaldo de AUTECO.",
+      "foto": "tvs_sport_100_els_sp.jpg",
+      "foto_hero": "tvs_sport_100_els_sp_hero.jpg"
+    },
+    {
+      "modelo": "SPORT KLS SPOKE",
+      "marca": "TVS",
+      "categoria": "de Trabajo y Transporte",
+      "cilindraje": "99.7 cc",
+      "precio": 6129999,
+      "inicial": null,
+      "colores": [
+        {
+          "nombre": "NEGRO NEBULOSA",
+          "hex": "#1a1a1a"
+        }
+      ],
+      "specs": [
+        [
+          "CILINDRAJE",
+          "99.7 cc"
+        ],
+        [
+          "POTENCIA MÁXIMA",
+          "7.38 HP @ 7500 rpm"
+        ],
+        [
+          "CAPACIDAD DEL TANQUE (Incluyendo la reserva)",
+          "10 l (2.64 gal)"
+        ],
+        [
+          "MOTOR",
+          "4 TIEMPOS, MONOCILÍNDRICO, SOHC"
+        ],
+        [
+          "TORQUE MÁXIMO",
+          "7.5 Nm @ 5000 rpm"
+        ],
+        [
+          "TRANSMISIÓN",
+          "Mecánica 4 velocidades"
+        ],
+        [
+          "COMBUSTIBLE",
+          "Gasolina corriente"
+        ],
+        [
+          "RELACIÓN DE COMPRESIÓN",
+          "9.15:1"
+        ],
+        [
+          "SISTEMA DE ALIMENTACIÓN",
+          "Carburador"
+        ],
+        [
+          "SUSPENSIÓN DELANTERA",
+          "HORQUILLA TELESCÓPICA."
+        ],
+        [
+          "SISTEMA DE ENCENDIDO",
+          "TCI"
+        ],
+        [
+          "DIÁMETRO POR CARRERA",
+          "51 X 48.8 mm"
+        ],
+        [
+          "REFRIGERACIÓN",
+          "Aire"
+        ],
+        [
+          "ARRANQUE",
+          "Pedal"
+        ],
+        [
+          "SUSPENSIÓN TRASERA",
+          "DOBLE AMORTIGUADOR"
+        ],
+        [
+          "FRENO DELANTERO",
+          "TAMBOR, 130 MM"
+        ],
+        [
+          "FRENO TRASERO",
+          "TAMBOR, 110 MM"
+        ],
+        [
+          "RINES",
+          "Radios"
+        ],
+        [
+          "LLANTA DELANTERA",
+          "2.75 X 17? 41P 4PR"
+        ],
+        [
+          "LLANTA TRASERA",
+          "3-17 50P 6PR"
+        ],
+        [
+          "ABS",
+          "No"
+        ],
+        [
+          "LARGO TOTAL",
+          "1950 mm"
+        ],
+        [
+          "ALTURA TOTAL",
+          "1080 mm"
+        ],
+        [
+          "ANCHO TOTAL",
+          "705 mm"
+        ],
+        [
+          "SEÑORITERA",
+          "No"
+        ],
+        [
+          "DISTANCIA ENTRE EJES",
+          "1236 mm"
+        ],
+        [
+          "ALTURA AL SILLÍN",
+          "780 mm"
+        ],
+        [
+          "PESO EN SECO",
+          "100 KG"
+        ],
+        [
+          "APTA PARA PRIMERA MOTO",
+          "No"
+        ],
+        [
+          "IMPUESTOS",
+          "No paga impuestos de rodamiento"
+        ]
+      ],
+      "manual_url": "https://media.autecomobility.com/recursos/marcas/tvs/manuales/manual-kls-nuevo.pdf",
+      "descripcion": "La TVS SPORT 100 es insignia en calidad, economía y comodidad, su motor de 99 cc con tecnología Duralife provee un transporte confiable y eficiente, ahora con todo el respaldo de AUTECO.",
+      "foto": "tvs_sport_kls_spoke.jpg",
+      "foto_hero": "tvs_sport_kls_spoke_hero.jpg"
+    },
+    {
+      "modelo": "MOTOCARRO TRICARGO 200 GRIS PARTICULAR PICK UP ACEITE MULTICOLOR 2027",
+      "marca": "TVS",
+      "categoria": "Motocarros",
+      "cilindraje": "197 cc",
+      "precio": 17238000,
+      "inicial": null,
+      "colores": [
+        {
+          "nombre": "GRIS",
+          "hex": "#7a7a7a"
+        }
+      ],
+      "specs": [
+        [
+          "MOTOR",
+          "Motos 4 tiempos monocilíndrico OHV"
+        ],
+        [
+          "CILINDRAJE",
+          "197 cc"
+        ],
+        [
+          "DIÁMETRO POR CARRERA",
+          "63.5 x 62.3 mm"
+        ],
+        [
+          "POTENCIA MÁXIMA",
+          "13.4 Hp @ 7500 rpm"
+        ],
+        [
+          "TORQUE MÁXIMO",
+          "13.5 Nm @ 6500 rpm"
+        ],
+        [
+          "RELACIÓN DE COMPRESIÓN",
+          "8.5 – 9.3 : 2"
+        ],
+        [
+          "SISTEMA DE ALIMENTACIÓN",
+          "Carburador"
+        ],
+        [
+          "COMBUSTIBLE",
+          "Gasolina corriente"
+        ],
+        [
+          "ARRANQUE",
+          "Eléctrico y pedal"
+        ],
+        [
+          "TRANSMISIÓN",
+          "Mecánica de 5 marchas + Booster"
+        ],
+        [
+          "SUSPENSIÓN DELANTERA",
+          "Telescópica hidráulica"
+        ],
+        [
+          "SUSPENSIÓN TRASERA",
+          "Muelles de 7 hojas reforzadas"
+        ],
+        [
+          "FRENO DELANTERO",
+          "Disco"
+        ],
+        [
+          "FRENO TRASERO",
+          "Campana"
+        ],
+        [
+          "LLANTA DELANTERA",
+          "4.50 – R12"
+        ],
+        [
+          "LLANTA TRASERA",
+          "4.50 – R12"
+        ],
+        [
+          "RINES",
+          "3.00 x 13"
+        ],
+        [
+          "CAPACIDAD DEL TANQUE (Incluyendo la reserva)",
+          "16 Litros (4.22 gal)"
+        ],
+        [
+          "SISTEMA DE ENCENDIDO",
+          "CDI"
+        ],
+        [
+          "LARGO TOTAL",
+          "3320 mm"
+        ],
+        [
+          "ALTURA TOTAL",
+          "1410 mm"
+        ],
+        [
+          "ANCHO TOTAL",
+          "1260 mm"
+        ],
+        [
+          "DISTANCIA ENTRE EJES",
+          "2300 mm"
+        ],
+        [
+          "ALTURA AL SILLÍN",
+          "845 mm"
+        ],
+        [
+          "REFRIGERACIÓN",
+          "Aceite"
+        ],
+        [
+          "CAPACIDAD DE CARGA",
+          "480 Kg"
+        ],
+        [
+          "PESO NETO",
+          "380"
+        ],
+        [
+          "PESO BRUTO",
+          "380 kg"
+        ]
+      ],
+      "manual_url": "",
+      "descripcion": "",
+      "foto": "tvs_motocarro_tricargo_200_gris_particular_pick_up_aceite_multicolor_2027.jpg",
+      "foto_hero": "tvs_motocarro_tricargo_200_gris_particular_pick_up_aceite_multicolor_2027_hero.jpg"
+    },
+    {
+      "modelo": "MOTOCARRO TRICARGO 300 PARTICULAR PICKUP NEGRO",
+      "marca": "TVS",
+      "categoria": "Motocarros",
+      "cilindraje": "272 cc",
+      "precio": 26335000,
+      "inicial": null,
+      "colores": [
+        {
+          "nombre": "NEGRO",
+          "hex": "#101010"
+        }
+      ],
+      "specs": [
+        [
+          "MOTOR",
+          "4T, 2V, Monocilíndrico OHV"
+        ],
+        [
+          "CILINDRAJE",
+          "272 cc"
+        ],
+        [
+          "DIÁMETRO POR CARRERA",
+          "73 x 65 mm"
+        ],
+        [
+          "POTENCIA MÁXIMA",
+          "18,8 HP @ 7000 rpm"
+        ],
+        [
+          "TORQUE MÁXIMO",
+          "21 Nm @ 4500 rpm"
+        ],
+        [
+          "RELACIÓN DE COMPRESIÓN",
+          "10.1:1"
+        ],
+        [
+          "SISTEMA DE ALIMENTACIÓN",
+          "Carburador"
+        ],
+        [
+          "COMBUSTIBLE",
+          "Gasolina corriente"
+        ],
+        [
+          "ARRANQUE",
+          "Eléctrico y pedal"
+        ],
+        [
+          "TRANSMISIÓN",
+          "Mecánica 5 velocidades + Booster"
+        ],
+        [
+          "SUSPENSIÓN DELANTERA",
+          "Telescópica hidráulica (4 Amortiguadores)"
+        ],
+        [
+          "SUSPENSIÓN TRASERA",
+          "Tipo Ballesta + amotiguador"
+        ],
+        [
+          "FRENO DELANTERO",
+          "Disco (220 mm)"
+        ],
+        [
+          "FRENO TRASERO",
+          "Tambor (220 mm)"
+        ],
+        [
+          "LLANTA DELANTERA",
+          "5.00-12"
+        ],
+        [
+          "LLANTA TRASERA",
+          "5.00-12"
+        ],
+        [
+          "RINES",
+          "Acero"
+        ],
+        [
+          "CAPACIDAD DEL TANQUE (Incluyendo la reserva)",
+          "23 L (6,1 gal)."
+        ],
+        [
+          "SISTEMA DE ENCENDIDO",
+          "CDI"
+        ],
+        [
+          "LARGO TOTAL",
+          "4130 mm"
+        ],
+        [
+          "ALTURA TOTAL",
+          "1590 mm"
+        ],
+        [
+          "ANCHO TOTAL",
+          "1580 mm"
+        ],
+        [
+          "DISTANCIA ENTRE EJES",
+          "2640 mm"
+        ],
+        [
+          "ALTURA AL SILLÍN",
+          "820 mm"
+        ],
+        [
+          "REFRIGERACIÓN",
+          "Líquido"
+        ],
+        [
+          "PESO NETO",
+          "634 Kg"
+        ],
+        [
+          "CARGA DISPONIBLE MÁXIMA",
+          "1 Tonelada"
+        ]
+      ],
+      "manual_url": "",
+      "descripcion": "",
+      "foto": "tvs_motocarro_tricargo_300_particular_pickup_negro.jpg",
+      "foto_hero": "tvs_motocarro_tricargo_300_particular_pickup_negro_hero.jpg"
+    }
+  ]
+}
