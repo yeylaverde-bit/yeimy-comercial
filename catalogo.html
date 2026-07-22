@@ -3,233 +3,250 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Catálogo de motos · Yeimy Laverde</title>
-<meta name="description" content="Catálogo de motos TVS, Victory y más — Yeimy Laverde. Ficha técnica, precios y manual de cada moto." />
+<title>Catálogo Auteco · TVS · Victory · Kymco — Yeimy Laverde</title>
+<meta name="description" content="Catálogo digital de motos — Yeimy Laverde, Asesora Comercial. Ficha técnica, precios, colores y cotización por WhatsApp." />
 <style>
-  :root{ --neg:#0d0d0d; --rojo:#C8102E; --gris:#6b6b6b; --linea:#e7e7e7; --bg:#f4f4f5; --card:#fff; }
+  :root{
+    --bg:#0b0b0c; --card:#151517; --card2:#1c1c1f; --line:#2a2a2e;
+    --txt:#f4f4f5; --mut:#9a9aa2; --mut2:#6d6d75;
+    --naranja:#F97316; --naranja2:#ea580c; --wa:#22c55e;
+  }
   *{ box-sizing:border-box; margin:0; padding:0; }
   body{ font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-        background:var(--bg); color:var(--neg); -webkit-font-smoothing:antialiased; }
+        background:var(--bg); color:var(--txt); -webkit-font-smoothing:antialiased; }
   a{ color:inherit; text-decoration:none; }
+  .wrap{ max-width:1180px; margin:0 auto; padding:0 16px; }
 
-  /* Header */
-  header{ background:var(--neg); color:#fff; padding:14px 16px; position:sticky; top:0; z-index:30;
-          display:flex; align-items:center; justify-content:space-between; gap:12px; }
-  .brand{ font-size:18px; font-weight:800; letter-spacing:.5px; }
-  .brand .r{ color:var(--rojo); }
-  .brand small{ display:block; font-weight:400; font-size:10px; color:#bbb; letter-spacing:.3px; margin-top:1px; }
-  .wa{ background:#25D366; color:#fff; padding:8px 12px; border-radius:8px; font-size:13px; font-weight:700;
-       white-space:nowrap; display:inline-flex; align-items:center; gap:6px; }
+  header{ border-bottom:1px solid var(--line); padding:14px 0; position:sticky; top:0; z-index:30;
+          background:rgba(11,11,12,.92); backdrop-filter:blur(8px); }
+  header .wrap{ display:flex; align-items:center; gap:12px; }
+  .logo{ font-weight:900; letter-spacing:1px; font-size:16px; border:2px solid var(--txt); padding:4px 8px; border-radius:6px; }
+  .htitle{ color:var(--mut); font-size:15px; font-weight:600; }
+  .hupd{ margin-left:auto; color:var(--mut2); font-size:12px; }
 
-  /* Controles */
-  .controls{ position:sticky; top:56px; z-index:20; background:var(--bg); padding:12px 16px 8px;
-             border-bottom:1px solid var(--linea); }
-  .search{ width:100%; padding:11px 14px; border:1px solid var(--linea); border-radius:10px; font-size:15px;
-           background:#fff; outline:none; }
-  .search:focus{ border-color:var(--neg); }
-  .chips{ display:flex; gap:8px; overflow-x:auto; padding:10px 0 2px; -webkit-overflow-scrolling:touch; }
-  .chip{ flex:0 0 auto; padding:7px 13px; border-radius:20px; border:1px solid var(--linea); background:#fff;
-         font-size:13px; font-weight:600; color:var(--gris); cursor:pointer; white-space:nowrap; }
-  .chip.active{ background:var(--neg); color:#fff; border-color:var(--neg); }
+  .profile{ background:var(--card); border:1px solid var(--line); border-radius:18px; padding:18px;
+            display:flex; flex-direction:column; align-items:center; gap:12px; margin:18px 0; text-align:center; }
+  .avatar{ width:82px; height:82px; border-radius:50%; background:linear-gradient(135deg,#2a2a2e,#3a3a40);
+           display:flex; align-items:center; justify-content:center; font-size:28px; font-weight:800; color:var(--naranja);
+           border:2px solid var(--naranja); }
+  .pname{ font-size:20px; font-weight:800; }
+  .prole{ color:var(--naranja); font-weight:700; font-size:13.5px; margin-top:-6px; }
+  .btn-wa-big{ background:var(--wa); color:#04210f; font-weight:800; padding:14px 20px; border-radius:12px;
+               font-size:15px; width:100%; max-width:420px; display:flex; align-items:center; justify-content:center; gap:8px; }
 
-  /* Grid */
-  .wrap{ max-width:1100px; margin:0 auto; padding:16px; }
-  .count{ font-size:12.5px; color:var(--gris); margin-bottom:12px; }
-  .grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(158px,1fr)); gap:14px; }
-  .card{ background:var(--card); border:1px solid var(--linea); border-radius:14px; overflow:hidden;
-         cursor:pointer; transition:transform .12s, box-shadow .12s; display:flex; flex-direction:column; }
-  .card:hover{ transform:translateY(-3px); box-shadow:0 10px 24px rgba(0,0,0,.10); }
-  .card .ph{ aspect-ratio:4/3; background:#fafafa; display:flex; align-items:center; justify-content:center; }
+  .controls{ position:sticky; top:56px; z-index:20; background:var(--bg); padding:8px 0 12px; }
+  .search{ width:100%; padding:13px 16px; border:1px solid var(--line); border-radius:12px; font-size:15px;
+           background:var(--card); color:var(--txt); outline:none; }
+  .search::placeholder{ color:var(--mut2); }
+  .search:focus{ border-color:var(--naranja); }
+  .chips{ display:flex; gap:8px; overflow-x:auto; padding:11px 0 2px; -webkit-overflow-scrolling:touch; scrollbar-width:none; }
+  .chips::-webkit-scrollbar{ display:none; }
+  .chip{ flex:0 0 auto; padding:8px 14px; border-radius:22px; border:1px solid var(--line); background:var(--card);
+         font-size:13px; font-weight:600; color:var(--mut); cursor:pointer; white-space:nowrap; }
+  .chip.active{ background:var(--naranja); color:#231000; border-color:var(--naranja); }
+  .count{ color:var(--mut); font-size:13px; margin:4px 0 14px; font-weight:600; }
+
+  .grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:16px; padding-bottom:40px; }
+  .card{ background:var(--card); border:1px solid var(--line); border-radius:16px; overflow:hidden;
+         display:flex; flex-direction:column; }
+  .card .ph{ background:#fff; aspect-ratio:16/10; display:flex; align-items:center; justify-content:center; position:relative; }
   .card .ph img{ width:100%; height:100%; object-fit:contain; }
-  .card .body{ padding:10px 11px 12px; display:flex; flex-direction:column; gap:4px; flex:1; }
-  .tag{ align-self:flex-start; font-size:9.5px; font-weight:700; text-transform:uppercase; letter-spacing:.4px;
-        color:var(--rojo); }
-  .card h3{ font-size:13.5px; font-weight:700; line-height:1.2; }
-  .card .cil{ font-size:11px; color:var(--gris); }
-  .card .precio{ margin-top:auto; font-size:15px; font-weight:800; }
-  .card .precio small{ display:block; font-weight:400; font-size:10px; color:var(--gris); }
+  .badge-new{ position:absolute; top:10px; left:10px; background:var(--naranja); color:#231000; font-size:10px;
+              font-weight:800; padding:3px 9px; border-radius:20px; letter-spacing:.5px; }
+  .card .body{ padding:14px 16px 16px; display:flex; flex-direction:column; gap:3px; }
+  .swrow{ display:flex; align-items:center; gap:7px; margin-bottom:4px; flex-wrap:wrap; }
+  .sw{ width:17px; height:17px; border-radius:50%; border:1px solid #555; }
+  .swname{ font-size:12px; color:var(--mut); }
+  .card h3{ font-size:16.5px; font-weight:800; line-height:1.2; }
+  .meta{ font-size:12px; color:var(--mut); margin-bottom:8px; }
+  .pblock{ border-top:1px solid var(--line); padding-top:10px; margin-top:4px; }
+  .plabel{ font-size:10px; letter-spacing:.6px; color:var(--mut2); text-transform:uppercase; }
+  .pini{ font-size:22px; font-weight:800; color:var(--txt); margin:1px 0 8px; }
+  .prow{ display:flex; justify-content:space-between; align-items:baseline; font-size:13px; padding:2px 0; }
+  .prow .l{ color:var(--mut); }
+  .prow .v{ font-weight:700; }
+  .prow .tach{ color:var(--mut2); text-decoration:line-through; font-size:12px; margin-right:6px; font-weight:400; }
+  .prow.bono .v{ color:var(--naranja); }
+  .cbtns{ display:flex; gap:8px; margin-top:14px; }
+  .btn{ flex:1; text-align:center; padding:11px; border-radius:10px; font-size:13.5px; font-weight:700; cursor:pointer; border:1px solid transparent; }
+  .btn-ficha{ background:transparent; border-color:var(--line); color:var(--txt); }
+  .btn-ficha:hover{ border-color:var(--naranja); color:var(--naranja); }
+  .btn-cot{ background:var(--naranja); color:#231000; }
 
-  /* Modal */
-  .overlay{ position:fixed; inset:0; background:rgba(0,0,0,.6); z-index:50; display:none;
-            align-items:flex-end; justify-content:center; }
+  .overlay{ position:fixed; inset:0; background:rgba(0,0,0,.7); z-index:50; display:none; align-items:flex-end; justify-content:center; }
   .overlay.open{ display:flex; }
-  .modal{ background:#fff; width:100%; max-width:720px; max-height:94vh; overflow-y:auto;
-          border-radius:18px 18px 0 0; animation:up .22s ease; }
-  @keyframes up{ from{ transform:translateY(30px); opacity:.6 } to{ transform:none; opacity:1 } }
-  .mhead{ position:relative; background:#fafafa; }
-  .mhead img{ width:100%; max-height:260px; object-fit:contain; display:block; }
-  .close{ position:absolute; top:10px; right:10px; width:34px; height:34px; border-radius:50%;
-          background:rgba(0,0,0,.55); color:#fff; border:none; font-size:20px; cursor:pointer; }
+  .modal{ background:var(--card); width:100%; max-width:640px; max-height:94vh; overflow-y:auto; border-radius:18px 18px 0 0;
+          border:1px solid var(--line); animation:up .22s ease; }
+  @keyframes up{ from{ transform:translateY(24px); opacity:.5 } to{ transform:none; opacity:1 } }
+  .mph{ background:#fff; position:relative; }
+  .mph img{ width:100%; max-height:240px; object-fit:contain; display:block; }
+  .close{ position:absolute; top:10px; right:10px; width:34px; height:34px; border-radius:50%; background:rgba(0,0,0,.6); color:#fff; border:none; font-size:20px; cursor:pointer; }
   .mbody{ padding:16px 18px 26px; }
-  .mbody .tag{ font-size:11px; }
-  .mbody h2{ font-size:22px; font-weight:800; line-height:1.15; margin:2px 0 4px; }
-  .mbody .sub{ color:var(--rojo); font-size:13px; font-weight:600; }
-  .swatches{ display:flex; gap:6px; margin:12px 0; flex-wrap:wrap; }
-  .sw{ width:22px; height:22px; border-radius:50%; border:1px solid #ccc; }
-  .precio-box{ background:var(--neg); color:#fff; border-radius:12px; padding:12px 14px; margin:12px 0; }
-  .precio-box .big{ font-size:22px; font-weight:800; }
-  .precio-box .sm{ font-size:12px; color:#bbb; }
-  .desc{ font-size:13px; color:#444; line-height:1.5; font-style:italic; margin:10px 0; }
-  .sec{ background:var(--neg); color:#fff; font-size:12px; font-weight:700; letter-spacing:.4px;
-        padding:7px 12px; border-radius:8px; margin:16px 0 8px; }
-  .specs{ display:grid; grid-template-columns:1fr 1fr; gap:0 18px; }
-  .spec{ padding:7px 0; border-bottom:1px solid var(--linea); }
-  .spec .k{ font-size:9.5px; text-transform:uppercase; color:#8a8a8a; letter-spacing:.3px; }
-  .spec .v{ font-size:12.5px; font-weight:700; margin-top:1px; }
-  .btns{ display:flex; flex-direction:column; gap:10px; margin-top:18px; }
-  .btn{ display:flex; align-items:center; justify-content:center; gap:8px; padding:13px; border-radius:11px;
-        font-size:14px; font-weight:700; cursor:pointer; border:none; }
-  .btn-manual{ background:var(--rojo); color:#fff; }
-  .btn-wa{ background:#25D366; color:#fff; }
-  .btn[disabled]{ opacity:.45; }
+  .mbody h2{ font-size:22px; font-weight:800; line-height:1.15; }
+  .mbody .meta{ font-size:13px; margin:2px 0 12px; }
+  .mini{ background:var(--card2); border:1px solid var(--line); border-radius:12px; padding:12px 14px; }
+  .mini .plabel{ margin-bottom:2px; }
+  .mini .big{ font-size:22px; font-weight:800; }
+  .disc{ font-size:11px; color:var(--mut2); margin:10px 0 4px; line-height:1.4; }
+  .sec{ color:var(--naranja); font-weight:800; font-size:13px; letter-spacing:.6px; margin:18px 0 8px; }
+  .specrow{ display:flex; justify-content:space-between; gap:14px; padding:8px 0; border-bottom:1px solid var(--line); }
+  .specrow .k{ color:var(--mut); font-size:12.5px; flex:0 0 45%; }
+  .specrow .v{ font-weight:700; font-size:13px; text-align:right; }
+  .mbtns{ display:flex; flex-direction:column; gap:10px; margin-top:18px; }
+  .btn-lg{ display:flex; align-items:center; justify-content:center; gap:8px; padding:14px; border-radius:12px; font-size:15px; font-weight:800; cursor:pointer; border:none; }
+  .btn-pdf{ background:var(--naranja); color:#231000; }
+  .btn-wa{ background:var(--wa); color:#04210f; }
+  .btn-lg[disabled]{ opacity:.4; }
 
-  footer{ text-align:center; padding:26px 16px 40px; color:var(--gris); font-size:12px; }
-  footer b{ color:var(--neg); }
-  .empty{ text-align:center; color:var(--gris); padding:50px 16px; }
-
-  @media(min-width:560px){
-    .overlay{ align-items:center; }
-    .modal{ border-radius:18px; }
-    .grid{ grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); }
-  }
-  @media(max-width:420px){ .specs{ grid-template-columns:1fr; } }
+  footer{ text-align:center; padding:26px 16px 46px; color:var(--mut2); font-size:12px; border-top:1px solid var(--line); }
+  footer b{ color:var(--txt); }
+  .empty{ text-align:center; color:var(--mut); padding:50px 16px; }
+  @media(min-width:560px){ .overlay{ align-items:center } .modal{ border-radius:18px } }
 </style>
 </head>
 <body>
-  <header>
-    <div class="brand">YEIMY <span class="r">LAVERDE</span>
-      <small>Asesora comercial · Motos nuevas</small></div>
-    <a class="wa" id="waTop" target="_blank" rel="noopener">💬 WhatsApp</a>
-  </header>
-
-  <div class="controls">
-    <input class="search" id="search" type="search" placeholder="Buscar moto… (ej. Apache, MRX, 125)" />
-    <div class="chips" id="chips"></div>
-  </div>
+  <header><div class="wrap">
+    <span class="logo">SERVIAUTEC</span>
+    <span class="htitle">Catálogo Digital</span>
+    <span class="hupd" id="hupd"></span>
+  </div></header>
 
   <div class="wrap">
+    <div class="profile">
+      <div class="avatar" id="avatar">YL</div>
+      <div>
+        <div class="pname" id="pname">Yeimy Laverde</div>
+        <div class="prole" id="prole">Asesora Comercial</div>
+      </div>
+      <a class="btn-wa-big" id="waTop" target="_blank" rel="noopener">💬 Escríbeme por WhatsApp</a>
+    </div>
+
+    <div class="controls">
+      <input class="search" id="search" type="search" placeholder="Buscar moto… (Apache, MRX, Raider, 125…)" />
+      <div class="chips" id="chips"></div>
+    </div>
+
     <div class="count" id="count"></div>
     <div class="grid" id="grid"></div>
     <div class="empty" id="empty" style="display:none">No encontramos motos con ese filtro.</div>
   </div>
 
   <footer>
-    <b>Yeimy Laverde</b> · <span id="fTel"></span><br/>
-    <span id="fDom"></span> · <span id="fGen"></span>
+    <b>Yeimy Laverde</b> · Asesora Comercial · <span id="fTel"></span><br/>
+    Catálogo referencial · precios sujetos a confirmación en punto de venta · <span id="fGen"></span>
   </footer>
 
-  <div class="overlay" id="overlay">
-    <div class="modal" id="modal"></div>
-  </div>
+  <div class="overlay" id="overlay"><div class="modal" id="modal"></div></div>
 
 <script>
 const fmt = new Intl.NumberFormat("es-CO");
 const cop = n => (typeof n === "number" && n > 0) ? "$ " + fmt.format(n) : null;
-let DATA = { motos: [] }, WA = "573021266110";
-let filtroCat = "Todas", q = "";
+let DATA = { motos: [] }, WA = "573021266110", filtroCat = "Todas", q = "";
+const NUEVOS = /(GP|GOPRO|ARIZONA|E5|RACING)/i;
 
 async function init(){
-  const r = await fetch("catalogo.json", { cache: "no-store" });
+  const r = await fetch("catalogo.json", { cache:"no-store" });
   DATA = await r.json();
   WA = DATA.whatsapp || WA;
-  document.getElementById("waTop").href = waLink("Hola Yeimy, quiero información de las motos disponibles.");
+  document.getElementById("waTop").href = waLink("Hola Yeimy Laverde, vi tu catálogo de motos y quiero más información.");
+  document.getElementById("pname").textContent = DATA.asesora || "Yeimy Laverde";
+  document.getElementById("prole").textContent = DATA.cargo || "Asesora Comercial";
+  document.getElementById("avatar").textContent = (DATA.asesora||"YL").split(" ").map(s=>s[0]).slice(0,2).join("").toUpperCase();
+  document.getElementById("hupd").textContent = "Actualizado: " + (DATA.generado||"");
   document.getElementById("fTel").textContent = DATA.telefono || "";
-  document.getElementById("fDom").textContent = DATA.dominio || "";
-  document.getElementById("fGen").textContent = "Actualizado " + (DATA.generado || "");
-  buildChips();
-  render();
+  document.getElementById("fGen").textContent = "Actualizado " + (DATA.generado||"");
+  buildChips(); render();
   document.getElementById("search").addEventListener("input", e => { q = e.target.value.toLowerCase().trim(); render(); });
-  document.getElementById("overlay").addEventListener("click", e => { if (e.target.id === "overlay") cerrar(); });
+  document.getElementById("overlay").addEventListener("click", e => { if (e.target.id==="overlay") cerrar(); });
 }
-
 function waLink(msg){ return `https://wa.me/${WA}?text=${encodeURIComponent(msg)}`; }
+function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 
 function buildChips(){
-  const cats = ["Todas", ...Array.from(new Set(DATA.motos.map(m => m.categoria)))];
+  const cats = ["Todas", ...Array.from(new Set(DATA.motos.map(m=>m.categoria)))];
   const cont = document.getElementById("chips");
-  cont.innerHTML = cats.map(c =>
-    `<button class="chip${c===filtroCat?' active':''}" data-cat="${c}">${c}</button>`).join("");
-  cont.querySelectorAll(".chip").forEach(b => b.addEventListener("click", () => {
-    filtroCat = b.dataset.cat; buildChips(); render();
-  }));
+  cont.innerHTML = cats.map(c=>`<button class="chip${c===filtroCat?' active':''}" data-cat="${esc(c)}">${esc(c)}</button>`).join("");
+  cont.querySelectorAll(".chip").forEach(b=>b.addEventListener("click",()=>{ filtroCat=b.dataset.cat; buildChips(); render(); }));
 }
-
 function filtradas(){
-  return DATA.motos.filter(m => {
-    if (filtroCat !== "Todas" && m.categoria !== filtroCat) return false;
-    if (q){
-      const blob = (m.modelo+" "+m.marca+" "+m.categoria+" "+m.cilindraje).toLowerCase();
-      if (!blob.includes(q)) return false;
-    }
+  return DATA.motos.filter(m=>{
+    if (filtroCat!=="Todas" && m.categoria!==filtroCat) return false;
+    if (q){ const blob=(m.modelo+" "+m.marca+" "+m.categoria+" "+m.cilindraje).toLowerCase(); if(!blob.includes(q)) return false; }
     return true;
   });
 }
-
-function precioTxt(m){
-  const ini = cop(m.inicial), con = cop(m.precio);
-  if (ini) return { big: "Inicial " + ini, sm: con ? "o contado " + con : "cuotas por WhatsApp" };
-  if (con) return { big: con, sm: "precio de contado" };
-  return { big: "Cotiza", sm: "por WhatsApp" };
+function swatchesHtml(m){
+  const s = (m.colores||[]).slice(0,6).map(c=>`<span class="sw" title="${esc(c.nombre)}" style="background:${esc(c.hex||'#888')}"></span>`).join("");
+  const nombres = (m.colores||[]).map(c=>c.nombre).filter(Boolean).slice(0,3).join(" · ");
+  return s ? `<div class="swrow">${s}<span class="swname">${esc(nombres)}</span></div>` : "";
 }
-
+function precioBlock(m){
+  const ini = cop(m.cuota_inicial), com = cop(m.comercial), con = cop(m.contado), bono = m.bono;
+  let comHtml = "";
+  if (com){
+    if (bono && bono>0){ const dcto=cop(m.comercial-bono); comHtml=`<span class="tach">${com}</span>${dcto}`; }
+    else comHtml = com;
+  }
+  return `<div class="pblock">
+    ${ini?`<div class="plabel">Cuota inicial</div><div class="pini">${ini}</div>`:""}
+    ${com?`<div class="prow"><span class="l">Precio comercial</span><span class="v">${comHtml}</span></div>`:""}
+    ${con?`<div class="prow"><span class="l">Contado total</span><span class="v">${con}</span></div>`:""}
+    ${(bono&&bono>0)?`<div class="prow bono"><span class="l">Bono de descuento</span><span class="v">− ${cop(bono)}</span></div>`:""}
+  </div>`;
+}
 function render(){
   const items = filtradas();
+  document.getElementById("count").textContent = `${items.length} de ${DATA.total} modelos`;
+  document.getElementById("empty").style.display = items.length?"none":"block";
   const grid = document.getElementById("grid");
-  document.getElementById("count").textContent = `${items.length} moto${items.length!==1?'s':''}`;
-  document.getElementById("empty").style.display = items.length ? "none" : "block";
-  grid.innerHTML = items.map((m, i) => {
+  grid.innerHTML = items.map(m=>{
     const idx = DATA.motos.indexOf(m);
-    const p = precioTxt(m);
-    const foto = m.foto ? `catalogo-fotos/${m.foto}` : "";
-    return `<div class="card" data-i="${idx}">
-      <div class="ph">${foto?`<img loading="lazy" src="${foto}" alt="${esc(m.modelo)}">`:""}</div>
+    const foto = m.foto?`catalogo-fotos/${m.foto}`:"";
+    const nuevo = NUEVOS.test(m.modelo);
+    return `<div class="card">
+      <div class="ph">${foto?`<img loading="lazy" src="${foto}" alt="${esc(m.modelo)}">`:""}${nuevo?'<span class="badge-new">NUEVO</span>':''}</div>
       <div class="body">
-        <span class="tag">${esc(m.categoria)}</span>
+        ${swatchesHtml(m)}
         <h3>${esc(m.modelo)}</h3>
-        <div class="cil">${esc(m.cilindraje||"")}</div>
-        <div class="precio">${p.big}<small>${p.sm}</small></div>
+        <div class="meta">${esc(m.categoria)}${m.cilindraje?' · '+esc(m.cilindraje):''}${m.anio?' · '+esc(m.anio):''}</div>
+        ${precioBlock(m)}
+        <div class="cbtns">
+          <button class="btn btn-ficha" data-i="${idx}">Ver Ficha Técnica</button>
+          <a class="btn btn-cot" target="_blank" rel="noopener" href="${waLink('Hola Yeimy, quiero cotizar la '+m.modelo+'. ¿Me ayudas?')}">Cotizar</a>
+        </div>
       </div>
     </div>`;
   }).join("");
-  grid.querySelectorAll(".card").forEach(c => c.addEventListener("click", () => abrir(+c.dataset.i)));
+  grid.querySelectorAll(".btn-ficha").forEach(b=>b.addEventListener("click",()=>abrir(+b.dataset.i)));
 }
-
 function abrir(i){
   const m = DATA.motos[i];
-  const p = precioTxt(m);
   const foto = m.foto_hero || m.foto;
-  const specsHtml = (m.specs||[]).map(([k,v]) =>
-    `<div class="spec"><div class="k">${esc(k)}</div><div class="v">${esc(v)}</div></div>`).join("");
-  const sw = (m.colores||[]).map(c => `<div class="sw" title="${esc(c.nombre)}" style="background:${esc(c.hex)}"></div>`).join("");
-  const msg = `Hola Yeimy, me interesa la ${m.modelo}. ¿Me das más información y disponibilidad?`;
+  const specs = (m.specs||[]).map(([k,v])=>`<div class="specrow"><div class="k">${esc(k)}</div><div class="v">${esc(v)}</div></div>`).join("");
+  const sw = (m.colores||[]).map(c=>`<div class="swrow"><span class="sw" style="background:${esc(c.hex||'#888')}"></span><span class="swname" style="color:var(--txt)">${esc(c.nombre)}</span></div>`).join("");
+  const ini = cop(m.cuota_inicial);
   document.getElementById("modal").innerHTML = `
-    <div class="mhead">
-      ${foto?`<img src="catalogo-fotos/${foto}" alt="${esc(m.modelo)}">`:""}
-      <button class="close" onclick="cerrar()">×</button>
-    </div>
+    <div class="mph">${foto?`<img src="catalogo-fotos/${foto}" alt="${esc(m.modelo)}">`:""}<button class="close" onclick="cerrar()">×</button></div>
     <div class="mbody">
-      <span class="tag">${esc(m.categoria)}</span>
       <h2>${esc(m.modelo)}</h2>
-      <div class="sub">${esc(m.cilindraje||"")}</div>
-      ${sw?`<div class="swatches">${sw}</div>`:""}
-      <div class="precio-box"><div class="big">${p.big}</div><div class="sm">${p.sm}</div></div>
-      ${m.descripcion?`<div class="desc">${esc(m.descripcion)}</div>`:""}
-      <div class="sec">FICHA TÉCNICA COMPLETA</div>
-      <div class="specs">${specsHtml||'<div class="spec"><div class="v">Consulta la ficha con Yeimy.</div></div>'}</div>
-      <div class="btns">
-        ${m.manual_url?`<a class="btn btn-manual" href="${esc(m.manual_url)}" target="_blank" rel="noopener">📖 Descargar manual y garantía</a>`
-                     :`<button class="btn btn-manual" disabled>Manual: consúltalo con Yeimy</button>`}
-        <a class="btn btn-wa" href="${waLink(msg)}" target="_blank" rel="noopener">💬 Cotizar esta moto por WhatsApp</a>
+      <div class="meta">${esc(m.categoria)}${m.cilindraje?' · '+esc(m.cilindraje):''}${m.anio?' · '+esc(m.anio):''}</div>
+      ${ini?`<div class="mini"><div class="plabel">Cuota inicial (incluye matrícula)</div><div class="big">${ini}</div></div>`:""}
+      <div class="prow" style="margin-top:10px"><span class="l">Precio comercial</span><span class="v">${cop(m.comercial)||'—'}</span></div>
+      <div class="prow"><span class="l">Contado total</span><span class="v">${cop(m.contado)||'—'}</span></div>
+      <div class="disc">Los valores de contado y cuota inicial incluyen gastos de matrícula. Precios referenciales, sujetos a confirmación en punto de venta.</div>
+      ${m.descripcion?`<div class="disc" style="font-style:italic;color:var(--mut)">${esc(m.descripcion)}</div>`:""}
+      <div class="sec">FICHA TÉCNICA</div>
+      ${specs||'<div class="specrow"><div class="v">Consúltala con Yeimy.</div></div>'}
+      ${sw?`<div class="sec">COLORES DISPONIBLES</div>${sw}`:""}
+      <div class="mbtns">
+        ${m.ficha_pdf?`<a class="btn-lg btn-pdf" href="catalogo-fichas/${esc(m.ficha_pdf)}" target="_blank" rel="noopener" download>⬇ Descargar ficha técnica (PDF)</a>`:""}
+        ${m.manual_url?`<a class="btn-lg btn-pdf" style="background:transparent;border:1px solid var(--line);color:var(--txt)" href="${esc(m.manual_url)}" target="_blank" rel="noopener">📖 Manual de propietario y garantía</a>`:""}
+        <a class="btn-lg btn-wa" target="_blank" rel="noopener" href="${waLink('Hola Yeimy, me interesa la '+m.modelo+'. ¿Me das más información y disponibilidad?')}">💬 Cotizar esta moto por WhatsApp</a>
       </div>
     </div>`;
-  const ov = document.getElementById("overlay");
-  ov.classList.add("open");
-  document.body.style.overflow = "hidden";
-  ov.querySelector(".modal").scrollTop = 0;
+  const ov=document.getElementById("overlay"); ov.classList.add("open"); document.body.style.overflow="hidden"; ov.querySelector(".modal").scrollTop=0;
 }
 function cerrar(){ document.getElementById("overlay").classList.remove("open"); document.body.style.overflow=""; }
-function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
-
 init();
 </script>
 </body>

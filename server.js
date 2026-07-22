@@ -2610,6 +2610,7 @@ app.get(PUBLIC_FILES, (req, res) => {
 app.get("/catalogo", (req, res) => res.sendFile(path.join(__dirname, "catalogo.html")));
 app.get("/catalogo.json", (req, res) => res.sendFile(path.join(__dirname, "catalogo.json")));
 app.use("/catalogo-fotos", express.static(path.join(__dirname, "catalogo-fotos")));
+app.use("/catalogo-fichas", express.static(path.join(__dirname, "catalogo-fichas")));
 
 // Todo lo demás (incluyendo /) requiere sesión
 app.use(requireAuth);

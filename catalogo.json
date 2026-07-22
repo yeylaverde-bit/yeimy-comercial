@@ -1,6 +1,7 @@
 {
   "generado": "2026-07-21",
   "asesora": "Yeimy Laverde",
+  "cargo": "Asesora Comercial",
   "telefono": "+57 302 126 6110",
   "whatsapp": "573021266110",
   "dominio": "www.yeimylaverde.com",
@@ -11,11 +12,14 @@
       "marca": "TVS",
       "categoria": "Deportivas",
       "cilindraje": "159.7 CC",
-      "precio": 10527999,
-      "inicial": 2100000,
+      "anio": "2027",
+      "cuota_inicial": 2100000,
+      "comercial": 9649999,
+      "contado": 10527999,
+      "bono": null,
       "colores": [
         {
-          "nombre": "NEGRO NEBULOSA VERDE",
+          "nombre": "Negro Nebulosa",
           "hex": "#1a1a1a"
         }
       ],
@@ -140,18 +144,22 @@
       "manual_url": "https://media.autecomobility.com/recursos/marcas/tvs/manuales/usuario/manual-usuario-apache-rtr-160-4V-ABS.pdf",
       "descripcion": "Algo nunca antes visto en su categoría.",
       "foto": "tvs_apache_160_carburada.jpg",
-      "foto_hero": "tvs_apache_160_carburada_hero.jpg"
+      "foto_hero": "tvs_apache_160_carburada_hero.jpg",
+      "ficha_pdf": "tvs_apache_160_carburada.pdf"
     },
     {
       "modelo": "APACHE 200 CARB ABS",
       "marca": "TVS",
       "categoria": "Deportivas",
       "cilindraje": "197.75 CC",
-      "precio": 13129999,
-      "inicial": 2500000,
+      "anio": "2027",
+      "cuota_inicial": 2500000,
+      "comercial": 12199999,
+      "contado": 13129999,
+      "bono": null,
       "colores": [
         {
-          "nombre": "NEGRO NEBULOSA DORADA",
+          "nombre": "Negro Nebulosa",
           "hex": "#1a1a1a"
         }
       ],
@@ -276,18 +284,22 @@
       "manual_url": "https://media.autecomobility.com/recursos/marcas/tvs/manuales/usuario/Manual-usuario-apache-RTR-200-4V-ABS.pdf",
       "descripcion": "Algo nunca antes visto en su categoría. La Apache RTR 200 4V regresa más imponente que nunca: cómoda, conectada y lista para darte una experiencia de manejo que conquista cualquier carretera.",
       "foto": "tvs_apache_200_carb_abs.jpg",
-      "foto_hero": "tvs_apache_200_carb_abs_hero.jpg"
+      "foto_hero": "tvs_apache_200_carb_abs_hero.jpg",
+      "ficha_pdf": "tvs_apache_200_carb_abs.pdf"
     },
     {
       "modelo": "APACHE RTR 160 4V XC FI",
       "marca": "TVS",
       "categoria": "Deportivas",
       "cilindraje": "159.7 CC",
-      "precio": 11877999,
-      "inicial": 2100000,
+      "anio": "2027",
+      "cuota_inicial": 2100000,
+      "comercial": 10999999,
+      "contado": 11877999,
+      "bono": null,
       "colores": [
         {
-          "nombre": "AZUL CUARZO NEGRO NEBULOSA ROJA",
+          "nombre": "Azul Cuarzo",
           "hex": "#1a1a1a"
         }
       ],
@@ -416,22 +428,26 @@
       "manual_url": "https://media.autecomobility.com/recursos/marcas/tvs/manuales/manual-garantia-apache160fi-nuevo.pdf",
       "descripcion": "La nueva Apache RTR 160 4V FI ABS no tiene competencia en su segmento, con su increíble potencia de 17.3HP. ¡Ninguna de su segmento le gana! Además, cuenta con modos de manejo, RT-FI, frenos ABS y SmartXConnect, tecnología racing exclusiva de TVS, para que disfrutes su ecosistema de conexión, telemetría en ruta, alerta y asistencia en navegación",
       "foto": "tvs_apache_rtr_160_4v_xc_fi.jpg",
-      "foto_hero": "tvs_apache_rtr_160_4v_xc_fi_hero.jpg"
+      "foto_hero": "tvs_apache_rtr_160_4v_xc_fi_hero.jpg",
+      "ficha_pdf": "tvs_apache_rtr_160_4v_xc_fi.pdf"
     },
     {
       "modelo": "APACHE RTR 160 4V XC FI ABS",
       "marca": "TVS",
       "categoria": "Deportivas",
       "cilindraje": "159.7 CC",
-      "precio": 11877999,
-      "inicial": 2100000,
+      "anio": "2027",
+      "cuota_inicial": 2100000,
+      "comercial": 10999999,
+      "contado": 11877999,
+      "bono": null,
       "colores": [
         {
-          "nombre": "AZUL MATE NEGRO NEBULOSA DORADA",
+          "nombre": "Azul Mate",
           "hex": "#1a1a1a"
         },
         {
-          "nombre": "GRIS GRAFITO NEGRO VERDE NEON",
+          "nombre": "Gris Grafito",
           "hex": "#101010"
         }
       ],
@@ -560,18 +576,22 @@
       "manual_url": "https://media.autecomobility.com/recursos/marcas/tvs/manuales/manual-garantia-apache160fi-nuevo.pdf",
       "descripcion": "La nueva Apache RTR 160 4V FI ABS no tiene competencia en su segmento, con su increíble potencia de 17.3HP. ¡Ninguna de su segmento le gana! Además, cuenta con modos de manejo, RT-FI, frenos ABS y SmartXConnect, tecnología racing exclusiva de TVS, para que disfrutes su ecosistema de conexión, telemetría en ruta, alerta y asistencia en navegación",
       "foto": "tvs_apache_rtr_160_4v_xc_fi_abs.jpg",
-      "foto_hero": "tvs_apache_rtr_160_4v_xc_fi_abs_hero.jpg"
+      "foto_hero": "tvs_apache_rtr_160_4v_xc_fi_abs_hero.jpg",
+      "ficha_pdf": "tvs_apache_rtr_160_4v_xc_fi_abs.pdf"
     },
     {
       "modelo": "APACHE RTR 160 4V XC FI ABS E5",
       "marca": "TVS",
       "categoria": "Deportivas",
       "cilindraje": "159.7 CC",
-      "precio": 11877999,
-      "inicial": 2100000,
+      "anio": "2027",
+      "cuota_inicial": 2100000,
+      "comercial": 10999999,
+      "contado": 11877999,
+      "bono": null,
       "colores": [
         {
-          "nombre": "NEGRA NEBULOSA GRIS CARBONO DORADA",
+          "nombre": "Negra Nebulosa",
           "hex": "#1a1a1a"
         }
       ],
@@ -700,18 +720,22 @@
       "manual_url": "https://media.autecomobility.com/recursos/marcas/tvs/manuales/manual-garantia-apache160fi-nuevo.pdf",
       "descripcion": "La nueva Apache RTR 160 4V FI ABS no tiene competencia en su segmento, con su increíble potencia de 17.3HP. ¡Ninguna de su segmento le gana! Además, cuenta con modos de manejo, RT-FI, frenos ABS y SmartXConnect, tecnología racing exclusiva de TVS, para que disfrutes su ecosistema de conexión, telemetría en ruta, alerta y asistencia en navegación",
       "foto": "tvs_apache_rtr_160_4v_xc_fi_abs_e5.jpg",
-      "foto_hero": "tvs_apache_rtr_160_4v_xc_fi_abs_e5_hero.jpg"
+      "foto_hero": "tvs_apache_rtr_160_4v_xc_fi_abs_e5_hero.jpg",
+      "ficha_pdf": "tvs_apache_rtr_160_4v_xc_fi_abs_e5.pdf"
     },
     {
       "modelo": "APACHE RTR 160 4V XC FI RACING",
       "marca": "TVS",
       "categoria": "Deportivas",
       "cilindraje": "159.7 cc",
-      "precio": 11877999,
-      "inicial": 2100000,
+      "anio": "2027",
+      "cuota_inicial": 2100000,
+      "comercial": 10999999,
+      "contado": 11877999,
+      "bono": null,
       "colores": [
         {
-          "nombre": "AZUL CUARZO NEGRO ROJA",
+          "nombre": "Azul Cuarzo",
           "hex": "#101010"
         }
       ],
@@ -832,18 +856,22 @@
       "manual_url": "https://media.autecomobility.com/recursos/marcas/tvs/manuales/manual-garantia-apache160fi-racing.pdf",
       "descripcion": "La nueva Apache RTR 160 4V FI ABS no tiene competencia en su segmento, con su increíble potencia de 17.3HP. ¡Ninguna de su segmento le gana! Además, cuenta con modos de manejo, RT-FI, frenos ABS y SmartXConnect, tecnología racing exclusiva de TVS",
       "foto": "tvs_apache_rtr_160_4v_xc_fi_racing.jpg",
-      "foto_hero": "tvs_apache_rtr_160_4v_xc_fi_racing_hero.jpg"
+      "foto_hero": "tvs_apache_rtr_160_4v_xc_fi_racing_hero.jpg",
+      "ficha_pdf": "tvs_apache_rtr_160_4v_xc_fi_racing.pdf"
     },
     {
       "modelo": "APACHE RTR 200 4V XC",
       "marca": "TVS",
       "categoria": "Deportivas",
       "cilindraje": "197.75 cc",
-      "precio": 13952999,
-      "inicial": 2500000,
+      "anio": "2027",
+      "cuota_inicial": 2500000,
+      "comercial": 12999999,
+      "contado": 13952999,
+      "bono": null,
       "colores": [
         {
-          "nombre": "NEGRA NEBULOSA AZUL",
+          "nombre": "Negra Nebulosa",
           "hex": "#1a1a1a"
         }
       ],
@@ -988,18 +1016,22 @@
       "manual_url": "https://media.autecomobility.com/recursos/marcas/tvs/manuales/manual-garantia-apache200fi-nuevo.pdf",
       "descripcion": "¡La 200 más completa llega a la familia Apache! La Apache 200 FI ABS es la moto más completa en su categoría que está equipada de 3 modos de manejo, RT-FI, conectividad SmartXConnect, frenos ABS y mucho más. Y cuenta con el respaldo de Auteco.",
       "foto": "tvs_apache_rtr_200_4v_xc.jpg",
-      "foto_hero": "tvs_apache_rtr_200_4v_xc_hero.jpg"
+      "foto_hero": "tvs_apache_rtr_200_4v_xc_hero.jpg",
+      "ficha_pdf": "tvs_apache_rtr_200_4v_xc.pdf"
     },
     {
       "modelo": "APACHE RTR 200 4V XC FI ABS",
       "marca": "TVS",
       "categoria": "Deportivas",
       "cilindraje": "197.75 cc",
-      "precio": 13952999,
-      "inicial": 2500000,
+      "anio": "2027",
+      "cuota_inicial": 2500000,
+      "comercial": 12999999,
+      "contado": 13952999,
+      "bono": null,
       "colores": [
         {
-          "nombre": "GRIS GRAFITO NEGRO COBRE",
+          "nombre": "Gris Grafito",
           "hex": "#101010"
         }
       ],
@@ -1144,30 +1176,34 @@
       "manual_url": "https://media.autecomobility.com/recursos/marcas/tvs/manuales/manual-garantia-apache200fi-nuevo.pdf",
       "descripcion": "¡La 200 más completa llega a la familia Apache! La Apache 200 FI ABS es la moto más completa en su categoría que está equipada de 3 modos de manejo, RT-FI, conectividad SmartXConnect, frenos ABS y mucho más. Y cuenta con el respaldo de Auteco.",
       "foto": "tvs_apache_rtr_200_4v_xc_fi_abs.jpg",
-      "foto_hero": "tvs_apache_rtr_200_4v_xc_fi_abs_hero.jpg"
+      "foto_hero": "tvs_apache_rtr_200_4v_xc_fi_abs_hero.jpg",
+      "ficha_pdf": "tvs_apache_rtr_200_4v_xc_fi_abs.pdf"
     },
     {
       "modelo": "RAIDER 125",
       "marca": "TVS",
       "categoria": "Deportivas",
       "cilindraje": "124.79 CC",
-      "precio": 8721999,
-      "inicial": 1650000,
+      "anio": "2027",
+      "cuota_inicial": 1650000,
+      "comercial": 7999999,
+      "contado": 8721999,
+      "bono": null,
       "colores": [
         {
-          "nombre": "AZUL ARLEQUIN",
+          "nombre": "Azul Arlequin",
           "hex": "#1d4ed8"
         },
         {
-          "nombre": "GRIS CARBONO",
+          "nombre": "Gris Carbono",
           "hex": "#4a4a4a"
         },
         {
-          "nombre": "NEGRO GRIS",
+          "nombre": "Negro Gris",
           "hex": "#101010"
         },
         {
-          "nombre": "NEGRO NEBULOSA",
+          "nombre": "Negro Nebulosa",
           "hex": "#1a1a1a"
         }
       ],
@@ -1280,26 +1316,30 @@
       "manual_url": "https://media.autecomobility.com/recursos/marcas/tvs/manuales/manual-garantia-raider-125.pdf",
       "descripcion": "¡Bienvenidos a la nueva Generación! La TVS Raider 125 viene a cambiar las reglas del juego, es perfecta para una nueva generación retadora, exigente y sin límites que siempre quiere lo mejor.",
       "foto": "tvs_raider_125.jpg",
-      "foto_hero": "tvs_raider_125_hero.jpg"
+      "foto_hero": "tvs_raider_125_hero.jpg",
+      "ficha_pdf": "tvs_raider_125.pdf"
     },
     {
       "modelo": "RAIDER 125 ACC",
       "marca": "TVS",
       "categoria": "Deportivas",
       "cilindraje": "124.79 CC",
-      "precio": 8721999,
-      "inicial": 1650000,
+      "anio": "2027",
+      "cuota_inicial": 1650000,
+      "comercial": 7999999,
+      "contado": 8721999,
+      "bono": null,
       "colores": [
         {
-          "nombre": "AZUL ARLEQUIN",
+          "nombre": "Azul Arlequin",
           "hex": "#1d4ed8"
         },
         {
-          "nombre": "GRIS CARBONO",
+          "nombre": "Gris Carbono",
           "hex": "#4a4a4a"
         },
         {
-          "nombre": "NEGRA NEBULOSA",
+          "nombre": "Negra Nebulosa",
           "hex": "#1a1a1a"
         }
       ],
@@ -1412,22 +1452,26 @@
       "manual_url": "https://media.autecomobility.com/recursos/marcas/tvs/manuales/manual-garantia-raider-125.pdf",
       "descripcion": "¡Bienvenidos a la nueva Generación! La TVS Raider 125 viene a cambiar las reglas del juego, es perfecta para una nueva generación retadora, exigente y sin límites que siempre quiere lo mejor.",
       "foto": "tvs_raider_125_acc.jpg",
-      "foto_hero": "tvs_raider_125_acc_hero.jpg"
+      "foto_hero": "tvs_raider_125_acc_hero.jpg",
+      "ficha_pdf": "tvs_raider_125_acc.pdf"
     },
     {
       "modelo": "RAIDER 125 ACC SBT",
       "marca": "TVS",
       "categoria": "Deportivas",
       "cilindraje": "124.79 CC",
-      "precio": 8521999,
-      "inicial": 1650000,
+      "anio": "2027",
+      "cuota_inicial": 1650000,
+      "comercial": 7799999,
+      "contado": 8521999,
+      "bono": null,
       "colores": [
         {
-          "nombre": "GRIS CARBONO",
+          "nombre": "Gris Carbono",
           "hex": "#4a4a4a"
         },
         {
-          "nombre": "NEGRO NEBULOSA",
+          "nombre": "Negro Nebulosa",
           "hex": "#1a1a1a"
         }
       ],
@@ -1540,26 +1584,30 @@
       "manual_url": "https://media.autecomobility.com/recursos/marcas/tvs/manuales/manual-garantia-raider-125.pdf",
       "descripcion": "¡Bienvenidos a la nueva Generación! La TVS Raider 125 viene a cambiar las reglas del juego, es perfecta para una nueva generación retadora, exigente y sin límites que siempre quiere lo mejor.",
       "foto": "tvs_raider_125_acc_sbt.jpg",
-      "foto_hero": "tvs_raider_125_acc_sbt_hero.jpg"
+      "foto_hero": "tvs_raider_125_acc_sbt_hero.jpg",
+      "ficha_pdf": "tvs_raider_125_acc_sbt.pdf"
     },
     {
       "modelo": "RAIDER 125 FI",
       "marca": "TVS",
       "categoria": "Deportivas",
       "cilindraje": "124.8 cc",
-      "precio": 9471999,
-      "inicial": 1700000,
+      "anio": "2027",
+      "cuota_inicial": 1700000,
+      "comercial": 8749999,
+      "contado": 9471999,
+      "bono": null,
       "colores": [
         {
-          "nombre": "AZUL FORZA GRIS",
+          "nombre": "Azul Forza",
           "hex": "#7a7a7a"
         },
         {
-          "nombre": "GRIS CALIFORNIA DORADA",
+          "nombre": "Gris California",
           "hex": "#5e5e5e"
         },
         {
-          "nombre": "NEGRO NEBULOSA GRIS",
+          "nombre": "Negro Nebulosa",
           "hex": "#1a1a1a"
         }
       ],
@@ -1672,18 +1720,22 @@
       "manual_url": "https://media.autecomobility.com/recursos/marcas/tvs/manuales/manual-garantia-raider-125FI.pdf",
       "descripcion": "Bienvenido a la generación imparable: la nueva Raider Fi viene inyectada de poder con su tecnología de vanguardia FI, que brinda una mezcla perfecta",
       "foto": "tvs_raider_125_fi.jpg",
-      "foto_hero": "tvs_raider_125_fi_hero.jpg"
+      "foto_hero": "tvs_raider_125_fi_hero.jpg",
+      "ficha_pdf": "tvs_raider_125_fi.pdf"
     },
     {
       "modelo": "RAIDER 125 FI NEBULOSA",
       "marca": "TVS",
       "categoria": "Deportivas",
       "cilindraje": "124.8 cc",
-      "precio": 9471999,
-      "inicial": 1700000,
+      "anio": "2027",
+      "cuota_inicial": 1700000,
+      "comercial": 8749999,
+      "contado": 9471999,
+      "bono": null,
       "colores": [
         {
-          "nombre": "NEGRO GRIS",
+          "nombre": "Negro Gris",
           "hex": "#101010"
         }
       ],
@@ -1796,18 +1848,22 @@
       "manual_url": "https://media.autecomobility.com/recursos/marcas/tvs/manuales/manual-garantia-raider-125FI.pdf",
       "descripcion": "Bienvenido a la generación imparable: la nueva Raider Fi viene inyectada de poder con su tecnología de vanguardia FI, que brinda una mezcla perfecta",
       "foto": "tvs_raider_125_fi_nebulosa.jpg",
-      "foto_hero": "tvs_raider_125_fi_nebulosa_hero.jpg"
+      "foto_hero": "tvs_raider_125_fi_nebulosa_hero.jpg",
+      "ficha_pdf": "tvs_raider_125_fi_nebulosa.pdf"
     },
     {
       "modelo": "RAIDER 125 FI NEGRO NEBULOSA",
       "marca": "TVS",
       "categoria": "Deportivas",
       "cilindraje": "124.8 cc",
-      "precio": 9471999,
-      "inicial": 1700000,
+      "anio": "2027",
+      "cuota_inicial": 1700000,
+      "comercial": 8749999,
+      "contado": 9471999,
+      "bono": null,
       "colores": [
         {
-          "nombre": "NEGRO GRIS",
+          "nombre": "Negro Gris",
           "hex": "#101010"
         }
       ],
@@ -1920,18 +1976,22 @@
       "manual_url": "https://media.autecomobility.com/recursos/marcas/tvs/manuales/manual-garantia-raider-125FI.pdf",
       "descripcion": "Bienvenido a la generación imparable: la nueva Raider Fi viene inyectada de poder con su tecnología de vanguardia FI, que brinda una mezcla perfecta",
       "foto": "tvs_raider_125_fi_negro_nebulosa.jpg",
-      "foto_hero": "tvs_raider_125_fi_negro_nebulosa_hero.jpg"
+      "foto_hero": "tvs_raider_125_fi_negro_nebulosa_hero.jpg",
+      "ficha_pdf": "tvs_raider_125_fi_negro_nebulosa.pdf"
     },
     {
       "modelo": "RAIDER 125 RAC",
       "marca": "TVS",
       "categoria": "Deportivas",
       "cilindraje": "124.79 cc",
-      "precio": 8771999,
-      "inicial": 1650000,
+      "anio": "2027",
+      "cuota_inicial": 1650000,
+      "comercial": 8049999,
+      "contado": 8771999,
+      "bono": null,
       "colores": [
         {
-          "nombre": "GRIS CALIFORNIA",
+          "nombre": "Gris California",
           "hex": "#5e5e5e"
         }
       ],
@@ -2044,18 +2104,22 @@
       "manual_url": "https://media.autecomobility.com/recursos/marcas/tvs/manuales/manual-garantia-125-racing.pdf",
       "descripcion": "Te invitamos a ser parte de la Nueva Generación que se impone en Diseño, Tecnología y Seguridad. ¡Una moto que no se parece a ninguna, por eso es la moto del año en Colombia!",
       "foto": "tvs_raider_125_rac.jpg",
-      "foto_hero": "tvs_raider_125_rac_hero.jpg"
+      "foto_hero": "tvs_raider_125_rac_hero.jpg",
+      "ficha_pdf": "tvs_raider_125_rac.pdf"
     },
     {
       "modelo": "RAIDER 125 RACING",
       "marca": "TVS",
       "categoria": "Deportivas",
       "cilindraje": "124.79 cc",
-      "precio": 8771999,
-      "inicial": 1650000,
+      "anio": "2027",
+      "cuota_inicial": 1650000,
+      "comercial": 8049999,
+      "contado": 8771999,
+      "bono": null,
       "colores": [
         {
-          "nombre": "GRIS CALIFORNIA ROJA",
+          "nombre": "Gris California",
           "hex": "#5e5e5e"
         }
       ],
@@ -2168,18 +2232,22 @@
       "manual_url": "https://media.autecomobility.com/recursos/marcas/tvs/manuales/manual-garantia-125-racing.pdf",
       "descripcion": "Te invitamos a ser parte de la Nueva Generación que se impone en Diseño, Tecnología y Seguridad. ¡Una moto que no se parece a ninguna, por eso es la moto del año en Colombia!",
       "foto": "tvs_raider_125_racing.jpg",
-      "foto_hero": "tvs_raider_125_racing_hero.jpg"
+      "foto_hero": "tvs_raider_125_racing_hero.jpg",
+      "ficha_pdf": "tvs_raider_125_racing.pdf"
     },
     {
       "modelo": "RAIDER 125 TK",
       "marca": "TVS",
       "categoria": "Deportivas",
       "cilindraje": "124.79 CC",
-      "precio": 8721999,
-      "inicial": 1650000,
+      "anio": "2027",
+      "cuota_inicial": 1650000,
+      "comercial": 7999999,
+      "contado": 8721999,
+      "bono": null,
       "colores": [
         {
-          "nombre": "NEGRO",
+          "nombre": "Negro",
           "hex": "#101010"
         }
       ],
@@ -2292,18 +2360,22 @@
       "manual_url": "https://media.autecomobility.com/recursos/marcas/tvs/manuales/manual-garantia-raider-125.pdf",
       "descripcion": "¡Bienvenidos a la nueva Generación! La TVS Raider 125 viene a cambiar las reglas del juego, es perfecta para una nueva generación retadora, exigente y sin límites que siempre quiere lo mejor.",
       "foto": "tvs_raider_125_tk.jpg",
-      "foto_hero": "tvs_raider_125_tk_hero.jpg"
+      "foto_hero": "tvs_raider_125_tk_hero.jpg",
+      "ficha_pdf": "tvs_raider_125_tk.pdf"
     },
     {
       "modelo": "AGILITY FUSION (124.6CC)",
       "marca": "KYMCO",
       "categoria": "Automáticas o Scooter",
       "cilindraje": "124.6 cc",
-      "precio": 10621000,
-      "inicial": 1800000,
+      "anio": "2027",
+      "cuota_inicial": 1800000,
+      "comercial": 9899000,
+      "contado": 10621000,
+      "bono": null,
       "colores": [
         {
-          "nombre": "GRIS GRAFITO AZUL",
+          "nombre": "Gris Grafito",
           "hex": "#3a3a3a"
         }
       ],
@@ -2432,18 +2504,22 @@
       "manual_url": "https://media.autecomobility.com/recursos/marcas/kymco/manuales-actualizados-diciembre-2025/Manual-de-garantia-y-mantenimiento-Agility-Fusion.pdf",
       "descripcion": "",
       "foto": "kymco_agility_fusion_124_6cc.jpg",
-      "foto_hero": "kymco_agility_fusion_124_6cc_hero.jpg"
+      "foto_hero": "kymco_agility_fusion_124_6cc_hero.jpg",
+      "ficha_pdf": "kymco_agility_fusion_124_6cc.pdf"
     },
     {
       "modelo": "NTORQ 125",
       "marca": "TVS",
       "categoria": "Automáticas o Scooter",
       "cilindraje": "124.79 CC",
-      "precio": 8921999,
-      "inicial": 1800000,
+      "anio": "2027",
+      "cuota_inicial": 1800000,
+      "comercial": 8199999,
+      "contado": 8921999,
+      "bono": null,
       "colores": [
         {
-          "nombre": "NEGRO MATE DORADA",
+          "nombre": "Negro Mate",
           "hex": "#222222"
         }
       ],
@@ -2556,22 +2632,26 @@
       "manual_url": "https://media.autecomobility.com/recursos/marcas/tvs/manuales/manual-ntorq-nuevo.pdf",
       "descripcion": "Diseñada para ser un ícono urbano, la TVS Ntorq 125 está lista para sorprenderte al ser la scooter más conectada de Colombia. Disfruta de su impresionante tecnología SmartXConnect y de su potencia inigualable que te hará destacar en cada recorrido.",
       "foto": "tvs_ntorq_125.jpg",
-      "foto_hero": "tvs_ntorq_125_hero.jpg"
+      "foto_hero": "tvs_ntorq_125_hero.jpg",
+      "ficha_pdf": "tvs_ntorq_125.pdf"
     },
     {
       "modelo": "NTORQ 125 XCONNECT",
       "marca": "TVS",
       "categoria": "Automáticas o Scooter",
       "cilindraje": "124.79 CC",
-      "precio": 10921999,
-      "inicial": 1800000,
+      "anio": "2027",
+      "cuota_inicial": 1800000,
+      "comercial": 10199999,
+      "contado": 10921999,
+      "bono": null,
       "colores": [
         {
-          "nombre": "AZUL PETROLEO COBRE",
+          "nombre": "Azul Petroleo",
           "hex": "#0c4a6e"
         },
         {
-          "nombre": "NEGRO MATE DORADA",
+          "nombre": "Negro Mate",
           "hex": "#222222"
         }
       ],
@@ -2684,22 +2764,26 @@
       "manual_url": "https://media.autecomobility.com/recursos/marcas/tvs/manuales/manual-ntorq-nuevo.pdf",
       "descripcion": "Diseñada para ser un ícono urbano, la TVS Ntorq 125 está lista para sorprenderte al ser la scooter más conectada de Colombia. Disfruta de su impresionante tecnología SmartXConnect y de su potencia inigualable que te hará destacar en cada recorrido.",
       "foto": "tvs_ntorq_125_xconnect.jpg",
-      "foto_hero": "tvs_ntorq_125_xconnect_hero.jpg"
+      "foto_hero": "tvs_ntorq_125_xconnect_hero.jpg",
+      "ficha_pdf": "tvs_ntorq_125_xconnect.pdf"
     },
     {
       "modelo": "NEW LIFE 125 TK",
       "marca": "VICTORY",
       "categoria": "Automáticas o Scooter",
       "cilindraje": "124,6 cc",
-      "precio": 8371000,
-      "inicial": 1550000,
+      "anio": "2027",
+      "cuota_inicial": 1550000,
+      "comercial": 7649000,
+      "contado": 8371000,
+      "bono": null,
       "colores": [
         {
-          "nombre": "NEGRA MATE MULTICOLOR",
+          "nombre": "Negra Mate",
           "hex": "#222222"
         },
         {
-          "nombre": "NEGRO NEBULOSA NEGRO MATE NARANJA",
+          "nombre": "Negro Nebulosa",
           "hex": "#1a1a1a"
         }
       ],
@@ -2840,18 +2924,22 @@
       "manual_url": "https://media.autecomobility.com/recursos//pdf/manuales/Victory/manuales-2025/Manual-de-garantia-y-mantenimiento-new-life-125-cbs-diciembre-2025.pdf",
       "descripcion": "",
       "foto": "victory_new_life_125_tk.jpg",
-      "foto_hero": "victory_new_life_125_tk_hero.jpg"
+      "foto_hero": "victory_new_life_125_tk_hero.jpg",
+      "ficha_pdf": "victory_new_life_125_tk.pdf"
     },
     {
       "modelo": "MRX 125 TK",
       "marca": "VICTORY",
       "categoria": "Todo Terreno",
       "cilindraje": "124,7 cc",
-      "precio": 9139000,
-      "inicial": 1800000,
+      "anio": "2026",
+      "cuota_inicial": 1800000,
+      "comercial": 9139000,
+      "contado": null,
+      "bono": null,
       "colores": [
         {
-          "nombre": "GRIS GRAFITO NEGRO NEBULOSA VERDE",
+          "nombre": "Gris Grafito",
           "hex": "#1a1a1a"
         }
       ],
@@ -3004,18 +3092,22 @@
       "manual_url": "https://media.autecomobility.com/recursos/pdf/manuales/Victory/Manual-Victory-MRX-125-150.pdf",
       "descripcion": "",
       "foto": "victory_mrx_125_tk.jpg",
-      "foto_hero": "victory_mrx_125_tk_hero.jpg"
+      "foto_hero": "victory_mrx_125_tk_hero.jpg",
+      "ficha_pdf": "victory_mrx_125_tk.pdf"
     },
     {
       "modelo": "MRX 200",
       "marca": "VICTORY",
       "categoria": "Todo Terreno",
       "cilindraje": "199,6 cc",
-      "precio": 13014000,
-      "inicial": 2500000,
+      "anio": "2027",
+      "cuota_inicial": 2500000,
+      "comercial": 12090000,
+      "contado": 13014000,
+      "bono": null,
       "colores": [
         {
-          "nombre": "GRIS GRAFITO NEGRO NEBULOSA GRIS",
+          "nombre": "Gris Grafito",
           "hex": "#1a1a1a"
         }
       ],
@@ -3156,18 +3248,22 @@
       "manual_url": "https://media.autecomobility.com/recursos/pdf/manuales/Victory/manuales-2025/Manual-de-garantia-y-mantenimiento-Victory-MRX-200-ABS-diciembre-2025.pdf",
       "descripcion": "",
       "foto": "victory_mrx_200.jpg",
-      "foto_hero": "victory_mrx_200_hero.jpg"
+      "foto_hero": "victory_mrx_200_hero.jpg",
+      "ficha_pdf": "victory_mrx_200.pdf"
     },
     {
       "modelo": "MRX ARIZONA",
       "marca": "VICTORY",
       "categoria": "Todo Terreno",
       "cilindraje": "199,5 cc",
-      "precio": 13514000,
-      "inicial": 2500000,
+      "anio": "2027",
+      "cuota_inicial": 2500000,
+      "comercial": 12590000,
+      "contado": 13514000,
+      "bono": null,
       "colores": [
         {
-          "nombre": "NEGRO MATE NEGRO NEBULOSA NEGRA",
+          "nombre": "Negro Mate",
           "hex": "#1a1a1a"
         }
       ],
@@ -3308,18 +3404,22 @@
       "manual_url": "https://media.autecomobility.com/recursos/pdf/manuales/Victory/manuales-2025/Manual-de-garantia-y-mantenimiento-Victory-MRX-Arizona-ABS-diciembre-2025.pdf",
       "descripcion": "",
       "foto": "victory_mrx_arizona.jpg",
-      "foto_hero": "victory_mrx_arizona_hero.jpg"
+      "foto_hero": "victory_mrx_arizona_hero.jpg",
+      "ficha_pdf": "victory_mrx_arizona.pdf"
     },
     {
       "modelo": "MRX ARIZONA FOX TK",
       "marca": "VICTORY",
       "categoria": "Todo Terreno",
       "cilindraje": "199,5 cc",
-      "precio": 13514000,
-      "inicial": 2500000,
+      "anio": "2027",
+      "cuota_inicial": 2500000,
+      "comercial": 12590000,
+      "contado": 13514000,
+      "bono": null,
       "colores": [
         {
-          "nombre": "GRIS CALIFORNIA NEGRO NEBULOSA ROJA",
+          "nombre": "Gris California",
           "hex": "#1a1a1a"
         }
       ],
@@ -3460,18 +3560,22 @@
       "manual_url": "https://media.autecomobility.com/recursos/pdf/manuales/Victory/manuales-2025/Manual-de-garantia-y-mantenimiento-Victory-MRX-Arizona-ABS-diciembre-2025.pdf",
       "descripcion": "",
       "foto": "victory_mrx_arizona_fox_tk.jpg",
-      "foto_hero": "victory_mrx_arizona_fox_tk_hero.jpg"
+      "foto_hero": "victory_mrx_arizona_fox_tk_hero.jpg",
+      "ficha_pdf": "victory_mrx_arizona_fox_tk.pdf"
     },
     {
       "modelo": "MRX ARIZONA XPLORE",
       "marca": "VICTORY",
       "categoria": "Todo Terreno",
       "cilindraje": "199,5 cc",
-      "precio": 13514000,
-      "inicial": 2500000,
+      "anio": "2027",
+      "cuota_inicial": 2500000,
+      "comercial": 12590000,
+      "contado": 13514000,
+      "bono": null,
       "colores": [
         {
-          "nombre": "NEGRO NEBULOSA GRIS PIEDRA ROJA",
+          "nombre": "Negro Nebulosa",
           "hex": "#1a1a1a"
         }
       ],
@@ -3616,18 +3720,22 @@
       "manual_url": "https://media.autecomobility.com/recursos/pdf/manuales/manuales-combustion-septiembre-2025/Manual-de-garantia-y-mantenimiento-MRX-Arizona.pdf",
       "descripcion": "",
       "foto": "victory_mrx_arizona_xplore.jpg",
-      "foto_hero": "victory_mrx_arizona_xplore_hero.jpg"
+      "foto_hero": "victory_mrx_arizona_xplore_hero.jpg",
+      "ficha_pdf": "victory_mrx_arizona_xplore.pdf"
     },
     {
       "modelo": "MRX125 FOX TK",
       "marca": "VICTORY",
       "categoria": "Todo Terreno",
       "cilindraje": "124,7 cc",
-      "precio": 10512000,
-      "inicial": 1800000,
+      "anio": "2027",
+      "cuota_inicial": 1800000,
+      "comercial": 9790000,
+      "contado": 10512000,
+      "bono": null,
       "colores": [
         {
-          "nombre": "GRIS CALIFORNIA NEGRO NEBULOSA ROJA",
+          "nombre": "Gris California",
           "hex": "#1a1a1a"
         }
       ],
@@ -3780,18 +3888,22 @@
       "manual_url": "https://media.autecomobility.com/recursos/pdf/manuales/Victory/Manual-Victory-MRX-125-150.pdf",
       "descripcion": "",
       "foto": "victory_mrx125_fox_tk.jpg",
-      "foto_hero": "victory_mrx125_fox_tk_hero.jpg"
+      "foto_hero": "victory_mrx125_fox_tk_hero.jpg",
+      "ficha_pdf": "victory_mrx125_fox_tk.pdf"
     },
     {
       "modelo": "MRX125 TK",
       "marca": "VICTORY",
       "categoria": "Todo Terreno",
       "cilindraje": "124,7 cc",
-      "precio": 9139000,
-      "inicial": 1800000,
+      "anio": "2026",
+      "cuota_inicial": 1800000,
+      "comercial": 9139000,
+      "contado": null,
+      "bono": null,
       "colores": [
         {
-          "nombre": "GRIS GRAFITO NEGRO NEBULOSA VERDE",
+          "nombre": "Gris Grafito",
           "hex": "#1a1a1a"
         }
       ],
@@ -3944,18 +4056,22 @@
       "manual_url": "https://media.autecomobility.com/recursos/pdf/manuales/Victory/Manual-Victory-MRX-125-150.pdf",
       "descripcion": "",
       "foto": "victory_mrx125_tk.jpg",
-      "foto_hero": "victory_mrx125_tk_hero.jpg"
+      "foto_hero": "victory_mrx125_tk_hero.jpg",
+      "ficha_pdf": "victory_mrx125_tk.pdf"
     },
     {
       "modelo": "MRX150 FOX TK",
       "marca": "VICTORY",
       "categoria": "Todo Terreno",
       "cilindraje": "149,2 cc",
-      "precio": 11241000,
-      "inicial": 2300000,
+      "anio": "2027",
+      "cuota_inicial": 2300000,
+      "comercial": 10340000,
+      "contado": 11241000,
+      "bono": null,
       "colores": [
         {
-          "nombre": "GRIS CALIFORNIA NEGRO NEBULOSA ROJA",
+          "nombre": "Gris California",
           "hex": "#1a1a1a"
         }
       ],
@@ -4104,18 +4220,22 @@
       "manual_url": "https://media.autecomobility.com/recursos/pdf/manuales/Victory/manuales-2026/Manual-de-garantia-y-mantenimiento-Victory-ONE-MP-CBS-marzo-2026.pdf",
       "descripcion": "",
       "foto": "victory_mrx150_fox_tk.jpg",
-      "foto_hero": "victory_mrx150_fox_tk_hero.jpg"
+      "foto_hero": "victory_mrx150_fox_tk_hero.jpg",
+      "ficha_pdf": "victory_mrx150_fox_tk.pdf"
     },
     {
       "modelo": "MRX150 TK",
       "marca": "VICTORY",
       "categoria": "Todo Terreno",
       "cilindraje": "149,2 cc",
-      "precio": 10741000,
-      "inicial": 2300000,
+      "anio": "2027",
+      "cuota_inicial": 2300000,
+      "comercial": 9840000,
+      "contado": 10741000,
+      "bono": null,
       "colores": [
         {
-          "nombre": "GRIS GRAFITO NEGRO NEBULOSA ROJA",
+          "nombre": "Gris Grafito",
           "hex": "#1a1a1a"
         }
       ],
@@ -4264,18 +4384,22 @@
       "manual_url": "https://media.autecomobility.com/recursos/pdf/manuales/Victory/manuales-2026/Manual-de-garantia-y-mantenimiento-Victory-ONE-MP-CBS-marzo-2026.pdf",
       "descripcion": "",
       "foto": "victory_mrx150_tk.jpg",
-      "foto_hero": "victory_mrx150_tk_hero.jpg"
+      "foto_hero": "victory_mrx150_tk_hero.jpg",
+      "ficha_pdf": "victory_mrx150_tk.pdf"
     },
     {
       "modelo": "SPORT 100 ELS SP",
       "marca": "TVS",
       "categoria": "de Trabajo y Transporte",
       "cilindraje": "99.7 cc",
-      "precio": 6379999,
-      "inicial": null,
+      "anio": "2027",
+      "cuota_inicial": null,
+      "comercial": 5749999,
+      "contado": 6379999,
+      "bono": null,
       "colores": [
         {
-          "nombre": "GRIS DORADA DORADA",
+          "nombre": "Gris Dorada",
           "hex": "#a6967c"
         }
       ],
@@ -4388,18 +4512,22 @@
       "manual_url": "https://media.autecomobility.com/recursos/marcas/tvs/manuales/manual-garantia.port100-els-nuevo.pdf",
       "descripcion": "La TVS SPORT 100 es insignia en calidad, economía y comodidad, su motor de 99 cc con tecnología Duralife provee un transporte confiable y eficiente, ahora con todo el respaldo de AUTECO.",
       "foto": "tvs_sport_100_els_sp.jpg",
-      "foto_hero": "tvs_sport_100_els_sp_hero.jpg"
+      "foto_hero": "tvs_sport_100_els_sp_hero.jpg",
+      "ficha_pdf": "tvs_sport_100_els_sp.pdf"
     },
     {
       "modelo": "SPORT KLS SPOKE",
       "marca": "TVS",
       "categoria": "de Trabajo y Transporte",
       "cilindraje": "99.7 cc",
-      "precio": 6129999,
-      "inicial": null,
+      "anio": "2027",
+      "cuota_inicial": null,
+      "comercial": 5499999,
+      "contado": 6129999,
+      "bono": null,
       "colores": [
         {
-          "nombre": "NEGRO NEBULOSA",
+          "nombre": "Negro Nebulosa",
           "hex": "#1a1a1a"
         }
       ],
@@ -4528,18 +4656,22 @@
       "manual_url": "https://media.autecomobility.com/recursos/marcas/tvs/manuales/manual-kls-nuevo.pdf",
       "descripcion": "La TVS SPORT 100 es insignia en calidad, economía y comodidad, su motor de 99 cc con tecnología Duralife provee un transporte confiable y eficiente, ahora con todo el respaldo de AUTECO.",
       "foto": "tvs_sport_kls_spoke.jpg",
-      "foto_hero": "tvs_sport_kls_spoke_hero.jpg"
+      "foto_hero": "tvs_sport_kls_spoke_hero.jpg",
+      "ficha_pdf": "tvs_sport_kls_spoke.pdf"
     },
     {
       "modelo": "MOTOCARRO TRICARGO 200 GRIS PARTICULAR PICK UP ACEITE MULTICOLOR 2027",
       "marca": "TVS",
       "categoria": "Motocarros",
       "cilindraje": "197 cc",
-      "precio": 17238000,
-      "inicial": null,
+      "anio": "2027",
+      "cuota_inicial": null,
+      "comercial": 16140000,
+      "contado": 17238000,
+      "bono": null,
       "colores": [
         {
-          "nombre": "GRIS",
+          "nombre": "Gris",
           "hex": "#7a7a7a"
         }
       ],
@@ -4660,18 +4792,22 @@
       "manual_url": "",
       "descripcion": "",
       "foto": "tvs_motocarro_tricargo_200_gris_particular_pick_up_aceite_multicolor_2027.jpg",
-      "foto_hero": "tvs_motocarro_tricargo_200_gris_particular_pick_up_aceite_multicolor_2027_hero.jpg"
+      "foto_hero": "tvs_motocarro_tricargo_200_gris_particular_pick_up_aceite_multicolor_2027_hero.jpg",
+      "ficha_pdf": "tvs_motocarro_tricargo_200_gris_particular_pick_up_aceite_multicolor_2027.pdf"
     },
     {
       "modelo": "MOTOCARRO TRICARGO 300 PARTICULAR PICKUP NEGRO",
       "marca": "TVS",
       "categoria": "Motocarros",
       "cilindraje": "272 cc",
-      "precio": 26335000,
-      "inicial": null,
+      "anio": "2027",
+      "cuota_inicial": null,
+      "comercial": 24649000,
+      "contado": 26335000,
+      "bono": null,
       "colores": [
         {
-          "nombre": "NEGRO",
+          "nombre": "Negro",
           "hex": "#101010"
         }
       ],
@@ -4788,7 +4924,8 @@
       "manual_url": "",
       "descripcion": "",
       "foto": "tvs_motocarro_tricargo_300_particular_pickup_negro.jpg",
-      "foto_hero": "tvs_motocarro_tricargo_300_particular_pickup_negro_hero.jpg"
+      "foto_hero": "tvs_motocarro_tricargo_300_particular_pickup_negro_hero.jpg",
+      "ficha_pdf": "tvs_motocarro_tricargo_300_particular_pickup_negro.pdf"
     }
   ]
 }
