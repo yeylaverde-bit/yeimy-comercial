@@ -1615,6 +1615,38 @@ app.post("/api/origen-ventas/marcar", requireAuth, requireAdmin, (req, res) => {
   res.json({ ok: true, id, origen: origen || "personal" });
 });
 
+// --- Mover venta de mes (comisión que cae en otro mes) ---
+// Guarda por venta el mes de comisión "YYYY-MM" cuando difiere del mes real de la venta.
+const VENTAS_MES_PATH = path.join(DATA_DIR, "ventas-mes.json");
+function leerVentasMes() {
+  try { if (fs.existsSync(VENTAS_MES_PATH)) return JSON.parse(fs.readFileSync(VENTAS_MES_PATH, "utf8")); }
+  catch (e) { console.warn("[ventas-mes]", e.message); }
+  return {};
+}
+function guardarVentasMes(data) {
+  fs.writeFileSync(VENTAS_MES_PATH, JSON.stringify(data, null, 2), "utf8");
+}
+
+app.get("/api/ventas-mes", requireAuth, requireAdmin, (req, res) => {
+  res.json({ ok: true, ventasMes: leerVentasMes() });
+});
+
+app.post("/api/ventas-mes/marcar", requireAuth, requireAdmin, (req, res) => {
+  const { id, mes } = req.body || {};
+  if (!id) return res.status(400).json({ ok: false, error: "Falta id de la venta" });
+  if (mes && !/^\d{4}-\d{2}$/.test(mes)) {
+    return res.status(400).json({ ok: false, error: "Mes inválido (formato YYYY-MM)" });
+  }
+  const data = leerVentasMes();
+  if (mes) {
+    data[String(id)] = { mes, marcadoEn: new Date().toISOString(), marcadoPor: req.session.userEmail };
+  } else {
+    delete data[String(id)]; // sin mes = vuelve al mes real de la venta
+  }
+  guardarVentasMes(data);
+  res.json({ ok: true, id, mes: mes || null });
+});
+
 // --- Panel admin: sesiones activas ---
 function parsearUserAgent(ua) {
   if (!ua) return { dispositivo: "—", navegador: "—", esMobile: false };

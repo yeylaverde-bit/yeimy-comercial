@@ -42,6 +42,7 @@ const state = {
   charts: {},
   comisionesPagadas: {}, // { "<id_venta>": { pagada: true, fechaPago: "ISO" } }
   origenVentas: {},       // { "<id_venta>": { origen: "personal", marcadoEn } } — default concesionario
+  ventasMovidas: {},      // { "<id_venta>": { mes: "YYYY-MM" } } — comisión que cuenta en otro mes
 };
 
 function idVenta(r) {
@@ -56,12 +57,80 @@ async function loadComisionesPagadas() {
       const d0 = await r0.json();
       if (d0.ok) state.origenVentas = d0.origen || {};
     }
+    const rm = await fetch("/api/ventas-mes").catch(() => null);
+    if (rm && rm.ok) {
+      const dm = await rm.json();
+      if (dm.ok) state.ventasMovidas = dm.ventasMes || {};
+    }
     const r = await fetch("/api/comisiones/pagadas");
     if (!r.ok) return;
     const data = await r.json();
     if (data.ok) state.comisionesPagadas = data.comisiones || {};
   } catch (e) {
     console.error("Error cargando comisiones pagadas:", e);
+  }
+}
+
+// Mes/año EFECTIVO de comisión: el override si la venta fue movida, si no el real.
+function mesEfectivo(r) {
+  const ov = state.ventasMovidas[idVenta(r)];
+  return (ov && ov.mes) || r.mes;
+}
+function anioEfectivo(r) {
+  const m = mesEfectivo(r);
+  return m ? parseInt(m.split("-")[0], 10) : r.anio;
+}
+
+// Mis ventas usando el mes EFECTIVO (respeta ventas movidas) — solo para el cuadro de comisiones.
+function calcularMisRows() {
+  const { marca, medio, search } = state.filters;
+  const mesF = state.filters.mes, anioF = state.filters.anio;
+  const q = (search || "").toLowerCase().trim();
+  return state.rows
+    .filter(isSold)
+    .filter(r => (r.asesor || "").toUpperCase() === MI_NOMBRE)
+    .filter(r => !marca || r.marca === marca)
+    .filter(r => !medio || classifyMedio(r.medio) === medio)
+    .filter(r => !anioF || String(anioEfectivo(r)) === String(anioF))
+    .filter(r => !mesF || mesEfectivo(r) === mesF)
+    .filter(r => !q || [r.asesor, r.modelo, r.marca, r.chasis, r.color, r.financiera].some(v => (v || "").toLowerCase().includes(q)));
+}
+
+// Opciones de mes para mover una venta: mes real ±unos meses.
+function opcionesMesVenta(r) {
+  const base = r.fecha ? new Date(r.fecha.getFullYear(), r.fecha.getMonth(), 1) : new Date();
+  const eff = mesEfectivo(r);
+  const opts = [];
+  for (let d = -1; d <= 3; d++) {
+    const dt = new Date(base.getFullYear(), base.getMonth() + d, 1);
+    const ym = `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, "0")}`;
+    opts.push(ym);
+  }
+  if (!opts.includes(eff)) opts.unshift(eff);
+  return opts.map(ym =>
+    `<option value="${ym}" ${ym === eff ? "selected" : ""}>${formatMes(ym)}${ym === r.mes ? " (real)" : ""}</option>`
+  ).join("");
+}
+
+async function moverVentaMes(id, mes, mesReal) {
+  const nuevoMes = (mes === mesReal) ? null : mes; // volver al real = quitar override
+  try {
+    const r = await fetch("/api/ventas-mes/marcar", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id, mes: nuevoMes }),
+    });
+    const data = await r.json();
+    if (data.ok) {
+      if (nuevoMes) state.ventasMovidas[String(id)] = { mes: nuevoMes };
+      else delete state.ventasMovidas[String(id)];
+      renderMisVentas();
+      showToast(nuevoMes ? `Movida a ${formatMes(nuevoMes)}` : "Vuelta a su mes real");
+    } else {
+      showToast(data.error || "Error al mover");
+    }
+  } catch {
+    showToast("Error de conexión");
   }
 }
 
@@ -313,9 +382,9 @@ function renderAll() {
 }
 
 function renderMisVentas() {
-  // Mis ventas respetan TODOS los filtros globales (mes, año, marca, etc.)
-  // pero forzamos el asesor = YEIMI
-  const misRows = state.filtered.filter(r => (r.asesor || "").toUpperCase() === MI_NOMBRE);
+  // Mis ventas respetan los filtros globales pero usan el mes EFECTIVO (ventas
+  // movidas cuentan en el mes al que se movieron). Asesor forzado = YEIMI.
+  const misRows = calcularMisRows();
 
   const unidades = misRows.length;
   const monto = misRows.reduce((s, r) => s + r.monto, 0);
@@ -393,7 +462,13 @@ function renderMisVentas() {
 
     return `
       <tr class="${isPagada ? 'fila-pagada' : ''}" data-vid="${escapeHtml(id)}">
-        <td>${r.fecha ? r.fecha.toLocaleDateString("es-CO") : "—"}</td>
+        <td>
+          ${r.fecha ? r.fecha.toLocaleDateString("es-CO") : "—"}
+          <div style="margin-top:4px">
+            <select class="sel-mes-venta" data-vid="${escapeHtml(id)}" data-real="${escapeHtml(r.mes || "")}" title="Cuenta la comisión en este mes" style="font-size:10.5px;padding:2px 4px;background:rgba(120,120,140,.12);border:1px solid var(--line);border-radius:6px;color:var(--text-soft);max-width:120px">${opcionesMesVenta(r)}</select>
+            ${mesEfectivo(r) !== r.mes ? `<div style="font-size:9.5px;color:#f59e0b;margin-top:2px">↷ movida</div>` : ""}
+          </div>
+        </td>
         <td><code style="font-size:11px;color:var(--muted)">${escapeHtml(r.factura || "—")}</code></td>
         <td>${marcaTag}</td>
         <td><strong>${escapeHtml(r.modelo || "—")}</strong></td>
@@ -422,6 +497,13 @@ function renderMisVentas() {
       const id = ev.target.dataset.vid;
       const pagada = ev.target.checked;
       marcarComisionPagada(id, pagada);
+    });
+  });
+
+  // Conectar selectores de mes (mover venta a otro mes de comisión)
+  tbody.querySelectorAll(".sel-mes-venta").forEach(sel => {
+    sel.addEventListener("change", (ev) => {
+      moverVentaMes(ev.target.dataset.vid, ev.target.value, ev.target.dataset.real);
     });
   });
 
