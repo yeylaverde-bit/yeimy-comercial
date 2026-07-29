@@ -4852,6 +4852,53 @@ async function descargarComisionesImagen() {
 const btnDescargar = document.getElementById("btnDescargarComisiones");
 if (btnDescargar) btnDescargar.addEventListener("click", descargarComisionesImagen);
 
+// Exportar a Excel/CSV TODAS las ventas de TODOS los asesores (solo admin).
+// Respeta los filtros globales activos (mes, año, marca, asesor si se eligió).
+// Delimitador ; y BOM UTF-8 para que abra limpio en Excel en español.
+function exportarVentasExcel() {
+  const rows = (state.filtered && state.filtered.length) ? state.filtered : state.rows;
+  if (!rows || !rows.length) { showToast("No hay ventas para exportar"); return; }
+  const cols = [
+    ["Fecha", r => r.fechaStr || ""],
+    ["Factura", r => r.factura || ""],
+    ["Asesor", r => r.asesor || ""],
+    ["Cliente", r => r.cliente || ""],
+    ["Marca", r => r.marca || ""],
+    ["Modelo", r => r.modelo || ""],
+    ["Chasis", r => r.chasis || ""],
+    ["Placa", r => r.placa || ""],
+    ["Municipio", r => r.municipio || ""],
+    ["Medio de pago", r => r.medio || ""],
+    ["Financiera", r => r.financiera || ""],
+    ["Origen comisión", r => r.origen || ""],
+    ["Precio venta", r => Math.round(r.monto || 0)],
+    ["IVA", r => Math.round(r.iva || 0)],
+    ["Base sin IVA", r => Math.round(r.precioSinIva || 0)],
+    ["Costo compra", r => Math.round(r.costoCompra || 0)],
+    ["Utilidad", r => Math.round(r.utilidad || 0)],
+    ["Comisión %", r => r.pctComision ? Math.round(r.pctComision * 100) : ""],
+    ["Comisión", r => Math.round(r.comision || 0)],
+  ];
+  const cell = v => {
+    const s = String(v == null ? "" : v);
+    return /[";\n\r]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+  };
+  const lineas = [cols.map(c => c[0]).join(";")];
+  for (const r of rows) lineas.push(cols.map(c => cell(c[1](r))).join(";"));
+  const csv = lineas.join("\r\n");
+  // BOM UTF-8 (U+FEFF) para que Excel en español lea bien los acentos
+  const blob = new Blob([String.fromCharCode(0xFEFF) + csv], { type: "text/csv;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `ventas_todos_asesores_${new Date().toISOString().slice(0, 10)}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast(`✅ Exportadas ${rows.length} ventas de todos los asesores`);
+}
+const btnExcel = document.getElementById("btnExportarExcel");
+if (btnExcel) btnExcel.addEventListener("click", exportarVentasExcel);
+
 // ============================================================
 //                  SESIÓN / USUARIO / ROL
 // ============================================================
