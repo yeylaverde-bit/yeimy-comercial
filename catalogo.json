@@ -19,8 +19,14 @@
       "bono": null,
       "colores": [
         {
-          "nombre": "Negro Nebulosa",
-          "hex": "#1a1a1a"
+          "nombre": "Negro Nebulosa - Verde",
+          "hex": "#1a1a1a",
+          "foto": "color_tvs_apache_160_carburada_0.jpg"
+        },
+        {
+          "nombre": "Gris Humo - Azul",
+          "hex": "#6b6b6b",
+          "foto": "color_tvs_apache_160_carburada_1.jpg"
         }
       ],
       "specs": [
@@ -159,8 +165,14 @@
       "bono": null,
       "colores": [
         {
-          "nombre": "Negro Nebulosa",
-          "hex": "#1a1a1a"
+          "nombre": "Negro Nebulosa - Dorado",
+          "hex": "#1a1a1a",
+          "foto": "color_tvs_apache_200_carb_abs_0.jpg"
+        },
+        {
+          "nombre": "Top Frost - Rojo",
+          "hex": "#dc2626",
+          "foto": "color_tvs_apache_200_carb_abs_1.jpg"
         }
       ],
       "specs": [
@@ -299,8 +311,14 @@
       "bono": null,
       "colores": [
         {
-          "nombre": "Azul Cuarzo",
-          "hex": "#1a1a1a"
+          "nombre": "Gris Grafito - Azul",
+          "hex": "#3a3a3a",
+          "foto": "color_tvs_apache_rtr_160_4v_xc_fi_0.jpg"
+        },
+        {
+          "nombre": "Negro Nebulosa - Roja",
+          "hex": "#1a1a1a",
+          "foto": "color_tvs_apache_rtr_160_4v_xc_fi_1.jpg"
         }
       ],
       "specs": [
@@ -443,12 +461,14 @@
       "bono": null,
       "colores": [
         {
-          "nombre": "Azul Mate",
-          "hex": "#1a1a1a"
+          "nombre": "Gris Grafito - Azul",
+          "hex": "#3a3a3a",
+          "foto": "color_tvs_apache_rtr_160_4v_xc_fi_abs_0.jpg"
         },
         {
-          "nombre": "Gris Grafito",
-          "hex": "#101010"
+          "nombre": "Negro Nebulosa - Roja",
+          "hex": "#1a1a1a",
+          "foto": "color_tvs_apache_rtr_160_4v_xc_fi_abs_1.jpg"
         }
       ],
       "specs": [
@@ -591,8 +611,14 @@
       "bono": null,
       "colores": [
         {
-          "nombre": "Negra Nebulosa",
-          "hex": "#1a1a1a"
+          "nombre": "Gris Grafito - Azul",
+          "hex": "#3a3a3a",
+          "foto": "color_tvs_apache_rtr_160_4v_xc_fi_abs_e5_0.jpg"
+        },
+        {
+          "nombre": "Negro Nebulosa - Roja",
+          "hex": "#1a1a1a",
+          "foto": "color_tvs_apache_rtr_160_4v_xc_fi_abs_e5_1.jpg"
         }
       ],
       "specs": [
@@ -736,7 +762,13 @@
       "colores": [
         {
           "nombre": "Azul Cuarzo",
-          "hex": "#101010"
+          "hex": "#1e3a8a",
+          "foto": "color_tvs_apache_rtr_160_4v_xc_fi_racing_0.jpg"
+        },
+        {
+          "nombre": "Gris Humo",
+          "hex": "#6b6b6b",
+          "foto": "color_tvs_apache_rtr_160_4v_xc_fi_racing_1.jpg"
         }
       ],
       "specs": [
@@ -871,8 +903,19 @@
       "bono": null,
       "colores": [
         {
-          "nombre": "Negra Nebulosa",
-          "hex": "#1a1a1a"
+          "nombre": "Azul Cuarzo",
+          "hex": "#1e3a8a",
+          "foto": "color_tvs_apache_rtr_200_4v_xc_0.jpg"
+        },
+        {
+          "nombre": "Gris Grafito",
+          "hex": "#3a3a3a",
+          "foto": "color_tvs_apache_rtr_200_4v_xc_1.jpg"
+        },
+        {
+          "nombre": "Negro Nebulosa - Roja",
+          "hex": "#1a1a1a",
+          "foto": "color_tvs_apache_rtr_200_4v_xc_2.jpg"
         }
       ],
       "specs": [
@@ -1031,8 +1074,19 @@
       "bono": null,
       "colores": [
         {
+          "nombre": "Azul Cuarzo",
+          "hex": "#1e3a8a",
+          "foto": "color_tvs_apache_rtr_200_4v_xc_fi_abs_0.jpg"
+        },
+        {
           "nombre": "Gris Grafito",
-          "hex": "#101010"
+          "hex": "#3a3a3a",
+          "foto": "color_tvs_apache_rtr_200_4v_xc_fi_abs_1.jpg"
+        },
+        {
+          "nombre": "Negro Nebulosa - Roja",
+          "hex": "#1a1a1a",
+          "foto": "color_tvs_apache_rtr_200_4v_xc_fi_abs_2.jpg"
         }
       ],
       "specs": [
@@ -1191,20 +1245,14 @@
       "bono": null,
       "colores": [
         {
-          "nombre": "Azul Arlequin",
-          "hex": "#1d4ed8"
+          "nombre": "Negra Nebulosa",
+          "hex": "#1a1a1a",
+          "foto": "color_tvs_raider_125_0.jpg"
         },
         {
-          "nombre": "Gris Carbono",
-          "hex": "#4a4a4a"
-        },
-        {
-          "nombre": "Negro Gris",
-          "hex": "#101010"
-        },
-        {
-          "nombre": "Negro Nebulosa",
-          "hex": "#1a1a1a"
+          "nombre": "Verde Slate",
+          "hex": "#16a34a",
+          "foto": "color_tvs_raider_125_1.jpg"
         }
       ],
       "specs": [
@@ -1331,16 +1379,14 @@
       "bono": null,
       "colores": [
         {
-          "nombre": "Azul Arlequin",
-          "hex": "#1d4ed8"
-        },
-        {
-          "nombre": "Gris Carbono",
-          "hex": "#4a4a4a"
-        },
-        {
           "nombre": "Negra Nebulosa",
-          "hex": "#1a1a1a"
+          "hex": "#1a1a1a",
+          "foto": "color_tvs_raider_125_acc_0.jpg"
+        },
+        {
+          "nombre": "Verde Slate",
+          "hex": "#16a34a",
+          "foto": "color_tvs_raider_125_acc_1.jpg"
         }
       ],
       "specs": [
@@ -1467,12 +1513,14 @@
       "bono": null,
       "colores": [
         {
-          "nombre": "Gris Carbono",
-          "hex": "#4a4a4a"
+          "nombre": "Negra Nebulosa",
+          "hex": "#1a1a1a",
+          "foto": "color_tvs_raider_125_acc_sbt_0.jpg"
         },
         {
-          "nombre": "Negro Nebulosa",
-          "hex": "#1a1a1a"
+          "nombre": "Verde Slate",
+          "hex": "#16a34a",
+          "foto": "color_tvs_raider_125_acc_sbt_1.jpg"
         }
       ],
       "specs": [
@@ -1599,16 +1647,14 @@
       "bono": null,
       "colores": [
         {
-          "nombre": "Azul Forza",
-          "hex": "#7a7a7a"
+          "nombre": "Gris California - Dorada",
+          "hex": "#5e5e5e",
+          "foto": "color_tvs_raider_125_fi_0.jpg"
         },
         {
-          "nombre": "Gris California",
-          "hex": "#5e5e5e"
-        },
-        {
-          "nombre": "Negro Nebulosa",
-          "hex": "#1a1a1a"
+          "nombre": "Negro Nebulosa - Gris",
+          "hex": "#1a1a1a",
+          "foto": "color_tvs_raider_125_fi_1.jpg"
         }
       ],
       "specs": [
@@ -1735,8 +1781,14 @@
       "bono": null,
       "colores": [
         {
-          "nombre": "Negro Gris",
-          "hex": "#101010"
+          "nombre": "Gris California - Dorada",
+          "hex": "#5e5e5e",
+          "foto": "color_tvs_raider_125_fi_nebulosa_0.jpg"
+        },
+        {
+          "nombre": "Negro Nebulosa - Gris",
+          "hex": "#1a1a1a",
+          "foto": "color_tvs_raider_125_fi_nebulosa_1.jpg"
         }
       ],
       "specs": [
@@ -1863,8 +1915,14 @@
       "bono": null,
       "colores": [
         {
-          "nombre": "Negro Gris",
-          "hex": "#101010"
+          "nombre": "Gris California - Dorada",
+          "hex": "#5e5e5e",
+          "foto": "color_tvs_raider_125_fi_negro_nebulosa_0.jpg"
+        },
+        {
+          "nombre": "Negro Nebulosa - Gris",
+          "hex": "#1a1a1a",
+          "foto": "color_tvs_raider_125_fi_negro_nebulosa_1.jpg"
         }
       ],
       "specs": [
@@ -1991,8 +2049,14 @@
       "bono": null,
       "colores": [
         {
-          "nombre": "Gris California",
-          "hex": "#5e5e5e"
+          "nombre": "Azul Petróleo - Dorado",
+          "hex": "#1e40af",
+          "foto": "color_tvs_raider_125_rac_0.jpg"
+        },
+        {
+          "nombre": "Gris California Rojo",
+          "hex": "#5e5e5e",
+          "foto": "color_tvs_raider_125_rac_1.jpg"
         }
       ],
       "specs": [
@@ -2119,8 +2183,14 @@
       "bono": null,
       "colores": [
         {
-          "nombre": "Gris California",
-          "hex": "#5e5e5e"
+          "nombre": "Azul Petróleo - Dorado",
+          "hex": "#1e40af",
+          "foto": "color_tvs_raider_125_racing_0.jpg"
+        },
+        {
+          "nombre": "Gris California Rojo",
+          "hex": "#5e5e5e",
+          "foto": "color_tvs_raider_125_racing_1.jpg"
         }
       ],
       "specs": [
@@ -2247,8 +2317,14 @@
       "bono": null,
       "colores": [
         {
-          "nombre": "Negro",
-          "hex": "#101010"
+          "nombre": "Negra Nebulosa",
+          "hex": "#1a1a1a",
+          "foto": "color_tvs_raider_125_tk_0.jpg"
+        },
+        {
+          "nombre": "Verde Slate",
+          "hex": "#16a34a",
+          "foto": "color_tvs_raider_125_tk_1.jpg"
         }
       ],
       "specs": [
@@ -2375,8 +2451,19 @@
       "bono": null,
       "colores": [
         {
-          "nombre": "Gris Grafito",
-          "hex": "#3a3a3a"
+          "nombre": "Azul Petróleo",
+          "hex": "#1e40af",
+          "foto": "color_kymco_agility_fusion_124_6cc_0.jpg"
+        },
+        {
+          "nombre": "Gris Azul",
+          "hex": "#7a7a7a",
+          "foto": "color_kymco_agility_fusion_124_6cc_1.jpg"
+        },
+        {
+          "nombre": "Negro Fucsia",
+          "hex": "#101010",
+          "foto": "color_kymco_agility_fusion_124_6cc_2.jpg"
         }
       ],
       "specs": [
@@ -2519,8 +2606,14 @@
       "bono": null,
       "colores": [
         {
-          "nombre": "Negro Mate",
-          "hex": "#222222"
+          "nombre": "Negro Mate Verde",
+          "hex": "#222222",
+          "foto": "color_tvs_ntorq_125_0.jpg"
+        },
+        {
+          "nombre": "Negro Mate Dorado",
+          "hex": "#222222",
+          "foto": "color_tvs_ntorq_125_1.jpg"
         }
       ],
       "specs": [
@@ -2647,12 +2740,14 @@
       "bono": null,
       "colores": [
         {
-          "nombre": "Azul Petroleo",
-          "hex": "#0c4a6e"
+          "nombre": "Negro Mate Verde",
+          "hex": "#222222",
+          "foto": "color_tvs_ntorq_125_xconnect_0.jpg"
         },
         {
-          "nombre": "Negro Mate",
-          "hex": "#222222"
+          "nombre": "Negro Mate Dorado",
+          "hex": "#222222",
+          "foto": "color_tvs_ntorq_125_xconnect_1.jpg"
         }
       ],
       "specs": [
@@ -2779,12 +2874,14 @@
       "bono": null,
       "colores": [
         {
-          "nombre": "Negra Mate",
-          "hex": "#222222"
+          "nombre": "Gris Piedra Azul",
+          "hex": "#888888",
+          "foto": "color_victory_new_life_125_tk_0.jpg"
         },
         {
-          "nombre": "Negro Nebulosa",
-          "hex": "#1a1a1a"
+          "nombre": "Gris Bruma Negro - Rojo",
+          "hex": "#101010",
+          "foto": "color_victory_new_life_125_tk_1.jpg"
         }
       ],
       "specs": [
@@ -2939,8 +3036,19 @@
       "bono": null,
       "colores": [
         {
-          "nombre": "Gris Grafito",
-          "hex": "#1a1a1a"
+          "nombre": "Blanco Dorado",
+          "hex": "#fafafa",
+          "foto": "color_victory_mrx_125_tk_0.jpg"
+        },
+        {
+          "nombre": "Gris Nopal",
+          "hex": "#7a7a7a",
+          "foto": "color_victory_mrx_125_tk_1.jpg"
+        },
+        {
+          "nombre": "Negro Verde",
+          "hex": "#101010",
+          "foto": "color_victory_mrx_125_tk_2.jpg"
         }
       ],
       "specs": [
@@ -3107,8 +3215,34 @@
       "bono": null,
       "colores": [
         {
-          "nombre": "Gris Grafito",
-          "hex": "#1a1a1a"
+          "nombre": "Gris Acero",
+          "hex": "#7a8186",
+          "foto": "color_victory_mrx_200_0.jpg"
+        },
+        {
+          "nombre": "Blanco Celestial - Azul",
+          "hex": "#1e40af",
+          "foto": "color_victory_mrx_200_1.jpg"
+        },
+        {
+          "nombre": "Gris Nopal - Verde",
+          "hex": "#7a7a7a",
+          "foto": "color_victory_mrx_200_2.jpg"
+        },
+        {
+          "nombre": "Azul Antartica",
+          "hex": "#1e40af",
+          "foto": "color_victory_mrx_200_3.jpg"
+        },
+        {
+          "nombre": "Café Arena",
+          "hex": "#888888",
+          "foto": "color_victory_mrx_200_4.jpg"
+        },
+        {
+          "nombre": "Gris Grafito Negro",
+          "hex": "#101010",
+          "foto": "color_victory_mrx_200_5.jpg"
         }
       ],
       "specs": [
@@ -3263,8 +3397,14 @@
       "bono": null,
       "colores": [
         {
-          "nombre": "Negro Mate",
-          "hex": "#1a1a1a"
+          "nombre": "Blanco Verde",
+          "hex": "#fafafa",
+          "foto": "color_victory_mrx_arizona_0.jpg"
+        },
+        {
+          "nombre": "Negro Dorado",
+          "hex": "#101010",
+          "foto": "color_victory_mrx_arizona_1.jpg"
         }
       ],
       "specs": [
@@ -3419,8 +3559,14 @@
       "bono": null,
       "colores": [
         {
-          "nombre": "Gris California",
-          "hex": "#1a1a1a"
+          "nombre": "Blanco Verde",
+          "hex": "#fafafa",
+          "foto": "color_victory_mrx_arizona_fox_tk_0.jpg"
+        },
+        {
+          "nombre": "Negro Dorado",
+          "hex": "#101010",
+          "foto": "color_victory_mrx_arizona_fox_tk_1.jpg"
         }
       ],
       "specs": [
@@ -3575,8 +3721,9 @@
       "bono": null,
       "colores": [
         {
-          "nombre": "Negro Nebulosa",
-          "hex": "#1a1a1a"
+          "nombre": "Negro Roja",
+          "hex": "#101010",
+          "foto": "color_victory_mrx_arizona_xplore_0.jpg"
         }
       ],
       "specs": [
@@ -3735,8 +3882,19 @@
       "bono": null,
       "colores": [
         {
-          "nombre": "Gris California",
-          "hex": "#1a1a1a"
+          "nombre": "Blanco Dorado",
+          "hex": "#fafafa",
+          "foto": "color_victory_mrx125_fox_tk_0.jpg"
+        },
+        {
+          "nombre": "Gris Nopal",
+          "hex": "#7a7a7a",
+          "foto": "color_victory_mrx125_fox_tk_1.jpg"
+        },
+        {
+          "nombre": "Negro Verde",
+          "hex": "#101010",
+          "foto": "color_victory_mrx125_fox_tk_2.jpg"
         }
       ],
       "specs": [
@@ -3903,8 +4061,19 @@
       "bono": null,
       "colores": [
         {
-          "nombre": "Gris Grafito",
-          "hex": "#1a1a1a"
+          "nombre": "Blanco Dorado",
+          "hex": "#fafafa",
+          "foto": "color_victory_mrx125_tk_0.jpg"
+        },
+        {
+          "nombre": "Gris Nopal",
+          "hex": "#7a7a7a",
+          "foto": "color_victory_mrx125_tk_1.jpg"
+        },
+        {
+          "nombre": "Negro Verde",
+          "hex": "#101010",
+          "foto": "color_victory_mrx125_tk_2.jpg"
         }
       ],
       "specs": [
@@ -4071,8 +4240,14 @@
       "bono": null,
       "colores": [
         {
-          "nombre": "Gris California",
-          "hex": "#1a1a1a"
+          "nombre": "Negro Mate Oro - Oro",
+          "hex": "#222222",
+          "foto": "color_victory_mrx150_fox_tk_0.jpg"
+        },
+        {
+          "nombre": "Gris Piedra Azul",
+          "hex": "#888888",
+          "foto": "color_victory_mrx150_fox_tk_1.jpg"
         }
       ],
       "specs": [
@@ -4235,8 +4410,14 @@
       "bono": null,
       "colores": [
         {
-          "nombre": "Gris Grafito",
-          "hex": "#1a1a1a"
+          "nombre": "Negro Mate Oro - Oro",
+          "hex": "#222222",
+          "foto": "color_victory_mrx150_tk_0.jpg"
+        },
+        {
+          "nombre": "Gris Piedra Azul",
+          "hex": "#888888",
+          "foto": "color_victory_mrx150_tk_1.jpg"
         }
       ],
       "specs": [
@@ -4399,8 +4580,24 @@
       "bono": null,
       "colores": [
         {
-          "nombre": "Gris Dorada",
-          "hex": "#a6967c"
+          "nombre": "Gris Grafito - Verde",
+          "hex": "#3a3a3a",
+          "foto": "color_tvs_sport_100_els_sp_0.jpg"
+        },
+        {
+          "nombre": "Negra Nebulosa - Gris",
+          "hex": "#1a1a1a",
+          "foto": "color_tvs_sport_100_els_sp_1.jpg"
+        },
+        {
+          "nombre": "Negro Nebulosa - Azul",
+          "hex": "#1a1a1a",
+          "foto": "color_tvs_sport_100_els_sp_2.jpg"
+        },
+        {
+          "nombre": "Trakku - Negro Nebulosa - Gris",
+          "hex": "#1a1a1a",
+          "foto": "color_tvs_sport_100_els_sp_3.jpg"
         }
       ],
       "specs": [
@@ -4527,8 +4724,14 @@
       "bono": null,
       "colores": [
         {
-          "nombre": "Negro Nebulosa",
-          "hex": "#1a1a1a"
+          "nombre": "Negro Nebulosa - Roja",
+          "hex": "#1a1a1a",
+          "foto": "color_tvs_sport_kls_spoke_0.jpg"
+        },
+        {
+          "nombre": "Trakku Negro Nebulosa - Rojo",
+          "hex": "#1a1a1a",
+          "foto": "color_tvs_sport_kls_spoke_1.jpg"
         }
       ],
       "specs": [
@@ -4672,7 +4875,8 @@
       "colores": [
         {
           "nombre": "Gris",
-          "hex": "#7a7a7a"
+          "hex": "#7a7a7a",
+          "foto": "color_tvs_motocarro_tricargo_200_gris_particular_pick_up_aceite_multicolor_2027_0.jpg"
         }
       ],
       "specs": [
@@ -4808,7 +5012,8 @@
       "colores": [
         {
           "nombre": "Negro",
-          "hex": "#101010"
+          "hex": "#101010",
+          "foto": "color_tvs_motocarro_tricargo_300_particular_pickup_negro_0.jpg"
         }
       ],
       "specs": [

@@ -101,6 +101,11 @@
   footer{ text-align:center; padding:26px 16px 46px; color:var(--mut2); font-size:12px; border-top:1px solid var(--line); }
   footer b{ color:var(--txt); }
   .empty{ text-align:center; color:var(--mut); padding:50px 16px; }
+  .swpick{ display:flex; align-items:center; gap:9px; width:100%; padding:8px 10px; margin-bottom:6px;
+           background:var(--card2); border:1px solid var(--line); border-radius:10px; cursor:pointer; text-align:left; }
+  .swpick .swname{ color:var(--txt); font-size:13px; font-weight:600; }
+  .swpick.active{ border-color:var(--naranja); }
+  .swpick .sw{ width:20px; height:20px; }
   @media(min-width:560px){ .overlay{ align-items:center } .modal{ border-radius:18px } }
 </style>
 </head>
@@ -221,12 +226,16 @@ function render(){
 }
 function abrir(i){
   const m = DATA.motos[i];
-  const foto = m.foto_hero || m.foto;
+  // Imagen por defecto: la del primer color (color-exacta) si existe, si no la studio/hero
+  const colFoto = (m.colores||[]).find(c=>c.foto);
+  const foto = (colFoto && colFoto.foto) ? colFoto.foto : (m.foto_hero || m.foto);
   const specs = (m.specs||[]).map(([k,v])=>`<div class="specrow"><div class="k">${esc(k)}</div><div class="v">${esc(v)}</div></div>`).join("");
-  const sw = (m.colores||[]).map(c=>`<div class="swrow"><span class="sw" style="background:${esc(c.hex||'#888')}"></span><span class="swname" style="color:var(--txt)">${esc(c.nombre)}</span></div>`).join("");
+  const sw = (m.colores||[]).map((c,ci)=>`<button class="swpick" data-img="${c.foto?esc('catalogo-fotos/'+c.foto):''}" data-ci="${ci}">
+      <span class="sw" style="background:${esc(c.hex||'#888')}"></span>
+      <span class="swname">${esc(c.nombre)}</span></button>`).join("");
   const ini = cop(m.cuota_inicial);
   document.getElementById("modal").innerHTML = `
-    <div class="mph">${foto?`<img src="catalogo-fotos/${foto}" alt="${esc(m.modelo)}">`:""}<button class="close" onclick="cerrar()">×</button></div>
+    <div class="mph">${foto?`<img id="mImg" src="catalogo-fotos/${foto}" alt="${esc(m.modelo)}">`:""}<button class="close" onclick="cerrar()">×</button></div>
     <div class="mbody">
       <h2>${esc(m.modelo)}</h2>
       <div class="meta">${esc(m.categoria)}${m.cilindraje?' · '+esc(m.cilindraje):''}${m.anio?' · '+esc(m.anio):''}</div>
@@ -245,6 +254,15 @@ function abrir(i){
       </div>
     </div>`;
   const ov=document.getElementById("overlay"); ov.classList.add("open"); document.body.style.overflow="hidden"; ov.querySelector(".modal").scrollTop=0;
+  // Al tocar un color, cambiar la imagen a la de ese color
+  const mImg=document.getElementById("mImg");
+  const picks=[...ov.querySelectorAll(".swpick")];
+  picks.forEach(p=>p.addEventListener("click",()=>{
+    const img=p.dataset.img;
+    if(img && mImg){ mImg.src=img; }
+    picks.forEach(x=>x.classList.remove("active")); p.classList.add("active");
+  }));
+  if(picks[0]) picks[0].classList.add("active");
 }
 function cerrar(){ document.getElementById("overlay").classList.remove("open"); document.body.style.overflow=""; }
 init();
