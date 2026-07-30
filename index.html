@@ -84,6 +84,14 @@
       </nav>
     </div>
 
+    <!-- Sidebar SOLO para rol cargataller (Astrid) -->
+    <div class="nav-section" data-role-only="cargataller">
+      <div class="nav-section-title">Mi área</div>
+      <nav class="nav">
+        <a class="active" href="#montartaller">🔧 Montar motos al taller</a>
+      </nav>
+    </div>
+
     <!-- Sidebar SOLO para rol gps_instalar -->
     <div class="nav-section" data-role-only="gps_instalar">
       <div class="nav-section-title">Mi área</div>
@@ -896,6 +904,19 @@
       <div id="gpsActivarLista" style="display:grid;gap:14px"></div>
     </section>
 
+    <!-- Vista SOLO para rol cargataller (Astrid): montar motos preasignadas al taller -->
+    <section id="montartaller" class="card" data-role-only="cargataller">
+      <div class="card-head">
+        <h2>🔧 Montar motos al taller</h2>
+        <span class="badge" id="montarTallerCount">0</span>
+      </div>
+      <p class="muted" style="margin:-4px 0 14px;font-size:13px">
+        Estas son las motos <strong>preasignadas</strong> listas para entrar a taller. Da click en
+        <strong>"→ Montar al taller"</strong> para que el equipo de taller empiece a alistarlas.
+      </p>
+      <div id="montarTallerWrap" style="display:grid;gap:12px"></div>
+    </section>
+
     <section id="taller" class="card" data-role-only="admin asesor dueno taller">
       <div class="card-head">
         <h2>🛠️ Taller · motos en proceso</h2>
@@ -1120,6 +1141,7 @@
               <option value="taller">Taller</option>
               <option value="gps_instalar">GPS Instalación</option>
               <option value="gps_activar">GPS Activación</option>
+              <option value="cargataller">Carga a Taller (solo montar motos al taller)</option>
               <option value="admin">Administrador</option>
             </select></label>
           <div class="modal-actions" style="grid-column:1/-1">

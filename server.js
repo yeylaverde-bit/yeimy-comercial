@@ -612,7 +612,7 @@ function guardarPreasig(data) {
 app.get("/api/preasignaciones/lista", requireAuth, (req, res) => {
   const usuario = buscarUsuario(req.session.userEmail);
   // Contable, dueno, taller, gps_instalar, gps_activar y admin ven todas; asesor solo lo suyo
-  const verTodos = ["contable", "dueno", "taller", "gps_instalar", "gps_activar"].includes(usuario?.rol)
+  const verTodos = ["contable", "dueno", "taller", "gps_instalar", "gps_activar", "cargataller"].includes(usuario?.rol)
     || (req.query.todos === "1" && usuario?.rol === "admin");
   const todas = leerPreasig();
   const out = {};
@@ -713,7 +713,8 @@ app.patch("/api/preasignaciones/:chasis", requireAuth, (req, res) => {
   const esTaller = usuario.rol === "taller";
   const esGpsInstalar = usuario.rol === "gps_instalar";
   const esGpsActivar = usuario.rol === "gps_activar";
-  const esRolEspecial = esTaller || esGpsInstalar || esGpsActivar;
+  const esCargaTaller = usuario.rol === "cargataller";
+  const esRolEspecial = esTaller || esGpsInstalar || esGpsActivar || esCargaTaller;
   const esDueno = todas[chasis].asesorEmail === usuario.email;
   if (!esDueno && usuario.rol !== "admin" && !esRolEspecial) {
     return res.status(403).json({ ok: false, error: "Sin permiso" });
@@ -744,6 +745,20 @@ app.patch("/api/preasignaciones/:chasis", requireAuth, (req, res) => {
     if (req.body.actaEntrega) {
       todas[chasis].actaEntregaEn = new Date().toISOString();
       todas[chasis].actaEntregaPor = usuario.email;
+    }
+  } else if (esCargaTaller && !esDueno && usuario.rol !== "admin") {
+    // Carga a Taller: SOLO puede montar una moto preasignada al taller (pasarla a en_taller).
+    if (req.body.estado !== "en_taller") {
+      return res.status(403).json({ ok: false, error: "Carga a Taller solo puede montar la moto al taller (en_taller)" });
+    }
+    if (todas[chasis].estado !== "preasignada" && todas[chasis].estado !== "en_taller") {
+      return res.status(403).json({ ok: false, error: "Solo se pueden montar motos que están en 'preasignada'" });
+    }
+    todas[chasis].estado = "en_taller";
+    if (!todas[chasis].entradaTaller) {
+      todas[chasis].entradaTaller = new Date().toISOString();
+      todas[chasis].montadaTallerPor = usuario.email;
+      todas[chasis].montadaTallerNombre = usuario.nombre || usuario.email;
     }
   } else if (esGpsInstalar && !esDueno && usuario.rol !== "admin") {
     // GPS instalador solo puede marcar gpsInstaladoEn o gpsInstalarEvidenciaPath
@@ -1786,7 +1801,7 @@ app.post("/api/usuarios/crear", requireAuth, requireAdmin, async (req, res) => {
   if (!email || !nombre || !rol) {
     return res.status(400).json({ ok: false, error: "Faltan campos: email, nombre, rol" });
   }
-  const rolesValidos = ["admin", "asesor", "contable", "dueno", "taller", "gps_instalar", "gps_activar"];
+  const rolesValidos = ["admin", "asesor", "contable", "dueno", "taller", "gps_instalar", "gps_activar", "cargataller"];
   if (!rolesValidos.includes(rol)) {
     return res.status(400).json({ ok: false, error: "Rol inválido. Usar: " + rolesValidos.join(", ") });
   }

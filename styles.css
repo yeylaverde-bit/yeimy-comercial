@@ -288,6 +288,7 @@ body.role-dueno [data-role-only~="dueno"]{display:revert}
 body.role-taller [data-role-only~="taller"]{display:revert}
 body.role-gps_instalar [data-role-only~="gps_instalar"]{display:revert}
 body.role-gps_activar [data-role-only~="gps_activar"]{display:revert}
+body.role-cargataller [data-role-only~="cargataller"]{display:revert}
 
 /* Avatar contable: color verde billete */
 .user-avatar.contable{background:linear-gradient(135deg,#22c55e,#15803d);color:#fff}
@@ -319,6 +320,9 @@ body.role-gps_activar [data-role-only~="gps_activar"]{display:revert}
 .role-banner{background:linear-gradient(135deg,rgba(239,68,68,.10),rgba(245,158,11,.06));border:1px solid rgba(239,68,68,.30);padding:14px 18px;border-radius:12px;margin-bottom:18px;display:flex;align-items:center;gap:14px;font-size:13px}
 .role-banner-ico{font-size:22px;flex-shrink:0}
 .role-banner strong{color:#fca5a5}
+/* El banner de asesor solo debe verlo el rol asesor (el display:flex de arriba
+   empata con [data-role-only]{display:none}; este selector por id lo corrige) */
+body:not(.role-asesor) #roleBanner{display:none}
 
 /* Modal cambio de password (primer login) */
 .modal-backdrop{position:fixed;inset:0;background:rgba(5,8,20,.75);backdrop-filter:blur(4px);z-index:200;display:none;align-items:center;justify-content:center;padding:20px}

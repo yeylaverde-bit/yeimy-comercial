@@ -1851,6 +1851,7 @@ async function loadPreasignaciones() {
       preasigState.preasignaciones = data.preasignaciones || {};
       renderPreasignaciones();
       renderTaller();  // taller depende de preasignaciones
+      try { renderMontarTaller(); } catch {}  // vista del rol cargataller (Astrid)
       try { renderGpsLista("instalar"); } catch {}
       try { renderGpsLista("activar"); } catch {}
       // Re-render Orden Facturación + SOAT: cruza info de preasignaciones
@@ -1860,6 +1861,41 @@ async function loadPreasignaciones() {
       }
     }
   } catch (e) { console.error("Error loadPreasignaciones:", e); }
+}
+
+// Vista del rol "cargataller" (Astrid): motos preasignadas listas para montar al taller.
+function renderMontarTaller() {
+  const wrap = document.getElementById("montarTallerWrap");
+  if (!wrap) return;
+  const pendientes = Object.values(preasigState.preasignaciones)
+    .filter(p => p.estado === "preasignada")
+    .sort((a, b) => (a.creadoEn || "").localeCompare(b.creadoEn || ""));
+  const countEl = document.getElementById("montarTallerCount");
+  if (countEl) countEl.textContent = fmtNum.format(pendientes.length);
+
+  if (pendientes.length === 0) {
+    wrap.innerHTML = `<div style="text-align:center;color:var(--muted);padding:40px;border:1px dashed var(--line);border-radius:12px">
+      ✓ ¡Todo al día! No hay motos preasignadas por montar al taller.</div>`;
+    return;
+  }
+
+  wrap.innerHTML = pendientes.map(p => `
+    <div class="docs-venta-card" style="display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap">
+      <div style="min-width:0;flex:1">
+        <h3 style="margin:0 0 4px">${escapeHtml(p.marca || "")} ${escapeHtml(p.modelo || "")}
+          <span class="muted" style="font-weight:400;font-size:12px">· ${escapeHtml(p.color || "")}</span></h3>
+        <div class="muted" style="font-size:12.5px">
+          Chasis <code style="color:var(--accent-2)">${escapeHtml(p.chasis || "—")}</code>
+          · Placa <strong>${escapeHtml(p.placa || "—")}</strong>
+          · Cliente ${escapeHtml(p.nombreCliente || "—")}
+        </div>
+      </div>
+      <button class="btn-primary" data-montar-taller="${escapeHtml(p.chasis)}" style="padding:11px 18px;font-size:14px;background:#22c55e;border-color:#22c55e;white-space:nowrap">→ Montar al taller</button>
+    </div>`).join("");
+
+  wrap.querySelectorAll("[data-montar-taller]").forEach(b => {
+    b.addEventListener("click", () => cambiarEstadoPreasig(b.dataset.montarTaller, "en_taller"));
+  });
 }
 
 function renderPreasignaciones() {
@@ -5175,7 +5211,7 @@ document.getElementById("formCambiarMiClave")?.addEventListener("submit", async 
 });
 
 function aplicarRol(usuario) {
-  document.body.classList.remove("role-admin", "role-asesor", "role-contable", "role-dueno", "role-taller", "role-gps_instalar", "role-gps_activar");
+  document.body.classList.remove("role-admin", "role-asesor", "role-contable", "role-dueno", "role-taller", "role-gps_instalar", "role-gps_activar", "role-cargataller");
   document.body.classList.add("role-" + usuario.rol);
 
   // User card
@@ -5193,6 +5229,7 @@ function aplicarRol(usuario) {
       taller: "Taller",
       gps_instalar: "GPS Instalación",
       gps_activar: "GPS Activación",
+      cargataller: "Carga a Taller",
     })[usuario.rol] || usuario.rol;
   }
   if (avEl) {
@@ -5213,6 +5250,7 @@ function aplicarRol(usuario) {
     taller: "taller",
     gps_instalar: "gpsinstalar",
     gps_activar: "gpsactivar",
+    cargataller: "montartaller",
   };
   const seccionDefault = seccionPorRol[usuario.rol];
   if (seccionDefault) {
