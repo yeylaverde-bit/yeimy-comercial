@@ -654,14 +654,21 @@ app.post("/api/preasignaciones/crear", requireAuth, (req, res) => {
     // EDICIÓN — merge que preserva el flujo completo (estado taller/GPS/acta/asesor original)
     todas[id] = { ...existente, ...camposForm };
   } else {
-    // CREACIÓN — nuevo registro con defaults
+    // CREACIÓN — nuevo registro con defaults.
+    // El rol "cargataller" (Astrid) entra la moto DIRECTO a taller para alistar.
+    const esCargaTaller = usuario.rol === "cargataller";
     todas[id] = {
       ...camposForm,
-      estado: "preasignada",
+      estado: esCargaTaller ? "en_taller" : "preasignada",
       asesorEmail: usuario.email,
       asesorNombre: usuario.nombre,
       creadoEn: new Date().toISOString(),
     };
+    if (esCargaTaller) {
+      todas[id].entradaTaller = new Date().toISOString();
+      todas[id].montadaTallerPor = usuario.email;
+      todas[id].montadaTallerNombre = usuario.nombre || usuario.email;
+    }
   }
   guardarPreasig(todas);
   res.json({ ok: true, preasignacion: todas[id], modo: existente ? "editado" : "creado" });

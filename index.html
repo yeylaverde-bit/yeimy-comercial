@@ -904,17 +904,32 @@
       <div id="gpsActivarLista" style="display:grid;gap:14px"></div>
     </section>
 
-    <!-- Vista SOLO para rol cargataller (Astrid): montar motos preasignadas al taller -->
+    <!-- Vista SOLO para rol cargataller (Astrid): registrar motos para que taller las aliste -->
     <section id="montartaller" class="card" data-role-only="cargataller">
       <div class="card-head">
         <h2>🔧 Montar motos al taller</h2>
-        <span class="badge" id="montarTallerCount">0</span>
       </div>
-      <p class="muted" style="margin:-4px 0 14px;font-size:13px">
-        Estas son las motos <strong>preasignadas</strong> listas para entrar a taller. Da click en
-        <strong>"→ Montar al taller"</strong> para que el equipo de taller empiece a alistarlas.
+      <p class="muted" style="margin:-4px 0 16px;font-size:13px">
+        Escribe los datos de la moto y da <strong>"→ Enviar a taller"</strong>. La info le llega al
+        equipo de taller para que la aliste.
       </p>
-      <div id="montarTallerWrap" style="display:grid;gap:12px"></div>
+
+      <form id="formMontarTaller" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;max-width:640px;margin-bottom:8px">
+        <label style="grid-column:1/-1"><span>Nro. Chasis *</span>
+          <input name="chasis" required placeholder="9FL..." style="text-transform:uppercase" /></label>
+        <label><span>Nro. Motor</span><input name="motor" placeholder="Ej. AF9AT..." style="text-transform:uppercase" /></label>
+        <label><span>Placa</span><input name="placa" placeholder="Ej. ABC12D" style="text-transform:uppercase" /></label>
+        <label style="grid-column:1/-1"><span>Modelo (opcional)</span><input name="modelo" placeholder="Ej. RAIDER 125 FI" style="text-transform:uppercase" /></label>
+        <label style="grid-column:1/-1"><span>Nombre del cliente *</span>
+          <input name="nombreCliente" required placeholder="Nombre completo" style="text-transform:uppercase" /></label>
+        <div id="montarTallerMsg" class="modal-msg" style="grid-column:1/-1"></div>
+        <div style="grid-column:1/-1">
+          <button type="submit" class="btn-primary" style="padding:12px 20px;font-size:14px;background:#22c55e;border-color:#22c55e">→ Enviar a taller</button>
+        </div>
+      </form>
+
+      <h3 style="margin:18px 0 8px;font-size:15px">Motos que enviaste a taller <span class="badge" id="montarTallerCount">0</span></h3>
+      <div id="montarTallerWrap" style="display:grid;gap:10px"></div>
     </section>
 
     <section id="taller" class="card" data-role-only="admin asesor dueno taller">

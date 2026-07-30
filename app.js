@@ -1863,38 +1863,76 @@ async function loadPreasignaciones() {
   } catch (e) { console.error("Error loadPreasignaciones:", e); }
 }
 
-// Vista del rol "cargataller" (Astrid): motos preasignadas listas para montar al taller.
+// Vista del rol "cargataller" (Astrid): lista de motos que ELLA envió a taller.
 function renderMontarTaller() {
   const wrap = document.getElementById("montarTallerWrap");
   if (!wrap) return;
-  const pendientes = Object.values(preasigState.preasignaciones)
-    .filter(p => p.estado === "preasignada")
-    .sort((a, b) => (a.creadoEn || "").localeCompare(b.creadoEn || ""));
+  const miEmail = (currentUser?.email || "").toLowerCase();
+  const mias = Object.values(preasigState.preasignaciones)
+    .filter(p => (p.montadaTallerPor || "").toLowerCase() === miEmail)
+    .sort((a, b) => (b.entradaTaller || b.creadoEn || "").localeCompare(a.entradaTaller || a.creadoEn || ""));
   const countEl = document.getElementById("montarTallerCount");
-  if (countEl) countEl.textContent = fmtNum.format(pendientes.length);
+  if (countEl) countEl.textContent = fmtNum.format(mias.length);
 
-  if (pendientes.length === 0) {
-    wrap.innerHTML = `<div style="text-align:center;color:var(--muted);padding:40px;border:1px dashed var(--line);border-radius:12px">
-      ✓ ¡Todo al día! No hay motos preasignadas por montar al taller.</div>`;
+  if (mias.length === 0) {
+    wrap.innerHTML = `<div style="text-align:center;color:var(--muted);padding:30px;border:1px dashed var(--line);border-radius:12px">
+      Todavía no has enviado motos a taller. Llena el formulario de arriba.</div>`;
     return;
   }
 
-  wrap.innerHTML = pendientes.map(p => `
-    <div class="docs-venta-card" style="display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap">
+  const estadoTxt = { en_taller: "🛠 En taller", lista_para_entregar: "✓ Lista", entregada: "✓ Entregada" };
+  wrap.innerHTML = mias.map(p => {
+    const fecha = p.entradaTaller ? new Date(p.entradaTaller).toLocaleString("es-CO", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" }) : "";
+    return `<div class="docs-venta-card" style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
       <div style="min-width:0;flex:1">
-        <h3 style="margin:0 0 4px">${escapeHtml(p.marca || "")} ${escapeHtml(p.modelo || "")}
-          <span class="muted" style="font-weight:400;font-size:12px">· ${escapeHtml(p.color || "")}</span></h3>
-        <div class="muted" style="font-size:12.5px">
+        <div style="font-weight:700">${escapeHtml(p.modelo || "Moto")} <span class="muted" style="font-weight:400;font-size:12px">· ${escapeHtml(p.nombreCliente || "—")}</span></div>
+        <div class="muted" style="font-size:12px">
           Chasis <code style="color:var(--accent-2)">${escapeHtml(p.chasis || "—")}</code>
-          · Placa <strong>${escapeHtml(p.placa || "—")}</strong>
-          · Cliente ${escapeHtml(p.nombreCliente || "—")}
+          · Motor <code>${escapeHtml(p.motor || "—")}</code>
+          · Placa <strong>${escapeHtml(p.placa || "—")}</strong>${fecha ? ` · ${fecha}` : ""}
         </div>
       </div>
-      <button class="btn-primary" data-montar-taller="${escapeHtml(p.chasis)}" style="padding:11px 18px;font-size:14px;background:#22c55e;border-color:#22c55e;white-space:nowrap">→ Montar al taller</button>
-    </div>`).join("");
+      <span class="tag tag-financiado" style="white-space:nowrap">${estadoTxt[p.estado] || p.estado}</span>
+    </div>`;
+  }).join("");
+}
 
-  wrap.querySelectorAll("[data-montar-taller]").forEach(b => {
-    b.addEventListener("click", () => cambiarEstadoPreasig(b.dataset.montarTaller, "en_taller"));
+// Formulario de Astrid: registrar una moto y enviarla directo a taller.
+const formMontarTaller = document.getElementById("formMontarTaller");
+if (formMontarTaller) {
+  formMontarTaller.addEventListener("submit", async (ev) => {
+    ev.preventDefault();
+    const msg = document.getElementById("montarTallerMsg");
+    const fd = new FormData(formMontarTaller);
+    const body = {
+      chasis: (fd.get("chasis") || "").trim(),
+      motor: (fd.get("motor") || "").trim(),
+      placa: (fd.get("placa") || "").trim(),
+      modelo: (fd.get("modelo") || "").trim(),
+      nombreCliente: (fd.get("nombreCliente") || "").trim(),
+    };
+    if (!body.chasis || !body.nombreCliente) {
+      msg.className = "modal-msg err"; msg.textContent = "Chasis y nombre del cliente son obligatorios";
+      return;
+    }
+    msg.className = "modal-msg"; msg.textContent = "Enviando…";
+    try {
+      const r = await fetch("/api/preasignaciones/crear", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+      const data = await r.json();
+      if (data.ok) {
+        msg.className = "modal-msg ok"; msg.textContent = "✓ Enviada a taller";
+        formMontarTaller.reset();
+        await loadPreasignaciones();
+        setTimeout(() => { msg.textContent = ""; msg.className = "modal-msg"; }, 2500);
+      } else {
+        msg.className = "modal-msg err"; msg.textContent = data.error || "Error al enviar";
+      }
+    } catch (e) {
+      msg.className = "modal-msg err"; msg.textContent = "Error de conexión";
+    }
   });
 }
 
