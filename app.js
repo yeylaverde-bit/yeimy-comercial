@@ -377,6 +377,7 @@ function renderAll() {
   renderKpis();
   renderAsesores();
   renderMatriz();
+  renderVentasMarca();
   renderVentas();
   renderCharts();
 }
@@ -749,6 +750,91 @@ function renderMatriz() {
   }
 }
 
+// Ventas por marca: resumen total por marca + matriz asesor × marca.
+function renderVentasMarca() {
+  const tbody = $("#tblVentasMarca tbody");
+  if (!tbody) return;
+  const rows = state.filtered; // respeta los filtros globales (mes, año, etc.)
+  const metrica = state.marcaMetrica || "ventas";
+  const val = r => metrica === "monto" ? (r.monto || 0) : 1;
+  const fmtCell = v => v ? (metrica === "monto" ? fmtCOP.format(v) : fmtNum.format(v)) : `<span class="muted-cell">—</span>`;
+
+  // Totales por marca (unidades + monto)
+  const totalMarca = new Map();
+  for (const r of rows) {
+    const m = r.marca || "Otra";
+    if (!totalMarca.has(m)) totalMarca.set(m, { u: 0, monto: 0 });
+    const t = totalMarca.get(m); t.u += 1; t.monto += r.monto || 0;
+  }
+  const marcas = [...totalMarca.keys()].sort((a, b) => totalMarca.get(b).u - totalMarca.get(a).u);
+
+  // Resumen (tarjetas por marca)
+  const resumen = document.getElementById("ventasMarcaResumen");
+  if (resumen) {
+    resumen.innerHTML = marcas.map(m => {
+      const t = totalMarca.get(m);
+      return `<div class="metric-card" style="padding:10px 14px">
+        <div class="metric-label">${escapeHtml(m)}</div>
+        <div class="metric-value" style="font-size:20px">${fmtNum.format(t.u)} <span style="font-size:11px;color:var(--muted)">motos</span></div>
+        <div class="muted" style="font-size:11px">${fmtCOP.format(t.monto)}</div>
+      </div>`;
+    }).join("") || `<div class="muted">Sin ventas en el periodo seleccionado.</div>`;
+  }
+
+  // Matriz asesor × marca
+  const grupos = new Map();
+  for (const r of rows) {
+    const k = r.asesor || "Sin asignar";
+    if (!grupos.has(k)) grupos.set(k, { asesor: k, porMarca: new Map(), total: 0 });
+    const g = grupos.get(k);
+    const m = r.marca || "Otra";
+    g.porMarca.set(m, (g.porMarca.get(m) || 0) + val(r));
+    g.total += val(r);
+  }
+  const lista = [...grupos.values()].sort((a, b) => b.total - a.total);
+
+  $("#tblVentasMarca thead").innerHTML = `<tr><th>Asesor</th>${marcas.map(m => `<th class="num">${escapeHtml(m)}</th>`).join("")}<th class="num"><strong>Total</strong></th></tr>`;
+
+  tbody.innerHTML = lista.map(g => `
+    <tr>
+      <td><strong>${escapeHtml(g.asesor)}</strong></td>
+      ${marcas.map(m => `<td class="num">${fmtCell(g.porMarca.get(m) || 0)}</td>`).join("")}
+      <td class="num" style="background:rgba(34,211,238,0.10)"><strong>${fmtCell(g.total)}</strong></td>
+    </tr>`).join("") || `<tr><td colspan="${marcas.length + 2}" style="text-align:center;color:var(--muted);padding:20px">Sin datos en el periodo.</td></tr>`;
+
+  if (lista.length) {
+    const totalRow = marcas.map(m => lista.reduce((s, g) => s + (g.porMarca.get(m) || 0), 0));
+    const gran = totalRow.reduce((s, v) => s + v, 0);
+    tbody.innerHTML += `<tr style="background:rgba(34,211,238,0.06);font-weight:700">
+      <td><strong>TOTAL</strong></td>
+      ${totalRow.map(v => `<td class="num">${fmtCell(v)}</td>`).join("")}
+      <td class="num" style="background:rgba(34,211,238,0.20)"><strong>${fmtCell(gran)}</strong></td></tr>`;
+  }
+
+  // Guardar para exportar
+  state._marcaMatriz = { marcas, lista, metrica };
+}
+
+function exportarMarcaExcel() {
+  const d = state._marcaMatriz;
+  if (!d || !d.lista.length) { showToast("No hay datos para exportar"); return; }
+  const cell = v => { const s = String(v == null ? "" : v); return /[";\n\r]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s; };
+  const header = ["Asesor", ...d.marcas, "Total"];
+  const lineas = [header.map(cell).join(";")];
+  for (const g of d.lista) {
+    const fila = [g.asesor, ...d.marcas.map(m => Math.round(g.porMarca.get(m) || 0)), Math.round(g.total)];
+    lineas.push(fila.map(cell).join(";"));
+  }
+  const totalRow = d.marcas.map(m => Math.round(d.lista.reduce((s, g) => s + (g.porMarca.get(m) || 0), 0)));
+  lineas.push(["TOTAL", ...totalRow, totalRow.reduce((s, v) => s + v, 0)].map(cell).join(";"));
+  const blob = new Blob([String.fromCharCode(0xFEFF) + lineas.join("\r\n")], { type: "text/csv;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url; a.download = `ventas_por_marca_${d.metrica}_${new Date().toISOString().slice(0, 10)}.csv`;
+  a.click(); URL.revokeObjectURL(url);
+  showToast("✅ Exportado ventas por marca");
+}
+
 function renderVentas() {
   const rows = [...state.filtered].sort((a, b) => (b.fecha?.getTime() || 0) - (a.fecha?.getTime() || 0));
   $("#ventasCount").textContent = `${fmtNum.format(rows.length)} ventas`;
@@ -931,6 +1017,8 @@ $("#filterAnio").addEventListener("change", e => { state.filters.anio = e.target
 $("#filterMes").addEventListener("change", e => { state.filters.mes = e.target.value; applyFilters(); });
 $("#matrizMetrica").addEventListener("change", e => { state.matrizMetrica = e.target.value; renderMatriz(); });
 $("#matrizSoloActivos").addEventListener("change", e => { state.matrizSoloActivos = e.target.checked; renderMatriz(); });
+document.getElementById("marcaMetrica")?.addEventListener("change", e => { state.marcaMetrica = e.target.value; renderVentasMarca(); });
+document.getElementById("btnExportarMarcaExcel")?.addEventListener("click", exportarMarcaExcel);
 $("#search").addEventListener("input", e => { state.filters.search = e.target.value; applyFilters(); });
 $("#refreshBtn").addEventListener("click", loadData);
 $("#asesorSort").addEventListener("change", e => { state.asesorSort = e.target.value; renderAsesores(); });
@@ -5068,6 +5156,13 @@ async function loadCurrentUser() {
     if (!data.ok) { window.location.href = "/login.html"; return null; }
     currentUser = data.usuario;
     aplicarRol(currentUser);
+    // Admin y dueño monitorean TODO el taller: ver preasignaciones de todos los
+    // asesores por defecto (incluye las que carga Astrid / cargataller).
+    if (["admin", "dueno"].includes(currentUser.rol)) {
+      preasigState.verTodos = true;
+      const t1 = document.getElementById("tallerVerTodos"); if (t1) t1.checked = true;
+      const t2 = document.getElementById("preasigVerTodos"); if (t2) t2.checked = true;
+    }
     if (data.ambiente) actualizarBadgeAmbiente(data.ambiente);
     if (currentUser.debeChangePass) abrirModalCambioPass();
     return currentUser;

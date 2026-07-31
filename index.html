@@ -46,6 +46,7 @@
         <a href="#resumen">📊 Resumen</a>
         <a href="#asesores">👥 Asesores</a>
         <a href="#mensual">📅 Mes a mes</a>
+        <a href="#ventasmarca">🏷️ Ventas por marca</a>
         <a href="#analitica">📈 Analítica</a>
         <a href="#ventas">📋 Ventas detalladas</a>
         <a href="/catalogo" target="_blank" rel="noopener">🏍️ Catálogo para clientes</a>
@@ -346,6 +347,30 @@
       </div>
       <div class="table-wrap">
         <table class="table table-matrix" id="tblMatriz">
+          <thead></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="ventasmarca" class="card" data-role-only="admin">
+      <div class="card-head">
+        <h2>🏷️ Ventas por marca <span class="muted" style="font-weight:400;font-size:12px">(respeta los filtros de arriba)</span></h2>
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+          <label class="filter" style="flex-direction:row;gap:6px;align-items:center">
+            <span>Métrica</span>
+            <select id="marcaMetrica">
+              <option value="ventas">Unidades</option>
+              <option value="monto">Monto facturado</option>
+            </select>
+          </label>
+          <button class="btn-descargar" id="btnExportarMarcaExcel" title="Exportar la matriz asesor × marca a Excel/CSV" style="background:#166534;border-color:#22c55e;padding:6px 12px;font-size:12px">📊 Exportar Excel</button>
+        </div>
+      </div>
+      <p class="muted" style="margin:-4px 0 12px;font-size:12.5px">Total vendido por marca y cuánto cerró cada asesor en cada marca.</p>
+      <div id="ventasMarcaResumen" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-bottom:16px"></div>
+      <div class="table-wrap">
+        <table class="table table-matrix" id="tblVentasMarca">
           <thead></thead>
           <tbody></tbody>
         </table>
