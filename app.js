@@ -1592,10 +1592,36 @@ if (formEl) {
         );
         formEl.reset();
       } else {
-        const errMsg = data.error || (data.impulsa && (data.impulsa.Error || JSON.stringify(data.impulsa))) || "Error desconocido";
+        // Diagnóstico por status code — pistas para saber qué le pasa a Impulsa
+        const status = data.status || "?";
+        const impulsaResp = data.impulsa || {};
+        // Buscar el mensaje que devuelve Impulsa en cualquiera de estos campos
+        const msgImpulsa = impulsaResp.Mensaje || impulsaResp.mensaje || impulsaResp.Message
+          || impulsaResp.Error || impulsaResp.error
+          || (Array.isArray(impulsaResp.Errores) ? impulsaResp.Errores.join(" · ") : "")
+          || (Array.isArray(impulsaResp.errors) ? impulsaResp.errors.join(" · ") : "")
+          || "";
+        const pistas = {
+          400: "Datos mal formados o faltantes (revisa cédula, celular, campos obligatorios)",
+          401: "API Key de Impulsa INVÁLIDA o VENCIDA — hay que renovar el token en Render",
+          403: "Impulsa RECHAZÓ la petición. Posibles causas: (1) API Key rotada por Impulsa, (2) cliente duplicado con oportunidad reciente activa, (3) permisos del token cambiados",
+          404: "Endpoint de Impulsa no encontrado — la URL cambió",
+          409: "Duplicado — este cliente ya tiene una oportunidad activa reciente",
+          429: "Muchas peticiones — Impulsa te bloqueó por rate limit, espera unos minutos",
+          500: "Error interno de Impulsa (no es nuestro programa)",
+          502: "Impulsa está caído momentáneamente",
+          503: "Impulsa en mantenimiento",
+        };
+        const pista = pistas[status] || `Status ${status}`;
+
         showFormMsg(
-          `❌ <strong>No se pudo crear la oportunidad.</strong><br>${escapeHtml(String(errMsg))}
-           <pre>${escapeHtml(JSON.stringify(data, null, 2))}</pre>`,
+          `❌ <strong>No se pudo crear la oportunidad.</strong><br>
+           <strong>Status:</strong> ${status} · ${escapeHtml(pista)}<br>
+           ${msgImpulsa ? `<strong>Mensaje Impulsa:</strong> ${escapeHtml(String(msgImpulsa))}<br>` : ""}
+           ${data.error ? `<strong>Error servidor:</strong> ${escapeHtml(String(data.error))}<br>` : ""}
+           <details style="margin-top:8px"><summary style="cursor:pointer;color:var(--accent)">Ver respuesta completa</summary>
+             <pre>${escapeHtml(JSON.stringify(data, null, 2))}</pre>
+           </details>`,
           "err"
         );
       }
