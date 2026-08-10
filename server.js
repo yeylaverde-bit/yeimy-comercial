@@ -2625,6 +2625,73 @@ app.get("/api/siigo/payment-types-fc", requireAuth, requireAdmin, async (req, re
   });
 });
 
+// --- Log de peticiones a Impulsa: últimas N con respuesta completa (admin) ---
+app.get("/api/admin/impulsa-log", requireAuth, requireAdmin, (req, res) => {
+  const limit = Math.min(Number(req.query.limit) || 20, 100);
+  try {
+    if (!fs.existsSync(LOG_PATH)) return res.json({ ok: true, total: 0, registros: [] });
+    const lineas = fs.readFileSync(LOG_PATH, "utf8").split("\n").filter(Boolean);
+    const ultimas = lineas.slice(-limit).reverse().map(l => {
+      try { return JSON.parse(l); } catch { return { raw: l }; }
+    });
+    res.json({ ok: true, total: lineas.length, registros: ultimas });
+  } catch (e) {
+    res.status(500).json({ ok: false, error: e.message });
+  }
+});
+
+// --- Test directo a Impulsa: envía un ping minimal para ver qué responde (admin) ---
+app.get("/api/admin/impulsa-test", requireAuth, requireAdmin, async (req, res) => {
+  if (!IMPULSA_API_KEY) {
+    return res.status(500).json({ ok: false, error: "IMPULSA_API_KEY no configurada" });
+  }
+  try {
+    // Enviar una petición de prueba con datos claramente de test
+    const testPayload = {
+      ID: 0,
+      IDOportunidadAuteco: String(Date.now()),
+      Origen: "TEST DIAGNOSTICO",
+      Campanna: "TEST DIAGNOSTICO",
+      Establecimiento: String(ESTABLECIMIENTO),
+      TipoDocumento: "CC",
+      Documento: "0000000000",
+      NombreContacto: "TEST TEST",
+      Email: "test@test.com",
+      Telefono2: "3000000000",
+      CodigoDANE: CODIGO_DANE,
+      Direccion: "TEST",
+      Productos: [{ Producto: "TEST", Marca: "TEST" }],
+      Observaciones: "TEST DIAGNOSTICO — ignorar",
+      HabeasData: true,
+      Sistema: "",
+      NivelInteres: "AA",
+      Usuario: USUARIO_TRAZABILIDAD,
+    };
+    const r = await fetch(`${IMPULSA_BASE_URL}/oportunidades/Crear`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${IMPULSA_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(testPayload),
+    });
+    let data = null;
+    try { data = await r.json(); } catch { data = { raw: await r.text() }; }
+    res.json({
+      ok: true,
+      status: r.status,
+      statusText: r.statusText,
+      headers: Object.fromEntries(r.headers.entries()),
+      impulsaResponse: data,
+      apiKeyLen: IMPULSA_API_KEY.length,
+      baseUrl: IMPULSA_BASE_URL,
+      establecimiento: ESTABLECIMIENTO,
+    });
+  } catch (e) {
+    res.status(500).json({ ok: false, error: e.message });
+  }
+});
+
 // --- Health (público, útil para diagnóstico) ---
 app.get("/api/health", (req, res) => {
   res.json({
