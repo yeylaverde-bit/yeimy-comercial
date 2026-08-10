@@ -95,12 +95,16 @@ function syncUsuariosNuevos() {
 }
 syncUsuariosNuevos();
 
-// --- Config Impulsa (igual que antes) ---
+// --- Config Impulsa ---
+// Impulsa migró su API a Google Cloud Run (doc actualizada 9 Agosto 2026).
+// URLs viejas (apiimpulsa.impulsacrm.com / apiimpulsa.azurewebsites.net)
+// devuelven 401/403 aunque el API key sea correcto. Ver PDF "Herramientas
+// para desarrollador" capítulo 1 - Ambientes.
 const IMPULSA_API_KEY = process.env.IMPULSA_API_KEY || "";
 const IMPULSA_ENV = (process.env.IMPULSA_ENV || "test").toLowerCase();
-const IMPULSA_BASE_URL = IMPULSA_ENV === "prod"
-  ? "https://apiimpulsa.impulsacrm.com/api/v2"
-  : "https://apiimpulsa.azurewebsites.net/api/v2";
+const IMPULSA_BASE_URL = process.env.IMPULSA_BASE_URL || (IMPULSA_ENV === "prod"
+  ? "https://api-impulsa-2ceeji4fra-uc.a.run.app/api/v2"
+  : "https://api-impulsa-test-2ceeji4fra-uc.a.run.app/api/v2");
 const ESTABLECIMIENTO = process.env.IMPULSA_ESTABLECIMIENTO || "550026948";
 const USUARIO_TRAZABILIDAD = process.env.IMPULSA_USUARIO || "yeimi";
 const CODIGO_DANE = process.env.IMPULSA_CODIGO_DANE || "05001";
