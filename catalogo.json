@@ -1,11 +1,11 @@
 {
-  "generado": "2026-07-21",
+  "generado": "2026-08-14",
   "asesora": "Yeimy Laverde",
   "cargo": "Asesora Comercial",
   "telefono": "+57 302 126 6110",
   "whatsapp": "573021266110",
   "dominio": "www.yeimylaverde.com",
-  "total": 34,
+  "total": 35,
   "motos": [
     {
       "modelo": "APACHE 160 CARBURADA",
@@ -152,6 +152,159 @@
       "foto": "tvs_apache_160_carburada.jpg",
       "foto_hero": "tvs_apache_160_carburada_hero.jpg",
       "ficha_pdf": "tvs_apache_160_carburada.pdf"
+    },
+    {
+      "modelo": "APACHE 160 FI NG",
+      "marca": "TVS",
+      "categoria": "Deportivas",
+      "cilindraje": "159,7 cc",
+      "anio": "2027",
+      "cuota_inicial": 2100000,
+      "comercial": 11499999,
+      "contado": 11499999,
+      "bono": null,
+      "colores": [
+        {
+          "nombre": "Negro Nebulosa - Rojo",
+          "hex": "#1a1a1a",
+          "foto": "color_tvs_apache_160_fi_ng_0.jpg"
+        }
+      ],
+      "specs": [
+        [
+          "CILINDRAJE",
+          "159,7 cc"
+        ],
+        [
+          "POTENCIA MÁXIMA",
+          "17,3 Hp @ 9250 rpm - Sport mode"
+        ],
+        [
+          "SISTEMA DE FRENOS",
+          "ABS Doble Canal"
+        ],
+        [
+          "CAPACIDAD DEL TANQUE (Incluyendo la reserva)",
+          "12 Lt (3,17 gal)"
+        ],
+        [
+          "MOTOR",
+          "4T MONOCILÍNDRICO SOHC  4 VÁLVULAS"
+        ],
+        [
+          "ALTURA AL PISO",
+          "ALTURA AL PISO 180 mm"
+        ],
+        [
+          "TORQUE MÁXIMO",
+          "14.73 Nm @ 7500 rpm - Sport mode"
+        ],
+        [
+          "TRANSMISIÓN",
+          "Mecánica 5 velocidades"
+        ],
+        [
+          "COMBUSTIBLE",
+          "Corriente"
+        ],
+        [
+          "RELACIÓN DE COMPRESIÓN",
+          "10,15:1"
+        ],
+        [
+          "SISTEMA DE ALIMENTACIÓN",
+          "Inyección electrónica"
+        ],
+        [
+          "SUSPENSIÓN DELANTERA",
+          "Suspensión delantera invertida 37 mm diametro"
+        ],
+        [
+          "SISTEMA DE ENCENDIDO",
+          "CDI"
+        ],
+        [
+          "DIÁMETRO POR CARRERA",
+          "62 x 52.9 mm"
+        ],
+        [
+          "REFRIGERACIÓN",
+          "Radiador de aceite"
+        ],
+        [
+          "ARRANQUE",
+          "Eléctrico"
+        ],
+        [
+          "SUSPENSIÓN TRASERA",
+          "Monoamortiguador ajustable en precarga"
+        ],
+        [
+          "FRENO DELANTERO",
+          "Disco 270 mm"
+        ],
+        [
+          "TEST DRIVE",
+          "No"
+        ],
+        [
+          "FRENO TRASERO",
+          "Disco 240 mm"
+        ],
+        [
+          "RINES",
+          "Aspas de Aleación"
+        ],
+        [
+          "LLANTA DELANTERA",
+          "90/90-17 49P"
+        ],
+        [
+          "LLANTA TRASERA",
+          "130/70 R17 M/C 62P"
+        ],
+        [
+          "ABS",
+          "Si"
+        ],
+        [
+          "LARGO TOTAL",
+          "2035 mm"
+        ],
+        [
+          "ALTURA TOTAL",
+          "1111 mm"
+        ],
+        [
+          "ANCHO TOTAL",
+          "819 mm"
+        ],
+        [
+          "SEÑORITERA",
+          "No"
+        ],
+        [
+          "DISTANCIA ENTRE EJES",
+          "1357 mm"
+        ],
+        [
+          "ALTURA AL SILLÍN",
+          "800 mm"
+        ],
+        [
+          "PESO EN SECO",
+          "146 kg"
+        ],
+        [
+          "IMPUESTOS",
+          "Debe pagar impuestos de rodamiento"
+        ]
+      ],
+      "manual_url": "https://media.autecomobility.com/recursos/marcas/tvs/manuales/usuario/Manual-de-garantia-mantenimiento-TVS-Apache-160-NG.pdf",
+      "descripcion": "La combinación entre diseño aerodinámico, tecnología y acabados deportivos convierten a la Apache 160 FI NUEVA GENERACIÓN en una moto hecha para quienes quieren dominar la calle con estilo y potencia.",
+      "foto": "tvs_apache_160_fi_ng.jpg",
+      "foto_hero": "tvs_apache_160_fi_ng_hero.jpg",
+      "ficha_pdf": "tvs_apache_160_fi_ng.pdf"
     },
     {
       "modelo": "APACHE 200 CARB ABS",
@@ -768,7 +921,7 @@
         {
           "nombre": "Gris Humo",
           "hex": "#6b6b6b",
-          "foto": "color_tvs_apache_rtr_160_4v_xc_fi_racing_1.jpg"
+          "foto": null
         }
       ],
       "specs": [
@@ -2613,7 +2766,7 @@
         {
           "nombre": "Negro Mate Dorado",
           "hex": "#222222",
-          "foto": "color_tvs_ntorq_125_1.jpg"
+          "foto": null
         }
       ],
       "specs": [
@@ -2747,7 +2900,7 @@
         {
           "nombre": "Negro Mate Dorado",
           "hex": "#222222",
-          "foto": "color_tvs_ntorq_125_xconnect_1.jpg"
+          "foto": null
         }
       ],
       "specs": [
@@ -3227,7 +3380,7 @@
         {
           "nombre": "Gris Nopal - Verde",
           "hex": "#7a7a7a",
-          "foto": "color_victory_mrx_200_2.jpg"
+          "foto": null
         },
         {
           "nombre": "Azul Antartica",
@@ -4587,17 +4740,17 @@
         {
           "nombre": "Negra Nebulosa - Gris",
           "hex": "#1a1a1a",
-          "foto": "color_tvs_sport_100_els_sp_1.jpg"
+          "foto": null
         },
         {
           "nombre": "Negro Nebulosa - Azul",
           "hex": "#1a1a1a",
-          "foto": "color_tvs_sport_100_els_sp_2.jpg"
+          "foto": null
         },
         {
           "nombre": "Trakku - Negro Nebulosa - Gris",
           "hex": "#1a1a1a",
-          "foto": "color_tvs_sport_100_els_sp_3.jpg"
+          "foto": null
         }
       ],
       "specs": [
