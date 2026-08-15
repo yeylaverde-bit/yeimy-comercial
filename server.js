@@ -1447,6 +1447,92 @@ app.post("/api/papeleria/generar", requireAuth, requireAdmin,
 );
 
 // ============================================================
+//      SOPORTE DE PAGO (Orden de Pago / recibo de abono inicial)
+// ============================================================
+const ORDEN_COUNTER_PATH = path.join(DATA_DIR, "orden_pago_counter.json");
+
+function siguienteNumeroOrden() {
+  let n = 4433;  // arranca despues del 4432 pre-impreso del template
+  try {
+    n = JSON.parse(fs.readFileSync(ORDEN_COUNTER_PATH, "utf8")).next || n;
+  } catch {}
+  fs.writeFileSync(ORDEN_COUNTER_PATH, JSON.stringify({ next: n + 1 }), "utf8");
+  return n;
+}
+
+// Parsea el valor inicial desde observaciones libres. Ejemplos:
+//   "cliente aprobado por Roda, inicial de $2.100.000"  -> 2100000
+//   "abono 500.000"                                     -> 500000
+//   "inicial 2173000"                                   -> 2173000
+function parsearValorInicial(observaciones) {
+  if (!observaciones) return null;
+  const t = String(observaciones).toLowerCase();
+  // Patrones: "inicial|abono ... $?NUMERO"
+  const patrones = [
+    /(?:inicial|abono|cuota\s*inicial)[^0-9]*(\$?\s*[\d.,]+)/i,
+    /\$\s*([\d.,]+)/,  // fallback: cualquier $ NUMBER
+  ];
+  for (const p of patrones) {
+    const m = t.match(p);
+    if (m) {
+      const num = m[1].replace(/[^\d]/g, "");
+      const val = parseInt(num, 10);
+      if (val > 0) return val;
+    }
+  }
+  return null;
+}
+
+// POST /api/soporte-pago/generar
+// Body JSON: { cliente, cc, telefono, direccion, ciudad, marca, modelo,
+//              valor?, observaciones?, fecha?, vendedor? }
+// Si 'valor' no viene, se intenta parsear de 'observaciones'.
+app.post("/api/soporte-pago/generar", requireAuth, requireAdmin, async (req, res) => {
+  try {
+    const b = req.body || {};
+    let valor = Number(b.valor) || parsearValorInicial(b.observaciones);
+    if (!valor) return res.status(400).json({
+      ok: false,
+      error: "No se pudo determinar el valor de la inicial. Escribe el valor en observaciones (ej: 'inicial de $2.100.000') o mándalo en el campo valor."
+    });
+
+    const hoy = new Date();
+    const fechaTxt = b.fecha || `${String(hoy.getDate()).padStart(2,"0")}/${String(hoy.getMonth()+1).padStart(2,"0")}/${hoy.getFullYear()}`;
+
+    const moto = [b.marca, b.modelo].filter(Boolean).join(" ").trim();
+    const descripcion = moto
+      ? `Abono inicial moto ${moto}`
+      : "Abono inicial";
+
+    const usuario = buscarUsuario(req.session.userEmail);
+    const vendedor = b.vendedor || usuario?.nombre || usuario?.email?.split("@")[0] || "";
+
+    const numero = siguienteNumeroOrden();
+
+    const bytes = await papeleria.llenarSoportePago({
+      numero_orden: String(numero),
+      cliente:      (b.cliente || "").toUpperCase(),
+      cc:           b.cc || "",
+      fecha:        fechaTxt,
+      direccion:    b.direccion || "",
+      telefono:     b.telefono || "",
+      ciudad:       (b.ciudad || "MEDELLIN").toUpperCase(),
+      descripcion,
+      valor,
+      vendedor:     vendedor.toUpperCase(),
+    });
+
+    const safeCC = (b.cc || "cliente").toString().replace(/\W+/g, "");
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader("Content-Disposition", `attachment; filename="orden-pago-${numero}-${safeCC}.pdf"`);
+    res.end(Buffer.from(bytes));
+  } catch (e) {
+    console.error("Error /api/soporte-pago/generar:", e);
+    res.status(500).json({ ok: false, error: e.message });
+  }
+});
+
+// ============================================================
 //      LEADS REGISTRADOS (lista de los clientes ingresados)
 // ============================================================
 app.get("/api/leads/lista", requireAuth, (req, res) => {

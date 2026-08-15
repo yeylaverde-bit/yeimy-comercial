@@ -220,6 +220,20 @@
 
       <button class="btn block success" id="btnGenerar">Generar paquete y descargar PDF</button>
       <div class="result" id="resultGen"></div>
+
+      <div style="margin-top:22px; padding-top:18px; border-top:1px solid var(--border);">
+        <div class="help" style="margin-bottom:10px; color:var(--text); font-weight:600;">
+          💵 Orden de pago (recibo del abono inicial):
+        </div>
+        <div class="grid-2" style="align-items:end;">
+          <div class="field" style="margin-bottom:0">
+            <label>Valor de la inicial (opcional — si vacío se intenta leer de observaciones)</label>
+            <input type="text" id="f_valor_inicial" placeholder="ej: 2100000" />
+          </div>
+          <button class="btn" id="btnSoporte">Generar orden de pago</button>
+        </div>
+        <div class="result" id="resultSoporte"></div>
+      </div>
     </div>
   </div>
 
@@ -369,6 +383,61 @@
       status.innerHTML = '<span style="color:var(--ok)">✓ Datos técnicos completados desde el empadronamiento</span>';
     } catch (err) {
       status.innerHTML = `<span style="color:var(--err)">Error: ${err.message}</span>`;
+    }
+  });
+
+  document.getElementById('btnSoporte').addEventListener('click', async () => {
+    const btn = document.getElementById('btnSoporte');
+    const result = document.getElementById('resultSoporte');
+    result.classList.remove('show', 'ok', 'err');
+    if (!STATE.selected) {
+      result.innerHTML = '<h3>✗ Falta cliente</h3><div>Selecciona primero un cliente en el Paso 1.</div>';
+      result.classList.add('show', 'err');
+      return;
+    }
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span>Generando orden de pago…';
+
+    const lead = STATE.selected;
+    const valor = document.getElementById('f_valor_inicial').value.replace(/[^\d]/g, '') || null;
+
+    const payload = {
+      cliente:      lead.cliente || document.getElementById('f_nombres').value + ' ' + document.getElementById('f_primer').value,
+      cc:           lead.documento || document.getElementById('f_cc').value,
+      telefono:     lead.celular || document.getElementById('f_telefono').value,
+      direccion:    lead.direccion || document.getElementById('f_direccion').value,
+      ciudad:       document.getElementById('f_ciudad').value,
+      marca:        lead.marca || document.getElementById('f_marca').value,
+      modelo:       lead.modelo || document.getElementById('f_linea').value,
+      observaciones: lead.observaciones || '',
+      valor:        valor ? parseInt(valor, 10) : undefined,
+    };
+
+    try {
+      const r = await fetch('/api/soporte-pago/generar', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+        credentials: 'same-origin',
+      });
+      if (!r.ok) {
+        const err = await r.json().catch(() => ({}));
+        throw new Error(err.error || `HTTP ${r.status}`);
+      }
+      const blob = await r.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = `orden-pago-${payload.cc || 'cliente'}.pdf`;
+      a.click();
+      URL.revokeObjectURL(url);
+      result.innerHTML = '<h3>✓ Orden de pago descargada</h3>';
+      result.classList.add('show', 'ok');
+    } catch (e) {
+      result.innerHTML = `<h3>✗ Error</h3><div>${e.message}</div>`;
+      result.classList.add('show', 'err');
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = 'Generar orden de pago';
     }
   });
 

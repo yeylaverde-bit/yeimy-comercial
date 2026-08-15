@@ -294,5 +294,26 @@
         "size": 11
       }
     }
+  },
+  "soporte_pago": {
+    "page_size": {"w": 612, "h": 792},
+    "campos": {
+      "numero_orden":    {"x": 461, "y": 665, "size": 12, "bold": true, "color": "red"},
+      "cliente":         {"x": 100, "y": 640, "size": 10},
+      "cc":              {"x": 335, "y": 640, "size": 10},
+      "fecha":           {"x": 458, "y": 640, "size": 10},
+      "direccion":       {"x": 100, "y": 623, "size": 10},
+      "telefono":        {"x": 310, "y": 623, "size": 10},
+      "ciudad":          {"x": 458, "y": 623, "size": 10},
+      "descripcion":     {"x": 130, "y": 570, "size": 9},
+      "cant":            {"x": 320, "y": 570, "size": 10},
+      "valor_unitario":  {"x": 400, "y": 570, "size": 10},
+      "valor_total":     {"x": 490, "y": 570, "size": 10},
+      "subtotal":        {"x": 447, "y": 468, "size": 10},
+      "total":           {"x": 447, "y": 431, "size": 11, "bold": true},
+      "recibi_nombre":   {"x": 130, "y": 408, "size": 9},
+      "recibi_cc":       {"x": 100, "y": 400, "size": 9},
+      "vendedor":        {"x": 315, "y": 404, "size": 9}
+    }
   }
 }
