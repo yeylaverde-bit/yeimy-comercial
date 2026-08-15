@@ -5916,3 +5916,254 @@ if (btnRefrescarMet) btnRefrescarMet.addEventListener("click", async () => {
   }
   attachChasisAutocomplete();
 })();
+
+// ============================================================
+//  PAPELERIA (seccion #papeleria en el dashboard, solo admin)
+//  Portado de papeleria-test.html a modo embebido con prefijo pap_.
+// ============================================================
+(function papeleriaSetup() {
+  const PAP = { leads: [], selected: null };
+
+  async function cargarLeadsPap() {
+    try {
+      const r = await fetch('/api/leads/lista', { credentials: 'same-origin' });
+      const d = await r.json();
+      PAP.leads = d.ok ? (d.leads || []) : [];
+    } catch { PAP.leads = []; }
+  }
+
+  function escapeHTMLPap(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+    });
+  }
+
+  async function buscarPap() {
+    if (!PAP.leads.length) await cargarLeadsPap();
+    const q = (document.getElementById('pap_search').value || '').trim().toUpperCase();
+    const list = document.getElementById('pap_leadsList');
+    if (!q) { list.style.display = 'none'; return; }
+    const matches = PAP.leads.filter(function(l){
+      const hay = [l.cliente, l.documento, l.chasis, l.motor, l.placa, l.celular].join(' ').toUpperCase();
+      return hay.indexOf(q) !== -1;
+    }).slice(0, 30);
+    if (matches.length === 0) {
+      list.innerHTML = '<div style="padding:14px;color:var(--muted);font-size:13px">Sin resultados</div>';
+    } else {
+      list.innerHTML = matches.map(function(l){
+        return '<div class="pap-item" data-ts="'+l.ts+'" style="padding:10px 14px;border-bottom:1px solid var(--line);cursor:pointer;display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center">'
+          + '<div><div style="font-weight:600;font-size:13.5px">'+escapeHTMLPap(l.cliente || '—')+'</div>'
+          + '<div style="font-size:11.5px;color:var(--muted);margin-top:2px">'
+          + escapeHTMLPap(l.tipoDocumento || '') + ' ' + escapeHTMLPap(l.documento || '—')
+          + ' · ' + escapeHTMLPap(l.marca || '') + ' ' + escapeHTMLPap(l.modelo || '')
+          + (l.placa ? ' · placa ' + escapeHTMLPap(l.placa) : '')
+          + '</div></div>'
+          + (l.tienePreasignacion ? '<div style="font-size:10.5px;padding:2px 8px;border-radius:99px;background:rgba(93,214,255,.2);color:var(--accent-2);white-space:nowrap">preasig ✓</div>' : '')
+          + '</div>';
+      }).join('');
+      list.querySelectorAll('.pap-item').forEach(function(el){
+        el.addEventListener('click', function(){ seleccionarPap(el.dataset.ts); });
+        el.addEventListener('mouseenter', function(){ el.style.background = 'rgba(124,92,255,.1)'; });
+        el.addEventListener('mouseleave', function(){ el.style.background = 'transparent'; });
+      });
+    }
+    list.style.display = 'block';
+  }
+
+  function seleccionarPap(ts) {
+    const lead = PAP.leads.find(function(l){ return l.ts === ts; });
+    if (!lead) return;
+    PAP.selected = lead;
+    document.getElementById('pap_leadsList').style.display = 'none';
+    document.getElementById('pap_selectedName').textContent = lead.cliente || '';
+    document.getElementById('pap_selectedDoc').textContent = (lead.tipoDocumento || '') + ' ' + (lead.documento || '');
+    document.getElementById('pap_selectedBanner').style.display = 'flex';
+    llenarFormularioPap(lead);
+    document.getElementById('pap_step2').style.display = '';
+    document.getElementById('pap_step3').style.display = '';
+  }
+
+  function llenarFormularioPap(lead) {
+    const partes = (lead.cliente || '').trim().split(/\s+/);
+    let primer = '', segundo = '', nombres = '';
+    if (partes.length >= 4) { nombres = partes.slice(0, -2).join(' '); primer = partes[partes.length-2]; segundo = partes[partes.length-1]; }
+    else if (partes.length === 3) { nombres = partes[0]; primer = partes[1]; segundo = partes[2]; }
+    else if (partes.length === 2) { nombres = partes[0]; primer = partes[1]; }
+    else nombres = lead.cliente || '';
+
+    const set = function(id, v){ const el = document.getElementById(id); if (el) el.value = v || ''; };
+    set('pap_primer', primer);
+    set('pap_segundo', segundo);
+    set('pap_nombres', nombres);
+    set('pap_cc', lead.documento);
+    set('pap_telefono', lead.celular);
+    set('pap_direccion', lead.direccion);
+    set('pap_marca', lead.marca);
+    set('pap_linea', lead.modelo);
+    const colorRaw = (lead.color || '').toUpperCase();
+    const colorLimpio = colorRaw.split(/\s*(CALCOMANIA|CBS|CHASIS|MOTOR)\s*/)[0].trim();
+    set('pap_color', colorLimpio);
+    set('pap_chasis', lead.chasis);
+    set('pap_motor', lead.motor);
+    const placa = (lead.placa || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+    if (placa.length >= 6) { set('pap_placa_letras', placa.slice(0,3)); set('pap_placa_numeros', placa.slice(3)); }
+    const hoy = new Date();
+    const meses = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
+    set('pap_dia', String(hoy.getDate()));
+    document.getElementById('pap_mes').value = meses[hoy.getMonth()];
+    set('pap_anio', String(hoy.getFullYear()));
+  }
+
+  function limpiarSeleccionPap() {
+    PAP.selected = null;
+    document.getElementById('pap_selectedBanner').style.display = 'none';
+    document.getElementById('pap_step2').style.display = 'none';
+    document.getElementById('pap_step3').style.display = 'none';
+    document.getElementById('pap_search').value = '';
+    document.getElementById('pap_search').focus();
+  }
+
+  async function generarPaquetePap() {
+    const btn = document.getElementById('pap_btnGenerar');
+    const result = document.getElementById('pap_resultGen');
+    result.style.display = 'none'; result.className = 'form-msg';
+    btn.disabled = true;
+    const originalText = btn.textContent;
+    btn.textContent = 'Generando…';
+
+    const g = function(id){ return (document.getElementById(id) && document.getElementById(id).value) || ''; };
+    const datos = {
+      primer_apellido: g('pap_primer').toUpperCase(),
+      segundo_apellido: g('pap_segundo').toUpperCase(),
+      nombres: g('pap_nombres').toUpperCase(),
+      cc: g('pap_cc'), ciudad: g('pap_ciudad'), direccion: g('pap_direccion'),
+      telefono: g('pap_telefono'), clase_vehiculo: "MOTOCICLETA",
+      marca: g('pap_marca'), linea: g('pap_linea'), color: g('pap_color'),
+      modelo: g('pap_modelo'), cilindrada: g('pap_cilindrada'), potencia: g('pap_potencia'),
+      chasis: g('pap_chasis'), motor: g('pap_motor'), combustible: g('pap_combustible'),
+      tipo_servicio: "PARTICULAR",
+      placa_letras: g('pap_placa_letras').toUpperCase(),
+      placa_numeros: g('pap_placa_numeros').toUpperCase(),
+      observaciones: g('pap_observ'),
+      fecha_dia: g('pap_dia'), fecha_mes_letra: g('pap_mes'), fecha_anio: g('pap_anio'),
+      tramite: g('pap_tramite'),
+    };
+    const fd = new FormData();
+    fd.append('datos', JSON.stringify(datos));
+    const anexos = [['empadronamiento','pap_f_emp'],['cedula','pap_f_ced'],['factura','pap_f_fac'],['recibo','pap_f_rec'],['prenda','pap_f_pre'],['firmaPng','pap_f_fir']];
+    for (let i = 0; i < anexos.length; i++) {
+      const inp = document.getElementById(anexos[i][1]);
+      const f = inp && inp.files[0];
+      if (f) fd.append(anexos[i][0], f);
+    }
+    try {
+      const r = await fetch('/api/papeleria/generar', { method:'POST', body: fd, credentials:'same-origin' });
+      if (!r.ok) { const err = await r.json().catch(function(){return{};}); throw new Error(err.error || ('HTTP ' + r.status)); }
+      const blob = await r.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = 'papeleria-' + (datos.cc || 'cliente') + '.pdf'; a.click();
+      URL.revokeObjectURL(url);
+      result.className = 'form-msg form-msg-ok';
+      result.textContent = '✓ Paquete descargado';
+      result.style.display = 'block';
+    } catch (e) {
+      result.className = 'form-msg form-msg-err';
+      result.textContent = '✗ ' + e.message;
+      result.style.display = 'block';
+    } finally {
+      btn.disabled = false; btn.textContent = originalText;
+    }
+  }
+
+  async function generarSoportePap() {
+    const btn = document.getElementById('pap_btnSoporte');
+    const result = document.getElementById('pap_resultSoporte');
+    result.style.display = 'none'; result.className = 'form-msg';
+    if (!PAP.selected) {
+      result.className = 'form-msg form-msg-err';
+      result.textContent = 'Selecciona primero un cliente';
+      result.style.display = 'block';
+      return;
+    }
+    btn.disabled = true;
+    const originalText = btn.textContent;
+    btn.textContent = 'Generando…';
+    const lead = PAP.selected;
+    const valor = (document.getElementById('pap_valorInicial').value || '').replace(/[^\d]/g, '');
+    const g = function(id){ return document.getElementById(id) ? document.getElementById(id).value : ''; };
+    const payload = {
+      cliente: lead.cliente || (g('pap_nombres') + ' ' + g('pap_primer')),
+      cc: lead.documento || g('pap_cc'),
+      telefono: lead.celular || g('pap_telefono'),
+      direccion: lead.direccion || g('pap_direccion'),
+      ciudad: g('pap_ciudad'),
+      marca: lead.marca || g('pap_marca'),
+      modelo: lead.modelo || g('pap_linea'),
+      observaciones: lead.observaciones || '',
+      valor: valor ? parseInt(valor,10) : undefined,
+    };
+    try {
+      const r = await fetch('/api/soporte-pago/generar', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload), credentials:'same-origin' });
+      if (!r.ok) { const err = await r.json().catch(function(){return{};}); throw new Error(err.error || ('HTTP ' + r.status)); }
+      const blob = await r.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = 'orden-pago-' + (payload.cc || 'cliente') + '.pdf'; a.click();
+      URL.revokeObjectURL(url);
+      result.className = 'form-msg form-msg-ok';
+      result.textContent = '✓ Orden de pago descargada';
+      result.style.display = 'block';
+    } catch (e) {
+      result.className = 'form-msg form-msg-err';
+      result.textContent = '✗ ' + e.message;
+      result.style.display = 'block';
+    } finally {
+      btn.disabled = false; btn.textContent = originalText;
+    }
+  }
+
+  async function procesarEmpadronamientoPap(e) {
+    const file = e.target.files[0]; if (!file) return;
+    const status = document.getElementById('pap_empStatus');
+    status.textContent = 'Leyendo empadronamiento…';
+    const fd = new FormData(); fd.append('archivo', file);
+    try {
+      const r = await fetch('/api/empadronamiento/procesar', { method:'POST', body: fd, credentials:'same-origin' });
+      const d = await r.json();
+      if (!d.ok) throw new Error(d.error || 'Error');
+      const emp = d.empadronamiento || {};
+      const setIfEmpty = function(id, val){ const el = document.getElementById(id); if (el && val && !el.value) el.value = val; };
+      setIfEmpty('pap_marca', emp.marca);
+      setIfEmpty('pap_linea', emp.linea);
+      setIfEmpty('pap_color', emp.color);
+      setIfEmpty('pap_modelo', emp.anio_modelo);
+      setIfEmpty('pap_cilindrada', emp.cilindrada_cc || '');
+      setIfEmpty('pap_potencia', emp.potencia_hp || '');
+      setIfEmpty('pap_chasis', emp.chasis || emp.vin);
+      setIfEmpty('pap_motor', emp.motor);
+      setIfEmpty('pap_combustible', emp.tipo_combustible);
+      status.innerHTML = '<span style="color:#22c55e">✓ Datos técnicos completados</span>';
+    } catch (err) {
+      status.innerHTML = '<span style="color:#ef4444">Error: ' + err.message + '</span>';
+    }
+  }
+
+  function initPap() {
+    const search = document.getElementById('pap_search');
+    if (!search) return;
+    document.getElementById('pap_btnBuscar')?.addEventListener('click', buscarPap);
+    search.addEventListener('keydown', function(e){ if (e.key === 'Enter') buscarPap(); });
+    document.getElementById('pap_btnClear')?.addEventListener('click', limpiarSeleccionPap);
+    document.getElementById('pap_btnGenerar')?.addEventListener('click', generarPaquetePap);
+    document.getElementById('pap_btnSoporte')?.addEventListener('click', generarSoportePap);
+    document.getElementById('pap_f_emp')?.addEventListener('change', procesarEmpadronamientoPap);
+    cargarLeadsPap();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initPap);
+  } else {
+    initPap();
+  }
+})();

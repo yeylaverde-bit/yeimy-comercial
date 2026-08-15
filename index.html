@@ -69,7 +69,7 @@
         <a href="#misleads" data-role-only="admin asesor contable dueno">📋 Registros del mes</a>
         <a href="#preasignacion" data-role-only="admin asesor dueno">🔧 Preasignación</a>
         <a href="#ordenfac">📑 Orden facturación</a>
-        <a href="/papeleria-test.html" data-role-only="admin">📄 Papelería</a>
+        <a href="#papeleria" data-role-only="admin">📄 Papelería</a>
         <a href="#soat" data-role-only="admin asesor contable dueno">🛡️ Crear SOAT</a>
         <a href="#gpsinstalar" data-role-only="admin asesor dueno">📡 GPS Instalar <span id="gpsInstalarBadge" class="badge" style="display:none;background:#06b6d4;color:#fff;margin-left:6px;font-size:10px"></span></a>
         <a href="#gpsactivar" data-role-only="admin asesor dueno">🛰️ GPS Activar <span id="gpsActivarBadge" class="badge" style="display:none;background:#a855f7;color:#fff;margin-left:6px;font-size:10px"></span></a>
@@ -1053,6 +1053,120 @@
           </thead>
           <tbody></tbody>
         </table>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         PAPELERIA (solo admin) - paquete RUNT+mandato + orden de pago
+         ============================================================ -->
+    <section id="papeleria" class="card" data-role-only="admin">
+      <div class="card-head">
+        <h2>📄 Papelería · Paquete matrícula y orden de pago</h2>
+      </div>
+      <p class="muted" style="margin:-4px 0 16px;font-size:12.5px">
+        Selecciona un cliente ya registrado, revisa/completa datos,
+        sube anexos opcionales y descarga el paquete o la orden de pago del abono inicial.
+      </p>
+
+      <!-- Paso 1 -->
+      <div style="display:grid;grid-template-columns:1fr auto;gap:10px;align-items:end;margin-bottom:12px">
+        <label class="form-field" style="margin-bottom:0">
+          <span>1. Busca el cliente (nombre, cédula, chasis o placa)</span>
+          <input id="pap_search" placeholder="ej: KEISLER, 5288024, 9FL..., KDA34J" style="background:rgba(8,12,28,.55);border:1px solid var(--line);color:var(--text);border-radius:10px;padding:10px 12px" />
+        </label>
+        <button id="pap_btnBuscar" class="btn-primary" style="padding:10px 16px">Buscar</button>
+      </div>
+
+      <div id="pap_selectedBanner" style="display:none;padding:10px 14px;background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.3);border-radius:10px;margin-bottom:12px;font-size:13px;display:flex;justify-content:space-between;align-items:center;gap:12px">
+        <span>✓ Cliente: <strong id="pap_selectedName">—</strong> · <span id="pap_selectedDoc" class="muted"></span></span>
+        <button id="pap_btnClear" class="btn-secondary" style="padding:4px 12px;font-size:12px">Cambiar</button>
+      </div>
+
+      <div id="pap_leadsList" style="display:none;max-height:280px;overflow-y:auto;background:rgba(8,12,28,.4);border:1px solid var(--line);border-radius:10px;margin-bottom:14px"></div>
+
+      <!-- Paso 2 -->
+      <div id="pap_step2" style="display:none;border-top:1px solid var(--line);padding-top:16px">
+        <h3 style="margin:0 0 12px;font-size:14px">2. Datos del cliente y la moto</h3>
+        <div class="grid-3" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
+          <label class="form-field"><span>Primer apellido</span><input id="pap_primer" /></label>
+          <label class="form-field"><span>Segundo apellido</span><input id="pap_segundo" /></label>
+          <label class="form-field"><span>Nombres</span><input id="pap_nombres" /></label>
+          <label class="form-field"><span>Cédula</span><input id="pap_cc" /></label>
+          <label class="form-field"><span>Teléfono</span><input id="pap_telefono" /></label>
+          <label class="form-field"><span>Ciudad</span><input id="pap_ciudad" value="MEDELLIN" /></label>
+        </div>
+        <label class="form-field" style="display:block"><span>Dirección</span><input id="pap_direccion" /></label>
+        <div class="grid-3" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:10px">
+          <label class="form-field"><span>Marca</span><input id="pap_marca" /></label>
+          <label class="form-field"><span>Línea</span><input id="pap_linea" /></label>
+          <label class="form-field"><span>Color</span><input id="pap_color" /></label>
+          <label class="form-field"><span>Año modelo</span><input id="pap_modelo" /></label>
+          <label class="form-field"><span>Cilindrada</span><input id="pap_cilindrada" /></label>
+          <label class="form-field"><span>Potencia (HP)</span><input id="pap_potencia" /></label>
+          <label class="form-field"><span>Chasis</span><input id="pap_chasis" /></label>
+          <label class="form-field"><span>Motor</span><input id="pap_motor" /></label>
+          <label class="form-field"><span>Combustible</span><input id="pap_combustible" value="GASOLINA" /></label>
+          <label class="form-field"><span>Placa - 3 letras</span><input id="pap_placa_letras" maxlength="3" /></label>
+          <label class="form-field"><span>Placa - 3 (números/letra)</span><input id="pap_placa_numeros" maxlength="3" /></label>
+          <label class="form-field"><span>Trámite</span>
+            <select id="pap_tramite">
+              <option>MATRICULA INICIAL</option><option>TRASPASO</option>
+              <option>CAMBIO DE COLOR</option><option>DUPLICADO DE TARJETA</option>
+              <option>RADICACION DE MATRICULA</option>
+            </select>
+          </label>
+          <label class="form-field"><span>Día</span><input id="pap_dia" maxlength="2" /></label>
+          <label class="form-field"><span>Mes (en letra)</span>
+            <select id="pap_mes">
+              <option>Enero</option><option>Febrero</option><option>Marzo</option>
+              <option>Abril</option><option>Mayo</option><option>Junio</option>
+              <option>Julio</option><option>Agosto</option><option>Septiembre</option>
+              <option>Octubre</option><option>Noviembre</option><option>Diciembre</option>
+            </select>
+          </label>
+          <label class="form-field"><span>Año</span><input id="pap_anio" maxlength="4" /></label>
+        </div>
+        <label class="form-field" style="display:block"><span>Observaciones (RUNT)</span>
+          <input id="pap_observ" value="MATRICULA INICIAL - VEHICULO NUEVO" /></label>
+      </div>
+
+      <!-- Paso 3: Anexos + generar paquete -->
+      <div id="pap_step3" style="display:none;border-top:1px solid var(--line);padding-top:16px;margin-top:14px">
+        <h3 style="margin:0 0 12px;font-size:14px">3. Anexos opcionales y generar paquete</h3>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <label class="form-field">
+            <span>📄 Empadronamiento Auteco (PDF) — completa datos técnicos</span>
+            <input type="file" id="pap_f_emp" accept="application/pdf,image/*" />
+            <span id="pap_empStatus" style="margin-top:4px;font-size:11.5px;color:var(--muted)"></span>
+          </label>
+          <label class="form-field"><span>🪪 Foto cédula</span>
+            <input type="file" id="pap_f_ced" accept="image/*,application/pdf" /></label>
+          <label class="form-field"><span>📄 Factura Serviautec</span>
+            <input type="file" id="pap_f_fac" accept="application/pdf,image/*" /></label>
+          <label class="form-field"><span>📸 Recibo de inicial (extrae firma auto)</span>
+            <input type="file" id="pap_f_rec" accept="image/*,application/pdf" /></label>
+          <label class="form-field"><span>📑 Contrato de prenda (si financiada)</span>
+            <input type="file" id="pap_f_pre" accept="application/pdf" /></label>
+          <label class="form-field"><span>✍️ Firma PNG (opcional, si no se extrae del recibo)</span>
+            <input type="file" id="pap_f_fir" accept="image/png" /></label>
+        </div>
+
+        <button id="pap_btnGenerar" class="btn-primary" style="width:100%;margin-top:14px;padding:12px">
+          📦 Generar paquete (RUNT + Mandato + anexos) y descargar PDF
+        </button>
+        <div id="pap_resultGen" class="form-msg" style="display:none;margin-top:10px"></div>
+
+        <div style="margin-top:22px;padding-top:16px;border-top:1px solid var(--line)">
+          <h3 style="margin:0 0 10px;font-size:14px">💵 Orden de pago (recibo del abono inicial)</h3>
+          <div style="display:grid;grid-template-columns:1fr auto;gap:10px;align-items:end">
+            <label class="form-field" style="margin-bottom:0">
+              <span>Valor de la inicial (opcional — si vacío se lee de observaciones)</span>
+              <input id="pap_valorInicial" placeholder="ej: 2100000" />
+            </label>
+            <button id="pap_btnSoporte" class="btn-primary" style="padding:10px 16px">Generar orden de pago</button>
+          </div>
+          <div id="pap_resultSoporte" class="form-msg" style="display:none;margin-top:10px"></div>
+        </div>
       </div>
     </section>
 
