@@ -1499,9 +1499,10 @@ app.post("/api/soporte-pago/generar", requireAuth, requireAdmin, async (req, res
     const hoy = new Date();
     const fechaTxt = b.fecha || `${String(hoy.getDate()).padStart(2,"0")}/${String(hoy.getMonth()+1).padStart(2,"0")}/${hoy.getFullYear()}`;
 
+    // Descripcion corta para que quepa en la columna del recibo
     const moto = [b.marca, b.modelo].filter(Boolean).join(" ").trim();
     const descripcion = moto
-      ? `Abono inicial moto ${moto}`
+      ? `Abono inicial - ${moto}`   // ej: "Abono inicial - TVS APACHE RTR 160 4V"
       : "Abono inicial";
 
     const usuario = buscarUsuario(req.session.userEmail);
