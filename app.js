@@ -1917,7 +1917,113 @@ function abrirDetalleLead(ts) {
   `;
 
   document.getElementById("modalDetalleLead").classList.add("show");
+  // Reset modo edicion cada vez que se abre el modal
+  salirModoEditarLead();
+  // Guardamos el ts activo para el guardar
+  document.getElementById("modalDetalleLead").dataset.leadTs = ts;
 }
+
+// ============================================================
+//  Editar datos del cliente (in-place en el modal)
+// ============================================================
+function entrarModoEditarLead() {
+  const lead = leadsState.leads.find(l => l.ts === document.getElementById("modalDetalleLead").dataset.leadTs);
+  if (!lead) return;
+  // Reemplaza la seccion DATOS DEL CLIENTE por inputs
+  const html = `
+    <div><span class="lab">Nombre completo</span>
+      <input class="lead-edit-input" id="edit_NombreContacto" value="${escapeHtml(lead.cliente || '')}" /></div>
+    <div><span class="lab">Tipo documento</span>
+      <select class="lead-edit-input" id="edit_TipoDocumento">
+        <option value="CC" ${lead.tipoDocumento==='CC'?'selected':''}>CC</option>
+        <option value="TI" ${lead.tipoDocumento==='TI'?'selected':''}>TI</option>
+        <option value="CE" ${lead.tipoDocumento==='CE'?'selected':''}>CE</option>
+        <option value="PP" ${lead.tipoDocumento==='PP'?'selected':''}>PP</option>
+        <option value="PPT" ${lead.tipoDocumento==='PPT'?'selected':''}>PPT</option>
+        <option value="NIT" ${lead.tipoDocumento==='NIT'?'selected':''}>NIT</option>
+      </select></div>
+    <div><span class="lab">Número documento</span>
+      <input class="lead-edit-input" id="edit_Documento" value="${escapeHtml(lead.documento || '')}" /></div>
+    <div><span class="lab">Celular</span>
+      <input class="lead-edit-input" id="edit_Telefono2" value="${escapeHtml(lead.celular || '')}" /></div>
+    <div><span class="lab">Correo electrónico</span>
+      <input class="lead-edit-input" id="edit_Email" value="${escapeHtml(lead.email || '')}" /></div>
+    <div><span class="lab">Dirección</span>
+      <input class="lead-edit-input" id="edit_Direccion" value="${escapeHtml(lead.direccion || '')}" /></div>
+  `;
+  document.getElementById("leadDatosCliente").innerHTML = html;
+  // Aplicar estilos a inputs
+  document.querySelectorAll(".lead-edit-input").forEach(el => {
+    el.style.width = "100%";
+    el.style.padding = "6px 8px";
+    el.style.background = "rgba(8,12,28,.6)";
+    el.style.border = "1px solid var(--accent-2)";
+    el.style.borderRadius = "6px";
+    el.style.color = "var(--text)";
+    el.style.fontSize = "13px";
+    el.style.marginTop = "4px";
+  });
+  document.getElementById("btnEditarLead").style.display = "none";
+  document.getElementById("btnGuardarLead").style.display = "";
+  document.getElementById("btnCancelarEditarLead").style.display = "";
+}
+
+function salirModoEditarLead() {
+  document.getElementById("btnEditarLead").style.display = "";
+  document.getElementById("btnGuardarLead").style.display = "none";
+  document.getElementById("btnCancelarEditarLead").style.display = "none";
+}
+
+document.getElementById("btnEditarLead")?.addEventListener("click", entrarModoEditarLead);
+
+document.getElementById("btnCancelarEditarLead")?.addEventListener("click", () => {
+  // Re-render el detalle con los datos originales
+  const ts = document.getElementById("modalDetalleLead").dataset.leadTs;
+  if (ts) abrirDetalleLead(ts);
+});
+
+document.getElementById("btnGuardarLead")?.addEventListener("click", async () => {
+  const btn = document.getElementById("btnGuardarLead");
+  const ts = document.getElementById("modalDetalleLead").dataset.leadTs;
+  if (!ts) return;
+  const cambios = {
+    NombreContacto: document.getElementById("edit_NombreContacto").value.trim().toUpperCase(),
+    TipoDocumento:  document.getElementById("edit_TipoDocumento").value,
+    Documento:      document.getElementById("edit_Documento").value.trim(),
+    Telefono2:      document.getElementById("edit_Telefono2").value.trim(),
+    Email:          document.getElementById("edit_Email").value.trim(),
+    Direccion:      document.getElementById("edit_Direccion").value.trim().toUpperCase(),
+  };
+  btn.disabled = true;
+  btn.textContent = "Guardando…";
+  try {
+    const r = await fetch(`/api/leads/${encodeURIComponent(ts)}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      credentials: "same-origin",
+      body: JSON.stringify(cambios),
+    });
+    const d = await r.json();
+    if (!r.ok || !d.ok) throw new Error(d.error || `HTTP ${r.status}`);
+    // Actualizar el estado local y re-renderizar
+    const lead = leadsState.leads.find(l => l.ts === ts);
+    if (lead) {
+      lead.cliente = cambios.NombreContacto;
+      lead.tipoDocumento = cambios.TipoDocumento;
+      lead.documento = cambios.Documento;
+      lead.celular = cambios.Telefono2;
+      lead.email = cambios.Email;
+      lead.direccion = cambios.Direccion;
+    }
+    abrirDetalleLead(ts);
+    salirModoEditarLead();
+  } catch (e) {
+    alert("No se pudo guardar: " + e.message);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "💾 Guardar cambios";
+  }
+});
 
 document.getElementById("btnCerrarLead")?.addEventListener("click", () => document.getElementById("modalDetalleLead").classList.remove("show"));
 document.getElementById("btnCerrarLead2")?.addEventListener("click", () => document.getElementById("modalDetalleLead").classList.remove("show"));

@@ -1635,6 +1635,48 @@ app.delete("/api/leads/:ts", requireAuth, (req, res) => {
   res.json({ ok: true, borrados });
 });
 
+// PATCH /api/leads/:ts — edita datos del cliente en un lead ya registrado.
+// Body JSON con los campos a actualizar (todos opcionales):
+//   { NombreContacto, Documento, TipoDocumento, Telefono2, Email, Direccion,
+//     Observaciones }
+// Nota: NO re-envia a Impulsa; solo actualiza el log local. Los cambios se
+// reflejan al buscar el lead o generar papeleria/recibo, pero NO en Impulsa.
+app.patch("/api/leads/:ts", requireAuth, (req, res) => {
+  const ts = String(req.params.ts);
+  if (!fs.existsSync(LOG_PATH)) return res.status(404).json({ ok: false, error: "No hay leads registrados" });
+
+  const CAMPOS_EDITABLES = new Set([
+    "NombreContacto", "Documento", "TipoDocumento",
+    "Telefono2", "Email", "Direccion", "Observaciones",
+  ]);
+  const cambios = {};
+  for (const [k, v] of Object.entries(req.body || {})) {
+    if (CAMPOS_EDITABLES.has(k)) cambios[k] = v;
+  }
+  if (Object.keys(cambios).length === 0) {
+    return res.status(400).json({ ok: false, error: "Nada que actualizar" });
+  }
+
+  const lineas = fs.readFileSync(LOG_PATH, "utf8").split("\n").filter(Boolean);
+  let encontrado = false;
+  const nuevas = lineas.map(linea => {
+    try {
+      const r = JSON.parse(linea);
+      if (r.ts !== ts) return linea;
+      encontrado = true;
+      r.payload = { ...(r.payload || {}), ...cambios };
+      r.editadoPor = req.session.userEmail;
+      r.editadoTs = new Date().toISOString();
+      return JSON.stringify(r);
+    } catch {
+      return linea;
+    }
+  });
+  if (!encontrado) return res.status(404).json({ ok: false, error: "Lead no encontrado" });
+  fs.writeFileSync(LOG_PATH, nuevas.join("\n") + "\n", "utf8");
+  res.json({ ok: true, actualizados: 1, cambios });
+});
+
 // Borrar TODA la venta (con todos sus documentos). Admin o quien subió original.
 app.delete("/api/docs/:idVenta", requireAuth, (req, res) => {
   const idVenta = idVentaSafe(req.params.idVenta);
