@@ -1641,7 +1641,7 @@ app.delete("/api/leads/:ts", requireAuth, (req, res) => {
 //     Observaciones }
 // Nota: NO re-envia a Impulsa; solo actualiza el log local. Los cambios se
 // reflejan al buscar el lead o generar papeleria/recibo, pero NO en Impulsa.
-app.patch("/api/leads/:ts", requireAuth, (req, res) => {
+app.patch("/api/leads/:ts", requireAuth, requireAdmin, (req, res) => {
   const ts = String(req.params.ts);
   if (!fs.existsSync(LOG_PATH)) return res.status(404).json({ ok: false, error: "No hay leads registrados" });
 
@@ -2868,6 +2868,10 @@ app.use("/catalogo-fichas", express.static(path.join(__dirname, "catalogo-fichas
 
 // Todo lo demás (incluyendo /) requiere sesión
 app.use(requireAuth);
+// Gate papeleria-test.html: solo admin (Yeimy). Los demas roles ven mensaje.
+app.get("/papeleria-test.html", requireAdmin, (req, res) => {
+  res.sendFile(path.join(__dirname, "papeleria-test.html"));
+});
 app.use(express.static(__dirname));
 
 // --- Arranque ---
