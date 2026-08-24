@@ -5234,6 +5234,12 @@ if (btnDescargar) btnDescargar.addEventListener("click", descargarComisionesImag
 function exportarVentasExcel() {
   const rows = (state.filtered && state.filtered.length) ? state.filtered : state.rows;
   if (!rows || !rows.length) { showToast("No hay ventas para exportar"); return; }
+  // Regla de comision por vendedor:
+  //   YEIMY → 5% (siempre)
+  //   Resto de asesores → 1%
+  // Se calcula por fila usando la base sin IVA de esa venta.
+  const pctPorAsesor = (asesor) => /YEIM/.test((asesor || "").toUpperCase()) ? 0.05 : 0.01;
+  const comisionPorFila = (r) => (r.precioSinIva || 0) * pctPorAsesor(r.asesor);
   const cols = [
     ["Fecha", r => r.fechaStr || ""],
     ["Factura", r => r.factura || ""],
@@ -5252,8 +5258,8 @@ function exportarVentasExcel() {
     ["Base sin IVA", r => Math.round(r.precioSinIva || 0)],
     ["Costo compra", r => Math.round(r.costoCompra || 0)],
     ["Utilidad", r => Math.round(r.utilidad || 0)],
-    ["Comisión %", r => r.pctComision ? Math.round(r.pctComision * 100) : ""],
-    ["Comisión", r => Math.round(r.comision || 0)],
+    ["Comisión %", r => Math.round(pctPorAsesor(r.asesor) * 100)],
+    ["Comisión", r => Math.round(comisionPorFila(r))],
   ];
   const cell = v => {
     const s = String(v == null ? "" : v);
