@@ -70,6 +70,7 @@
         <a href="#preasignacion" data-role-only="admin asesor dueno">🔧 Preasignación</a>
         <a href="#ordenfac">📑 Orden facturación</a>
         <a href="#papeleria" data-role-only="admin">📄 Papelería</a>
+        <a href="#ventassiigo" data-role-only="admin">🔍 Ventas Siigo (real)</a>
         <a href="#soat" data-role-only="admin asesor contable dueno">🛡️ Crear SOAT</a>
         <a href="#gpsinstalar" data-role-only="admin asesor dueno">📡 GPS Instalar <span id="gpsInstalarBadge" class="badge" style="display:none;background:#06b6d4;color:#fff;margin-left:6px;font-size:10px"></span></a>
         <a href="#gpsactivar" data-role-only="admin asesor dueno">🛰️ GPS Activar <span id="gpsActivarBadge" class="badge" style="display:none;background:#a855f7;color:#fff;margin-left:6px;font-size:10px"></span></a>
@@ -1052,6 +1053,47 @@
             </tr>
           </thead>
           <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         VENTAS SIIGO EN TIEMPO REAL (solo admin)
+         ============================================================ -->
+    <section id="ventassiigo" class="card" data-role-only="admin">
+      <div class="card-head">
+        <h2>🔍 Ventas Siigo · tiempo real</h2>
+        <button class="btn-primary" id="siigoRefreshBtn" style="padding:8px 14px;font-size:13px">Actualizar</button>
+      </div>
+      <p class="muted" style="margin:-4px 0 12px;font-size:12.5px">
+        Consulta directa a Siigo (fuente oficial de las facturas). No depende del delay del Google Sheets.
+        Cache de 5 min para no saturar la API.
+      </p>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:10px;align-items:end;margin-bottom:12px">
+        <label class="form-field" style="margin-bottom:0"><span>Desde</span>
+          <input type="date" id="siigoDesde" style="background:rgba(8,12,28,.55);border:1px solid var(--line);color:var(--text);border-radius:10px;padding:9px 12px" /></label>
+        <label class="form-field" style="margin-bottom:0"><span>Hasta</span>
+          <input type="date" id="siigoHasta" style="background:rgba(8,12,28,.55);border:1px solid var(--line);color:var(--text);border-radius:10px;padding:9px 12px" /></label>
+        <label class="form-field" style="margin-bottom:0"><span>Asesor</span>
+          <input id="siigoAsesor" value="YEIMI" style="background:rgba(8,12,28,.55);border:1px solid var(--line);color:var(--text);border-radius:10px;padding:9px 12px" /></label>
+      </div>
+
+      <div id="siigoResumen" style="display:none;padding:12px 14px;background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.3);border-radius:10px;margin-bottom:12px;font-size:14px"></div>
+
+      <div id="siigoMsg" class="form-msg" style="display:none;margin-bottom:12px"></div>
+
+      <div class="table-wrap">
+        <table class="table" id="siigoTabla">
+          <thead>
+            <tr>
+              <th>Factura</th><th>Fecha</th><th>Cliente CC</th>
+              <th>Modelo</th><th>Chasis</th><th style="text-align:right">Total</th>
+            </tr>
+          </thead>
+          <tbody id="siigoTbody">
+            <tr><td colspan="6" class="muted" style="text-align:center;padding:24px">Click "Actualizar" para consultar Siigo</td></tr>
+          </tbody>
         </table>
       </div>
     </section>

@@ -6173,3 +6173,92 @@ if (btnRefrescarMet) btnRefrescarMet.addEventListener("click", async () => {
     initPap();
   }
 })();
+
+// ============================================================
+//  VENTAS SIIGO EN TIEMPO REAL (seccion #ventassiigo)
+// ============================================================
+(function ventasSiigoSetup() {
+  function fmtCOP(n) {
+    return "$" + Math.round(Number(n) || 0).toLocaleString("es-CO");
+  }
+  function initFechas() {
+    const desde = document.getElementById("siigoDesde");
+    const hasta = document.getElementById("siigoHasta");
+    if (!desde || !hasta) return;
+    const hoy = new Date();
+    const primero = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
+    const iso = d => d.toISOString().slice(0, 10);
+    if (!desde.value) desde.value = iso(primero);
+    if (!hasta.value) hasta.value = iso(hoy);
+  }
+  async function consultar() {
+    const btn = document.getElementById("siigoRefreshBtn");
+    const msg = document.getElementById("siigoMsg");
+    const tbody = document.getElementById("siigoTbody");
+    const resumen = document.getElementById("siigoResumen");
+    if (!btn) return;
+    msg.style.display = "none"; msg.className = "form-msg";
+    btn.disabled = true;
+    const originalText = btn.textContent;
+    btn.textContent = "Consultando Siigo…";
+    const params = new URLSearchParams({
+      asesor: document.getElementById("siigoAsesor").value || "YEIMI",
+      desde: document.getElementById("siigoDesde").value || "",
+      hasta: document.getElementById("siigoHasta").value || "",
+    });
+    try {
+      const r = await fetch("/api/siigo/mis-facturas?" + params.toString(), { credentials: "same-origin" });
+      const d = await r.json();
+      if (!r.ok || !d.ok) throw new Error(d.error || "HTTP " + r.status);
+      const facts = d.facturas || [];
+      resumen.style.display = "block";
+      resumen.innerHTML =
+        "<strong>" + d.totalFacturas + "</strong> facturas · <strong>" + d.totalMotos + "</strong> motos · " +
+        "asesor <strong>" + d.asesor + "</strong> · " +
+        "cache " + d.cacheEdadSeg + "s";
+      if (!facts.length) {
+        tbody.innerHTML = '<tr><td colspan="6" class="muted" style="text-align:center;padding:24px">Sin facturas en el rango</td></tr>';
+        return;
+      }
+      const filas = [];
+      for (const f of facts) {
+        if (!f.motos.length) {
+          filas.push('<tr><td><strong>' + escapeH(f.factura) + '</strong></td><td>' + fechaCorta(f.fecha) + '</td><td>' + escapeH(f.cliente_id) + '</td><td colspan="2" class="muted">(sin motos parseables)</td><td style="text-align:right">' + fmtCOP(f.total) + '</td></tr>');
+          continue;
+        }
+        for (let i = 0; i < f.motos.length; i++) {
+          const m = f.motos[i];
+          filas.push('<tr>'
+            + (i === 0 ? '<td><strong>' + escapeH(f.factura) + '</strong></td><td>' + fechaCorta(f.fecha) + '</td><td>' + escapeH(f.cliente_id) + '</td>' : '<td colspan="3" class="muted">↳</td>')
+            + '<td>' + escapeH(m.modelo) + '</td>'
+            + '<td style="font-family:monospace;font-size:11.5px">' + escapeH(m.chasis) + '</td>'
+            + '<td style="text-align:right">' + fmtCOP(m.precio) + '</td></tr>');
+        }
+      }
+      tbody.innerHTML = filas.join("");
+    } catch (e) {
+      msg.className = "form-msg form-msg-err";
+      msg.textContent = "✗ " + e.message;
+      msg.style.display = "block";
+    } finally {
+      btn.disabled = false; btn.textContent = originalText;
+    }
+  }
+  function escapeH(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+  function fechaCorta(iso) {
+    if (!iso) return "—";
+    const d = new Date(iso);
+    if (isNaN(d)) return iso;
+    return d.getDate() + "/" + (d.getMonth() + 1) + "/" + d.getFullYear();
+  }
+  function initSiigo() {
+    initFechas();
+    const btn = document.getElementById("siigoRefreshBtn");
+    if (btn) btn.addEventListener("click", consultar);
+  }
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initSiigo);
+  } else {
+    initSiigo();
+  }
+})();
