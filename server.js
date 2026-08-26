@@ -1398,18 +1398,15 @@ app.post("/api/papeleria/generar", requireAuth, requireAdmin,
         ? { bytes: fs.readFileSync(files[key][0].path), mime: files[key][0].mimetype }
         : null;
 
-      // Firma: prioridad al PNG manual; si no hay, intenta extraerla del recibo
+      // Firma: por defecto NO se estampa. El paquete se imprime y el cliente
+      // firma físicamente (decisión de flujo confirmada). El área de firma
+      // queda en blanco. Solo se estampa si Yeimy sube un PNG de firma a mano
+      // (override opcional); ya no se auto-extrae del recibo.
       let firmaPng = null;
       const firmaSrc = readFile("firmaPng");
       if (firmaSrc && /png/i.test(firmaSrc.mime)) {
         firmaPng = firmaSrc.bytes;
-      } else {
-        const reciboParaFirma = readFile("recibo");
-        if (reciboParaFirma && /^image\//i.test(reciboParaFirma.mime)) {
-          firmaPng = await papeleria.extraerFirma(reciboParaFirma.bytes, reciboParaFirma.mime);
-          if (firmaPng) console.log("[papeleria] firma extraída del recibo OK");
-          else console.warn("[papeleria] no se logró extraer firma del recibo");
-        }
+        console.log("[papeleria] estampando firma PNG subida manualmente");
       }
 
       // 1) Generar RUNT y Mandato llenos
@@ -2442,6 +2439,69 @@ app.get("/api/preasignaciones/auditar-siigo", requireAuth, async (req, res) => {
 // ─────────────────────────────────────────────────────────────────
 let facturasCache = { data: null, fetchedAt: 0 };
 const FACTURAS_CACHE_MS = 5 * 60 * 1000; // 5 min
+
+// GET /api/siigo/mis-facturas?asesor=YEIMI&desde=YYYY-MM-DD&hasta=YYYY-MM-DD
+// Lista facturas de VENTA de Siigo (fuente autoritaria) filtradas por vendedor y rango de fechas.
+// Sirve para verificar en tiempo real que motos facturaste, sin depender del delay de Google Sheets.
+app.get("/api/siigo/mis-facturas", requireAuth, requireAdmin, async (req, res) => {
+  if (!siigo.siigoConfigurado()) return res.status(503).json({ ok: false, error: "Siigo no configurado" });
+  try {
+    const asesor = String(req.query.asesor || "YEIMI").toUpperCase();
+    const desde = req.query.desde ? new Date(req.query.desde) : null;
+    const hasta = req.query.hasta ? new Date(req.query.hasta + "T23:59:59") : null;
+
+    // Aprovecha el cache de 5 min existente
+    const now = Date.now();
+    let facturas = facturasCache.data;
+    if (!facturas || (now - facturasCache.fetchedAt) > FACTURAS_CACHE_MS) {
+      facturas = await siigo.obtenerFacturasVenta();
+      facturasCache = { data: facturas, fetchedAt: now };
+    }
+
+    const mias = [];
+    for (const f of facturas) {
+      const vendedor = siigo.vendedorDesdeObservaciones(f.observations) || "";
+      if (!vendedor.includes(asesor.slice(0, 4))) continue; // match tipo YEIM
+      const fecha = f.date ? new Date(f.date) : null;
+      if (desde && fecha && fecha < desde) continue;
+      if (hasta && fecha && fecha > hasta) continue;
+
+      const motos = [];
+      for (const it of (f.items || [])) {
+        const descNorm = String(it.description || "").replace(/CHAISIS/gi, "CHASIS");
+        const parsed = siigo.parseDescripcion(descNorm);
+        if (!parsed.chasis) continue;
+        motos.push({
+          chasis: parsed.chasis.toUpperCase(),
+          modelo: (parsed.modelo || "").trim(),
+          precio: it.total || it.price || 0,
+        });
+      }
+      mias.push({
+        factura: f.name || `${f.prefix || ""}-${f.number}`,
+        fecha: f.date || "",
+        cliente_id: f.customer?.identification || "",
+        vendedor,
+        motos,
+        total: f.total || 0,
+      });
+    }
+    mias.sort((a, b) => (b.fecha || "").localeCompare(a.fecha || ""));
+    res.json({
+      ok: true,
+      asesor,
+      desde: req.query.desde || null,
+      hasta: req.query.hasta || null,
+      totalFacturas: mias.length,
+      totalMotos: mias.reduce((s, f) => s + f.motos.length, 0),
+      facturas: mias,
+      cacheEdadSeg: Math.round((now - facturasCache.fetchedAt) / 1000),
+    });
+  } catch (e) {
+    console.error("Error /api/siigo/mis-facturas:", e);
+    res.status(500).json({ ok: false, error: e.message });
+  }
+});
 
 app.get("/api/taller/auditar-proceso", requireAuth, async (req, res) => {
   if (!siigo.siigoConfigurado()) {
