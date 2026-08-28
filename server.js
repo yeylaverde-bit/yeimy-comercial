@@ -2440,17 +2440,18 @@ app.get("/api/preasignaciones/auditar-siigo", requireAuth, async (req, res) => {
 let facturasCache = { data: null, fetchedAt: 0 };
 const FACTURAS_CACHE_MS = 5 * 60 * 1000; // 5 min
 
-// GET /api/siigo/mis-facturas?asesor=YEIMI&desde=YYYY-MM-DD&hasta=YYYY-MM-DD
-// Lista facturas de VENTA de Siigo (fuente autoritaria) filtradas por vendedor y rango de fechas.
-// Sirve para verificar en tiempo real que motos facturaste, sin depender del delay de Google Sheets.
+// GET /api/siigo/mis-facturas?asesor=YEIMI|TODOS&desde=YYYY-MM-DD&hasta=YYYY-MM-DD
+// Lista facturas de VENTA de Siigo (fuente autoritaria) filtradas por vendedor
+// y rango de fechas. Solo devuelve items que son MOTOS (los que tienen chasis).
+// Si asesor es "TODOS" o vacío, no filtra por vendedor.
 app.get("/api/siigo/mis-facturas", requireAuth, requireAdmin, async (req, res) => {
   if (!siigo.siigoConfigurado()) return res.status(503).json({ ok: false, error: "Siigo no configurado" });
   try {
-    const asesor = String(req.query.asesor || "YEIMI").toUpperCase();
+    const asesorRaw = String(req.query.asesor || "").toUpperCase().trim();
+    const filtrarAsesor = asesorRaw && asesorRaw !== "TODOS";
     const desde = req.query.desde ? new Date(req.query.desde) : null;
     const hasta = req.query.hasta ? new Date(req.query.hasta + "T23:59:59") : null;
 
-    // Aprovecha el cache de 5 min existente
     const now = Date.now();
     let facturas = facturasCache.data;
     if (!facturas || (now - facturasCache.fetchedAt) > FACTURAS_CACHE_MS) {
@@ -2458,43 +2459,64 @@ app.get("/api/siigo/mis-facturas", requireAuth, requireAdmin, async (req, res) =
       facturasCache = { data: facturas, fetchedAt: now };
     }
 
-    const mias = [];
+    const result = [];
+    const asesoresSet = new Set();
     for (const f of facturas) {
-      const vendedor = siigo.vendedorDesdeObservaciones(f.observations) || "";
-      if (!vendedor.includes(asesor.slice(0, 4))) continue; // match tipo YEIM
+      const vendedor = (siigo.vendedorDesdeObservaciones(f.observations) || "").toUpperCase();
       const fecha = f.date ? new Date(f.date) : null;
       if (desde && fecha && fecha < desde) continue;
       if (hasta && fecha && fecha > hasta) continue;
 
+      // Solo items que son MOTOS (tienen chasis parseado)
       const motos = [];
       for (const it of (f.items || [])) {
         const descNorm = String(it.description || "").replace(/CHAISIS/gi, "CHASIS");
         const parsed = siigo.parseDescripcion(descNorm);
-        if (!parsed.chasis) continue;
+        if (!parsed.chasis) continue; // no es moto: skip
         motos.push({
           chasis: parsed.chasis.toUpperCase(),
           modelo: (parsed.modelo || "").trim(),
           precio: it.total || it.price || 0,
         });
       }
-      mias.push({
+      if (!motos.length) continue; // factura sin motos, saltar
+
+      if (vendedor) asesoresSet.add(vendedor);
+      if (filtrarAsesor && !vendedor.includes(asesorRaw.slice(0, 4))) continue;
+
+      result.push({
         factura: f.name || `${f.prefix || ""}-${f.number}`,
         fecha: f.date || "",
         cliente_id: f.customer?.identification || "",
-        vendedor,
+        cliente_nombre: f.customer?.name?.join?.(" ") || f.customer?.commercial_name || "",
+        vendedor: vendedor || "(sin vendedor)",
         motos,
         total: f.total || 0,
       });
     }
-    mias.sort((a, b) => (b.fecha || "").localeCompare(a.fecha || ""));
+    result.sort((a, b) => (b.fecha || "").localeCompare(a.fecha || ""));
+
+    // Resumen por asesor (siempre, útil aunque haya filtro)
+    const porAsesor = {};
+    for (const f of result) {
+      const a = f.vendedor || "(sin vendedor)";
+      if (!porAsesor[a]) porAsesor[a] = { facturas: 0, motos: 0, total: 0 };
+      porAsesor[a].facturas++;
+      porAsesor[a].motos += f.motos.length;
+      porAsesor[a].total += f.total;
+    }
+
     res.json({
       ok: true,
-      asesor,
+      asesor: filtrarAsesor ? asesorRaw : "TODOS",
       desde: req.query.desde || null,
       hasta: req.query.hasta || null,
-      totalFacturas: mias.length,
-      totalMotos: mias.reduce((s, f) => s + f.motos.length, 0),
-      facturas: mias,
+      totalFacturas: result.length,
+      totalMotos: result.reduce((s, f) => s + f.motos.length, 0),
+      totalMonto: result.reduce((s, f) => s + f.total, 0),
+      asesores: Array.from(asesoresSet).sort(),
+      porAsesor,
+      facturas: result,
       cacheEdadSeg: Math.round((now - facturasCache.fetchedAt) / 1000),
     });
   } catch (e) {

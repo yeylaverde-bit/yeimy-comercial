@@ -6214,22 +6214,40 @@ if (btnRefrescarMet) btnRefrescarMet.addEventListener("click", async () => {
       resumen.style.display = "block";
       resumen.innerHTML =
         "<strong>" + d.totalFacturas + "</strong> facturas · <strong>" + d.totalMotos + "</strong> motos · " +
-        "asesor <strong>" + d.asesor + "</strong> · " +
-        "cache " + d.cacheEdadSeg + "s";
+        "total <strong>" + fmtCOP(d.totalMonto || 0) + "</strong> · " +
+        "asesor <strong>" + d.asesor + "</strong> · cache " + d.cacheEdadSeg + "s";
+
+      // Resumen por asesor: solo se muestra si el filtro es TODOS
+      const resAsesorBody = document.getElementById("siigoResumenAsesorBody");
+      const resAsesorWrap = document.getElementById("siigoResumenAsesor");
+      if (d.asesor === "TODOS" && d.porAsesor) {
+        const entries = Object.entries(d.porAsesor).sort((a, b) => b[1].motos - a[1].motos);
+        resAsesorBody.innerHTML = entries.map(function(e){
+          return "<tr><td><strong>" + escapeH(e[0]) + "</strong></td>"
+            + "<td style='text-align:right'>" + e[1].facturas + "</td>"
+            + "<td style='text-align:right'>" + e[1].motos + "</td>"
+            + "<td style='text-align:right'>" + fmtCOP(e[1].total) + "</td></tr>";
+        }).join("");
+        resAsesorWrap.style.display = "block";
+      } else {
+        resAsesorWrap.style.display = "none";
+      }
+
       if (!facts.length) {
-        tbody.innerHTML = '<tr><td colspan="6" class="muted" style="text-align:center;padding:24px">Sin facturas en el rango</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="7" class="muted" style="text-align:center;padding:24px">Sin facturas de motos en el rango</td></tr>';
         return;
       }
       const filas = [];
       for (const f of facts) {
-        if (!f.motos.length) {
-          filas.push('<tr><td><strong>' + escapeH(f.factura) + '</strong></td><td>' + fechaCorta(f.fecha) + '</td><td>' + escapeH(f.cliente_id) + '</td><td colspan="2" class="muted">(sin motos parseables)</td><td style="text-align:right">' + fmtCOP(f.total) + '</td></tr>');
-          continue;
-        }
         for (let i = 0; i < f.motos.length; i++) {
           const m = f.motos[i];
           filas.push('<tr>'
-            + (i === 0 ? '<td><strong>' + escapeH(f.factura) + '</strong></td><td>' + fechaCorta(f.fecha) + '</td><td>' + escapeH(f.cliente_id) + '</td>' : '<td colspan="3" class="muted">↳</td>')
+            + (i === 0
+                ? '<td><strong>' + escapeH(f.factura) + '</strong></td>'
+                  + '<td>' + fechaCorta(f.fecha) + '</td>'
+                  + '<td>' + escapeH(f.vendedor) + '</td>'
+                  + '<td>' + escapeH(f.cliente_id) + '</td>'
+                : '<td colspan="4" class="muted">↳</td>')
             + '<td>' + escapeH(m.modelo) + '</td>'
             + '<td style="font-family:monospace;font-size:11.5px">' + escapeH(m.chasis) + '</td>'
             + '<td style="text-align:right">' + fmtCOP(m.precio) + '</td></tr>');
