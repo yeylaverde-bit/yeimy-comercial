@@ -2496,14 +2496,29 @@ app.get("/api/siigo/mis-facturas", requireAuth, requireAdmin, async (req, res) =
     }
     result.sort((a, b) => (b.fecha || "").localeCompare(a.fecha || ""));
 
-    // Resumen por asesor (siempre, útil aunque haya filtro)
+    // Resumen por asesor con top modelo y desglose por modelo
     const porAsesor = {};
     for (const f of result) {
       const a = f.vendedor || "(sin vendedor)";
-      if (!porAsesor[a]) porAsesor[a] = { facturas: 0, motos: 0, total: 0 };
+      if (!porAsesor[a]) porAsesor[a] = { facturas: 0, motos: 0, total: 0, modelos: {} };
       porAsesor[a].facturas++;
       porAsesor[a].motos += f.motos.length;
       porAsesor[a].total += f.total;
+      for (const m of f.motos) {
+        const mod = (m.modelo || "").split(/\s+CHASIS/i)[0].trim().toUpperCase();
+        if (!mod) continue;
+        porAsesor[a].modelos[mod] = (porAsesor[a].modelos[mod] || 0) + 1;
+      }
+    }
+    // Extraer top modelo por asesor
+    for (const a of Object.keys(porAsesor)) {
+      const modelos = porAsesor[a].modelos;
+      let topMod = "", topN = 0;
+      for (const [k, n] of Object.entries(modelos)) {
+        if (n > topN) { topMod = k; topN = n; }
+      }
+      porAsesor[a].topModelo = topMod;
+      porAsesor[a].topModeloN = topN;
     }
 
     res.json({

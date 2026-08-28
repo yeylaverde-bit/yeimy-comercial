@@ -6222,11 +6222,18 @@ if (btnRefrescarMet) btnRefrescarMet.addEventListener("click", async () => {
       const resAsesorWrap = document.getElementById("siigoResumenAsesor");
       if (d.asesor === "TODOS" && d.porAsesor) {
         const entries = Object.entries(d.porAsesor).sort((a, b) => b[1].motos - a[1].motos);
-        resAsesorBody.innerHTML = entries.map(function(e){
-          return "<tr><td><strong>" + escapeH(e[0]) + "</strong></td>"
-            + "<td style='text-align:right'>" + e[1].facturas + "</td>"
-            + "<td style='text-align:right'>" + e[1].motos + "</td>"
-            + "<td style='text-align:right'>" + fmtCOP(e[1].total) + "</td></tr>";
+        const medalla = i => i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : "#" + (i + 1);
+        resAsesorBody.innerHTML = entries.map(function(e, i){
+          const info = e[1];
+          const top = info.topModelo ? escapeH(info.topModelo) + " <span style='color:var(--muted);font-size:11px'>(" + info.topModeloN + ")</span>" : "—";
+          return "<tr>"
+            + "<td style='text-align:center;font-weight:600'>" + medalla(i) + "</td>"
+            + "<td><strong>" + escapeH(e[0]) + "</strong></td>"
+            + "<td style='text-align:right;font-weight:600'>" + info.motos + "</td>"
+            + "<td style='text-align:right'>" + info.facturas + "</td>"
+            + "<td style='text-align:right'>" + fmtCOP(info.total) + "</td>"
+            + "<td>" + top + "</td>"
+            + "</tr>";
         }).join("");
         resAsesorWrap.style.display = "block";
       } else {

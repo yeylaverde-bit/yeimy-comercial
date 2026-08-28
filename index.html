@@ -1091,11 +1091,23 @@
 
       <div id="siigoResumen" style="display:none;padding:12px 14px;background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.3);border-radius:10px;margin-bottom:12px;font-size:14px"></div>
 
-      <!-- Tabla resumen por asesor -->
+      <!-- Ranking por asesor (visible cuando el filtro es Todos) -->
       <div id="siigoResumenAsesor" style="display:none;margin-bottom:12px">
+        <div style="font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">
+          🏆 Ranking por asesor (real de Siigo)
+        </div>
         <div class="table-wrap">
           <table class="table">
-            <thead><tr><th>Asesor</th><th style="text-align:right">Facturas</th><th style="text-align:right">Motos</th><th style="text-align:right">Total</th></tr></thead>
+            <thead>
+              <tr>
+                <th style="text-align:center;width:44px">#</th>
+                <th>Asesor</th>
+                <th style="text-align:right">Motos</th>
+                <th style="text-align:right">Facturas</th>
+                <th style="text-align:right">Monto total</th>
+                <th>Top modelo</th>
+              </tr>
+            </thead>
             <tbody id="siigoResumenAsesorBody"></tbody>
           </table>
         </div>
