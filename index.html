@@ -1091,6 +1091,42 @@
 
       <div id="siigoResumen" style="display:none;padding:12px 14px;background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.3);border-radius:10px;margin-bottom:12px;font-size:14px"></div>
 
+      <!-- KPI CARDS -->
+      <div id="siigoKPIs" style="display:none;margin-bottom:14px">
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px">
+          <div style="background:rgba(124,92,255,.10);border:1px solid rgba(124,92,255,.35);border-radius:12px;padding:14px">
+            <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em">Total motos vendidas</div>
+            <div id="siigoKpiMotos" style="font-size:28px;font-weight:800;margin-top:4px">—</div>
+          </div>
+          <div style="background:rgba(93,214,255,.10);border:1px solid rgba(93,214,255,.35);border-radius:12px;padding:14px">
+            <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em">Facturas</div>
+            <div id="siigoKpiFacturas" style="font-size:28px;font-weight:800;margin-top:4px">—</div>
+          </div>
+          <div style="background:rgba(34,197,94,.10);border:1px solid rgba(34,197,94,.35);border-radius:12px;padding:14px">
+            <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em">Monto total</div>
+            <div id="siigoKpiMonto" style="font-size:28px;font-weight:800;margin-top:4px;color:#22c55e">—</div>
+          </div>
+          <div style="background:rgba(251,146,60,.10);border:1px solid rgba(251,146,60,.35);border-radius:12px;padding:14px">
+            <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em">Ticket promedio</div>
+            <div id="siigoKpiTicket" style="font-size:28px;font-weight:800;margin-top:4px">—</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- GRAFICOS -->
+      <div id="siigoGraficos" style="display:none;margin-bottom:14px">
+        <div style="display:grid;grid-template-columns:1.4fr 1fr;gap:14px" class="grid-2">
+          <div style="background:rgba(8,12,28,.4);border:1px solid var(--line);border-radius:12px;padding:14px">
+            <div style="font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">🏆 Motos vendidas por asesor</div>
+            <canvas id="siigoChartAsesor" height="220"></canvas>
+          </div>
+          <div style="background:rgba(8,12,28,.4);border:1px solid var(--line);border-radius:12px;padding:14px">
+            <div style="font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">🍩 Top modelos</div>
+            <canvas id="siigoChartModelo" height="220"></canvas>
+          </div>
+        </div>
+      </div>
+
       <!-- Ranking por asesor (visible cuando el filtro es Todos) -->
       <div id="siigoResumenAsesor" style="display:none;margin-bottom:12px">
         <div style="font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">
@@ -1114,6 +1150,11 @@
       </div>
 
       <div id="siigoMsg" class="form-msg" style="display:none;margin-bottom:12px"></div>
+
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <div style="font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em">📋 Detalle de motos vendidas</div>
+        <button id="siigoBtnExport" class="btn-secondary" style="padding:6px 12px;font-size:12px;display:none">📥 Exportar CSV</button>
+      </div>
 
       <div class="table-wrap">
         <table class="table" id="siigoTabla">

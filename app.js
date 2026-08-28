@@ -6217,6 +6217,21 @@ if (btnRefrescarMet) btnRefrescarMet.addEventListener("click", async () => {
         "total <strong>" + fmtCOP(d.totalMonto || 0) + "</strong> · " +
         "asesor <strong>" + d.asesor + "</strong> · cache " + d.cacheEdadSeg + "s";
 
+      // KPIs
+      document.getElementById("siigoKPIs").style.display = "block";
+      document.getElementById("siigoKpiMotos").textContent = d.totalMotos || 0;
+      document.getElementById("siigoKpiFacturas").textContent = d.totalFacturas || 0;
+      document.getElementById("siigoKpiMonto").textContent = fmtCOP(d.totalMonto || 0);
+      const ticket = d.totalMotos ? Math.round(d.totalMonto / d.totalMotos) : 0;
+      document.getElementById("siigoKpiTicket").textContent = fmtCOP(ticket);
+
+      // Cache el ultimo dataset para exportar
+      window.__siigoLastData = d;
+      document.getElementById("siigoBtnExport").style.display = facts.length ? "inline-block" : "none";
+
+      // Charts
+      renderSiigoCharts(d);
+
       // Resumen por asesor: solo se muestra si el filtro es TODOS
       const resAsesorBody = document.getElementById("siigoResumenAsesorBody");
       const resAsesorWrap = document.getElementById("siigoResumenAsesor");
@@ -6276,10 +6291,101 @@ if (btnRefrescarMet) btnRefrescarMet.addEventListener("click", async () => {
     if (isNaN(d)) return iso;
     return d.getDate() + "/" + (d.getMonth() + 1) + "/" + d.getFullYear();
   }
+  let chartAsesor = null, chartModelo = null;
+  function renderSiigoCharts(d) {
+    if (typeof Chart === "undefined") return;
+    const gWrap = document.getElementById("siigoGraficos");
+    if (!gWrap) return;
+    gWrap.style.display = "block";
+    // Ranking por asesor (bar)
+    const asesorEntries = Object.entries(d.porAsesor || {}).sort((a, b) => b[1].motos - a[1].motos);
+    const cA = document.getElementById("siigoChartAsesor").getContext("2d");
+    if (chartAsesor) chartAsesor.destroy();
+    chartAsesor = new Chart(cA, {
+      type: "bar",
+      data: {
+        labels: asesorEntries.map(e => e[0]),
+        datasets: [{
+          label: "Motos",
+          data: asesorEntries.map(e => e[1].motos),
+          backgroundColor: "rgba(124,92,255,.75)",
+          borderColor: "rgba(124,92,255,1)",
+          borderWidth: 1, borderRadius: 6,
+        }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { ticks: { color: "#94a3b8", font: { size: 10 } }, grid: { display: false } },
+          y: { ticks: { color: "#94a3b8", precision: 0 }, grid: { color: "rgba(255,255,255,.05)" } }
+        }
+      }
+    });
+
+    // Top modelos (donut)
+    const modelosCnt = {};
+    for (const f of d.facturas || []) {
+      for (const m of f.motos) {
+        const mod = (m.modelo || "").split(/\s+CHASIS/i)[0].trim().toUpperCase() || "(sin modelo)";
+        modelosCnt[mod] = (modelosCnt[mod] || 0) + 1;
+      }
+    }
+    const modelosSorted = Object.entries(modelosCnt).sort((a, b) => b[1] - a[1]);
+    const TOP = 8;
+    const topModelos = modelosSorted.slice(0, TOP);
+    const otros = modelosSorted.slice(TOP).reduce((s, e) => s + e[1], 0);
+    if (otros > 0) topModelos.push(["OTROS", otros]);
+    const colores = ["#7c5cff","#5dd6ff","#22c55e","#fb923c","#f43f5e","#a855f7","#eab308","#06b6d4","#94a3b8"];
+    const cM = document.getElementById("siigoChartModelo").getContext("2d");
+    if (chartModelo) chartModelo.destroy();
+    chartModelo = new Chart(cM, {
+      type: "doughnut",
+      data: {
+        labels: topModelos.map(e => e[0]),
+        datasets: [{
+          data: topModelos.map(e => e[1]),
+          backgroundColor: colores.slice(0, topModelos.length),
+          borderColor: "rgba(0,0,0,.3)", borderWidth: 1,
+        }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: {
+          legend: { position: "right", labels: { color: "#e6e8f3", font: { size: 10 }, boxWidth: 10 } }
+        },
+        cutout: "60%",
+      }
+    });
+  }
+
+  function exportarSiigoCSV() {
+    const d = window.__siigoLastData;
+    if (!d || !d.facturas || !d.facturas.length) return;
+    const cols = ["Factura","Fecha","Asesor","Cliente CC","Modelo","Chasis","Precio","TotalFactura"];
+    const lineas = [cols.join(";")];
+    const esc = v => { const s = String(v == null ? "" : v); return /[";\n\r]/.test(s) ? '"' + s.replace(/"/g,'""') + '"' : s; };
+    for (const f of d.facturas) {
+      for (const m of f.motos) {
+        lineas.push([f.factura, f.fecha ? f.fecha.slice(0,10) : "", f.vendedor, f.cliente_id, m.modelo, m.chasis, Math.round(m.precio||0), Math.round(f.total||0)].map(esc).join(";"));
+      }
+    }
+    const csv = lineas.join("\r\n");
+    const blob = new Blob([String.fromCharCode(0xFEFF) + csv], { type: "text/csv;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `ventas_siigo_${d.desde || ""}_${d.hasta || ""}_${d.asesor}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
   function initSiigo() {
     initFechas();
     const btn = document.getElementById("siigoRefreshBtn");
     if (btn) btn.addEventListener("click", consultar);
+    const btnExp = document.getElementById("siigoBtnExport");
+    if (btnExp) btnExp.addEventListener("click", exportarSiigoCSV);
   }
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", initSiigo);
