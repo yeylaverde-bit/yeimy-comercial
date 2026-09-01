@@ -2972,7 +2972,12 @@ app.get("/papeleria-test.html", requireAdmin, (req, res) => {
 app.use(express.static(__dirname));
 
 // --- Arranque ---
-app.listen(PORT, HOST, () => {
+// En cPanel/Passenger, Passenger inyecta el puerto/socket vía process.env.PORT
+// y NO se debe fijar el HOST (bindear 0.0.0.0 rompe el arranque bajo Passenger).
+// Localmente sí bindeamos HOST para poder entrar desde otros equipos de la WiFi.
+const onPassenger = !!process.env.PASSENGER_BASE_URI;
+const listenArgs = onPassenger ? [PORT] : [PORT, HOST];
+app.listen(...listenArgs, () => {
   const usuarios = leerUsuarios();
   console.log("");
   console.log("==================================================================");
