@@ -2959,6 +2959,8 @@ app.get(PUBLIC_FILES, (req, res) => {
 // --- Catálogo público (link branded para compartir a clientes por WhatsApp) ---
 // Va ANTES de requireAuth: no exige login. Solo el perfil de Yeimy.
 app.get("/catalogo", (req, res) => res.sendFile(path.join(__dirname, "catalogo.html")));
+// Versión SERVIAUTEC (sin nombre de asesor, WhatsApp a la línea de Lorena). Usa el mismo catalogo.json.
+app.get("/catalogo-serviautec", (req, res) => res.sendFile(path.join(__dirname, "catalogo-serviautec.html")));
 app.get("/catalogo.json", (req, res) => res.sendFile(path.join(__dirname, "catalogo.json")));
 app.use("/catalogo-fotos", express.static(path.join(__dirname, "catalogo-fotos")));
 app.use("/catalogo-fichas", express.static(path.join(__dirname, "catalogo-fichas")));
