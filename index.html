@@ -46,6 +46,7 @@
         <a href="#ventassiigo">🔍 Ventas Siigo (real)</a>
         <a href="#resumen">📊 Resumen</a>
         <a href="#asesores">👥 Asesores</a>
+        <a href="#financieras">🏦 Financieras</a>
         <a href="#mensual">📅 Mes a mes</a>
         <a href="#ventasmarca">🏷️ Ventas por marca</a>
         <a href="#analitica">📈 Analítica</a>
@@ -326,6 +327,23 @@
           <tbody></tbody>
         </table>
       </div>
+    </section>
+
+    <section id="financieras" class="card" data-role-only="admin">
+      <div class="card-head">
+        <h2>Financieras por asesor <span class="muted" style="font-weight:400;font-size:12px">(ventas financiadas)</span></h2>
+        <span class="badge" id="financierasTotal">0</span>
+      </div>
+      <p class="muted" style="margin:-4px 0 12px;font-size:12.5px">
+        Cuántas ventas financiadas cerró cada asesor con cada entidad. Respeta los filtros de arriba (mes, marca, asesor…). Pasa el cursor sobre un número para ver el monto. Fuente: Excel de ventas registradas.
+      </p>
+      <div class="table-wrap">
+        <table class="table" id="tblFinancieras">
+          <thead></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <p class="muted" id="financierasVacio" style="display:none;text-align:center;padding:20px">Sin ventas financiadas en el filtro actual.</p>
     </section>
 
     <section id="mensual" class="card" data-role-only="admin">
@@ -1110,6 +1128,11 @@
             <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em">Ticket promedio</div>
             <div id="siigoKpiTicket" style="font-size:28px;font-weight:800;margin-top:4px">—</div>
           </div>
+          <div style="background:rgba(91,229,138,.10);border:1px solid rgba(91,229,138,.35);border-radius:12px;padding:14px">
+            <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em">Comisión (5%)</div>
+            <div id="siigoKpiComision" style="font-size:28px;font-weight:800;margin-top:4px;color:#5be58a">—</div>
+            <div style="font-size:10.5px;color:var(--muted);margin-top:2px">5% sobre base sin IVA</div>
+          </div>
         </div>
       </div>
 
@@ -1161,11 +1184,11 @@
           <thead>
             <tr>
               <th>Factura</th><th>Fecha</th><th>Asesor</th><th>Cliente CC</th>
-              <th>Modelo</th><th>Chasis</th><th style="text-align:right">Total</th>
+              <th>Modelo</th><th>Chasis</th><th style="text-align:right">Total</th><th style="text-align:right">Comisión 5%</th>
             </tr>
           </thead>
           <tbody id="siigoTbody">
-            <tr><td colspan="7" class="muted" style="text-align:center;padding:24px">Click "Actualizar" para consultar Siigo</td></tr>
+            <tr><td colspan="8" class="muted" style="text-align:center;padding:24px">Click "Actualizar" para consultar Siigo</td></tr>
           </tbody>
         </table>
       </div>

@@ -376,6 +376,7 @@ function renderAll() {
   renderMisVentas();
   renderKpis();
   renderAsesores();
+  renderFinancierasAsesor();
   renderMatriz();
   renderVentasMarca();
   renderVentas();
@@ -550,6 +551,65 @@ function rangoFechas(rows) {
   const max = new Date(Math.max(...ds.map(d => d.getTime())));
   const f = d => d.toLocaleDateString("es-CO", { day: "2-digit", month: "short", year: "numeric" });
   return `${f(min)} → ${f(max)}`;
+}
+
+// Matriz asesor × financiera (solo ventas financiadas, desde el Excel). Respeta filtros.
+function renderFinancierasAsesor() {
+  const tabla = document.getElementById("tblFinancieras");
+  if (!tabla) return;
+  const thead = tabla.querySelector("thead");
+  const tbody = tabla.querySelector("tbody");
+  const vacio = document.getElementById("financierasVacio");
+  const badge = document.getElementById("financierasTotal");
+
+  const fin = state.filtered.filter(r => classifyMedio(r.medio) === "Financiado" && (r.financiera || "").trim());
+  if (badge) badge.textContent = fin.length;
+
+  if (!fin.length) {
+    thead.innerHTML = ""; tbody.innerHTML = "";
+    if (vacio) vacio.style.display = "block";
+    return;
+  }
+  if (vacio) vacio.style.display = "none";
+
+  // Agrupar asesor → financiera → { n, monto }
+  const financierasSet = new Set();
+  const porAsesor = new Map();
+  for (const r of fin) {
+    const f = (r.financiera || "").trim().toUpperCase();
+    const a = (r.asesor || "Sin asignar").trim() || "Sin asignar";
+    financierasSet.add(f);
+    if (!porAsesor.has(a)) porAsesor.set(a, { total: 0, monto: 0, fin: new Map() });
+    const g = porAsesor.get(a);
+    g.total++; g.monto += r.monto || 0;
+    const cell = g.fin.get(f) || { n: 0, monto: 0 };
+    cell.n++; cell.monto += r.monto || 0;
+    g.fin.set(f, cell);
+  }
+
+  // Ordenar financieras por volumen total (desc) para las columnas
+  const finTotals = {};
+  for (const f of financierasSet) finTotals[f] = 0;
+  for (const g of porAsesor.values()) for (const [f, c] of g.fin) finTotals[f] += c.n;
+  const financieras = [...financierasSet].sort((a, b) => finTotals[b] - finTotals[a]);
+
+  thead.innerHTML = "<tr><th>Asesor</th>"
+    + financieras.map(f => `<th class="num">${escapeHtml(f)}</th>`).join("")
+    + '<th class="num">Total fin.</th></tr>';
+
+  const asesores = [...porAsesor.entries()].sort((a, b) => b[1].total - a[1].total);
+  let html = asesores.map(([a, g]) => {
+    const cells = financieras.map(f => {
+      const c = g.fin.get(f);
+      if (!c) return '<td class="num muted">·</td>';
+      return `<td class="num" title="${fmtCOP.format(c.monto)}">${c.n}</td>`;
+    }).join("");
+    return `<tr><td><strong>${escapeHtml(a)}</strong></td>${cells}<td class="num"><strong>${g.total}</strong></td></tr>`;
+  }).join("");
+
+  const totalRow = financieras.map(f => `<td class="num"><strong>${finTotals[f]}</strong></td>`).join("");
+  html += `<tr style="border-top:2px solid var(--line)"><td><strong>TOTAL</strong></td>${totalRow}<td class="num"><strong>${fin.length}</strong></td></tr>`;
+  tbody.innerHTML = html;
 }
 
 function renderAsesores() {
@@ -6224,6 +6284,11 @@ if (btnRefrescarMet) btnRefrescarMet.addEventListener("click", async () => {
       document.getElementById("siigoKpiMonto").textContent = fmtCOP(d.totalMonto || 0);
       const ticket = d.totalMotos ? Math.round(d.totalMonto / d.totalMotos) : 0;
       document.getElementById("siigoKpiTicket").textContent = fmtCOP(ticket);
+      // Comisión personal (5% sobre la base sin IVA de cada moto)
+      let totalComision = 0;
+      for (const f of facts) for (const m of f.motos) totalComision += comisionMoto(m.precio);
+      const kpiCom = document.getElementById("siigoKpiComision");
+      if (kpiCom) kpiCom.textContent = fmtCOP(totalComision);
 
       // Cache el ultimo dataset para exportar
       window.__siigoLastData = d;
@@ -6256,7 +6321,7 @@ if (btnRefrescarMet) btnRefrescarMet.addEventListener("click", async () => {
       }
 
       if (!facts.length) {
-        tbody.innerHTML = '<tr><td colspan="7" class="muted" style="text-align:center;padding:24px">Sin facturas de motos en el rango</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="8" class="muted" style="text-align:center;padding:24px">Sin facturas de motos en el rango</td></tr>';
         return;
       }
       const filas = [];
@@ -6272,7 +6337,8 @@ if (btnRefrescarMet) btnRefrescarMet.addEventListener("click", async () => {
                 : '<td colspan="4" class="muted">↳</td>')
             + '<td>' + escapeH(m.modelo) + '</td>'
             + '<td style="font-family:monospace;font-size:11.5px">' + escapeH(m.chasis) + '</td>'
-            + '<td style="text-align:right">' + fmtCOP(m.precio) + '</td></tr>');
+            + '<td style="text-align:right">' + fmtCOP(m.precio) + '</td>'
+            + '<td style="text-align:right;color:#5be58a">' + fmtCOP(comisionMoto(m.precio)) + '</td></tr>');
         }
       }
       tbody.innerHTML = filas.join("");
@@ -6285,6 +6351,8 @@ if (btnRefrescarMet) btnRefrescarMet.addEventListener("click", async () => {
     }
   }
   function escapeH(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+  // Comisión 5% sobre la base sin IVA (precio Siigo viene con IVA → /1.19)
+  function comisionMoto(precioConIva) { return (Number(precioConIva) || 0) / 1.19 * 0.05; }
   function fechaCorta(iso) {
     if (!iso) return "—";
     const d = new Date(iso);
@@ -6362,12 +6430,12 @@ if (btnRefrescarMet) btnRefrescarMet.addEventListener("click", async () => {
   function exportarSiigoCSV() {
     const d = window.__siigoLastData;
     if (!d || !d.facturas || !d.facturas.length) return;
-    const cols = ["Factura","Fecha","Asesor","Cliente CC","Modelo","Chasis","Precio","TotalFactura"];
+    const cols = ["Factura","Fecha","Asesor","Cliente CC","Modelo","Chasis","Precio","Comision5pct","TotalFactura"];
     const lineas = [cols.join(";")];
     const esc = v => { const s = String(v == null ? "" : v); return /[";\n\r]/.test(s) ? '"' + s.replace(/"/g,'""') + '"' : s; };
     for (const f of d.facturas) {
       for (const m of f.motos) {
-        lineas.push([f.factura, f.fecha ? f.fecha.slice(0,10) : "", f.vendedor, f.cliente_id, m.modelo, m.chasis, Math.round(m.precio||0), Math.round(f.total||0)].map(esc).join(";"));
+        lineas.push([f.factura, f.fecha ? f.fecha.slice(0,10) : "", f.vendedor, f.cliente_id, m.modelo, m.chasis, Math.round(m.precio||0), Math.round(comisionMoto(m.precio)), Math.round(f.total||0)].map(esc).join(";"));
       }
     }
     const csv = lineas.join("\r\n");
