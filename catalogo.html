@@ -3,266 +3,464 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Catálogo Auteco · TVS · Victory · Kymco — Yeimy Laverde</title>
-<meta name="description" content="Catálogo digital de motos — Yeimy Laverde, Asesora Comercial. Ficha técnica, precios, colores y cotización por WhatsApp." />
+<title>Catálogo de Motos TVS · Victory · Kymco — Yeimy Laverde</title>
+<meta name="description" content="Catálogo digital de motos TVS, Victory y Kymco. Precios, cuota inicial, ficha técnica, colores y cotización por WhatsApp con Yeimy Laverde, Asesora Comercial." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800;900&family=Open+Sans:wght@400;600;700&display=swap">
 <style>
   :root{
-    --bg:#0b0b0c; --card:#151517; --card2:#1c1c1f; --line:#2a2a2e;
-    --txt:#f4f4f5; --mut:#9a9aa2; --mut2:#6d6d75;
-    --naranja:#F97316; --naranja2:#ea580c; --wa:#22c55e;
+    --navy:#0f2f6b; --navy2:#16408f; --navy-soft:#e8eef8;
+    --red:#e30613; --red2:#c10510; --red-soft:#fde8e9;
+    --bg:#f4f6f9; --card:#ffffff; --line:#e3e7ee; --line2:#cfd6e2;
+    --txt:#1a1f2b; --mut:#5d6677; --mut2:#8b93a3;
+    --wa:#25d366; --wa2:#1ebe5b;
+    --shadow:0 2px 6px rgba(15,47,107,.06),0 10px 26px rgba(15,47,107,.07);
   }
   *{ box-sizing:border-box; margin:0; padding:0; }
-  body{ font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-        background:var(--bg); color:var(--txt); -webkit-font-smoothing:antialiased; }
+  html{ scroll-behavior:smooth; }
+  body{ font-family:"Open Sans",-apple-system,"Segoe UI",Roboto,Arial,sans-serif; background:var(--bg); color:var(--txt); -webkit-font-smoothing:antialiased; }
+  h1,h2,h3,.mont{ font-family:"Montserrat","Segoe UI",Arial,sans-serif; }
   a{ color:inherit; text-decoration:none; }
-  .wrap{ max-width:1180px; margin:0 auto; padding:0 16px; }
+  button{ font:inherit; }
+  .wrap{ max-width:1240px; margin:0 auto; padding:0 16px; }
+  .num{ font-variant-numeric:tabular-nums; }
 
-  header{ border-bottom:1px solid var(--line); padding:14px 0; position:sticky; top:0; z-index:30;
-          background:rgba(11,11,12,.92); backdrop-filter:blur(8px); }
-  header .wrap{ display:flex; align-items:center; gap:12px; }
-  .logo{ font-weight:900; letter-spacing:1px; font-size:16px; border:2px solid var(--txt); padding:4px 8px; border-radius:6px; }
-  .htitle{ color:var(--mut); font-size:15px; font-weight:600; }
-  .hupd{ margin-left:auto; color:var(--mut2); font-size:12px; }
+  /* Top strip */
+  .strip{ background:var(--navy); color:#fff; font-size:13px; }
+  .strip .wrap{ display:flex; align-items:center; justify-content:space-between; gap:12px; padding-block:8px; }
+  .strip b{ color:#fff; }
+  .strip .s-l{ opacity:.9; }
+  .strip a.s-wa{ display:inline-flex; align-items:center; gap:7px; background:var(--wa); color:#063d1c; font-weight:800; padding:6px 12px; border-radius:6px; font-family:"Montserrat",sans-serif; font-size:12.5px; white-space:nowrap; }
+  @media(max-width:620px){ .strip .s-l{ display:none } .strip .wrap{ justify-content:center } }
 
-  .profile{ background:var(--card); border:1px solid var(--line); border-radius:18px; padding:18px;
-            display:flex; flex-direction:column; align-items:center; gap:12px; margin:18px 0; text-align:center; }
-  .avatar{ width:82px; height:82px; border-radius:50%; background:linear-gradient(135deg,#2a2a2e,#3a3a40);
-           display:flex; align-items:center; justify-content:center; font-size:28px; font-weight:800; color:var(--naranja);
-           border:2px solid var(--naranja); }
-  .pname{ font-size:20px; font-weight:800; }
-  .prole{ color:var(--naranja); font-weight:700; font-size:13.5px; margin-top:-6px; }
-  .btn-wa-big{ background:var(--wa); color:#04210f; font-weight:800; padding:14px 20px; border-radius:12px;
-               font-size:15px; width:100%; max-width:420px; display:flex; align-items:center; justify-content:center; gap:8px; }
+  /* Header */
+  header{ background:#fff; border-bottom:1px solid var(--line); position:sticky; top:0; z-index:40; }
+  header .wrap{ display:flex; align-items:center; gap:18px; padding-block:12px; }
+  .brand{ display:flex; flex-direction:column; line-height:1; flex:none; }
+  .brand .b1{ font-family:"Montserrat",sans-serif; font-weight:900; font-size:22px; color:var(--navy); letter-spacing:.5px; }
+  .brand .b1 span{ color:var(--red); }
+  .brand .b2{ font-size:11.5px; color:var(--mut); font-weight:600; margin-top:4px; letter-spacing:.3px; }
+  .searchbox{ flex:1; display:flex; max-width:560px; margin-left:auto; }
+  .searchbox input{ flex:1; min-width:0; border:0; background:#eef1f6; padding:13px 16px; border-radius:8px 0 0 8px; font-size:15px; color:var(--txt); outline:none; }
+  .searchbox input:focus{ background:#e6ebf3; box-shadow:inset 0 0 0 2px var(--navy2); }
+  .searchbox button{ border:0; background:var(--navy); color:#fff; width:52px; border-radius:0 8px 8px 0; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+  .searchbox button svg{ width:20px; height:20px; }
+  @media(max-width:620px){ header .wrap{ flex-wrap:wrap; gap:10px } .searchbox{ max-width:none; flex-basis:100%; } .brand .b1{ font-size:19px } }
 
-  .controls{ position:sticky; top:56px; z-index:20; background:var(--bg); padding:8px 0 12px; }
-  .search{ width:100%; padding:13px 16px; border:1px solid var(--line); border-radius:12px; font-size:15px;
-           background:var(--card); color:var(--txt); outline:none; }
-  .search::placeholder{ color:var(--mut2); }
-  .search:focus{ border-color:var(--naranja); }
-  .chips{ display:flex; gap:8px; overflow-x:auto; padding:11px 0 2px; -webkit-overflow-scrolling:touch; scrollbar-width:none; }
-  .chips::-webkit-scrollbar{ display:none; }
-  .chip{ flex:0 0 auto; padding:8px 14px; border-radius:22px; border:1px solid var(--line); background:var(--card);
-         font-size:13px; font-weight:600; color:var(--mut); cursor:pointer; white-space:nowrap; }
-  .chip.active{ background:var(--naranja); color:#231000; border-color:var(--naranja); }
-  .count{ color:var(--mut); font-size:13px; margin:4px 0 14px; font-weight:600; }
+  /* Hero */
+  .hero{ background:linear-gradient(115deg,var(--navy) 0%,var(--navy2) 60%,#1f56b8 100%); color:#fff; overflow:hidden; position:relative; }
+  .hero .wrap{ display:grid; grid-template-columns:1.1fr 1fr; align-items:center; gap:20px; padding-block:34px 30px; }
+  .hero .eyebrow{ font-family:"Montserrat",sans-serif; font-weight:700; font-size:12.5px; letter-spacing:2px; text-transform:uppercase; color:#ffd2d4; }
+  .hero h1{ font-size:clamp(28px,4.6vw,46px); font-weight:900; line-height:1.05; margin:10px 0 12px; }
+  .hero h1 em{ font-style:normal; color:#fff; border-bottom:4px solid var(--red); }
+  .hero p{ font-size:16px; opacity:.92; max-width:48ch; line-height:1.5; }
+  .hero .stats{ display:flex; gap:26px; margin-top:20px; flex-wrap:wrap; }
+  .hero .stat b{ display:block; font-family:"Montserrat",sans-serif; font-size:26px; font-weight:900; }
+  .hero .stat span{ font-size:12.5px; opacity:.85; }
+  .hero .cta{ display:inline-flex; align-items:center; gap:8px; margin-top:22px; background:var(--red); color:#fff; font-family:"Montserrat",sans-serif; font-weight:800; padding:13px 22px; border-radius:8px; font-size:14.5px; }
+  .hero .cta:hover{ background:var(--red2); }
+  .hero .pic{ position:relative; display:flex; justify-content:center; }
+  .hero .pic .frame{ background:#fff; border-radius:22px; padding:14px; width:100%; max-width:470px; box-shadow:0 22px 40px rgba(0,0,0,.28); position:relative; }
+  .hero .pic .frame::after{ content:"La más vendida"; position:absolute; top:14px; right:14px; background:var(--red); color:#fff; font-family:"Montserrat",sans-serif; font-weight:700; font-size:12px; padding:5px 11px; border-radius:6px; }
+  .hero .pic img{ display:block; width:100%; aspect-ratio:4/3; object-fit:contain; }
+  .hero .pic .cap{ text-align:center; font-family:"Montserrat",sans-serif; font-weight:800; color:var(--navy); font-size:15px; padding:4px 0 2px; }
+  @media(max-width:820px){ .hero .wrap{ grid-template-columns:1fr; } .hero .pic .frame{ max-width:320px } }
 
-  .grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:16px; padding-bottom:40px; }
-  .card{ background:var(--card); border:1px solid var(--line); border-radius:16px; overflow:hidden;
-         display:flex; flex-direction:column; }
-  .card .ph{ background:#fff; aspect-ratio:16/10; display:flex; align-items:center; justify-content:center; position:relative; }
-  .card .ph img{ width:100%; height:100%; object-fit:contain; }
-  .badge-new{ position:absolute; top:10px; left:10px; background:var(--naranja); color:#231000; font-size:10px;
-              font-weight:800; padding:3px 9px; border-radius:20px; letter-spacing:.5px; }
-  .card .body{ padding:14px 16px 16px; display:flex; flex-direction:column; gap:3px; }
-  .swrow{ display:flex; align-items:center; gap:7px; margin-bottom:4px; flex-wrap:wrap; }
-  .sw{ width:17px; height:17px; border-radius:50%; border:1px solid #555; }
-  .swname{ font-size:12px; color:var(--mut); }
-  .card h3{ font-size:16.5px; font-weight:800; line-height:1.2; }
-  .meta{ font-size:12px; color:var(--mut); margin-bottom:8px; }
-  .pblock{ border-top:1px solid var(--line); padding-top:10px; margin-top:4px; }
-  .plabel{ font-size:10px; letter-spacing:.6px; color:var(--mut2); text-transform:uppercase; }
-  .pini{ font-size:22px; font-weight:800; color:var(--txt); margin:1px 0 8px; }
-  .prow{ display:flex; justify-content:space-between; align-items:baseline; font-size:13px; padding:2px 0; }
-  .prow .l{ color:var(--mut); }
-  .prow .v{ font-weight:700; }
-  .prow .tach{ color:var(--mut2); text-decoration:line-through; font-size:12px; margin-right:6px; font-weight:400; }
-  .prow.bono .v{ color:var(--naranja); }
-  .cbtns{ display:flex; gap:8px; margin-top:14px; }
-  .btn{ flex:1; text-align:center; padding:11px; border-radius:10px; font-size:13.5px; font-weight:700; cursor:pointer; border:1px solid transparent; }
-  .btn-ficha{ background:transparent; border-color:var(--line); color:var(--txt); }
-  .btn-ficha:hover{ border-color:var(--naranja); color:var(--naranja); }
-  .btn-cot{ background:var(--naranja); color:#231000; }
+  /* Sections */
+  .sec-h{ display:flex; align-items:flex-end; justify-content:space-between; gap:12px; margin:34px 0 16px; }
+  .sec-h h2{ font-size:clamp(21px,2.6vw,26px); font-weight:800; color:var(--navy); }
+  .sec-h h2::after{ content:""; display:block; width:44px; height:4px; background:var(--red); border-radius:2px; margin-top:8px; }
 
-  .overlay{ position:fixed; inset:0; background:rgba(0,0,0,.7); z-index:50; display:none; align-items:flex-end; justify-content:center; }
+  /* Category tiles */
+  .cats{ display:grid; grid-template-columns:repeat(5,1fr); gap:14px; }
+  @media(max-width:980px){ .cats{ grid-template-columns:repeat(3,1fr) } }
+  @media(max-width:560px){ .cats{ grid-template-columns:repeat(2,1fr); gap:10px } }
+  .cat{ background:var(--card); border:1px solid var(--line); border-radius:14px; overflow:hidden; cursor:pointer; text-align:left; display:flex; flex-direction:column; transition:transform .15s,box-shadow .15s,border-color .15s; }
+  .cat:hover{ transform:translateY(-3px); box-shadow:var(--shadow); }
+  .cat.active{ border-color:var(--navy); box-shadow:0 0 0 2px var(--navy) inset; }
+  .cat .cimg{ background:linear-gradient(180deg,#f7f9fc,#eef2f8); aspect-ratio:16/10; display:flex; align-items:center; justify-content:center; }
+  .cat .cimg img{ width:88%; height:88%; object-fit:contain; }
+  .cat .cbody{ padding:11px 13px 13px; display:flex; flex-direction:column; gap:6px; }
+  .cat .cname{ font-family:"Montserrat",sans-serif; font-weight:800; font-size:14.5px; color:var(--navy); line-height:1.15; }
+  .cat .ccount{ font-size:12px; color:var(--mut); }
+  .cat .cbtn{ align-self:flex-start; background:var(--red); color:#fff; font-family:"Montserrat",sans-serif; font-weight:700; font-size:12px; padding:6px 12px; border-radius:6px; }
+
+  /* Toolbar */
+  .crumbs{ font-size:13px; color:var(--mut); margin:26px 0 6px; }
+  .crumbs b{ color:var(--navy); }
+  .crumbs span{ margin:0 6px; color:var(--mut2); }
+  .toolbar{ display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; padding:12px 0 16px; border-bottom:1px solid var(--line); margin-bottom:18px; }
+  .brands{ display:flex; gap:8px; flex-wrap:wrap; }
+  .bchip{ border:1.5px solid var(--line2); background:#fff; color:var(--txt); font-family:"Montserrat",sans-serif; font-weight:700; font-size:12.5px; padding:8px 14px; border-radius:22px; cursor:pointer; }
+  .bchip:hover{ border-color:var(--navy); color:var(--navy); }
+  .bchip.active{ background:var(--navy); border-color:var(--navy); color:#fff; }
+  .tright{ display:flex; align-items:center; gap:12px; }
+  .count{ font-size:13.5px; color:var(--mut); }
+  .count b{ color:var(--txt); }
+  select.sort{ border:1.5px solid var(--line2); background:#fff; border-radius:8px; padding:8px 10px; font-size:13.5px; color:var(--txt); font-family:inherit; cursor:pointer; }
+  select.sort:focus, .bchip:focus-visible, .cat:focus-visible{ outline:2px solid var(--navy2); outline-offset:2px; }
+
+  /* Product grid */
+  .grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:18px; padding-bottom:50px; }
+  @media(max-width:1100px){ .grid{ grid-template-columns:repeat(3,1fr) } }
+  @media(max-width:760px){ .grid{ grid-template-columns:repeat(2,1fr); gap:10px } }
+  .card{ background:var(--card); border:1px solid var(--line); border-radius:14px; overflow:hidden; display:flex; flex-direction:column; position:relative; transition:box-shadow .18s, transform .18s; }
+  .card:hover{ box-shadow:var(--shadow); transform:translateY(-2px); }
+  .card .top{ position:relative; padding:12px 12px 0; }
+  .mk{ position:absolute; top:12px; left:12px; z-index:2; font-family:"Montserrat",sans-serif; font-weight:900; font-style:italic; font-size:15px; letter-spacing:.3px; }
+  .mk.TVS{ color:#1f3d8f; }
+  .mk.VICTORY{ color:#c9a227; font-style:normal; letter-spacing:1.5px; font-size:13px; }
+  .mk.KYMCO{ color:#0b6b3a; font-style:normal; }
+  .tag{ position:absolute; top:10px; right:10px; z-index:2; background:var(--red); color:#fff; font-family:"Montserrat",sans-serif; font-weight:700; font-size:11px; padding:4px 10px; border-radius:6px; }
+  .tag.new{ background:var(--navy); }
+  .card .ph{ aspect-ratio:4/3; display:flex; align-items:center; justify-content:center; margin-top:14px; cursor:pointer; }
+  .card .ph img{ width:100%; height:100%; object-fit:contain; transition:transform .25s; }
+  .card:hover .ph img{ transform:scale(1.04); }
+  .card .body{ padding:6px 14px 16px; display:flex; flex-direction:column; align-items:center; text-align:center; gap:2px; flex:1; }
+  .card .bn{ font-family:"Montserrat",sans-serif; font-weight:700; font-size:13px; color:var(--mut); letter-spacing:.5px; }
+  .card h3{ font-size:15.5px; font-weight:800; line-height:1.2; color:var(--txt); min-height:2.4em; display:flex; align-items:center; justify-content:center; }
+  .card .cc{ font-size:12px; color:var(--mut2); }
+  .card .price{ font-family:"Montserrat",sans-serif; font-weight:800; font-size:clamp(18px,2.2vw,22px); color:var(--txt); margin:8px 0 2px; }
+  .card .price small{ display:block; font-family:"Open Sans",sans-serif; font-size:11px; color:var(--mut2); font-weight:600; letter-spacing:.3px; margin-bottom:1px; }
+  .card .ini{ background:var(--red-soft); color:var(--red2); border-radius:8px; padding:6px 10px; font-size:11.5px; font-weight:700; margin-top:6px; width:100%; display:flex; flex-direction:column; line-height:1.25; }
+  .card .ini b{ font-family:"Montserrat",sans-serif; font-size:15px; white-space:nowrap; }
+  .card .contado b{ white-space:nowrap; }
+  @media(max-width:460px){ .mk{ display:none } .tag{ left:8px; right:auto; top:8px; font-size:10px; padding:3px 8px } }
+  .card .ini.none{ background:var(--navy-soft); color:var(--navy); }
+  .card .contado{ font-size:12px; color:var(--mut); margin-top:6px; }
+  .card .contado b{ color:var(--txt); }
+  .swrow{ display:flex; gap:6px; justify-content:center; margin-top:9px; flex-wrap:wrap; }
+  .sw{ width:15px; height:15px; border-radius:50%; border:1px solid rgba(0,0,0,.18); box-shadow:inset 0 0 0 1.5px #fff; }
+  .card .actions{ display:flex; gap:8px; width:100%; margin-top:auto; padding-top:12px; }
+  .btn{ flex:1; display:inline-flex; align-items:center; justify-content:center; gap:6px; padding:10px 8px; border-radius:8px; font-family:"Montserrat",sans-serif; font-weight:700; font-size:12.5px; cursor:pointer; border:1.5px solid transparent; }
+  .btn-more{ background:#fff; border-color:var(--navy); color:var(--navy); }
+  .btn-more:hover{ background:var(--navy); color:#fff; }
+  .btn-cot{ background:var(--wa); color:#063d1c; }
+  .btn-cot:hover{ background:var(--wa2); }
+  .btn svg{ width:15px; height:15px; flex:none; }
+  @media(max-width:460px){ .card .actions{ flex-direction:column; gap:6px } .card h3{ font-size:14px } .card .body{ padding:4px 10px 12px } }
+  .empty{ text-align:center; color:var(--mut); padding:60px 16px; grid-column:1/-1; }
+
+  /* Benefits band */
+  .benef{ background:#fff; border-top:1px solid var(--line); border-bottom:1px solid var(--line); }
+  .benef .wrap{ display:grid; grid-template-columns:repeat(4,1fr); gap:18px; padding-block:22px; }
+  @media(max-width:820px){ .benef .wrap{ grid-template-columns:repeat(2,1fr) } }
+  .bf{ display:flex; gap:12px; align-items:flex-start; }
+  .bf .ic{ flex:none; width:42px; height:42px; border-radius:10px; background:var(--navy-soft); color:var(--navy); display:flex; align-items:center; justify-content:center; }
+  .bf .ic svg{ width:22px; height:22px; }
+  .bf b{ display:block; font-family:"Montserrat",sans-serif; font-size:14px; color:var(--navy); }
+  .bf span{ font-size:12.5px; color:var(--mut); }
+
+  /* Modal */
+  .overlay{ position:fixed; inset:0; background:rgba(10,20,40,.6); z-index:60; display:none; align-items:center; justify-content:center; padding:16px; }
   .overlay.open{ display:flex; }
-  .modal{ background:var(--card); width:100%; max-width:640px; max-height:94vh; overflow-y:auto; border-radius:18px 18px 0 0;
-          border:1px solid var(--line); animation:up .22s ease; }
-  @keyframes up{ from{ transform:translateY(24px); opacity:.5 } to{ transform:none; opacity:1 } }
-  .mph{ background:#fff; position:relative; }
-  .mph img{ width:100%; max-height:240px; object-fit:contain; display:block; }
-  .close{ position:absolute; top:10px; right:10px; width:34px; height:34px; border-radius:50%; background:rgba(0,0,0,.6); color:#fff; border:none; font-size:20px; cursor:pointer; }
-  .mbody{ padding:16px 18px 26px; }
-  .mbody h2{ font-size:22px; font-weight:800; line-height:1.15; }
-  .mbody .meta{ font-size:13px; margin:2px 0 12px; }
-  .mini{ background:var(--card2); border:1px solid var(--line); border-radius:12px; padding:12px 14px; }
-  .mini .plabel{ margin-bottom:2px; }
-  .mini .big{ font-size:22px; font-weight:800; }
-  .disc{ font-size:11px; color:var(--mut2); margin:10px 0 4px; line-height:1.4; }
-  .sec{ color:var(--naranja); font-weight:800; font-size:13px; letter-spacing:.6px; margin:18px 0 8px; }
-  .specrow{ display:flex; justify-content:space-between; gap:14px; padding:8px 0; border-bottom:1px solid var(--line); }
-  .specrow .k{ color:var(--mut); font-size:12.5px; flex:0 0 45%; }
-  .specrow .v{ font-weight:700; font-size:13px; text-align:right; }
-  .mbtns{ display:flex; flex-direction:column; gap:10px; margin-top:18px; }
-  .btn-lg{ display:flex; align-items:center; justify-content:center; gap:8px; padding:14px; border-radius:12px; font-size:15px; font-weight:800; cursor:pointer; border:none; }
-  .btn-pdf{ background:var(--naranja); color:#231000; }
-  .btn-wa{ background:var(--wa); color:#04210f; }
-  .btn-lg[disabled]{ opacity:.4; }
+  .modal{ background:#fff; width:100%; max-width:1020px; max-height:92vh; overflow-y:auto; border-radius:16px; position:relative; animation:up .22s ease; }
+  @keyframes up{ from{ transform:translateY(20px); opacity:.4 } to{ transform:none; opacity:1 } }
+  @media(prefers-reduced-motion:reduce){ .modal{ animation:none } .card,.card .ph img,.cat{ transition:none } }
+  .close{ position:absolute; top:12px; right:12px; z-index:3; width:38px; height:38px; border-radius:50%; background:#fff; border:1px solid var(--line); color:var(--txt); font-size:22px; cursor:pointer; box-shadow:var(--shadow); }
+  .pd{ display:grid; grid-template-columns:1.15fr 1fr; gap:0; }
+  @media(max-width:820px){ .pd{ grid-template-columns:1fr } .overlay{ padding:0; align-items:flex-end } .modal{ max-height:95vh; border-radius:16px 16px 0 0 } }
+  .pd-img{ background:linear-gradient(180deg,#f7f9fc,#eef2f8); padding:28px 22px 18px; display:flex; flex-direction:column; align-items:center; gap:14px; }
+  .pd-img img{ width:100%; max-height:380px; object-fit:contain; }
+  .pd-colors{ display:flex; gap:8px; flex-wrap:wrap; justify-content:center; }
+  .cpick{ display:flex; align-items:center; gap:7px; background:#fff; border:1.5px solid var(--line2); border-radius:22px; padding:5px 11px 5px 6px; cursor:pointer; font-size:12.5px; font-weight:600; color:var(--txt); }
+  .cpick .sw{ width:18px; height:18px; }
+  .cpick.active{ border-color:var(--navy); box-shadow:0 0 0 1px var(--navy) inset; }
+  .pd-info{ padding:28px 26px 24px; display:flex; flex-direction:column; gap:10px; }
+  .pd-info .bn{ font-family:"Montserrat",sans-serif; font-weight:800; color:var(--red); font-size:13px; letter-spacing:1px; }
+  .pd-info h2{ font-size:clamp(22px,3vw,30px); font-weight:900; color:var(--navy); line-height:1.1; }
+  .pd-info .cc{ font-size:13px; color:var(--mut); }
+  .pbox{ border:1px solid var(--line); border-radius:12px; overflow:hidden; margin-top:6px; }
+  .pbox .row{ display:flex; justify-content:space-between; align-items:baseline; gap:10px; padding:11px 14px; border-top:1px solid var(--line); font-size:14px; }
+  .pbox .row:first-child{ border-top:0; }
+  .pbox .row .l{ color:var(--mut); }
+  .pbox .row .v{ font-weight:700; font-family:"Montserrat",sans-serif; }
+  .pbox .row.big{ background:var(--navy); color:#fff; }
+  .pbox .row.big .l{ color:#c9d6ef; }
+  .pbox .row.big .v{ font-size:22px; }
+  .pbox .row.ini .v{ color:var(--red); font-size:18px; }
+  .pbox .row.bono .v{ color:var(--red); }
+  .disc{ font-size:11.5px; color:var(--mut2); line-height:1.45; }
+  .pd-btns{ display:flex; flex-direction:column; gap:9px; margin-top:6px; }
+  .btn-lg{ display:flex; align-items:center; justify-content:center; gap:8px; padding:13px; border-radius:10px; font-family:"Montserrat",sans-serif; font-weight:800; font-size:14px; cursor:pointer; border:1.5px solid transparent; }
+  .btn-lg svg{ width:18px; height:18px; }
+  .btn-wa{ background:var(--wa); color:#063d1c; }
+  .btn-wa:hover{ background:var(--wa2); }
+  .btn-red{ background:var(--red); color:#fff; }
+  .btn-red:hover{ background:var(--red2); }
+  .btn-line{ background:#fff; border-color:var(--line2); color:var(--navy); }
+  .btn-line:hover{ border-color:var(--navy); }
+  .specs{ padding:6px 26px 28px; }
+  .specs h3{ font-size:18px; font-weight:800; color:var(--navy); margin:12px 0 12px; }
+  .specs h3::after{ content:""; display:block; width:36px; height:3px; background:var(--red); border-radius:2px; margin-top:6px; }
+  .spec-grid{ display:grid; grid-template-columns:1fr 1fr; column-gap:28px; }
+  @media(max-width:620px){ .spec-grid{ grid-template-columns:1fr } }
+  .spec{ display:flex; justify-content:space-between; gap:14px; padding:9px 0; border-bottom:1px solid var(--line); font-size:13px; }
+  .spec .k{ color:var(--mut); flex:0 0 48%; }
+  .spec .v{ font-weight:700; text-align:right; }
+  .desc{ font-size:13.5px; color:var(--mut); line-height:1.55; margin-top:14px; font-style:italic; }
 
-  footer{ text-align:center; padding:26px 16px 46px; color:var(--mut2); font-size:12px; border-top:1px solid var(--line); }
-  footer b{ color:var(--txt); }
-  .empty{ text-align:center; color:var(--mut); padding:50px 16px; }
-  .swpick{ display:flex; align-items:center; gap:9px; width:100%; padding:8px 10px; margin-bottom:6px;
-           background:var(--card2); border:1px solid var(--line); border-radius:10px; cursor:pointer; text-align:left; }
-  .swpick .swname{ color:var(--txt); font-size:13px; font-weight:600; }
-  .swpick.active{ border-color:var(--naranja); }
-  .swpick .sw{ width:20px; height:20px; }
-  @media(min-width:560px){ .overlay{ align-items:center } .modal{ border-radius:18px } }
+  /* Floating WhatsApp */
+  .fab{ position:fixed; right:18px; bottom:18px; z-index:50; width:60px; height:60px; border-radius:50%; background:var(--wa); display:flex; align-items:center; justify-content:center; box-shadow:0 8px 24px rgba(0,0,0,.25); }
+  .fab svg{ width:32px; height:32px; color:#fff; }
+  .fab:hover{ background:var(--wa2); }
+
+  /* Footer */
+  footer{ background:var(--navy); color:#c9d6ef; }
+  footer .wrap{ display:grid; grid-template-columns:1.2fr 1fr 1fr; gap:24px; padding-block:34px 26px; }
+  @media(max-width:760px){ footer .wrap{ grid-template-columns:1fr } }
+  footer .fb1{ font-family:"Montserrat",sans-serif; font-weight:900; font-size:22px; color:#fff; }
+  footer .fb1 span{ color:#ff5a64; }
+  footer h4{ font-family:"Montserrat",sans-serif; color:#fff; font-size:14px; margin-bottom:10px; }
+  footer p, footer li{ font-size:13px; line-height:1.7; }
+  footer ul{ list-style:none; }
+  footer a.fwa{ display:inline-flex; align-items:center; gap:8px; margin-top:10px; background:var(--wa); color:#063d1c; font-family:"Montserrat",sans-serif; font-weight:800; padding:10px 16px; border-radius:8px; font-size:13.5px; }
+  footer .legal{ border-top:1px solid rgba(255,255,255,.12); text-align:center; font-size:11.5px; padding:14px 16px 80px; color:#9fb1d6; }
 </style>
 </head>
 <body>
+
+  <div class="strip"><div class="wrap">
+    <span class="s-l">Motos nuevas TVS · Victory · Kymco — financiación y trámite de matrícula incluidos</span>
+    <a class="s-wa" id="waStrip" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.7.8-.8 1-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.3-.4.7-1.3a.5.5 0 0 0 0-.5l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.8 11.9 11.9 0 0 0 4.6 4c1.7.7 2.4.8 3.2.7a2.8 2.8 0 0 0 1.8-1.3 2.3 2.3 0 0 0 .2-1.3c-.1-.1-.3-.2-.5-.3Z"/></svg><span id="stripTel">WhatsApp</span></a>
+  </div></div>
+
   <header><div class="wrap">
-    <span class="logo">SERVIAUTEC</span>
-    <span class="htitle">Catálogo Digital</span>
-    <span class="hupd" id="hupd"></span>
+    <a class="brand" href="#top" aria-label="Inicio">
+      <span class="b1">SERVI<span>AUTEC</span></span>
+      <span class="b2" id="brandSub">Yeimy Laverde · Asesora Comercial</span>
+    </a>
+    <form class="searchbox" id="searchForm" role="search" onsubmit="event.preventDefault(); document.getElementById('productos').scrollIntoView();">
+      <input id="search" type="search" placeholder="¿Qué moto estás buscando? Raider, Apache, NTorq…" aria-label="Buscar moto" autocomplete="off" />
+      <button type="submit" aria-label="Buscar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></button>
+    </form>
   </div></header>
 
-  <div class="wrap">
-    <div class="profile">
-      <div class="avatar" id="avatar">YL</div>
-      <div>
-        <div class="pname" id="pname">Yeimy Laverde</div>
-        <div class="prole" id="prole">Asesora Comercial</div>
+  <section class="hero" id="top"><div class="wrap">
+    <div>
+      <div class="eyebrow">Catálogo 2027</div>
+      <h1>Encuentra la moto <em>que buscas</em></h1>
+      <p>Precios actualizados, cuota inicial, ficha técnica completa y colores disponibles. Cotiza por WhatsApp y te acompaño en todo el proceso.</p>
+      <div class="stats">
+        <div class="stat"><b class="num" id="stTotal">—</b><span>modelos</span></div>
+        <div class="stat"><b class="num" id="stMarcas">—</b><span>marcas</span></div>
+        <div class="stat"><b class="num" id="stDesde">—</b><span>precio desde</span></div>
       </div>
-      <a class="btn-wa-big" id="waTop" target="_blank" rel="noopener">💬 Escríbeme por WhatsApp</a>
+      <a class="cta" href="#productos">Ver todas las motos →</a>
     </div>
+    <div class="pic"><div class="frame"><img id="heroImg" alt="" /><div class="cap" id="heroCap"></div></div></div>
+  </div></section>
 
-    <div class="controls">
-      <input class="search" id="search" type="search" placeholder="Buscar moto… (Apache, MRX, Raider, 125…)" />
-      <div class="chips" id="chips"></div>
+  <div class="wrap">
+    <div class="sec-h"><h2>Categorías</h2></div>
+    <div class="cats" id="cats"></div>
+
+    <div id="productos"></div>
+    <div class="crumbs" id="crumbs"></div>
+    <div class="toolbar">
+      <div class="brands" id="brands"></div>
+      <div class="tright">
+        <span class="count" id="count"></span>
+        <select class="sort" id="sort" aria-label="Ordenar">
+          <option value="rec">Recomendados</option>
+          <option value="asc">Menor precio</option>
+          <option value="desc">Mayor precio</option>
+        </select>
+      </div>
     </div>
-
-    <div class="count" id="count"></div>
     <div class="grid" id="grid"></div>
-    <div class="empty" id="empty" style="display:none">No encontramos motos con ese filtro.</div>
   </div>
 
+  <section class="benef"><div class="wrap">
+    <div class="bf"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="13" rx="2"/><path d="M2 10h20M6 15h4"/></svg></div><div><b>Financiación</b><span>Cuota inicial desde el valor que ves en cada moto</span></div></div>
+    <div class="bf"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6M8 13h8M8 17h5"/></svg></div><div><b>Matrícula incluida</b><span>Contado y cuota inicial con papeles</span></div></div>
+    <div class="bf"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg></div><div><b>Garantía de fábrica</b><span>Manual de propietario y garantía en cada ficha</span></div></div>
+    <div class="bf"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-4-7.5L21 3v6h-6"/></svg></div><div><b>Asesoría personal</b><span>Te respondo por WhatsApp</span></div></div>
+  </div></section>
+
   <footer>
-    <b>Yeimy Laverde</b> · Asesora Comercial · <span id="fTel"></span><br/>
-    Catálogo referencial · precios sujetos a confirmación en punto de venta · <span id="fGen"></span>
+    <div class="wrap">
+      <div>
+        <div class="fb1">SERVI<span>AUTEC</span></div>
+        <p style="margin-top:8px">Catálogo digital de motos nuevas. Precios referenciales, sujetos a confirmación en punto de venta.</p>
+      </div>
+      <div>
+        <h4>Tu asesora</h4>
+        <ul><li id="fName">Yeimy Laverde</li><li id="fRole">Asesora Comercial</li><li>WhatsApp: <b id="fTel" style="color:#fff"></b></li></ul>
+        <a class="fwa" id="waFoot" target="_blank" rel="noopener">Escríbeme por WhatsApp</a>
+      </div>
+      <div>
+        <h4>Categorías</h4>
+        <ul id="fCats"></ul>
+      </div>
+    </div>
+    <div class="legal">Actualizado <span id="fGen"></span> · Los valores de contado y cuota inicial incluyen gastos de matrícula.</div>
   </footer>
 
-  <div class="overlay" id="overlay"><div class="modal" id="modal"></div></div>
+  <a class="fab" id="fab" target="_blank" rel="noopener" aria-label="Escribir por WhatsApp"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.7.8-.8 1-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.3-.4.7-1.3a.5.5 0 0 0 0-.5l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.8 11.9 11.9 0 0 0 4.6 4c1.7.7 2.4.8 3.2.7a2.8 2.8 0 0 0 1.8-1.3 2.3 2.3 0 0 0 .2-1.3c-.1-.1-.3-.2-.5-.3Z"/></svg></a>
+
+  <div class="overlay" id="overlay" role="dialog" aria-modal="true"><div class="modal" id="modal"></div></div>
 
 <script>
 const fmt = new Intl.NumberFormat("es-CO");
-const cop = n => (typeof n === "number" && n > 0) ? "$ " + fmt.format(n) : null;
-let DATA = { motos: [] }, WA = "573021266110", filtroCat = "Todas", q = "";
+const cop = n => (typeof n === "number" && n > 0) ? "$ " + fmt.format(n) : null;
+const WA_ICON = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm4.5 12.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.7.8-.8 1-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.3-.4.7-1.3a.5.5 0 0 0 0-.5l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.8 11.9 11.9 0 0 0 4.6 4c1.7.7 2.4.8 3.2.7a2.8 2.8 0 0 0 1.8-1.3 2.3 2.3 0 0 0 .2-1.3c-.1-.1-.3-.2-.5-.3Z"/></svg>';
+let DATA = { motos: [] }, WA = "573244414390", TEL = "+57 324 441 4390";
+let fCat = "Todas", fMarca = "Todas", q = "", orden = "rec";
 const NUEVOS = /(GP|GOPRO|ARIZONA|E5|RACING)/i;
+const MAS_VENDIDAS = ["RAIDER 125", "RAIDER 125 FI", "APACHE 160 CARBURADA", "NTORQ 125"];
+const CAT_NOMBRE = c => ({"de Trabajo y Transporte":"Trabajo y transporte","Automáticas o Scooter":"Automáticas y scooter"}[c] || c);
+const MARCA_NOMBRE = m => m.length <= 3 ? m : m.charAt(0) + m.slice(1).toLowerCase();
 
 async function init(){
   const r = await fetch("catalogo.json", { cache:"no-store" });
   DATA = await r.json();
-  WA = DATA.whatsapp || WA;
-  document.getElementById("waTop").href = waLink("Hola Yeimy Laverde, vi tu catálogo de motos y quiero más información.");
-  document.getElementById("pname").textContent = DATA.asesora || "Yeimy Laverde";
-  document.getElementById("prole").textContent = DATA.cargo || "Asesora Comercial";
-  document.getElementById("avatar").textContent = (DATA.asesora||"YL").split(" ").map(s=>s[0]).slice(0,2).join("").toUpperCase();
-  document.getElementById("hupd").textContent = "Actualizado: " + (DATA.generado||"");
-  document.getElementById("fTel").textContent = DATA.telefono || "";
-  document.getElementById("fGen").textContent = "Actualizado " + (DATA.generado||"");
-  buildChips(); render();
+  WA = DATA.whatsapp || WA; TEL = DATA.telefono || TEL;
+  const hola = `Hola ${DATA.asesora||"Yeimy"}, vi tu catálogo de motos y quiero más información.`;
+  ["waStrip","waFoot","fab"].forEach(id => document.getElementById(id).href = waLink(hola));
+  document.getElementById("stripTel").textContent = "WhatsApp " + TEL;
+  document.getElementById("fTel").textContent = TEL;
+  document.getElementById("brandSub").textContent = `${DATA.asesora||"Yeimy Laverde"} · ${DATA.cargo||"Asesora Comercial"}`;
+  document.getElementById("fName").textContent = DATA.asesora || "Yeimy Laverde";
+  document.getElementById("fRole").textContent = DATA.cargo || "Asesora Comercial";
+  document.getElementById("fGen").textContent = DATA.generado || "";
+  const motos = DATA.motos;
+  document.getElementById("stTotal").textContent = motos.length;
+  document.getElementById("stMarcas").textContent = new Set(motos.map(m=>m.marca)).size;
+  const minP = Math.min(...motos.map(m=>m.comercial).filter(v=>v>0));
+  document.getElementById("stDesde").textContent = "$" + (minP/1e6).toLocaleString("es-CO",{maximumFractionDigits:1}) + " M";
+  const heroM = motos.find(m=>m.modelo==="RAIDER 125") || motos.find(m=>m.foto);
+  if (heroM) {
+    const h = document.getElementById("heroImg"); h.src = "catalogo-fotos/" + heroM.foto; h.alt = heroM.marca + " " + heroM.modelo;
+    document.getElementById("heroCap").textContent = heroM.cuota_inicial ? `${heroM.marca} ${heroM.modelo} · Cuota inicial ${cop(heroM.cuota_inicial)}` : `${heroM.marca} ${heroM.modelo}`;
+    document.querySelector(".hero .pic .frame").style.cursor = "pointer";
+    document.querySelector(".hero .pic .frame").addEventListener("click", ()=>abrir(motos.indexOf(heroM)));
+  }
+  buildCats(); buildBrands(); render();
   document.getElementById("search").addEventListener("input", e => { q = e.target.value.toLowerCase().trim(); render(); });
+  document.getElementById("sort").addEventListener("change", e => { orden = e.target.value; render(); });
   document.getElementById("overlay").addEventListener("click", e => { if (e.target.id==="overlay") cerrar(); });
+  document.addEventListener("keydown", e => { if (e.key==="Escape") cerrar(); });
 }
 function waLink(msg){ return `https://wa.me/${WA}?text=${encodeURIComponent(msg)}`; }
 function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function categorias(){ return Array.from(new Set(DATA.motos.map(m=>m.categoria))); }
 
-function buildChips(){
-  const cats = ["Todas", ...Array.from(new Set(DATA.motos.map(m=>m.categoria)))];
-  const cont = document.getElementById("chips");
-  cont.innerHTML = cats.map(c=>`<button class="chip${c===filtroCat?' active':''}" data-cat="${esc(c)}">${esc(c)}</button>`).join("");
-  cont.querySelectorAll(".chip").forEach(b=>b.addEventListener("click",()=>{ filtroCat=b.dataset.cat; buildChips(); render(); }));
+function buildCats(){
+  const cats = categorias();
+  const el = document.getElementById("cats");
+  el.innerHTML = cats.map(c=>{
+    const ms = DATA.motos.filter(m=>m.categoria===c);
+    const rep = ms.find(m=>MAS_VENDIDAS.includes(m.modelo)) || ms.find(m=>m.foto) || ms[0];
+    return `<button class="cat${fCat===c?' active':''}" data-cat="${esc(c)}">
+      <div class="cimg">${rep&&rep.foto?`<img loading="lazy" src="catalogo-fotos/${esc(rep.foto)}" alt="">`:""}</div>
+      <div class="cbody"><div class="cname">Motos ${esc(CAT_NOMBRE(c).toLowerCase())}</div><div class="ccount">${ms.length} modelos</div><span class="cbtn">Ver más</span></div>
+    </button>`;
+  }).join("");
+  el.querySelectorAll(".cat").forEach(b=>b.addEventListener("click",()=>{
+    fCat = (fCat===b.dataset.cat) ? "Todas" : b.dataset.cat;
+    buildCats(); render(); document.getElementById("productos").scrollIntoView();
+  }));
+  document.getElementById("fCats").innerHTML = cats.map(c=>`<li><a href="#productos" data-cat="${esc(c)}">${esc(CAT_NOMBRE(c))}</a></li>`).join("");
+  document.querySelectorAll("#fCats a").forEach(a=>a.addEventListener("click",()=>{ fCat=a.dataset.cat; buildCats(); render(); }));
+}
+function buildBrands(){
+  const marcas = ["Todas", ...Array.from(new Set(DATA.motos.map(m=>m.marca)))];
+  const el = document.getElementById("brands");
+  el.innerHTML = marcas.map(m=>`<button class="bchip${fMarca===m?' active':''}" data-m="${esc(m)}">${m==="Todas"?"Todas las marcas":esc(MARCA_NOMBRE(m))}</button>`).join("");
+  el.querySelectorAll(".bchip").forEach(b=>b.addEventListener("click",()=>{ fMarca=b.dataset.m; buildBrands(); render(); }));
 }
 function filtradas(){
-  return DATA.motos.filter(m=>{
-    if (filtroCat!=="Todas" && m.categoria!==filtroCat) return false;
+  let arr = DATA.motos.filter(m=>{
+    if (fCat!=="Todas" && m.categoria!==fCat) return false;
+    if (fMarca!=="Todas" && m.marca!==fMarca) return false;
     if (q){ const blob=(m.modelo+" "+m.marca+" "+m.categoria+" "+m.cilindraje).toLowerCase(); if(!blob.includes(q)) return false; }
     return true;
   });
+  if (orden==="asc") arr = arr.slice().sort((a,b)=>(a.comercial||9e9)-(b.comercial||9e9));
+  if (orden==="desc") arr = arr.slice().sort((a,b)=>(b.comercial||0)-(a.comercial||0));
+  if (orden==="rec") arr = arr.slice().sort((a,b)=>(MAS_VENDIDAS.includes(b.modelo)?1:0)-(MAS_VENDIDAS.includes(a.modelo)?1:0));
+  return arr;
 }
-function swatchesHtml(m){
+function swatches(m){
   const s = (m.colores||[]).slice(0,6).map(c=>`<span class="sw" title="${esc(c.nombre)}" style="background:${esc(c.hex||'#888')}"></span>`).join("");
-  const nombres = (m.colores||[]).map(c=>c.nombre).filter(Boolean).slice(0,3).join(" · ");
-  return s ? `<div class="swrow">${s}<span class="swname">${esc(nombres)}</span></div>` : "";
-}
-function precioBlock(m){
-  const ini = cop(m.cuota_inicial), com = cop(m.comercial), con = cop(m.contado), bono = m.bono;
-  let comHtml = "";
-  if (com){
-    if (bono && bono>0){ const dcto=cop(m.comercial-bono); comHtml=`<span class="tach">${com}</span>${dcto}`; }
-    else comHtml = com;
-  }
-  return `<div class="pblock">
-    ${ini?`<div class="plabel">Cuota inicial</div><div class="pini">${ini}</div>`:""}
-    ${com?`<div class="prow"><span class="l">Precio comercial</span><span class="v">${comHtml}</span></div>`:""}
-    ${con?`<div class="prow"><span class="l">Contado total</span><span class="v">${con}</span></div>`:""}
-    ${(bono&&bono>0)?`<div class="prow bono"><span class="l">Bono de descuento</span><span class="v">− ${cop(bono)}</span></div>`:""}
-  </div>`;
+  return s ? `<div class="swrow">${s}</div>` : "";
 }
 function render(){
   const items = filtradas();
-  document.getElementById("count").textContent = `${items.length} de ${DATA.total} modelos`;
-  document.getElementById("empty").style.display = items.length?"none":"block";
+  document.getElementById("crumbs").innerHTML = `Inicio<span>›</span>Motos${fCat!=="Todas"?`<span>›</span><b>${esc(CAT_NOMBRE(fCat))}</b>`:""}${fMarca!=="Todas"?`<span>›</span><b>${esc(MARCA_NOMBRE(fMarca))}</b>`:""}`;
+  document.getElementById("count").innerHTML = `<b>${items.length}</b> ${items.length===1?"moto":"motos"}`;
   const grid = document.getElementById("grid");
+  if (!items.length){ grid.innerHTML = `<div class="empty">No encontramos motos con ese filtro. <a href="#" onclick="fCat='Todas';fMarca='Todas';q='';document.getElementById('search').value='';buildCats();buildBrands();render();return false" style="color:var(--navy);font-weight:700">Ver todas</a></div>`; return; }
   grid.innerHTML = items.map(m=>{
     const idx = DATA.motos.indexOf(m);
-    const foto = m.foto?`catalogo-fotos/${m.foto}`:"";
-    const nuevo = NUEVOS.test(m.modelo);
-    return `<div class="card">
-      <div class="ph">${foto?`<img loading="lazy" src="${foto}" alt="${esc(m.modelo)}">`:""}${nuevo?'<span class="badge-new">NUEVO</span>':''}</div>
+    const top = MAS_VENDIDAS.includes(m.modelo), nuevo = !top && NUEVOS.test(m.modelo);
+    const precio = m.bono>0 ? m.comercial-m.bono : m.comercial;
+    const ini = cop(m.cuota_inicial);
+    return `<article class="card">
+      <div class="top">
+        <span class="mk ${esc(m.marca)}">${esc(m.marca)}</span>
+        ${top?'<span class="tag">La más vendida</span>':nuevo?'<span class="tag new">Nuevo</span>':''}
+        <div class="ph" data-i="${idx}">${m.foto?`<img loading="lazy" src="catalogo-fotos/${esc(m.foto)}" alt="${esc(m.marca+' '+m.modelo)}">`:""}</div>
+      </div>
       <div class="body">
-        ${swatchesHtml(m)}
+        <div class="bn">${esc(m.marca)}</div>
         <h3>${esc(m.modelo)}</h3>
-        <div class="meta">${esc(m.categoria)}${m.cilindraje?' · '+esc(m.cilindraje):''}${m.anio?' · '+esc(m.anio):''}</div>
-        ${precioBlock(m)}
-        <div class="cbtns">
-          <button class="btn btn-ficha" data-i="${idx}">Ver Ficha Técnica</button>
-          <a class="btn btn-cot" target="_blank" rel="noopener" href="${waLink('Hola Yeimy, quiero cotizar la '+m.modelo+'. ¿Me ayudas?')}">Cotizar</a>
+        <div class="cc">${esc(m.cilindraje||"")}${m.anio?' · Modelo '+esc(m.anio):''}</div>
+        <div class="price num"><small>PRECIO</small>${cop(precio)||"Consultar"}</div>
+        ${ini?`<div class="ini"><span>Cuota inicial</span><b class="num">${ini}</b></div>`:`<div class="ini none">Consulta tu cuota inicial</div>`}
+        ${m.contado?`<div class="contado">Contado con papeles <b class="num">${cop(m.contado)}</b></div>`:""}
+        ${swatches(m)}
+        <div class="actions">
+          <button class="btn btn-more" data-i="${idx}">Conoce más</button>
+          <a class="btn btn-cot" target="_blank" rel="noopener" href="${waLink('Hola '+(DATA.asesora||'Yeimy')+', quiero cotizar la '+m.marca+' '+m.modelo+'. ¿Me ayudas?')}">${WA_ICON}Cotizar</a>
         </div>
       </div>
-    </div>`;
+    </article>`;
   }).join("");
-  grid.querySelectorAll(".btn-ficha").forEach(b=>b.addEventListener("click",()=>abrir(+b.dataset.i)));
+  grid.querySelectorAll(".btn-more,.ph").forEach(b=>b.addEventListener("click",()=>abrir(+b.dataset.i)));
 }
 function abrir(i){
   const m = DATA.motos[i];
-  // Imagen por defecto: la del primer color (color-exacta) si existe, si no la studio/hero
   const colFoto = (m.colores||[]).find(c=>c.foto);
-  const foto = (colFoto && colFoto.foto) ? colFoto.foto : (m.foto_hero || m.foto);
-  const specs = (m.specs||[]).map(([k,v])=>`<div class="specrow"><div class="k">${esc(k)}</div><div class="v">${esc(v)}</div></div>`).join("");
-  const sw = (m.colores||[]).map((c,ci)=>`<button class="swpick" data-img="${c.foto?esc('catalogo-fotos/'+c.foto):''}" data-ci="${ci}">
-      <span class="sw" style="background:${esc(c.hex||'#888')}"></span>
-      <span class="swname">${esc(c.nombre)}</span></button>`).join("");
-  const ini = cop(m.cuota_inicial);
+  const foto = (colFoto && colFoto.foto) ? colFoto.foto : (m.foto || m.foto_hero);
+  const specs = (m.specs||[]).map(([k,v])=>`<div class="spec"><div class="k">${esc(k)}</div><div class="v">${esc(v)}</div></div>`).join("");
+  const cols = (m.colores||[]).map((c,ci)=>`<button class="cpick${ci===0?' active':''}" data-img="${c.foto?esc('catalogo-fotos/'+c.foto):''}"><span class="sw" style="background:${esc(c.hex||'#888')}"></span>${esc(c.nombre)}</button>`).join("");
+  const precio = m.bono>0 ? m.comercial-m.bono : m.comercial;
   document.getElementById("modal").innerHTML = `
-    <div class="mph">${foto?`<img id="mImg" src="catalogo-fotos/${foto}" alt="${esc(m.modelo)}">`:""}<button class="close" onclick="cerrar()">×</button></div>
-    <div class="mbody">
-      <h2>${esc(m.modelo)}</h2>
-      <div class="meta">${esc(m.categoria)}${m.cilindraje?' · '+esc(m.cilindraje):''}${m.anio?' · '+esc(m.anio):''}</div>
-      ${ini?`<div class="mini"><div class="plabel">Cuota inicial (incluye matrícula)</div><div class="big">${ini}</div></div>`:""}
-      <div class="prow" style="margin-top:10px"><span class="l">Precio comercial</span><span class="v">${cop(m.comercial)||'—'}</span></div>
-      <div class="prow"><span class="l">Contado total</span><span class="v">${cop(m.contado)||'—'}</span></div>
-      <div class="disc">Los valores de contado y cuota inicial incluyen gastos de matrícula. Precios referenciales, sujetos a confirmación en punto de venta.</div>
-      ${m.descripcion?`<div class="disc" style="font-style:italic;color:var(--mut)">${esc(m.descripcion)}</div>`:""}
-      <div class="sec">FICHA TÉCNICA</div>
-      ${specs||'<div class="specrow"><div class="v">Consúltala con Yeimy.</div></div>'}
-      ${sw?`<div class="sec">COLORES DISPONIBLES</div>${sw}`:""}
-      <div class="mbtns">
-        ${m.ficha_pdf?`<a class="btn-lg btn-pdf" href="catalogo-fichas/${esc(m.ficha_pdf)}" target="_blank" rel="noopener" download>⬇ Descargar ficha técnica (PDF)</a>`:""}
-        ${m.manual_url?`<a class="btn-lg btn-pdf" style="background:transparent;border:1px solid var(--line);color:var(--txt)" href="${esc(m.manual_url)}" target="_blank" rel="noopener">📖 Manual de propietario y garantía</a>`:""}
-        <a class="btn-lg btn-wa" target="_blank" rel="noopener" href="${waLink('Hola Yeimy, me interesa la '+m.modelo+'. ¿Me das más información y disponibilidad?')}">💬 Cotizar esta moto por WhatsApp</a>
+    <button class="close" onclick="cerrar()" aria-label="Cerrar">×</button>
+    <div class="pd">
+      <div class="pd-img">
+        ${foto?`<img id="mImg" src="catalogo-fotos/${esc(foto)}" alt="${esc(m.marca+' '+m.modelo)}">`:""}
+        ${cols?`<div class="pd-colors">${cols}</div>`:""}
       </div>
+      <div class="pd-info">
+        <div class="bn">${esc(m.marca)}</div>
+        <h2>${esc(m.modelo)}</h2>
+        <div class="cc">${esc(CAT_NOMBRE(m.categoria))}${m.cilindraje?' · '+esc(m.cilindraje):''}${m.anio?' · Modelo '+esc(m.anio):''}</div>
+        <div class="pbox num">
+          <div class="row big"><span class="l">Precio</span><span class="v">${cop(precio)||"Consultar"}</span></div>
+          ${m.bono>0?`<div class="row bono"><span class="l">Bono de descuento</span><span class="v">− ${cop(m.bono)}</span></div>`:""}
+          <div class="row ini"><span class="l">Cuota inicial</span><span class="v">${cop(m.cuota_inicial)||"Consultar"}</span></div>
+          <div class="row"><span class="l">Contado con papeles</span><span class="v">${cop(m.contado)||"Consultar"}</span></div>
+        </div>
+        <div class="disc">Los valores de contado y cuota inicial incluyen gastos de matrícula. Precios referenciales, sujetos a confirmación en punto de venta.</div>
+        <div class="pd-btns">
+          <a class="btn-lg btn-wa" target="_blank" rel="noopener" href="${waLink('Hola '+(DATA.asesora||'Yeimy')+', me interesa la '+m.marca+' '+m.modelo+'. ¿Me das más información y disponibilidad?')}">${WA_ICON}Cotizar por WhatsApp</a>
+          ${m.ficha_pdf?`<a class="btn-lg btn-red" href="catalogo-fichas/${esc(m.ficha_pdf)}" target="_blank" rel="noopener" download>Descargar ficha técnica (PDF)</a>`:""}
+          ${m.manual_url?`<a class="btn-lg btn-line" href="${esc(m.manual_url)}" target="_blank" rel="noopener">Manual de propietario y garantía</a>`:""}
+        </div>
+      </div>
+    </div>
+    <div class="specs">
+      <h3>Ficha técnica</h3>
+      <div class="spec-grid">${specs||'<div class="spec"><div class="v">Consúltala por WhatsApp.</div></div>'}</div>
+      ${m.descripcion?`<p class="desc">${esc(m.descripcion)}</p>`:""}
     </div>`;
-  const ov=document.getElementById("overlay"); ov.classList.add("open"); document.body.style.overflow="hidden"; ov.querySelector(".modal").scrollTop=0;
-  // Al tocar un color, cambiar la imagen a la de ese color
-  const mImg=document.getElementById("mImg");
-  const picks=[...ov.querySelectorAll(".swpick")];
-  picks.forEach(p=>p.addEventListener("click",()=>{
-    const img=p.dataset.img;
-    if(img && mImg){ mImg.src=img; }
-    picks.forEach(x=>x.classList.remove("active")); p.classList.add("active");
-  }));
-  if(picks[0]) picks[0].classList.add("active");
+  const ov = document.getElementById("overlay"); ov.classList.add("open"); document.body.style.overflow="hidden"; ov.querySelector(".modal").scrollTop=0;
+  const mImg = document.getElementById("mImg");
+  const picks = [...ov.querySelectorAll(".cpick")];
+  picks.forEach(p=>p.addEventListener("click",()=>{ if(p.dataset.img && mImg) mImg.src=p.dataset.img; picks.forEach(x=>x.classList.remove("active")); p.classList.add("active"); }));
 }
 function cerrar(){ document.getElementById("overlay").classList.remove("open"); document.body.style.overflow=""; }
 init();
