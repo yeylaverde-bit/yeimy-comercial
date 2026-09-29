@@ -227,8 +227,8 @@
 
   <header><div class="wrap">
     <a class="brand" href="#top" aria-label="Inicio">
-      <span class="b1">SERVI<span>AUTEC</span></span>
-      <span class="b2" id="brandSub">Yeimy Laverde · Asesora Comercial</span>
+      <span class="b1">YEIMY <span>LAVERDE</span></span>
+      <span class="b2" id="brandSub">Asesora Comercial · Catálogo de motos</span>
     </a>
     <form class="searchbox" id="searchForm" role="search" onsubmit="event.preventDefault(); document.getElementById('productos').scrollIntoView();">
       <input id="search" type="search" placeholder="¿Qué moto estás buscando? Raider, Apache, NTorq…" aria-label="Buscar moto" autocomplete="off" />
@@ -281,7 +281,7 @@
   <footer>
     <div class="wrap">
       <div>
-        <div class="fb1">SERVI<span>AUTEC</span></div>
+        <div class="fb1">YEIMY <span>LAVERDE</span></div>
         <p style="margin-top:8px">Catálogo digital de motos nuevas. Precios referenciales, sujetos a confirmación en punto de venta.</p>
       </div>
       <div>
@@ -320,7 +320,7 @@ async function init(){
   ["waStrip","waFoot","fab"].forEach(id => document.getElementById(id).href = waLink(hola));
   document.getElementById("stripTel").textContent = "WhatsApp " + TEL;
   document.getElementById("fTel").textContent = TEL;
-  document.getElementById("brandSub").textContent = `${DATA.asesora||"Yeimy Laverde"} · ${DATA.cargo||"Asesora Comercial"}`;
+  document.getElementById("brandSub").textContent = `${DATA.cargo||"Asesora Comercial"} · Catálogo de motos`;
   document.getElementById("fName").textContent = DATA.asesora || "Yeimy Laverde";
   document.getElementById("fRole").textContent = DATA.cargo || "Asesora Comercial";
   document.getElementById("fGen").textContent = DATA.generado || "";
