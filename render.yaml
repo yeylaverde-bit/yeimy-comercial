@@ -28,6 +28,8 @@ services:
         value: prod
       - key: IMPULSA_ESTABLECIMIENTO
         value: "550026948"
+      - key: IMPULSA_IDVENDEDOR
+        value: "52"
       - key: IMPULSA_USUARIO
         value: yeimi
       - key: IMPULSA_CODIGO_DANE

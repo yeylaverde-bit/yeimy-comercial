@@ -106,6 +106,10 @@ const IMPULSA_BASE_URL = process.env.IMPULSA_BASE_URL || (IMPULSA_ENV === "prod"
   ? "https://api-impulsa-2ceeji4fra-uc.a.run.app/api/v2"
   : "https://api-impulsa-test-2ceeji4fra-uc.a.run.app/api/v2");
 const ESTABLECIMIENTO = process.env.IMPULSA_ESTABLECIMIENTO || "550026948";
+// IDVendedor por defecto (cédula del asesor responsable). Asigna la oportunidad
+// a esa persona y evita el round robin. Cada usuario puede sobreescribirlo con
+// su propio "idVendedorImpulsa" en users.json.
+const IDVENDEDOR_DEFAULT = process.env.IMPULSA_IDVENDEDOR || "";
 const USUARIO_TRAZABILIDAD = process.env.IMPULSA_USUARIO || "yeimi";
 const CODIGO_DANE = process.env.IMPULSA_CODIGO_DANE || "05001";
 const ORIGEN_DEFAULT = process.env.IMPULSA_ORIGEN || "Venta directa";
@@ -2033,6 +2037,12 @@ function construirPayload(form, usuario) {
   // Si no, usamos un timestamp único como ID interno (siempre > 0).
   const idAutecoRaw = String(form.IDOportunidadAuteco || "").replace(/[^0-9]/g, "");
   const idAuteco = idAutecoRaw && Number(idAutecoRaw) > 0 ? idAutecoRaw : String(Date.now());
+  // IDVendedor: asigna la oportunidad al asesor responsable (evita round robin).
+  // Prioridad: el del usuario logueado (users.json) > el default del .env.
+  // Solo se incluye en el payload si es un documento numérico > 0 (según doc
+  // Impulsa: enviar 0/-1 o no enviarlo deja la asignación por defecto del socio).
+  const idVendedorRaw = String(usuario.idVendedorImpulsa || IDVENDEDOR_DEFAULT || "").replace(/[^0-9]/g, "");
+  const idVendedor = idVendedorRaw && Number(idVendedorRaw) > 0 ? idVendedorRaw : null;
   return {
     ID: 0,
     IDOportunidadAuteco: idAuteco,
@@ -2055,6 +2065,8 @@ function construirPayload(form, usuario) {
     NivelInteres: form.NivelInteres || "AA",
     // Login en Impulsa: si users.json define usuarioImpulsa, lo usamos; sino, parte antes del @
     Usuario: usuario.usuarioImpulsa || usuario.email.split("@")[0],
+    // Solo incluir IDVendedor cuando es válido (asigna responsable, evita round robin).
+    ...(idVendedor ? { IDVendedor: idVendedor } : {}),
   };
 }
 
@@ -2068,7 +2080,9 @@ function validar(payload) {
   return faltan;
 }
 
-app.post("/api/registrar-venta", requireAuth, async (req, res) => {
+// Solo admin (Yeimy) puede registrar ventas a Impulsa: así la oportunidad
+// siempre queda asignada a su IDVendedor y ninguna venta ajena cae en su ID.
+app.post("/api/registrar-venta", requireAuth, requireAdmin, async (req, res) => {
   const usuarioLogueado = buscarUsuario(req.session.userEmail);
   if (!usuarioLogueado) return res.status(401).json({ ok: false, error: "Sesión inválida" });
 
@@ -2891,11 +2905,14 @@ app.get("/api/admin/impulsa-test", requireAuth, requireAdmin, async (req, res) =
       CodigoDANE: CODIGO_DANE,
       Direccion: "TEST",
       Productos: [{ Producto: "TEST", Marca: "TEST" }],
-      Observaciones: "TEST DIAGNOSTICO — ignorar",
+      Observaciones: "TEST DIAGNOSTICO — ELIMINAR",
       HabeasData: true,
       Sistema: "",
       NivelInteres: "AA",
       Usuario: USUARIO_TRAZABILIDAD,
+      ...(IDVENDEDOR_DEFAULT && Number(String(IDVENDEDOR_DEFAULT).replace(/[^0-9]/g, "")) > 0
+        ? { IDVendedor: String(IDVENDEDOR_DEFAULT).replace(/[^0-9]/g, "") }
+        : {}),
     };
     const r = await fetch(`${IMPULSA_BASE_URL}/oportunidades/Crear`, {
       method: "POST",
@@ -2930,6 +2947,7 @@ app.get("/api/health", (req, res) => {
     baseUrl: IMPULSA_BASE_URL,
     establecimiento: ESTABLECIMIENTO,
     usuarioImpulsa: USUARIO_TRAZABILIDAD,
+    idVendedor: IDVENDEDOR_DEFAULT || null,
     apiKeyConfigurada: !!IMPULSA_API_KEY,
     apiKeyLongitud: IMPULSA_API_KEY.length,
     totalUsuarios: leerUsuarios().length,
