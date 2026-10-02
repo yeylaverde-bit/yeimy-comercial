@@ -24,6 +24,8 @@ services:
         sync: false
       - key: IMPULSA_API_KEY
         sync: false
+      - key: BOT_API_KEY
+        sync: false
       - key: IMPULSA_ENV
         value: prod
       - key: IMPULSA_ESTABLECIMIENTO

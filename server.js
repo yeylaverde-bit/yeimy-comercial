@@ -115,6 +115,8 @@ const CODIGO_DANE = process.env.IMPULSA_CODIGO_DANE || "05001";
 const ORIGEN_DEFAULT = process.env.IMPULSA_ORIGEN || "Venta directa";
 const CAMPANNA_DEFAULT = process.env.IMPULSA_CAMPANNA || "Venta directa";
 const SESSION_SECRET = process.env.SESSION_SECRET || "cambiar-este-secreto-en-produccion";
+// Clave compartida con el bot de WhatsApp para el endpoint /api/bot/lead.
+const BOT_API_KEY = process.env.BOT_API_KEY || "";
 
 // --- Middleware base ---
 app.use(express.json({ limit: "200kb" }));
@@ -2137,6 +2139,74 @@ app.post("/api/registrar-venta", requireAuth, requireAdmin, async (req, res) => 
       error: `Error de red: ${e.message}`,
       payload,
     });
+  }
+});
+
+// --- Lead desde el bot de WhatsApp → crea oportunidad en Impulsa asignada a Yeimy ---
+// Protegido por clave compartida (header x-bot-key == BOT_API_KEY). No usa sesión.
+// Fuerza IDVendedor = IDVENDEDOR_DEFAULT (52) para que el lead quede SIEMPRE de Yeimy.
+app.post("/api/bot/lead", async (req, res) => {
+  if (!BOT_API_KEY || req.get("x-bot-key") !== BOT_API_KEY) {
+    return res.status(401).json({ ok: false, error: "No autorizado" });
+  }
+  const b = req.body || {};
+  const nombre = String(b.nombre || "").trim();
+  const documento = String(b.documento || "").replace(/[^0-9]/g, "");
+  const telefono = String(b.celular || b.telefono || "").replace(/[^0-9]/g, "");
+  const correoRaw = String(b.correo || "").trim();
+  const correo = (/@/.test(correoRaw) && !/no\s*indic/i.test(correoRaw)) ? correoRaw : "";
+  const moto = String(b.moto || b.producto || "").trim();
+  const idv = String(IDVENDEDOR_DEFAULT || "").replace(/[^0-9]/g, "");
+
+  // Mínimos para que Impulsa cree: nombre, moto, y (correo O teléfono).
+  if (!nombre || !moto || (!correo && !telefono)) {
+    return res.status(400).json({ ok: false, error: "Faltan datos mínimos (nombre, moto, y correo o celular)" });
+  }
+
+  const payload = {
+    ID: 0,
+    IDOportunidadAuteco: String(Date.now()),
+    Origen: String(b.origen || "Bot WhatsApp Yeimy").slice(0, 50),
+    Campanna: String(b.campanna || "Bot WhatsApp Yeimy").slice(0, 50),
+    Establecimiento: String(ESTABLECIMIENTO),
+    TipoDocumento: String(b.tipoDocumento || "CC").toUpperCase().slice(0, 4),
+    Documento: documento,
+    NombreContacto: nombre.toUpperCase().slice(0, 120),
+    Email: correo,
+    Telefono2: telefono,
+    CodigoDANE: String(b.codigoDane || CODIGO_DANE),
+    Direccion: "",
+    Productos: [{ Producto: moto.slice(0, 120), Marca: String(b.marca || "").trim() }],
+    Observaciones: `Lead del bot de WhatsApp.${b.via ? " Vía: " + b.via + "." : ""}${b.ciudad ? " Ciudad: " + b.ciudad + "." : ""} WhatsApp: ${telefono || "n/d"}`.slice(0, 500),
+    HabeasData: true,
+    Sistema: "",
+    NivelInteres: String(b.nivelInteres || "AA"),
+    Usuario: USUARIO_TRAZABILIDAD,
+    ...(idv && Number(idv) > 0 ? { IDVendedor: idv } : {}),
+  };
+
+  if (!IMPULSA_API_KEY) {
+    return res.status(500).json({ ok: false, error: "IMPULSA_API_KEY no configurada" });
+  }
+  try {
+    const r = await fetch(`${IMPULSA_BASE_URL}/oportunidades/Crear`, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${IMPULSA_API_KEY}`, "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    let data = null;
+    try { data = await r.json(); } catch { data = { Exitoso: r.ok }; }
+    const exitoso = r.ok && data && data.Exitoso === true;
+    const idRegistro = data && (data.IDRegistro ?? data.idRegistro) || null;
+    append({ ts: new Date().toISOString(), origen: "bot", enviadoAImpulsa: exitoso, status: r.status, idRegistro, payload, respuesta: data });
+    return res.status(exitoso ? 200 : 422).json({
+      ok: exitoso,
+      idRegistro,
+      error: exitoso ? null : ((data && data.Error && (data.Error.MensajeUsuario || data.Error.Mensaje)) || "No se creó la oportunidad"),
+    });
+  } catch (e) {
+    append({ ts: new Date().toISOString(), origen: "bot", enviadoAImpulsa: false, motivo: e.message, payload });
+    return res.status(500).json({ ok: false, error: `Error de red: ${e.message}` });
   }
 });
 
