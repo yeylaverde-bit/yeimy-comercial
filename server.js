@@ -2084,7 +2084,7 @@ function validar(payload) {
 
 // Solo admin (Yeimy) puede registrar ventas a Impulsa: así la oportunidad
 // siempre queda asignada a su IDVendedor y ninguna venta ajena cae en su ID.
-app.post("/api/registrar-venta", requireAuth, requireAdmin, async (req, res) => {
+app.post("/api/registrar-venta", requireAuth, async (req, res) => {
   const usuarioLogueado = buscarUsuario(req.session.userEmail);
   if (!usuarioLogueado) return res.status(401).json({ ok: false, error: "Sesión inválida" });
 
