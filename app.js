@@ -6284,11 +6284,24 @@ if (btnRefrescarMet) btnRefrescarMet.addEventListener("click", async () => {
       document.getElementById("siigoKpiMonto").textContent = fmtCOP(d.totalMonto || 0);
       const ticket = d.totalMotos ? Math.round(d.totalMonto / d.totalMotos) : 0;
       document.getElementById("siigoKpiTicket").textContent = fmtCOP(ticket);
-      // Comisión personal (5% sobre la base sin IVA de cada moto)
+      // Comisión sobre la base sin IVA de cada moto (Yeimy 5%, resto 1%, según el vendedor)
       let totalComision = 0;
-      for (const f of facts) for (const m of f.motos) totalComision += comisionMoto(m.precio);
+      for (const f of facts) for (const m of f.motos) totalComision += comisionMoto(m.precio, f.vendedor);
       const kpiCom = document.getElementById("siigoKpiComision");
       if (kpiCom) kpiCom.textContent = fmtCOP(totalComision);
+      // Etiqueta dinámica del % según el asesor filtrado
+      const lblCom = document.getElementById("siigoKpiComisionLabel");
+      const subCom = document.getElementById("siigoKpiComisionSub");
+      if (lblCom && subCom) {
+        if (d.asesor && d.asesor !== "TODOS") {
+          const pct = esVendedorYeimy(d.asesor) ? "5%" : "1%";
+          lblCom.textContent = "Comisión (" + pct + ")";
+          subCom.textContent = pct + " sobre base sin IVA";
+        } else {
+          lblCom.textContent = "Comisión";
+          subCom.textContent = "Yeimy 5% · asesores 1% (base sin IVA)";
+        }
+      }
 
       // Cache el ultimo dataset para exportar
       window.__siigoLastData = d;
@@ -6338,7 +6351,7 @@ if (btnRefrescarMet) btnRefrescarMet.addEventListener("click", async () => {
             + '<td>' + escapeH(m.modelo) + '</td>'
             + '<td style="font-family:monospace;font-size:11.5px">' + escapeH(m.chasis) + '</td>'
             + '<td style="text-align:right">' + fmtCOP(m.precio) + '</td>'
-            + '<td style="text-align:right;color:#5be58a">' + fmtCOP(comisionMoto(m.precio)) + '</td></tr>');
+            + '<td style="text-align:right;color:#5be58a">' + fmtCOP(comisionMoto(m.precio, f.vendedor)) + '</td></tr>');
         }
       }
       tbody.innerHTML = filas.join("");
@@ -6351,8 +6364,16 @@ if (btnRefrescarMet) btnRefrescarMet.addEventListener("click", async () => {
     }
   }
   function escapeH(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
-  // Comisión 5% sobre la base sin IVA (precio Siigo viene con IVA → /1.19)
-  function comisionMoto(precioConIva) { return (Number(precioConIva) || 0) / 1.19 * 0.05; }
+  // Comisión sobre la base sin IVA (precio Siigo viene con IVA → /1.19).
+  // Solo Yeimy gana 5%; los demás asesores 1%.
+  function esVendedorYeimy(v) {
+    const t = String(v == null ? "" : v).toUpperCase().trim().split(/\s+/)[0];
+    return /^Y.?IM/.test(t); // YEIMY, YEIMI, YIMY, YEIMIY, YEIMY LAVERDE...
+  }
+  function pctComisionVend(v) { return esVendedorYeimy(v) ? 0.05 : 0.01; }
+  function comisionMoto(precioConIva, vendedor) {
+    return (Number(precioConIva) || 0) / 1.19 * pctComisionVend(vendedor);
+  }
   function fechaCorta(iso) {
     if (!iso) return "—";
     const d = new Date(iso);
@@ -6430,12 +6451,13 @@ if (btnRefrescarMet) btnRefrescarMet.addEventListener("click", async () => {
   function exportarSiigoCSV() {
     const d = window.__siigoLastData;
     if (!d || !d.facturas || !d.facturas.length) return;
-    const cols = ["Factura","Fecha","Asesor","Cliente CC","Modelo","Chasis","Precio","Comision5pct","TotalFactura"];
+    const cols = ["Factura","Fecha","Asesor","Cliente CC","Modelo","Chasis","Precio","% Comision","Comision","TotalFactura"];
     const lineas = [cols.join(";")];
     const esc = v => { const s = String(v == null ? "" : v); return /[";\n\r]/.test(s) ? '"' + s.replace(/"/g,'""') + '"' : s; };
     for (const f of d.facturas) {
       for (const m of f.motos) {
-        lineas.push([f.factura, f.fecha ? f.fecha.slice(0,10) : "", f.vendedor, f.cliente_id, m.modelo, m.chasis, Math.round(m.precio||0), Math.round(comisionMoto(m.precio)), Math.round(f.total||0)].map(esc).join(";"));
+        const pct = esVendedorYeimy(f.vendedor) ? "5%" : "1%";
+        lineas.push([f.factura, f.fecha ? f.fecha.slice(0,10) : "", f.vendedor, f.cliente_id, m.modelo, m.chasis, Math.round(m.precio||0), pct, Math.round(comisionMoto(m.precio, f.vendedor)), Math.round(f.total||0)].map(esc).join(";"));
       }
     }
     const csv = lineas.join("\r\n");
