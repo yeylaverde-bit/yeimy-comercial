@@ -2210,6 +2210,90 @@ app.post("/api/bot/lead", async (req, res) => {
   }
 });
 
+// --- Portal público de captación → crea oportunidad en Impulsa asignada a Yeimy ---
+// SIN sesión ni bot-key: lo usa el cliente final desde la web (yeimylaverde.com/verificar).
+// Fuerza IDVendedor = IDVENDEDOR_DEFAULT para que el prospecto quede SIEMPRE de Yeimy,
+// capturándolo ANTES de que llegue al concesionario. Protegido con honeypot + rate-limit.
+const portalHits = new Map(); // ip -> [timestamps]
+const PORTAL_MAX = 5;                 // máx registros
+const PORTAL_VENTANA_MS = 10 * 60e3;  // por IP cada 10 min
+function portalRateLimited(ip) {
+  const now = Date.now();
+  const prev = (portalHits.get(ip) || []).filter(t => now - t < PORTAL_VENTANA_MS);
+  prev.push(now);
+  portalHits.set(ip, prev);
+  return prev.length > PORTAL_MAX;
+}
+
+app.post("/api/portal/registro", async (req, res) => {
+  const b = req.body || {};
+
+  // Honeypot: si un bot llenó el campo oculto, fingimos éxito y no creamos nada.
+  if (String(b.empresa || "").trim()) return res.json({ ok: true });
+
+  const ip = (req.headers["x-forwarded-for"] || req.ip || "").toString().split(",")[0].trim();
+  if (portalRateLimited(ip)) {
+    return res.status(429).json({ ok: false, error: "Demasiados intentos. Espera unos minutos o escríbele a Yeimy por WhatsApp." });
+  }
+
+  const nombre = String(b.nombre || "").trim();
+  const documento = String(b.documento || "").replace(/[^0-9]/g, "");
+  const telefono = String(b.celular || b.telefono || "").replace(/[^0-9]/g, "");
+  const correoRaw = String(b.correo || "").trim();
+  const correo = (/@/.test(correoRaw)) ? correoRaw : "";
+  const ciudad = String(b.ciudad || "Medellín").trim();
+  const moto = String(b.moto || "").trim() || "POR DEFINIR (portal)";
+  const habeas = b.habeas === true || b.habeas === "on" || b.habeas === "true";
+  const idv = String(IDVENDEDOR_DEFAULT || "").replace(/[^0-9]/g, "");
+
+  if (!nombre || nombre.length < 3) return res.status(400).json({ ok: false, error: "Escribe tu nombre completo." });
+  if (documento.length < 5)         return res.status(400).json({ ok: false, error: "Revisa tu número de cédula." });
+  if (telefono.length < 10)         return res.status(400).json({ ok: false, error: "Escribe tu celular a 10 dígitos." });
+  if (!habeas)                      return res.status(400).json({ ok: false, error: "Debes autorizar el tratamiento de datos." });
+  if (!IMPULSA_API_KEY)             return res.status(500).json({ ok: false, error: "Servicio no disponible por el momento." });
+
+  const payload = {
+    ID: 0,
+    IDOportunidadAuteco: String(Date.now()),
+    Origen: "Portal web Yeimy",
+    Campanna: "Portal web Yeimy",
+    Establecimiento: String(ESTABLECIMIENTO),
+    TipoDocumento: String(b.tipoDocumento || "CC").toUpperCase().slice(0, 4),
+    Documento: documento,
+    NombreContacto: nombre.toUpperCase().slice(0, 120),
+    Email: correo,
+    Telefono2: telefono,
+    CodigoDANE: String(b.codigoDane || CODIGO_DANE),
+    Direccion: "",
+    Productos: [{ Producto: moto.slice(0, 120), Marca: "" }],
+    Observaciones: `Prospecto del PORTAL WEB. Ciudad: ${ciudad}. WhatsApp: ${telefono}. Interés: ${moto}.`.slice(0, 500),
+    HabeasData: true,
+    Sistema: "",
+    NivelInteres: "AA",
+    Usuario: USUARIO_TRAZABILIDAD,
+    ...(idv && Number(idv) > 0 ? { IDVendedor: idv } : {}),
+  };
+
+  try {
+    const r = await fetch(`${IMPULSA_BASE_URL}/oportunidades/Crear`, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${IMPULSA_API_KEY}`, "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    let data = null;
+    try { data = await r.json(); } catch { data = { Exitoso: r.ok }; }
+    const exitoso = r.ok && data && data.Exitoso === true;
+    const idRegistro = (data && (data.IDRegistro ?? data.idRegistro)) || null;
+    append({ ts: new Date().toISOString(), origen: "portal", enviadoAImpulsa: exitoso, status: r.status, idRegistro, payload, respuesta: data });
+    // Para el cliente respondemos OK aunque Impulsa falle: igual quedó registrado en el log
+    // y un asesor lo retoma. No exponemos errores internos de Impulsa al público.
+    return res.json({ ok: true, idRegistro });
+  } catch (e) {
+    append({ ts: new Date().toISOString(), origen: "portal", enviadoAImpulsa: false, motivo: e.message, payload });
+    return res.json({ ok: true }); // registrado en log; se retoma manual
+  }
+});
+
 // --- Siigo: leer inventario de productos ---
 // Cualquier usuario autenticado puede consultar el inventario combinado.
 let siigoCache = { data: null, fetchedAt: 0 };
@@ -3029,7 +3113,7 @@ app.get("/api/health", (req, res) => {
 // --- Static files con control de auth ---
 // El login es público. Todo lo demás requiere sesión.
 app.get("/login.html", (req, res, next) => {
-  if (req.session && req.session.userEmail) return res.redirect("/");
+  if (req.session && req.session.userEmail) return res.redirect("/panel");
   next();
 });
 
@@ -3051,8 +3135,21 @@ app.get("/catalogo.json", (req, res) => res.sendFile(path.join(__dirname, "catal
 app.use("/catalogo-fotos", express.static(path.join(__dirname, "catalogo-fotos")));
 app.use("/catalogo-fichas", express.static(path.join(__dirname, "catalogo-fichas")));
 
-// Todo lo demás (incluyendo /) requiere sesión
+// --- Sitio público / landing SEO (www.yeimylaverde.com) ---
+// Va ANTES de requireAuth: la página de inicio es pública para posicionar en Google.
+// El dashboard interno se movió a /panel (requiere login).
+app.get("/", (req, res) => res.sendFile(path.join(__dirname, "landing.html")));
+app.get("/robots.txt", (req, res) => res.type("text/plain").sendFile(path.join(__dirname, "robots.txt")));
+app.get("/sitemap.xml", (req, res) => res.type("application/xml").sendFile(path.join(__dirname, "sitemap.xml")));
+
+// --- Portal público de captación (link para compartir a clientes) ---
+// Va ANTES de requireAuth: el cliente final lo abre sin login.
+app.get(["/verificar", "/portal"], (req, res) => res.sendFile(path.join(__dirname, "portal.html")));
+
+// Todo lo demás requiere sesión
 app.use(requireAuth);
+// Dashboard interno (antes estaba en "/"). Solo con sesión iniciada.
+app.get("/panel", (req, res) => res.sendFile(path.join(__dirname, "index.html")));
 // Gate papeleria-test.html: solo admin (Yeimy). Los demas roles ven mensaje.
 app.get("/papeleria-test.html", requireAdmin, (req, res) => {
   res.sendFile(path.join(__dirname, "papeleria-test.html"));

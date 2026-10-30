@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Verifica tu moto · Yeimy Laverde</title>
+<meta name="description" content="Déjanos tus datos y verificamos tu información para estrenar moto. Tu asesora Yeimy Laverde te acompaña en todo el proceso." />
+<meta name="robots" content="noindex" />
+<style>
+  :root{
+    --bg:#0a0e1f; --card:#121733; --line:rgba(255,255,255,.12);
+    --text:#eef1ff; --muted:#9aa3c7;
+    --grad:linear-gradient(90deg,#7c5cff 0%,#49c6ff 100%);
+    --ok:#22c55e; --err:#ff6b6b;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+    background:
+      radial-gradient(900px 600px at 85% -5%, rgba(124,92,255,.20) 0%, transparent 55%),
+      radial-gradient(800px 600px at 10% 110%, rgba(73,198,255,.16) 0%, transparent 55%),
+      var(--bg);
+    color:var(--text); min-height:100dvh;
+    display:flex; align-items:flex-start; justify-content:center;
+    padding:24px 16px calc(24px + env(safe-area-inset-bottom));
+  }
+  .wrap{width:100%; max-width:440px}
+  .brand{display:flex; align-items:center; gap:12px; margin:4px 0 18px}
+  .logo{width:46px;height:46px;border-radius:13px;background:var(--grad);display:flex;align-items:center;justify-content:center;font-weight:800;color:#0a0e1f;font-size:17px}
+  .brand h1{font-size:15px;margin:0;line-height:1.2}
+  .brand span{font-size:11.5px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:22px 20px;box-shadow:0 20px 60px rgba(0,0,0,.35)}
+  .hook{font-size:22px;font-weight:800;line-height:1.2;margin:0 0 6px;background:var(--grad);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+  .sub{font-size:13.5px;color:var(--muted);margin:0 0 18px}
+  label{display:block;font-size:12.5px;color:var(--muted);margin:0 0 6px;font-weight:600}
+  .field{margin-bottom:13px}
+  input,select{
+    width:100%;background:rgba(8,12,28,.6);border:1px solid var(--line);color:var(--text);
+    border-radius:11px;padding:12px 13px;font-size:15px;outline:none;transition:border .15s
+  }
+  input:focus,select:focus{border-color:#7c5cff}
+  .row{display:grid;grid-template-columns:90px 1fr;gap:10px}
+  .hp{position:absolute;left:-9999px;opacity:0;height:0;width:0}
+  .consent{display:flex;gap:10px;align-items:flex-start;margin:6px 0 16px;font-size:11.5px;color:var(--muted);line-height:1.45}
+  .consent input{width:18px;height:18px;margin-top:1px;flex:0 0 auto}
+  .consent a{color:#9db8ff}
+  button{
+    width:100%;border:0;border-radius:12px;padding:15px;font-size:16px;font-weight:800;color:#0a0e1f;
+    background:var(--grad);cursor:pointer;transition:transform .08s, opacity .15s
+  }
+  button:active{transform:scale(.99)}
+  button:disabled{opacity:.6;cursor:not-allowed}
+  .msg{display:none;margin-top:12px;font-size:13px;padding:10px 12px;border-radius:10px}
+  .msg.err{display:block;background:rgba(255,107,107,.12);border:1px solid rgba(255,107,107,.35);color:#ffc9c9}
+  .foot{text-align:center;font-size:11px;color:var(--muted);margin-top:16px}
+  /* Pantalla de éxito */
+  .exito{display:none;text-align:center;padding:10px 4px}
+  .exito .check{width:68px;height:68px;border-radius:50%;background:rgba(34,197,94,.15);border:2px solid var(--ok);display:flex;align-items:center;justify-content:center;margin:4px auto 14px;font-size:34px}
+  .exito h2{margin:0 0 8px;font-size:21px}
+  .exito p{color:var(--muted);font-size:14px;line-height:1.5;margin:0 0 18px}
+  .wa{display:inline-flex;align-items:center;gap:9px;background:#25d366;color:#07351b;font-weight:800;text-decoration:none;padding:13px 20px;border-radius:12px;font-size:15px}
+  .asesora{background:rgba(124,92,255,.12);border:1px solid rgba(124,92,255,.35);border-radius:12px;padding:12px;margin:0 0 18px;font-size:14px}
+  .asesora b{color:#c9bbff}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="brand">
+      <div class="logo">YL</div>
+      <div><h1>Yeimy Laverde</h1><span>Motos a crédito · Medellín</span></div>
+    </div>
+
+    <!-- FORMULARIO -->
+    <div class="card" id="cardForm">
+      <h2 class="hook">¿Quieres estrenar moto?</h2>
+      <p class="sub">Déjanos tus datos y verificamos tu información para iniciar tu proceso. Es <b>gratis y sin compromiso</b> — tu asesora te contacta hoy.</p>
+
+      <form id="form" autocomplete="on" novalidate>
+        <!-- honeypot anti-bots -->
+        <input class="hp" type="text" name="empresa" tabindex="-1" autocomplete="off" aria-hidden="true" />
+
+        <div class="field">
+          <label for="nombre">Nombre completo *</label>
+          <input id="nombre" name="nombre" type="text" required placeholder="Ej: María Gómez Pérez" />
+        </div>
+
+        <div class="field">
+          <label for="documento">Número de cédula *</label>
+          <div class="row">
+            <select id="tipoDocumento" name="tipoDocumento" aria-label="Tipo de documento">
+              <option value="CC">CC</option>
+              <option value="CE">CE</option>
+              <option value="PPT">PPT</option>
+              <option value="PA">PA</option>
+            </select>
+            <input id="documento" name="documento" type="tel" inputmode="numeric" required placeholder="Número de documento" />
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="celular">Celular (WhatsApp) *</label>
+          <input id="celular" name="celular" type="tel" inputmode="numeric" required placeholder="Ej: 300 123 4567" />
+        </div>
+
+        <div class="field">
+          <label for="ciudad">Ciudad</label>
+          <input id="ciudad" name="ciudad" type="text" value="Medellín" />
+        </div>
+
+        <div class="field">
+          <label for="moto">¿Qué moto te interesa? (opcional)</label>
+          <input id="moto" name="moto" type="text" placeholder="Ej: TVS Raider 125 / No sé, quiero asesoría" />
+        </div>
+
+        <label class="consent">
+          <input type="checkbox" id="habeas" name="habeas" required />
+          <span>Autorizo el tratamiento de mis datos personales para ser contactado(a) sobre la compra y financiación de mi moto, conforme a la Ley 1581 de 2012 (Habeas Data).</span>
+        </label>
+
+        <button type="submit" id="btn">Verificar y apartar mi cupo</button>
+        <div class="msg err" id="err"></div>
+      </form>
+      <div class="foot">🔒 Tus datos son confidenciales y solo los usa tu asesora.</div>
+    </div>
+
+    <!-- ÉXITO -->
+    <div class="card exito" id="cardExito">
+      <div class="check">✓</div>
+      <h2 id="exitoTitulo">¡Listo!</h2>
+      <p id="exitoTexto">Ya iniciamos tu verificación.</p>
+      <div class="asesora">Tu asesora asignada es <b>Yeimy Laverde</b>.<br>Cuando llegues al concesionario, <b>pregunta por ella</b>.</div>
+      <a class="wa" id="waBtn" href="#" target="_blank" rel="noopener">💬 Escríbele a Yeimy por WhatsApp</a>
+      <div class="foot" style="margin-top:18px">Serviautec Concesionario · Medellín</div>
+    </div>
+  </div>
+
+<script>
+  // Línea de WhatsApp de Yeimy (editable). Formato internacional sin "+".
+  var WHATSAPP_YEIMY = "573244414390";
+
+  var form = document.getElementById("form");
+  var btn = document.getElementById("btn");
+  var err = document.getElementById("err");
+
+  function soloDigitos(s){ return String(s||"").replace(/\D/g,""); }
+
+  form.addEventListener("submit", async function(e){
+    e.preventDefault();
+    err.style.display = "none";
+
+    var nombre = document.getElementById("nombre").value.trim();
+    var documento = soloDigitos(document.getElementById("documento").value);
+    var celular = soloDigitos(document.getElementById("celular").value);
+    var habeas = document.getElementById("habeas").checked;
+
+    if(!nombre || nombre.length < 3){ return mostrarError("Escribe tu nombre completo."); }
+    if(documento.length < 5){ return mostrarError("Revisa tu número de cédula."); }
+    if(celular.length < 10){ return mostrarError("Escribe tu celular a 10 dígitos."); }
+    if(!habeas){ return mostrarError("Debes autorizar el tratamiento de datos para continuar."); }
+
+    var payload = {
+      nombre: nombre,
+      tipoDocumento: document.getElementById("tipoDocumento").value,
+      documento: documento,
+      celular: celular,
+      ciudad: document.getElementById("ciudad").value.trim(),
+      moto: document.getElementById("moto").value.trim(),
+      habeas: true,
+      empresa: form.empresa.value // honeypot
+    };
+
+    btn.disabled = true; btn.textContent = "Enviando…";
+    try{
+      var r = await fetch("/api/portal/registro", {
+        method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify(payload)
+      });
+      var data = await r.json().catch(function(){ return {}; });
+      if(r.ok && data.ok){
+        mostrarExito(nombre);
+      }else{
+        mostrarError(data.error || "No pudimos registrar tus datos. Intenta de nuevo o escríbele a Yeimy por WhatsApp.");
+        btn.disabled = false; btn.textContent = "Verificar y apartar mi cupo";
+      }
+    }catch(ex){
+      mostrarError("Sin conexión. Revisa tu internet e intenta de nuevo.");
+      btn.disabled = false; btn.textContent = "Verificar y apartar mi cupo";
+    }
+  });
+
+  function mostrarError(t){ err.textContent = "⚠️ " + t; err.style.display = "block"; }
+
+  function mostrarExito(nombre){
+    var primer = nombre.split(/\s+/)[0];
+    document.getElementById("exitoTitulo").textContent = "¡Listo, " + primer + "! 🎉";
+    document.getElementById("exitoTexto").textContent = "Recibimos tus datos y ya estamos verificando tu información para tu moto.";
+    var texto = encodeURIComponent("Hola Yeimy, soy " + nombre + ". Acabo de registrarme en tu portal para estrenar moto 🏍️");
+    document.getElementById("waBtn").href = "https://wa.me/" + WHATSAPP_YEIMY + "?text=" + texto;
+    document.getElementById("cardForm").style.display = "none";
+    document.getElementById("cardExito").style.display = "block";
+    window.scrollTo(0,0);
+  }
+</script>
+</body>
+</html>
