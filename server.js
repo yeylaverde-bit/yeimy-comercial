@@ -3138,7 +3138,13 @@ app.use("/catalogo-fichas", express.static(path.join(__dirname, "catalogo-fichas
 // --- Sitio público / landing SEO (www.yeimylaverde.com) ---
 // Va ANTES de requireAuth: la página de inicio es pública para posicionar en Google.
 // El dashboard interno se movió a /panel (requiere login).
-app.get("/", (req, res) => res.sendFile(path.join(__dirname, "landing.html")));
+app.get("/", (req, res) => {
+  // Si existe la landing SEO (www.yeimylaverde.com) la mostramos; si no, la raiz
+  // lleva al panel (dominio interno programa.serviautec.com). Evita 404 si falta el archivo.
+  const landing = path.join(__dirname, "landing.html");
+  if (fs.existsSync(landing)) return res.sendFile(landing);
+  return res.redirect("/panel");
+});
 app.get("/robots.txt", (req, res) => res.type("text/plain").sendFile(path.join(__dirname, "robots.txt")));
 app.get("/sitemap.xml", (req, res) => res.type("application/xml").sendFile(path.join(__dirname, "sitemap.xml")));
 
