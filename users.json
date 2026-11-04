@@ -5,6 +5,7 @@
       "nombre": "YEIMI",
       "apellido": "Laverde",
       "rol": "admin",
+      "idVendedorImpulsa": "52",
       "passwordHash": "$2a$10$pzhz1jwG2W3k4I0eauA.GOw0z5QNFNnU/KlLb1DEKscJ.oJpSbgsm",
       "debeChangePass": false,
       "creadoEn": "2026-05-29T01:08:37.717Z",
@@ -93,6 +94,43 @@
       "passwordHash": "$2a$10$IdUFaPCeMEtyZmf1OBNhP.ZWlpkJs3kwdBvW4WW35jfmfy3dRJwfm",
       "debeChangePass": true,
       "creadoEn": "2026-06-04T01:00:00.000Z"
+    },
+    {
+      "email": "tempadmin@test.local",
+      "nombre": "TEMPADMIN",
+      "apellido": "",
+      "rol": "admin",
+      "passwordHash": "$2a$10$XCmqZib.paQp739oA/qhs.F97L6/7/GJYLFHq77UzZidmA6eFbONe",
+      "debeChangePass": false,
+      "creadoEn": "2026-09-18T22:26:57.587Z"
+    },
+    {
+      "email": "asesormotos118@gmail.com",
+      "nombre": "ASESOR 118",
+      "apellido": "",
+      "rol": "asesor",
+      "passwordHash": "$2a$10$4LqolmRs1EgsriraMtNf8.Tz/qlKxRx8zOjM0qbbIWfvRPSBKINZ2",
+      "debeChangePass": true,
+      "creadoEn": "2026-10-19T00:00:00.000Z"
+    },
+    {
+      "email": "josergch42@gmail.com",
+      "nombre": "JOSE",
+      "apellido": "",
+      "rol": "asesor",
+      "passwordHash": "$2a$10$oOs7CLTfoWi3dKKWgfnsfOA3H9xoH5fEaHC1qR284z4Mi9hF1Jij2",
+      "debeChangePass": true,
+      "creadoEn": "2026-10-19T00:00:00.000Z"
+    },
+    {
+      "email": "yeylaverde@gmail.com",
+      "nombre": "YEIMI",
+      "apellido": "Laverde",
+      "rol": "admin",
+      "idVendedorImpulsa": "52",
+      "passwordHash": "$2a$10$8TqhFDlahw0tt.Yo9vlrK.7f2qHZrX/aW5xJTkgLYLz7eQhX8NPGW",
+      "debeChangePass": false,
+      "creadoEn": "2026-11-04T00:00:00.000Z"
     }
   ]
 }
