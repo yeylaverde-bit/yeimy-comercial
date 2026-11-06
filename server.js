@@ -3219,6 +3219,8 @@ app.get(PUBLIC_FILES, (req, res) => {
 // --- Catálogo público (link branded para compartir a clientes por WhatsApp) ---
 // Va ANTES de requireAuth: no exige login. Solo el perfil de Yeimy.
 app.get("/catalogo", (req, res) => res.sendFile(path.join(__dirname, "catalogo.html")));
+// Ventana emergente "Crear oportunidad" (se abre con window.open desde el dashboard)
+app.get("/oportunidad", requireAuth, (req, res) => res.sendFile(path.join(__dirname, "oportunidad.html")));
 app.get("/catalogo.json", (req, res) => res.sendFile(path.join(__dirname, "catalogo.json")));
 app.use("/catalogo-fotos", express.static(path.join(__dirname, "catalogo-fotos")));
 app.use("/catalogo-fichas", express.static(path.join(__dirname, "catalogo-fichas")));

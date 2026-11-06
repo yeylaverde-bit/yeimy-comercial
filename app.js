@@ -6485,134 +6485,30 @@ if (btnRefrescarMet) btnRefrescarMet.addEventListener("click", async () => {
 })();
 
 // ============================================================
-//   EXTENSIÓN: Crear oportunidad en Impulsa (form simple del programa)
-//   Asesor + campaña + moto preestablecidos. Un botón: Enviar a Impulsa.
+//   Botón flotante 🚀 → abre "Crear oportunidad" en ventana APARTE
+//   (window.open: se queda abierta aunque navegues a otra página)
 // ============================================================
-(function initOportunidad() {
-  const esc = (s) => String(s == null ? "" : s).replace(/[&<>"']/g, c =>
-    ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
-
+(function initOportunidadFab() {
   function arrancar() {
-    const form = document.getElementById("formOportunidad");
-    if (!form || form.dataset.ready) return;
-    form.dataset.ready = "1";
-
-    // --- Botón flotante: abrir/cerrar/minimizar/arrastrar ---
     const fab = document.getElementById("oppFab");
-    const panel = document.getElementById("oppPanel");
-    const head = document.getElementById("oppPanelHead");
-    if (fab && panel) {
-      const abrir = () => { panel.classList.add("open"); panel.classList.remove("min"); };
-      fab.addEventListener("click", () => {
-        if (panel.classList.contains("open") && !panel.classList.contains("min")) panel.classList.remove("open");
-        else abrir();
-      });
-      const btnClose = document.getElementById("oppClose");
-      const btnMin = document.getElementById("oppMin");
-      if (btnClose) btnClose.addEventListener("click", () => panel.classList.remove("open"));
-      if (btnMin) btnMin.addEventListener("click", () => panel.classList.toggle("min"));
-      // Arrastrar por el encabezado
-      let drag = false, ox = 0, oy = 0;
-      const startDrag = (cx, cy) => {
-        const r = panel.getBoundingClientRect();
-        ox = cx - r.left; oy = cy - r.top;
-        panel.style.right = "auto"; panel.style.bottom = "auto";
-        panel.style.left = r.left + "px"; panel.style.top = r.top + "px";
-        drag = true;
-      };
-      const moveDrag = (cx, cy) => {
-        if (!drag) return;
-        let x = cx - ox, y = cy - oy;
-        x = Math.max(6, Math.min(x, window.innerWidth - panel.offsetWidth - 6));
-        y = Math.max(6, Math.min(y, window.innerHeight - 48));
-        panel.style.left = x + "px"; panel.style.top = y + "px";
-      };
-      if (head) {
-        head.addEventListener("mousedown", (e) => { if (e.target.closest("button")) return; startDrag(e.clientX, e.clientY); e.preventDefault(); });
-        head.addEventListener("touchstart", (e) => { if (e.target.closest("button")) return; const t = e.touches[0]; startDrag(t.clientX, t.clientY); }, { passive: true });
-      }
-      document.addEventListener("mousemove", (e) => moveDrag(e.clientX, e.clientY));
-      document.addEventListener("touchmove", (e) => { if (drag) { const t = e.touches[0]; moveDrag(t.clientX, t.clientY); } }, { passive: true });
-      document.addEventListener("mouseup", () => { drag = false; });
-      document.addEventListener("touchend", () => { drag = false; });
-    }
-
-    const selAsesor = document.getElementById("oppAsesor");
-    const selMoto = document.getElementById("oppMoto");
-    const btn = document.getElementById("btnOpp");
-    const msg = document.getElementById("oppMsg");
-    const showMsg = (html, tipo) => {
-      msg.style.display = "block";
-      msg.className = "form-msg " + (tipo || "");
-      msg.innerHTML = html;
-    };
-
-    // Asesores (dropdown preestablecido)
-    fetch("/api/asesores").then(r => r.json()).then(d => {
-      if (d && d.ok) {
-        selAsesor.innerHTML = '<option value="">Selecciona asesor…</option>' +
-          d.asesores.map(a => `<option value="${esc(a.email)}">${esc(a.nombre)}</option>`).join("");
-      } else {
-        selAsesor.innerHTML = '<option value="">No se pudieron cargar</option>';
-      }
-    }).catch(() => { selAsesor.innerHTML = '<option value="">No se pudieron cargar</option>'; });
-
-    // Motos del catálogo (dropdown preestablecido)
-    fetch("/catalogo.json", { cache: "no-store" }).then(r => r.json()).then(d => {
-      const motos = (d && d.motos || []).slice()
-        .sort((a, b) => (a.marca + " " + a.modelo).localeCompare(b.marca + " " + b.modelo, "es"));
-      selMoto.innerHTML = '<option value="">Selecciona moto…</option>' +
-        motos.map(m => `<option value="${esc(m.marca + "|" + m.modelo)}">${esc(m.marca + " — " + m.modelo)}</option>`).join("");
-    }).catch(() => { selMoto.innerHTML = '<option value="">No se pudo cargar el catálogo</option>'; });
-
-    form.addEventListener("submit", async (ev) => {
-      ev.preventDefault();
-      const fd = new FormData(form);
-      const [marca, modelo] = String(fd.get("MotoSel") || "").split("|");
-      const body = {
-        asesorEmail: fd.get("asesorEmail"),
-        Campanna: fd.get("Campanna"),
-        NombreContacto: fd.get("NombreContacto"),
-        Documento: fd.get("Documento"),
-        Telefono2: fd.get("Telefono2"),
-        Email: fd.get("Email"),
-        Producto: modelo || "",
-        Marca: marca || "",
-      };
-      const orig = btn.textContent;
-      btn.disabled = true; btn.textContent = "Enviando…";
-      showMsg("Enviando a Impulsa CRM…", "info");
+    if (!fab || fab.dataset.ready) return;
+    fab.dataset.ready = "1";
+    let win = null;
+    fab.addEventListener("click", () => {
       try {
-        const r = await fetch("/api/crear-oportunidad", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(body),
-        });
-        const data = await r.json();
-        if (data.ok) {
-          showMsg(
-            `✅ <strong>Oportunidad creada en Impulsa</strong> (ambiente: ${esc(data.ambiente || "?")})${data.idRegistro ? ` · ID ${esc(String(data.idRegistro))}` : ""}.<br>` +
-            `Cliente <strong>${esc(body.NombreContacto)}</strong> — ${esc((body.Marca || "") + " " + (body.Producto || ""))}.`,
-            "ok"
-          );
-          form.reset();
-        } else {
-          showMsg(
-            `❌ <strong>No se pudo crear la oportunidad.</strong><br>${esc(String(data.error || ("Status " + (data.status || "?"))))}`,
-            "err"
-          );
-        }
+        if (win && !win.closed) { win.focus(); return; }
+        const w = 460, h = 720;
+        const x = Math.max(0, (window.screen.availWidth || 1200) - w - 40);
+        const y = 80;
+        win = window.open("/oportunidad", "oportunidadImpulsa",
+          "width=" + w + ",height=" + h + ",left=" + x + ",top=" + y + ",resizable=yes,scrollbars=yes");
+        if (win) win.focus();
+        else alert("Tu navegador bloqueó la ventana emergente. Permite las ventanas emergentes para este sitio y vuelve a intentar.");
       } catch (e) {
-        showMsg(`❌ <strong>Error de conexión:</strong> ${esc(e.message)}`, "err");
-      } finally {
-        btn.disabled = false; btn.textContent = orig;
+        window.open("/oportunidad", "oportunidadImpulsa");
       }
     });
   }
-
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", arrancar);
-  } else {
-    arrancar();
-  }
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", arrancar);
+  else arrancar();
 })();

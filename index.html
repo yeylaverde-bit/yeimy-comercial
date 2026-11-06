@@ -1634,64 +1634,6 @@
 
   <!-- ===== Widget flotante: Crear oportunidad en Impulsa ===== -->
   <button id="oppFab" type="button" title="Crear oportunidad en Impulsa" aria-label="Crear oportunidad en Impulsa">🚀</button>
-  <div id="oppPanel" role="dialog" aria-label="Crear oportunidad en Impulsa">
-    <div id="oppPanelHead">
-      <span class="opp-title">🚀 Crear oportunidad</span>
-      <div class="opp-head-btns">
-        <button type="button" id="oppMin" title="Minimizar">–</button>
-        <button type="button" id="oppClose" title="Cerrar">×</button>
-      </div>
-    </div>
-    <div id="oppPanelBody">
-      <p class="opp-hint">Anéxalo a Impulsa desde cualquier pantalla. Elige asesor, campaña y moto de las listas.</p>
-      <form id="formOportunidad" autocomplete="off">
-        <label class="opp-full">
-          <span>Asesor *</span>
-          <select name="asesorEmail" id="oppAsesor" required>
-            <option value="">Cargando asesores…</option>
-          </select>
-        </label>
-        <label class="opp-full">
-          <span>Campaña *</span>
-          <select name="Campanna" required>
-            <option value="">Selecciona…</option>
-            <option value="Mobility">Mobility</option>
-            <option value="Redes">Redes</option>
-            <option value="Sala">Sala</option>
-            <option value="Referidos">Referidos</option>
-          </select>
-        </label>
-        <label class="opp-full">
-          <span>Nombre del cliente *</span>
-          <input name="NombreContacto" required placeholder="JUAN PEREZ GONZALEZ" />
-        </label>
-        <label>
-          <span>Documento *</span>
-          <input name="Documento" required inputmode="numeric" placeholder="1015388115" />
-        </label>
-        <label>
-          <span>Teléfono *</span>
-          <input name="Telefono2" required inputmode="tel" placeholder="3001234567" />
-        </label>
-        <label class="opp-full">
-          <span>Correo (opcional)</span>
-          <input name="Email" type="email" placeholder="cliente@correo.com" />
-        </label>
-        <label class="opp-full">
-          <span>Moto *</span>
-          <select name="MotoSel" id="oppMoto" required>
-            <option value="">Cargando catálogo…</option>
-          </select>
-        </label>
-        <div class="opp-actions">
-          <button type="reset" class="opp-btn-sec">Limpiar</button>
-          <button type="submit" class="opp-btn-main" id="btnOpp">🚀 Enviar a Impulsa</button>
-        </div>
-        <div id="oppMsg" class="opp-msg" style="display:none"></div>
-      </form>
-    </div>
-  </div>
-
   <script src="app.js"></script>
 </body>
 </html>
