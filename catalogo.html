@@ -331,7 +331,7 @@ async function init(){
   document.getElementById("stDesde").textContent = "$" + (minP/1e6).toLocaleString("es-CO",{maximumFractionDigits:1}) + " M";
   const heroM = motos.find(m=>m.modelo==="RAIDER 125") || motos.find(m=>m.foto);
   if (heroM) {
-    const h = document.getElementById("heroImg"); h.src = "catalogo-fotos/" + heroM.foto; h.alt = heroM.marca + " " + heroM.modelo;
+    const h = document.getElementById("heroImg"); h.src = IMG(heroM.foto); h.alt = heroM.marca + " " + heroM.modelo;
     document.getElementById("heroCap").textContent = heroM.cuota_inicial ? `${heroM.marca} ${heroM.modelo} · Cuota inicial ${cop(heroM.cuota_inicial)}` : `${heroM.marca} ${heroM.modelo}`;
     document.querySelector(".hero .pic .frame").style.cursor = "pointer";
     document.querySelector(".hero .pic .frame").addEventListener("click", ()=>abrir(motos.indexOf(heroM)));
@@ -344,6 +344,7 @@ async function init(){
 }
 function waLink(msg){ return `https://wa.me/${WA}?text=${encodeURIComponent(msg)}`; }
 function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function IMG(f){ return !f ? "" : (/^https?:\/\//.test(f) ? f : "catalogo-fotos/"+f); }
 function categorias(){ return Array.from(new Set(DATA.motos.map(m=>m.categoria))); }
 
 function buildCats(){
@@ -353,7 +354,7 @@ function buildCats(){
     const ms = DATA.motos.filter(m=>m.categoria===c);
     const rep = ms.find(m=>MAS_VENDIDAS.includes(m.modelo)) || ms.find(m=>m.foto) || ms[0];
     return `<button class="cat${fCat===c?' active':''}" data-cat="${esc(c)}">
-      <div class="cimg">${rep&&rep.foto?`<img loading="lazy" src="catalogo-fotos/${esc(rep.foto)}" alt="">`:""}</div>
+      <div class="cimg">${rep&&rep.foto?`<img loading="lazy" src="${esc(IMG(rep.foto))}" alt="">`:""}</div>
       <div class="cbody"><div class="cname">Motos ${esc(CAT_NOMBRE(c).toLowerCase())}</div><div class="ccount">${ms.length} modelos</div><span class="cbtn">Ver más</span></div>
     </button>`;
   }).join("");
@@ -401,7 +402,7 @@ function render(){
       <div class="top">
         <span class="mk ${esc(m.marca)}">${esc(m.marca)}</span>
         ${top?'<span class="tag">La más vendida</span>':nuevo?'<span class="tag new">Nuevo</span>':''}
-        <div class="ph" data-i="${idx}">${m.foto?`<img loading="lazy" src="catalogo-fotos/${esc(m.foto)}" alt="${esc(m.marca+' '+m.modelo)}">`:""}</div>
+        <div class="ph" data-i="${idx}">${m.foto?`<img loading="lazy" src="${esc(IMG(m.foto))}" alt="${esc(m.marca+' '+m.modelo)}">`:""}</div>
       </div>
       <div class="body">
         <div class="bn">${esc(m.marca)}</div>
@@ -409,7 +410,8 @@ function render(){
         <div class="cc">${esc(m.cilindraje||"")}${m.anio?' · Modelo '+esc(m.anio):''}</div>
         <div class="price num"><small>PRECIO</small>${cop(precio)||"Consultar"}</div>
         ${ini?`<div class="ini"><span>Cuota inicial</span><b class="num">${ini}</b></div>`:`<div class="ini none">Consulta tu cuota inicial</div>`}
-        ${m.contado?`<div class="contado">Contado con papeles <b class="num">${cop(m.contado)}</b></div>`:""}
+        ${m.contado?`<div class="contado">De contado <b class="num">${cop(m.contado)}</b></div>`:""}
+        ${m.credito?`<div class="contado">A crédito (con prenda) <b class="num">${cop(m.credito)}</b></div>`:""}
         ${swatches(m)}
         <div class="actions">
           <button class="btn btn-more" data-i="${idx}">Conoce más</button>
@@ -425,13 +427,13 @@ function abrir(i){
   const colFoto = (m.colores||[]).find(c=>c.foto);
   const foto = (colFoto && colFoto.foto) ? colFoto.foto : (m.foto || m.foto_hero);
   const specs = (m.specs||[]).map(([k,v])=>`<div class="spec"><div class="k">${esc(k)}</div><div class="v">${esc(v)}</div></div>`).join("");
-  const cols = (m.colores||[]).map((c,ci)=>`<button class="cpick${ci===0?' active':''}" data-img="${c.foto?esc('catalogo-fotos/'+c.foto):''}"><span class="sw" style="background:${esc(c.hex||'#888')}"></span>${esc(c.nombre)}</button>`).join("");
+  const cols = (m.colores||[]).map((c,ci)=>`<button class="cpick${ci===0?' active':''}" data-img="${esc(IMG(c.foto))}"><span class="sw" style="background:${esc(c.hex||'#888')}"></span>${esc(c.nombre)}</button>`).join("");
   const precio = m.bono>0 ? m.comercial-m.bono : m.comercial;
   document.getElementById("modal").innerHTML = `
     <button class="close" onclick="cerrar()" aria-label="Cerrar">×</button>
     <div class="pd">
       <div class="pd-img">
-        ${foto?`<img id="mImg" src="catalogo-fotos/${esc(foto)}" alt="${esc(m.marca+' '+m.modelo)}">`:""}
+        ${foto?`<img id="mImg" src="${esc(IMG(foto))}" alt="${esc(m.marca+' '+m.modelo)}">`:""}
         ${cols?`<div class="pd-colors">${cols}</div>`:""}
       </div>
       <div class="pd-info">
@@ -442,9 +444,10 @@ function abrir(i){
           <div class="row big"><span class="l">Precio</span><span class="v">${cop(precio)||"Consultar"}</span></div>
           ${m.bono>0?`<div class="row bono"><span class="l">Bono de descuento</span><span class="v">− ${cop(m.bono)}</span></div>`:""}
           <div class="row ini"><span class="l">Cuota inicial</span><span class="v">${cop(m.cuota_inicial)||"Consultar"}</span></div>
-          <div class="row"><span class="l">Contado con papeles</span><span class="v">${cop(m.contado)||"Consultar"}</span></div>
+          <div class="row"><span class="l">De contado (con papeles)</span><span class="v">${cop(m.contado)||"Consultar"}</span></div>
+          ${m.credito?`<div class="row"><span class="l">A crédito (con prenda)</span><span class="v">${cop(m.credito)}</span></div>`:""}
         </div>
-        <div class="disc">Los valores de contado y cuota inicial incluyen gastos de matrícula. Precios referenciales, sujetos a confirmación en punto de venta.</div>
+        <div class="disc">El valor <b>de contado</b> incluye papeles de tránsito (matrícula). El valor <b>a crédito</b> incluye papeles con prenda. La <b>cuota inicial</b> es 10% del precio (15% en motocarros) + papeles con prenda; la financiera presta hasta $18.000.000, por eso en vehículos de mayor valor la inicial sube. Precios referenciales, sujetos a confirmación en punto de venta.</div>
         <div class="pd-btns">
           <a class="btn-lg btn-wa" target="_blank" rel="noopener" href="${waLink('Hola '+(DATA.asesora||'Yeimy')+', me interesa la '+m.marca+' '+m.modelo+'. ¿Me das más información y disponibilidad?')}">${WA_ICON}Cotizar por WhatsApp</a>
           ${m.ficha_pdf?`<a class="btn-lg btn-red" href="catalogo-fichas/${esc(m.ficha_pdf)}" target="_blank" rel="noopener" download>Descargar ficha técnica (PDF)</a>`:""}

@@ -6483,3 +6483,95 @@ if (btnRefrescarMet) btnRefrescarMet.addEventListener("click", async () => {
     initSiigo();
   }
 })();
+
+// ============================================================
+//   EXTENSIÓN: Crear oportunidad en Impulsa (form simple del programa)
+//   Asesor + campaña + moto preestablecidos. Un botón: Enviar a Impulsa.
+// ============================================================
+(function initOportunidad() {
+  const esc = (s) => String(s == null ? "" : s).replace(/[&<>"']/g, c =>
+    ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
+  function arrancar() {
+    const form = document.getElementById("formOportunidad");
+    if (!form || form.dataset.ready) return;
+    form.dataset.ready = "1";
+    const selAsesor = document.getElementById("oppAsesor");
+    const selMoto = document.getElementById("oppMoto");
+    const btn = document.getElementById("btnOpp");
+    const msg = document.getElementById("oppMsg");
+    const showMsg = (html, tipo) => {
+      msg.style.display = "block";
+      msg.className = "form-msg " + (tipo || "");
+      msg.innerHTML = html;
+    };
+
+    // Asesores (dropdown preestablecido)
+    fetch("/api/asesores").then(r => r.json()).then(d => {
+      if (d && d.ok) {
+        selAsesor.innerHTML = '<option value="">Selecciona asesor…</option>' +
+          d.asesores.map(a => `<option value="${esc(a.email)}">${esc(a.nombre)}</option>`).join("");
+      } else {
+        selAsesor.innerHTML = '<option value="">No se pudieron cargar</option>';
+      }
+    }).catch(() => { selAsesor.innerHTML = '<option value="">No se pudieron cargar</option>'; });
+
+    // Motos del catálogo (dropdown preestablecido)
+    fetch("/catalogo.json", { cache: "no-store" }).then(r => r.json()).then(d => {
+      const motos = (d && d.motos || []).slice()
+        .sort((a, b) => (a.marca + " " + a.modelo).localeCompare(b.marca + " " + b.modelo, "es"));
+      selMoto.innerHTML = '<option value="">Selecciona moto…</option>' +
+        motos.map(m => `<option value="${esc(m.marca + "|" + m.modelo)}">${esc(m.marca + " — " + m.modelo)}</option>`).join("");
+    }).catch(() => { selMoto.innerHTML = '<option value="">No se pudo cargar el catálogo</option>'; });
+
+    form.addEventListener("submit", async (ev) => {
+      ev.preventDefault();
+      const fd = new FormData(form);
+      const [marca, modelo] = String(fd.get("MotoSel") || "").split("|");
+      const body = {
+        asesorEmail: fd.get("asesorEmail"),
+        Campanna: fd.get("Campanna"),
+        NombreContacto: fd.get("NombreContacto"),
+        Documento: fd.get("Documento"),
+        Telefono2: fd.get("Telefono2"),
+        Email: fd.get("Email"),
+        Producto: modelo || "",
+        Marca: marca || "",
+      };
+      const orig = btn.textContent;
+      btn.disabled = true; btn.textContent = "Enviando…";
+      showMsg("Enviando a Impulsa CRM…", "info");
+      try {
+        const r = await fetch("/api/crear-oportunidad", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+        });
+        const data = await r.json();
+        if (data.ok) {
+          showMsg(
+            `✅ <strong>Oportunidad creada en Impulsa</strong> (ambiente: ${esc(data.ambiente || "?")})${data.idRegistro ? ` · ID ${esc(String(data.idRegistro))}` : ""}.<br>` +
+            `Cliente <strong>${esc(body.NombreContacto)}</strong> — ${esc((body.Marca || "") + " " + (body.Producto || ""))}.`,
+            "ok"
+          );
+          form.reset();
+        } else {
+          showMsg(
+            `❌ <strong>No se pudo crear la oportunidad.</strong><br>${esc(String(data.error || ("Status " + (data.status || "?"))))}`,
+            "err"
+          );
+        }
+      } catch (e) {
+        showMsg(`❌ <strong>Error de conexión:</strong> ${esc(e.message)}`, "err");
+      } finally {
+        btn.disabled = false; btn.textContent = orig;
+      }
+    });
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", arrancar);
+  } else {
+    arrancar();
+  }
+})();

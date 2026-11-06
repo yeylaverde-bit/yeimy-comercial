@@ -1,11 +1,11 @@
 {
-  "generado": "2026-08-14",
+  "generado": "2026-11-05",
   "asesora": "Yeimy Laverde",
   "cargo": "Asesora Comercial",
   "telefono": "+57 324 441 4390",
   "whatsapp": "573244414390",
   "dominio": "www.yeimylaverde.com",
-  "total": 35,
+  "total": 50,
   "motos": [
     {
       "modelo": "APACHE 160 CARBURADA",
@@ -13,7 +13,7 @@
       "categoria": "Deportivas",
       "cilindraje": "159.7 CC",
       "anio": "2027",
-      "cuota_inicial": 2100000,
+      "cuota_inicial": 1948000,
       "comercial": 9649999,
       "contado": 10527999,
       "bono": null,
@@ -151,7 +151,8 @@
       "descripcion": "Algo nunca antes visto en su categoría.",
       "foto": "tvs_apache_160_carburada.jpg",
       "foto_hero": "tvs_apache_160_carburada_hero.jpg",
-      "ficha_pdf": "tvs_apache_160_carburada.pdf"
+      "ficha_pdf": "tvs_apache_160_carburada.pdf",
+      "credito": 10632999
     },
     {
       "modelo": "APACHE 160 FI NG",
@@ -159,7 +160,7 @@
       "categoria": "Deportivas",
       "cilindraje": "159,7 cc",
       "anio": "2027",
-      "cuota_inicial": 2100000,
+      "cuota_inicial": 2133000,
       "comercial": 11499999,
       "contado": 12377999,
       "bono": null,
@@ -304,7 +305,8 @@
       "descripcion": "La combinación entre diseño aerodinámico, tecnología y acabados deportivos convierten a la Apache 160 FI NUEVA GENERACIÓN en una moto hecha para quienes quieren dominar la calle con estilo y potencia.",
       "foto": "tvs_apache_160_fi_ng.jpg",
       "foto_hero": "tvs_apache_160_fi_ng_hero.jpg",
-      "ficha_pdf": "tvs_apache_160_fi_ng.pdf"
+      "ficha_pdf": "tvs_apache_160_fi_ng.pdf",
+      "credito": 12482999
     },
     {
       "modelo": "APACHE 200 CARB ABS",
@@ -312,7 +314,7 @@
       "categoria": "Deportivas",
       "cilindraje": "197.75 CC",
       "anio": "2027",
-      "cuota_inicial": 2500000,
+      "cuota_inicial": 2254775,
       "comercial": 12199999,
       "contado": 13129999,
       "bono": null,
@@ -450,7 +452,8 @@
       "descripcion": "Algo nunca antes visto en su categoría. La Apache RTR 200 4V regresa más imponente que nunca: cómoda, conectada y lista para darte una experiencia de manejo que conquista cualquier carretera.",
       "foto": "tvs_apache_200_carb_abs.jpg",
       "foto_hero": "tvs_apache_200_carb_abs_hero.jpg",
-      "ficha_pdf": "tvs_apache_200_carb_abs.pdf"
+      "ficha_pdf": "tvs_apache_200_carb_abs.pdf",
+      "credito": 13234774
     },
     {
       "modelo": "APACHE RTR 160 4V XC FI",
@@ -458,9 +461,9 @@
       "categoria": "Deportivas",
       "cilindraje": "159.7 CC",
       "anio": "2027",
-      "cuota_inicial": 2100000,
-      "comercial": 10999999,
-      "contado": 11877999,
+      "cuota_inicial": 2033000,
+      "comercial": 10499999,
+      "contado": 11377999,
       "bono": null,
       "colores": [
         {
@@ -600,7 +603,8 @@
       "descripcion": "La nueva Apache RTR 160 4V FI ABS no tiene competencia en su segmento, con su increíble potencia de 17.3HP. ¡Ninguna de su segmento le gana! Además, cuenta con modos de manejo, RT-FI, frenos ABS y SmartXConnect, tecnología racing exclusiva de TVS, para que disfrutes su ecosistema de conexión, telemetría en ruta, alerta y asistencia en navegación",
       "foto": "tvs_apache_rtr_160_4v_xc_fi.jpg",
       "foto_hero": "tvs_apache_rtr_160_4v_xc_fi_hero.jpg",
-      "ficha_pdf": "tvs_apache_rtr_160_4v_xc_fi.pdf"
+      "ficha_pdf": "tvs_apache_rtr_160_4v_xc_fi.pdf",
+      "credito": 11482999
     },
     {
       "modelo": "APACHE RTR 160 4V XC FI ABS",
@@ -608,9 +612,9 @@
       "categoria": "Deportivas",
       "cilindraje": "159.7 CC",
       "anio": "2027",
-      "cuota_inicial": 2100000,
-      "comercial": 10999999,
-      "contado": 11877999,
+      "cuota_inicial": 2033000,
+      "comercial": 10499999,
+      "contado": 11377999,
       "bono": null,
       "colores": [
         {
@@ -750,7 +754,8 @@
       "descripcion": "La nueva Apache RTR 160 4V FI ABS no tiene competencia en su segmento, con su increíble potencia de 17.3HP. ¡Ninguna de su segmento le gana! Además, cuenta con modos de manejo, RT-FI, frenos ABS y SmartXConnect, tecnología racing exclusiva de TVS, para que disfrutes su ecosistema de conexión, telemetría en ruta, alerta y asistencia en navegación",
       "foto": "tvs_apache_rtr_160_4v_xc_fi_abs.jpg",
       "foto_hero": "tvs_apache_rtr_160_4v_xc_fi_abs_hero.jpg",
-      "ficha_pdf": "tvs_apache_rtr_160_4v_xc_fi_abs.pdf"
+      "ficha_pdf": "tvs_apache_rtr_160_4v_xc_fi_abs.pdf",
+      "credito": 11482999
     },
     {
       "modelo": "APACHE RTR 160 4V XC FI ABS E5",
@@ -758,9 +763,9 @@
       "categoria": "Deportivas",
       "cilindraje": "159.7 CC",
       "anio": "2027",
-      "cuota_inicial": 2100000,
-      "comercial": 10999999,
-      "contado": 11877999,
+      "cuota_inicial": 2033000,
+      "comercial": 10499999,
+      "contado": 11377999,
       "bono": null,
       "colores": [
         {
@@ -900,7 +905,8 @@
       "descripcion": "La nueva Apache RTR 160 4V FI ABS no tiene competencia en su segmento, con su increíble potencia de 17.3HP. ¡Ninguna de su segmento le gana! Además, cuenta con modos de manejo, RT-FI, frenos ABS y SmartXConnect, tecnología racing exclusiva de TVS, para que disfrutes su ecosistema de conexión, telemetría en ruta, alerta y asistencia en navegación",
       "foto": "tvs_apache_rtr_160_4v_xc_fi_abs_e5.jpg",
       "foto_hero": "tvs_apache_rtr_160_4v_xc_fi_abs_e5_hero.jpg",
-      "ficha_pdf": "tvs_apache_rtr_160_4v_xc_fi_abs_e5.pdf"
+      "ficha_pdf": "tvs_apache_rtr_160_4v_xc_fi_abs_e5.pdf",
+      "credito": 11482999
     },
     {
       "modelo": "APACHE RTR 160 4V XC FI RACING",
@@ -908,9 +914,9 @@
       "categoria": "Deportivas",
       "cilindraje": "159.7 cc",
       "anio": "2027",
-      "cuota_inicial": 2100000,
-      "comercial": 10999999,
-      "contado": 11877999,
+      "cuota_inicial": 2058000,
+      "comercial": 10749999,
+      "contado": 11627999,
       "bono": null,
       "colores": [
         {
@@ -1042,7 +1048,8 @@
       "descripcion": "La nueva Apache RTR 160 4V FI ABS no tiene competencia en su segmento, con su increíble potencia de 17.3HP. ¡Ninguna de su segmento le gana! Además, cuenta con modos de manejo, RT-FI, frenos ABS y SmartXConnect, tecnología racing exclusiva de TVS",
       "foto": "tvs_apache_rtr_160_4v_xc_fi_racing.jpg",
       "foto_hero": "tvs_apache_rtr_160_4v_xc_fi_racing_hero.jpg",
-      "ficha_pdf": "tvs_apache_rtr_160_4v_xc_fi_racing.pdf"
+      "ficha_pdf": "tvs_apache_rtr_160_4v_xc_fi_racing.pdf",
+      "credito": 11732999
     },
     {
       "modelo": "APACHE RTR 200 4V XC",
@@ -1050,7 +1057,7 @@
       "categoria": "Deportivas",
       "cilindraje": "197.75 cc",
       "anio": "2027",
-      "cuota_inicial": 2500000,
+      "cuota_inicial": 2357875,
       "comercial": 12999999,
       "contado": 13952999,
       "bono": null,
@@ -1213,7 +1220,8 @@
       "descripcion": "¡La 200 más completa llega a la familia Apache! La Apache 200 FI ABS es la moto más completa en su categoría que está equipada de 3 modos de manejo, RT-FI, conectividad SmartXConnect, frenos ABS y mucho más. Y cuenta con el respaldo de Auteco.",
       "foto": "tvs_apache_rtr_200_4v_xc.jpg",
       "foto_hero": "tvs_apache_rtr_200_4v_xc_hero.jpg",
-      "ficha_pdf": "tvs_apache_rtr_200_4v_xc.pdf"
+      "ficha_pdf": "tvs_apache_rtr_200_4v_xc.pdf",
+      "credito": 14057874
     },
     {
       "modelo": "APACHE RTR 200 4V XC FI ABS",
@@ -1221,7 +1229,7 @@
       "categoria": "Deportivas",
       "cilindraje": "197.75 cc",
       "anio": "2027",
-      "cuota_inicial": 2500000,
+      "cuota_inicial": 2357875,
       "comercial": 12999999,
       "contado": 13952999,
       "bono": null,
@@ -1384,7 +1392,8 @@
       "descripcion": "¡La 200 más completa llega a la familia Apache! La Apache 200 FI ABS es la moto más completa en su categoría que está equipada de 3 modos de manejo, RT-FI, conectividad SmartXConnect, frenos ABS y mucho más. Y cuenta con el respaldo de Auteco.",
       "foto": "tvs_apache_rtr_200_4v_xc_fi_abs.jpg",
       "foto_hero": "tvs_apache_rtr_200_4v_xc_fi_abs_hero.jpg",
-      "ficha_pdf": "tvs_apache_rtr_200_4v_xc_fi_abs.pdf"
+      "ficha_pdf": "tvs_apache_rtr_200_4v_xc_fi_abs.pdf",
+      "credito": 14057874
     },
     {
       "modelo": "RAIDER 125",
@@ -1392,10 +1401,10 @@
       "categoria": "Deportivas",
       "cilindraje": "124.79 CC",
       "anio": "2027",
-      "cuota_inicial": 1650000,
+      "cuota_inicial": 1626875,
       "comercial": 7999999,
       "contado": 8721999,
-      "bono": null,
+      "bono": 600000,
       "colores": [
         {
           "nombre": "Negra Nebulosa",
@@ -1518,7 +1527,8 @@
       "descripcion": "¡Bienvenidos a la nueva Generación! La TVS Raider 125 viene a cambiar las reglas del juego, es perfecta para una nueva generación retadora, exigente y sin límites que siempre quiere lo mejor.",
       "foto": "tvs_raider_125.jpg",
       "foto_hero": "tvs_raider_125_hero.jpg",
-      "ficha_pdf": "tvs_raider_125.pdf"
+      "ficha_pdf": "tvs_raider_125.pdf",
+      "credito": 8826874
     },
     {
       "modelo": "RAIDER 125 ACC",
@@ -1526,10 +1536,10 @@
       "categoria": "Deportivas",
       "cilindraje": "124.79 CC",
       "anio": "2027",
-      "cuota_inicial": 1650000,
+      "cuota_inicial": 1626875,
       "comercial": 7999999,
       "contado": 8721999,
-      "bono": null,
+      "bono": 600000,
       "colores": [
         {
           "nombre": "Negra Nebulosa",
@@ -1652,7 +1662,8 @@
       "descripcion": "¡Bienvenidos a la nueva Generación! La TVS Raider 125 viene a cambiar las reglas del juego, es perfecta para una nueva generación retadora, exigente y sin límites que siempre quiere lo mejor.",
       "foto": "tvs_raider_125_acc.jpg",
       "foto_hero": "tvs_raider_125_acc_hero.jpg",
-      "ficha_pdf": "tvs_raider_125_acc.pdf"
+      "ficha_pdf": "tvs_raider_125_acc.pdf",
+      "credito": 8826874
     },
     {
       "modelo": "RAIDER 125 ACC SBT",
@@ -1660,10 +1671,10 @@
       "categoria": "Deportivas",
       "cilindraje": "124.79 CC",
       "anio": "2027",
-      "cuota_inicial": 1650000,
+      "cuota_inicial": 1606875,
       "comercial": 7799999,
       "contado": 8521999,
-      "bono": null,
+      "bono": 600000,
       "colores": [
         {
           "nombre": "Negra Nebulosa",
@@ -1786,7 +1797,8 @@
       "descripcion": "¡Bienvenidos a la nueva Generación! La TVS Raider 125 viene a cambiar las reglas del juego, es perfecta para una nueva generación retadora, exigente y sin límites que siempre quiere lo mejor.",
       "foto": "tvs_raider_125_acc_sbt.jpg",
       "foto_hero": "tvs_raider_125_acc_sbt_hero.jpg",
-      "ficha_pdf": "tvs_raider_125_acc_sbt.pdf"
+      "ficha_pdf": "tvs_raider_125_acc_sbt.pdf",
+      "credito": 8626874
     },
     {
       "modelo": "RAIDER 125 FI",
@@ -1794,10 +1806,10 @@
       "categoria": "Deportivas",
       "cilindraje": "124.8 cc",
       "anio": "2027",
-      "cuota_inicial": 1700000,
-      "comercial": 8749999,
-      "contado": 9471999,
-      "bono": null,
+      "cuota_inicial": 1646875,
+      "comercial": 8199999,
+      "contado": 8921999,
+      "bono": 600000,
       "colores": [
         {
           "nombre": "Gris California - Dorada",
@@ -1920,7 +1932,8 @@
       "descripcion": "Bienvenido a la generación imparable: la nueva Raider Fi viene inyectada de poder con su tecnología de vanguardia FI, que brinda una mezcla perfecta",
       "foto": "tvs_raider_125_fi.jpg",
       "foto_hero": "tvs_raider_125_fi_hero.jpg",
-      "ficha_pdf": "tvs_raider_125_fi.pdf"
+      "ficha_pdf": "tvs_raider_125_fi.pdf",
+      "credito": 9026874
     },
     {
       "modelo": "RAIDER 125 FI NEBULOSA",
@@ -1928,10 +1941,10 @@
       "categoria": "Deportivas",
       "cilindraje": "124.8 cc",
       "anio": "2027",
-      "cuota_inicial": 1700000,
-      "comercial": 8749999,
-      "contado": 9471999,
-      "bono": null,
+      "cuota_inicial": 1646875,
+      "comercial": 8199999,
+      "contado": 8921999,
+      "bono": 600000,
       "colores": [
         {
           "nombre": "Gris California - Dorada",
@@ -2054,7 +2067,8 @@
       "descripcion": "Bienvenido a la generación imparable: la nueva Raider Fi viene inyectada de poder con su tecnología de vanguardia FI, que brinda una mezcla perfecta",
       "foto": "tvs_raider_125_fi_nebulosa.jpg",
       "foto_hero": "tvs_raider_125_fi_nebulosa_hero.jpg",
-      "ficha_pdf": "tvs_raider_125_fi_nebulosa.pdf"
+      "ficha_pdf": "tvs_raider_125_fi_nebulosa.pdf",
+      "credito": 9026874
     },
     {
       "modelo": "RAIDER 125 FI NEGRO NEBULOSA",
@@ -2062,10 +2076,10 @@
       "categoria": "Deportivas",
       "cilindraje": "124.8 cc",
       "anio": "2027",
-      "cuota_inicial": 1700000,
-      "comercial": 8749999,
-      "contado": 9471999,
-      "bono": null,
+      "cuota_inicial": 1646875,
+      "comercial": 8199999,
+      "contado": 8921999,
+      "bono": 600000,
       "colores": [
         {
           "nombre": "Gris California - Dorada",
@@ -2188,7 +2202,8 @@
       "descripcion": "Bienvenido a la generación imparable: la nueva Raider Fi viene inyectada de poder con su tecnología de vanguardia FI, que brinda una mezcla perfecta",
       "foto": "tvs_raider_125_fi_negro_nebulosa.jpg",
       "foto_hero": "tvs_raider_125_fi_negro_nebulosa_hero.jpg",
-      "ficha_pdf": "tvs_raider_125_fi_negro_nebulosa.pdf"
+      "ficha_pdf": "tvs_raider_125_fi_negro_nebulosa.pdf",
+      "credito": 9026874
     },
     {
       "modelo": "RAIDER 125 RAC",
@@ -2196,10 +2211,10 @@
       "categoria": "Deportivas",
       "cilindraje": "124.79 cc",
       "anio": "2027",
-      "cuota_inicial": 1650000,
+      "cuota_inicial": 1631875,
       "comercial": 8049999,
       "contado": 8771999,
-      "bono": null,
+      "bono": 600000,
       "colores": [
         {
           "nombre": "Azul Petróleo - Dorado",
@@ -2322,7 +2337,8 @@
       "descripcion": "Te invitamos a ser parte de la Nueva Generación que se impone en Diseño, Tecnología y Seguridad. ¡Una moto que no se parece a ninguna, por eso es la moto del año en Colombia!",
       "foto": "tvs_raider_125_rac.jpg",
       "foto_hero": "tvs_raider_125_rac_hero.jpg",
-      "ficha_pdf": "tvs_raider_125_rac.pdf"
+      "ficha_pdf": "tvs_raider_125_rac.pdf",
+      "credito": 8876874
     },
     {
       "modelo": "RAIDER 125 RACING",
@@ -2330,10 +2346,10 @@
       "categoria": "Deportivas",
       "cilindraje": "124.79 cc",
       "anio": "2027",
-      "cuota_inicial": 1650000,
+      "cuota_inicial": 1631875,
       "comercial": 8049999,
       "contado": 8771999,
-      "bono": null,
+      "bono": 600000,
       "colores": [
         {
           "nombre": "Azul Petróleo - Dorado",
@@ -2456,7 +2472,8 @@
       "descripcion": "Te invitamos a ser parte de la Nueva Generación que se impone en Diseño, Tecnología y Seguridad. ¡Una moto que no se parece a ninguna, por eso es la moto del año en Colombia!",
       "foto": "tvs_raider_125_racing.jpg",
       "foto_hero": "tvs_raider_125_racing_hero.jpg",
-      "ficha_pdf": "tvs_raider_125_racing.pdf"
+      "ficha_pdf": "tvs_raider_125_racing.pdf",
+      "credito": 8876874
     },
     {
       "modelo": "RAIDER 125 TK",
@@ -2464,10 +2481,10 @@
       "categoria": "Deportivas",
       "cilindraje": "124.79 CC",
       "anio": "2027",
-      "cuota_inicial": 1650000,
+      "cuota_inicial": 1626875,
       "comercial": 7999999,
       "contado": 8721999,
-      "bono": null,
+      "bono": 600000,
       "colores": [
         {
           "nombre": "Negra Nebulosa",
@@ -2590,7 +2607,8 @@
       "descripcion": "¡Bienvenidos a la nueva Generación! La TVS Raider 125 viene a cambiar las reglas del juego, es perfecta para una nueva generación retadora, exigente y sin límites que siempre quiere lo mejor.",
       "foto": "tvs_raider_125_tk.jpg",
       "foto_hero": "tvs_raider_125_tk_hero.jpg",
-      "ficha_pdf": "tvs_raider_125_tk.pdf"
+      "ficha_pdf": "tvs_raider_125_tk.pdf",
+      "credito": 8826874
     },
     {
       "modelo": "AGILITY FUSION (124.6CC)",
@@ -2598,7 +2616,7 @@
       "categoria": "Automáticas o Scooter",
       "cilindraje": "124.6 cc",
       "anio": "2027",
-      "cuota_inicial": 1800000,
+      "cuota_inicial": 1816775,
       "comercial": 9899000,
       "contado": 10621000,
       "bono": null,
@@ -2745,7 +2763,8 @@
       "descripcion": "",
       "foto": "kymco_agility_fusion_124_6cc.jpg",
       "foto_hero": "kymco_agility_fusion_124_6cc_hero.jpg",
-      "ficha_pdf": "kymco_agility_fusion_124_6cc.pdf"
+      "ficha_pdf": "kymco_agility_fusion_124_6cc.pdf",
+      "credito": 10725875
     },
     {
       "modelo": "NTORQ 125",
@@ -2753,10 +2772,10 @@
       "categoria": "Automáticas o Scooter",
       "cilindraje": "124.79 CC",
       "anio": "2027",
-      "cuota_inicial": 1800000,
+      "cuota_inicial": 1646875,
       "comercial": 8199999,
       "contado": 8921999,
-      "bono": null,
+      "bono": 300000,
       "colores": [
         {
           "nombre": "Negro Mate Verde",
@@ -2879,7 +2898,8 @@
       "descripcion": "Diseñada para ser un ícono urbano, la TVS Ntorq 125 está lista para sorprenderte al ser la scooter más conectada de Colombia. Disfruta de su impresionante tecnología SmartXConnect y de su potencia inigualable que te hará destacar en cada recorrido.",
       "foto": "tvs_ntorq_125.jpg",
       "foto_hero": "tvs_ntorq_125_hero.jpg",
-      "ficha_pdf": "tvs_ntorq_125.pdf"
+      "ficha_pdf": "tvs_ntorq_125.pdf",
+      "credito": 9026874
     },
     {
       "modelo": "NTORQ 125 XCONNECT",
@@ -2887,10 +2907,10 @@
       "categoria": "Automáticas o Scooter",
       "cilindraje": "124.79 CC",
       "anio": "2027",
-      "cuota_inicial": 1800000,
+      "cuota_inicial": 1846875,
       "comercial": 10199999,
       "contado": 10921999,
-      "bono": null,
+      "bono": 300000,
       "colores": [
         {
           "nombre": "Negro Mate Verde",
@@ -3013,7 +3033,8 @@
       "descripcion": "Diseñada para ser un ícono urbano, la TVS Ntorq 125 está lista para sorprenderte al ser la scooter más conectada de Colombia. Disfruta de su impresionante tecnología SmartXConnect y de su potencia inigualable que te hará destacar en cada recorrido.",
       "foto": "tvs_ntorq_125_xconnect.jpg",
       "foto_hero": "tvs_ntorq_125_xconnect_hero.jpg",
-      "ficha_pdf": "tvs_ntorq_125_xconnect.pdf"
+      "ficha_pdf": "tvs_ntorq_125_xconnect.pdf",
+      "credito": 11026874
     },
     {
       "modelo": "NEW LIFE 125 TK",
@@ -3021,7 +3042,7 @@
       "categoria": "Automáticas o Scooter",
       "cilindraje": "124,6 cc",
       "anio": "2027",
-      "cuota_inicial": 1550000,
+      "cuota_inicial": 1591775,
       "comercial": 7649000,
       "contado": 8371000,
       "bono": null,
@@ -3175,7 +3196,8 @@
       "descripcion": "",
       "foto": "victory_new_life_125_tk.jpg",
       "foto_hero": "victory_new_life_125_tk_hero.jpg",
-      "ficha_pdf": "victory_new_life_125_tk.pdf"
+      "ficha_pdf": "victory_new_life_125_tk.pdf",
+      "credito": 8475875
     },
     {
       "modelo": "MRX 125 TK",
@@ -3183,9 +3205,9 @@
       "categoria": "Todo Terreno",
       "cilindraje": "124,7 cc",
       "anio": "2026",
-      "cuota_inicial": 1800000,
+      "cuota_inicial": 1740775,
       "comercial": 9139000,
-      "contado": null,
+      "contado": 9861000,
       "bono": null,
       "colores": [
         {
@@ -3354,7 +3376,8 @@
       "descripcion": "",
       "foto": "victory_mrx_125_tk.jpg",
       "foto_hero": "victory_mrx_125_tk_hero.jpg",
-      "ficha_pdf": "victory_mrx_125_tk.pdf"
+      "ficha_pdf": "victory_mrx_125_tk.pdf",
+      "credito": 9965875
     },
     {
       "modelo": "MRX 200",
@@ -3362,9 +3385,9 @@
       "categoria": "Todo Terreno",
       "cilindraje": "199,6 cc",
       "anio": "2027",
-      "cuota_inicial": 2500000,
+      "cuota_inicial": 2243775,
       "comercial": 12090000,
-      "contado": 13014000,
+      "contado": 13020000,
       "bono": null,
       "colores": [
         {
@@ -3536,7 +3559,8 @@
       "descripcion": "",
       "foto": "victory_mrx_200.jpg",
       "foto_hero": "victory_mrx_200_hero.jpg",
-      "ficha_pdf": "victory_mrx_200.pdf"
+      "ficha_pdf": "victory_mrx_200.pdf",
+      "credito": 13124775
     },
     {
       "modelo": "MRX ARIZONA",
@@ -3544,9 +3568,9 @@
       "categoria": "Todo Terreno",
       "cilindraje": "199,5 cc",
       "anio": "2027",
-      "cuota_inicial": 2500000,
+      "cuota_inicial": 2293775,
       "comercial": 12590000,
-      "contado": 13514000,
+      "contado": 13520000,
       "bono": null,
       "colores": [
         {
@@ -3698,7 +3722,8 @@
       "descripcion": "",
       "foto": "victory_mrx_arizona.jpg",
       "foto_hero": "victory_mrx_arizona_hero.jpg",
-      "ficha_pdf": "victory_mrx_arizona.pdf"
+      "ficha_pdf": "victory_mrx_arizona.pdf",
+      "credito": 13624775
     },
     {
       "modelo": "MRX ARIZONA FOX TK",
@@ -3706,9 +3731,9 @@
       "categoria": "Todo Terreno",
       "cilindraje": "199,5 cc",
       "anio": "2027",
-      "cuota_inicial": 2500000,
+      "cuota_inicial": 2293775,
       "comercial": 12590000,
-      "contado": 13514000,
+      "contado": 13520000,
       "bono": null,
       "colores": [
         {
@@ -3860,7 +3885,8 @@
       "descripcion": "",
       "foto": "victory_mrx_arizona_fox_tk.jpg",
       "foto_hero": "victory_mrx_arizona_fox_tk_hero.jpg",
-      "ficha_pdf": "victory_mrx_arizona_fox_tk.pdf"
+      "ficha_pdf": "victory_mrx_arizona_fox_tk.pdf",
+      "credito": 13624775
     },
     {
       "modelo": "MRX ARIZONA XPLORE",
@@ -3868,9 +3894,9 @@
       "categoria": "Todo Terreno",
       "cilindraje": "199,5 cc",
       "anio": "2027",
-      "cuota_inicial": 2500000,
-      "comercial": 12590000,
-      "contado": 13514000,
+      "cuota_inicial": 2243775,
+      "comercial": 12090000,
+      "contado": 13020000,
       "bono": null,
       "colores": [
         {
@@ -4021,7 +4047,8 @@
       "descripcion": "",
       "foto": "victory_mrx_arizona_xplore.jpg",
       "foto_hero": "victory_mrx_arizona_xplore_hero.jpg",
-      "ficha_pdf": "victory_mrx_arizona_xplore.pdf"
+      "ficha_pdf": "victory_mrx_arizona_xplore.pdf",
+      "credito": 13124775
     },
     {
       "modelo": "MRX125 FOX TK",
@@ -4029,7 +4056,7 @@
       "categoria": "Todo Terreno",
       "cilindraje": "124,7 cc",
       "anio": "2027",
-      "cuota_inicial": 1800000,
+      "cuota_inicial": 1805875,
       "comercial": 9790000,
       "contado": 10512000,
       "bono": null,
@@ -4200,7 +4227,8 @@
       "descripcion": "",
       "foto": "victory_mrx125_fox_tk.jpg",
       "foto_hero": "victory_mrx125_fox_tk_hero.jpg",
-      "ficha_pdf": "victory_mrx125_fox_tk.pdf"
+      "ficha_pdf": "victory_mrx125_fox_tk.pdf",
+      "credito": 10616875
     },
     {
       "modelo": "MRX125 TK",
@@ -4208,9 +4236,9 @@
       "categoria": "Todo Terreno",
       "cilindraje": "124,7 cc",
       "anio": "2026",
-      "cuota_inicial": 1800000,
+      "cuota_inicial": 1740775,
       "comercial": 9139000,
-      "contado": null,
+      "contado": 9861000,
       "bono": null,
       "colores": [
         {
@@ -4379,7 +4407,8 @@
       "descripcion": "",
       "foto": "victory_mrx125_tk.jpg",
       "foto_hero": "victory_mrx125_tk_hero.jpg",
-      "ficha_pdf": "victory_mrx125_tk.pdf"
+      "ficha_pdf": "victory_mrx125_tk.pdf",
+      "credito": 9965875
     },
     {
       "modelo": "MRX150 FOX TK",
@@ -4387,9 +4416,9 @@
       "categoria": "Todo Terreno",
       "cilindraje": "149,2 cc",
       "anio": "2027",
-      "cuota_inicial": 2300000,
+      "cuota_inicial": 2039000,
       "comercial": 10340000,
-      "contado": 11241000,
+      "contado": 11240000,
       "bono": null,
       "colores": [
         {
@@ -4549,7 +4578,8 @@
       "descripcion": "",
       "foto": "victory_mrx150_fox_tk.jpg",
       "foto_hero": "victory_mrx150_fox_tk_hero.jpg",
-      "ficha_pdf": "victory_mrx150_fox_tk.pdf"
+      "ficha_pdf": "victory_mrx150_fox_tk.pdf",
+      "credito": 11345000
     },
     {
       "modelo": "MRX150 TK",
@@ -4557,9 +4587,9 @@
       "categoria": "Todo Terreno",
       "cilindraje": "149,2 cc",
       "anio": "2027",
-      "cuota_inicial": 2300000,
+      "cuota_inicial": 1989000,
       "comercial": 9840000,
-      "contado": 10741000,
+      "contado": 10740000,
       "bono": null,
       "colores": [
         {
@@ -4719,7 +4749,8 @@
       "descripcion": "",
       "foto": "victory_mrx150_tk.jpg",
       "foto_hero": "victory_mrx150_tk_hero.jpg",
-      "ficha_pdf": "victory_mrx150_tk.pdf"
+      "ficha_pdf": "victory_mrx150_tk.pdf",
+      "credito": 10845000
     },
     {
       "modelo": "SPORT 100 ELS SP",
@@ -4727,10 +4758,10 @@
       "categoria": "de Trabajo y Transporte",
       "cilindraje": "99.7 cc",
       "anio": "2027",
-      "cuota_inicial": null,
+      "cuota_inicial": 1310000,
       "comercial": 5749999,
       "contado": 6379999,
-      "bono": null,
+      "bono": 500000,
       "colores": [
         {
           "nombre": "Gris Grafito - Verde",
@@ -4863,7 +4894,8 @@
       "descripcion": "La TVS SPORT 100 es insignia en calidad, economía y comodidad, su motor de 99 cc con tecnología Duralife provee un transporte confiable y eficiente, ahora con todo el respaldo de AUTECO.",
       "foto": "tvs_sport_100_els_sp.jpg",
       "foto_hero": "tvs_sport_100_els_sp_hero.jpg",
-      "ficha_pdf": "tvs_sport_100_els_sp.pdf"
+      "ficha_pdf": "tvs_sport_100_els_sp.pdf",
+      "credito": 6484999
     },
     {
       "modelo": "SPORT KLS SPOKE",
@@ -4871,9 +4903,9 @@
       "categoria": "de Trabajo y Transporte",
       "cilindraje": "99.7 cc",
       "anio": "2027",
-      "cuota_inicial": null,
-      "comercial": 5499999,
-      "contado": 6129999,
+      "cuota_inicial": 1235000,
+      "comercial": 4999999,
+      "contado": 5629999,
       "bono": null,
       "colores": [
         {
@@ -5013,7 +5045,8 @@
       "descripcion": "La TVS SPORT 100 es insignia en calidad, economía y comodidad, su motor de 99 cc con tecnología Duralife provee un transporte confiable y eficiente, ahora con todo el respaldo de AUTECO.",
       "foto": "tvs_sport_kls_spoke.jpg",
       "foto_hero": "tvs_sport_kls_spoke_hero.jpg",
-      "ficha_pdf": "tvs_sport_kls_spoke.pdf"
+      "ficha_pdf": "tvs_sport_kls_spoke.pdf",
+      "credito": 5734999
     },
     {
       "modelo": "MOTOCARRO TRICARGO 200 GRIS PARTICULAR PICK UP ACEITE MULTICOLOR 2027",
@@ -5021,7 +5054,7 @@
       "categoria": "Motocarros",
       "cilindraje": "197 cc",
       "anio": "2027",
-      "cuota_inicial": null,
+      "cuota_inicial": 3623250,
       "comercial": 16140000,
       "contado": 17238000,
       "bono": null,
@@ -5150,7 +5183,8 @@
       "descripcion": "",
       "foto": "tvs_motocarro_tricargo_200_gris_particular_pick_up_aceite_multicolor_2027.jpg",
       "foto_hero": "tvs_motocarro_tricargo_200_gris_particular_pick_up_aceite_multicolor_2027_hero.jpg",
-      "ficha_pdf": "tvs_motocarro_tricargo_200_gris_particular_pick_up_aceite_multicolor_2027.pdf"
+      "ficha_pdf": "tvs_motocarro_tricargo_200_gris_particular_pick_up_aceite_multicolor_2027.pdf",
+      "credito": 17342250
     },
     {
       "modelo": "MOTOCARRO TRICARGO 300 PARTICULAR PICKUP NEGRO",
@@ -5158,7 +5192,7 @@
       "categoria": "Motocarros",
       "cilindraje": "272 cc",
       "anio": "2027",
-      "cuota_inicial": null,
+      "cuota_inicial": 8420000,
       "comercial": 24649000,
       "contado": 26335000,
       "bono": null,
@@ -5283,7 +5317,2208 @@
       "descripcion": "",
       "foto": "tvs_motocarro_tricargo_300_particular_pickup_negro.jpg",
       "foto_hero": "tvs_motocarro_tricargo_300_particular_pickup_negro_hero.jpg",
-      "ficha_pdf": "tvs_motocarro_tricargo_300_particular_pickup_negro.pdf"
+      "ficha_pdf": "tvs_motocarro_tricargo_300_particular_pickup_negro.pdf",
+      "credito": 26420000
+    },
+    {
+      "modelo": "NEO NX 110",
+      "marca": "TVS",
+      "categoria": "de Trabajo y Transporte",
+      "cilindraje": "109.7 CC",
+      "anio": "2027",
+      "cuota_inicial": 1466875,
+      "comercial": 6399999,
+      "contado": 7121999,
+      "bono": 300000,
+      "colores": [
+        {
+          "nombre": "Negra Nebulosa",
+          "hex": "#1a1a1a",
+          "foto": "https://auteco.vteximg.com.br/arquivos/ids/1600119/TVS-Neo-NX-110-Negra-Nebulosa-Gris-360-02.webp?v=639239029061930000"
+        },
+        {
+          "nombre": "Negro Mate Dorado",
+          "hex": "#222222",
+          "foto": "https://auteco.vteximg.com.br/arquivos/ids/1591047/TVS-Neo-NX-110-Negro-Mate-Dorado-360-01.webp?v=639221642380470000"
+        },
+        {
+          "nombre": "Gris Nardo Azul",
+          "hex": "#6f7276",
+          "foto": "https://auteco.vteximg.com.br/arquivos/ids/1591064/TVS-NEO-NX-110-Gris-Nardo-Azul-360-01.webp?v=639221643701770000"
+        }
+      ],
+      "specs": [
+        [
+          "CILINDRAJE",
+          "109.7 CC"
+        ],
+        [
+          "POTENCIA MÁXIMA",
+          "8.44 HP @ 7500 rpm"
+        ],
+        [
+          "CAPACIDAD DEL TANQUE (Incluyendo la reserva)",
+          "4L (1.06 GAL)"
+        ],
+        [
+          "MOTOR",
+          "4 tiempos, monocilíndrico"
+        ],
+        [
+          "TORQUE MÁXIMO",
+          "8.5 Nm @ 4500 rpm"
+        ],
+        [
+          "TRANSMISIÓN",
+          "Semi-automática"
+        ],
+        [
+          "COMBUSTIBLE",
+          "Gasolina corriente"
+        ],
+        [
+          "RELACIÓN DE COMPRESIÓN",
+          "9.35:1"
+        ],
+        [
+          "SISTEMA DE ALIMENTACIÓN",
+          "Carburador"
+        ],
+        [
+          "SUSPENSIÓN DELANTERA",
+          "HORQUILLA TELESCÓPICA"
+        ],
+        [
+          "SISTEMA DE ENCENDIDO",
+          "CDI"
+        ],
+        [
+          "DIÁMETRO POR CARRERA",
+          "53.5 X 48.8 mm"
+        ],
+        [
+          "REFRIGERACIÓN",
+          "Aire"
+        ],
+        [
+          "ARRANQUE",
+          "Eléctrico y pedal"
+        ],
+        [
+          "SUSPENSIÓN TRASERA",
+          "Doble amortiguador"
+        ],
+        [
+          "FRENO DELANTERO",
+          "Disco (220 mm) pinza flotante de 1 émbolo"
+        ],
+        [
+          "FRENO TRASERO",
+          "TAMBOR (110 MM)"
+        ],
+        [
+          "RINES",
+          "Aspas de Aleación"
+        ],
+        [
+          "LLANTA DELANTERA",
+          "2.5 X R17 O 70/90 R17"
+        ],
+        [
+          "LLANTA TRASERA",
+          "2.75 X R17 O 80/90 R17"
+        ],
+        [
+          "LARGO TOTAL",
+          "1915 mm"
+        ],
+        [
+          "ALTURA TOTAL",
+          "1100 mm"
+        ],
+        [
+          "ANCHO TOTAL",
+          "665 mm"
+        ],
+        [
+          "DISTANCIA ENTRE EJES",
+          "1260 mm"
+        ],
+        [
+          "ALTURA AL SILLÍN",
+          "760 mm"
+        ],
+        [
+          "PESO EN SECO",
+          "99 kg"
+        ]
+      ],
+      "manual_url": "https://media.autecomobility.com/recursos/marcas/tvs/manuales/manual-garantia-neo-nuevo.pdf",
+      "descripcion": "Con la Neo NX 110 sin lugar a duda tendrás la mejor opción en el segmento de motos semiautomáticas. Esta moto tiene un diseño moderno y un estilo característico que te encantará. Además, es potente, económica y como si no fuera suficiente, está llena de detalles que harán que tu transporte cotidiano sea una experiencia muy cómoda.",
+      "foto": "https://auteco.vteximg.com.br/arquivos/ids/1600119/TVS-Neo-NX-110-Negra-Nebulosa-Gris-360-02.webp?v=639239029061930000",
+      "foto_hero": "https://auteco.vteximg.com.br/arquivos/ids/1600119/TVS-Neo-NX-110-Negra-Nebulosa-Gris-360-02.webp?v=639239029061930000",
+      "ficha_pdf": null,
+      "credito": 7226874
+    },
+    {
+      "modelo": "NEO NX 125 FI",
+      "marca": "TVS",
+      "categoria": "de Trabajo y Transporte",
+      "cilindraje": "124,5 cc",
+      "anio": "2027",
+      "cuota_inicial": 1626875,
+      "comercial": 7999999,
+      "contado": 8721999,
+      "bono": null,
+      "colores": [
+        {
+          "nombre": "Negro Nebulosa",
+          "hex": "#1a1a1a",
+          "foto": "https://auteco.vteximg.com.br/arquivos/ids/1600136/TVS-NEO-125-FI-Negro-360-02.webp?v=639239029466800000"
+        },
+        {
+          "nombre": "Top Frost",
+          "hex": "#888888",
+          "foto": "https://auteco.vteximg.com.br/arquivos/ids/1598502/TVS-NEO-125-FI-Gris-360-01.webp?v=639235464327070000"
+        }
+      ],
+      "specs": [
+        [
+          "CILINDRAJE",
+          "124,5 cc"
+        ],
+        [
+          "POTENCIA MÁXIMA",
+          "9,25 HP @ 8000 rpm"
+        ],
+        [
+          "SISTEMA DE FRENOS",
+          "CBS"
+        ],
+        [
+          "CAPACIDAD DEL TANQUE (Incluyendo la reserva)",
+          "4,6 Lt"
+        ],
+        [
+          "MOTOR",
+          "4 Tiempos monocilíndrico"
+        ],
+        [
+          "ALTURA AL PISO",
+          "150 mm"
+        ],
+        [
+          "TORQUE MÁXIMO",
+          "9,3 Nm @ 6000 rpm"
+        ],
+        [
+          "TRANSMISIÓN",
+          "Semiautomática 4 velocidades"
+        ],
+        [
+          "COMBUSTIBLE",
+          "Corriente"
+        ],
+        [
+          "RELACIÓN DE COMPRESIÓN",
+          "9,7:1"
+        ],
+        [
+          "SISTEMA DE ALIMENTACIÓN",
+          "Inyección electrónica"
+        ],
+        [
+          "PESO NETO",
+          "106 kg"
+        ],
+        [
+          "SUSPENSIÓN DELANTERA",
+          "Telescópica hidráulica"
+        ],
+        [
+          "SISTEMA DE ENCENDIDO",
+          "CDI"
+        ],
+        [
+          "DIÁMETRO POR CARRERA",
+          "57,0 x 48,8 mm"
+        ],
+        [
+          "REFRIGERACIÓN",
+          "Aire"
+        ],
+        [
+          "ARRANQUE",
+          "Eléctrico y pedal"
+        ],
+        [
+          "SUSPENSIÓN TRASERA",
+          "Telescópica hidráulica"
+        ],
+        [
+          "FRENO DELANTERO",
+          "Disco 220 mm"
+        ],
+        [
+          "FRENO TRASERO",
+          "Campana 130 mm"
+        ],
+        [
+          "LLANTA DELANTERA",
+          "70/90-17"
+        ],
+        [
+          "LLANTA TRASERA",
+          "80/90-17"
+        ],
+        [
+          "ABS",
+          "No"
+        ],
+        [
+          "LARGO TOTAL",
+          "1940 mm"
+        ],
+        [
+          "ALTURA TOTAL",
+          "1098 mm"
+        ],
+        [
+          "ANCHO TOTAL",
+          "700 mm"
+        ],
+        [
+          "DISTANCIA ENTRE EJES",
+          "1260 mm"
+        ],
+        [
+          "ALTURA AL SILLÍN",
+          "767 mm"
+        ]
+      ],
+      "manual_url": "https://media.autecomobility.com/recursos/marcas/tvs/manuales/usuario/Manual-de-usuario-TVS-NEO-125-FI.pdf",
+      "descripcion": "Descubre la nueva TVS NEO 110 FI , una motocicleta diseñada para quienes buscan economía, rendimiento y estilo en cada recorrido. Gracias a su inyección electrónica (FI) , ofrece una respuesta más eficiente, un menor consumo de combustible y un desempeño confiable, ideal para enfrentar la movilidad diaria con tranquilidad.",
+      "foto": "https://auteco.vteximg.com.br/arquivos/ids/1600136/TVS-NEO-125-FI-Negro-360-02.webp?v=639239029466800000",
+      "foto_hero": "https://auteco.vteximg.com.br/arquivos/ids/1600136/TVS-NEO-125-FI-Negro-360-02.webp?v=639239029466800000",
+      "ficha_pdf": null,
+      "credito": 8826874
+    },
+    {
+      "modelo": "DAZZ 110",
+      "marca": "TVS",
+      "categoria": "de Trabajo y Transporte",
+      "cilindraje": "109.7 CC",
+      "anio": "2027",
+      "cuota_inicial": 1476875,
+      "comercial": 6499999,
+      "contado": 7221999,
+      "bono": null,
+      "colores": [
+        {
+          "nombre": "Gris Carbono - Azul",
+          "hex": "#4a4a4a",
+          "foto": "https://auteco.vteximg.com.br/arquivos/ids/1605039/TVS-Dazz-110-Gris-Carbono-360-02.webp?v=639239775680270000"
+        },
+        {
+          "nombre": "Negro Nebulosa",
+          "hex": "#1a1a1a",
+          "foto": "https://auteco.vteximg.com.br/arquivos/ids/1590801/TVS-Dazz-110-Negra-Nebulosa-360-01.webp?v=639221447303870000"
+        }
+      ],
+      "specs": [
+        [
+          "CILINDRAJE",
+          "109.7 CC"
+        ],
+        [
+          "POTENCIA MÁXIMA",
+          "7,9 HP@ 7500 rpm"
+        ],
+        [
+          "CAPACIDAD DEL TANQUE (Incluyendo la reserva)",
+          "5,3 L (1,4 GAL)"
+        ],
+        [
+          "MOTOR",
+          "4 TIEMPOS, MONOCILÍNDRICO"
+        ],
+        [
+          "TORQUE MÁXIMO",
+          "8.3 Nm@ 5500 rpm"
+        ],
+        [
+          "TRANSMISIÓN",
+          "Automática"
+        ],
+        [
+          "COMBUSTIBLE",
+          "Gasolina corriente"
+        ],
+        [
+          "RELACIÓN DE COMPRESIÓN",
+          "9.5:1"
+        ],
+        [
+          "SISTEMA DE ALIMENTACIÓN",
+          "Carburador"
+        ],
+        [
+          "SUSPENSIÓN DELANTERA",
+          "TVS Telescopica"
+        ],
+        [
+          "SISTEMA DE ENCENDIDO",
+          "TCI"
+        ],
+        [
+          "DIÁMETRO POR CARRERA",
+          "53,5 X 48,8 mm"
+        ],
+        [
+          "REFRIGERACIÓN",
+          "Aire"
+        ],
+        [
+          "ARRANQUE",
+          "Eléctrico y pedal"
+        ],
+        [
+          "SUSPENSIÓN TRASERA",
+          "Mono amotiguador"
+        ],
+        [
+          "FRENO DELANTERO",
+          "DISCO"
+        ],
+        [
+          "FRENO TRASERO",
+          "TAMBOR O CAMPANA"
+        ],
+        [
+          "RINES",
+          "Aspas"
+        ],
+        [
+          "LLANTA DELANTERA",
+          "MA-3DN"
+        ],
+        [
+          "LLANTA TRASERA",
+          "MA-3DN"
+        ],
+        [
+          "LARGO TOTAL",
+          "1810 mm"
+        ],
+        [
+          "ALTURA TOTAL",
+          "1119mm"
+        ],
+        [
+          "ANCHO TOTAL",
+          "670mm"
+        ],
+        [
+          "DISTANCIA ENTRE EJES",
+          "1250mm"
+        ],
+        [
+          "ALTURA AL SILLÍN",
+          "780mm"
+        ],
+        [
+          "PESO EN SECO",
+          "92 kg"
+        ]
+      ],
+      "manual_url": "https://media.autecomobility.com/recursos/marcas/tvs/manuales/manual-dazz-nuevo.pdf",
+      "descripcion": "Una nueva scooter se toma la ciudad. TVS DAZZ Slim scooter es la moto urbana perfecta para empezar. Con esta moto liviana, versátil y compacta, la ciudad se hace más simple. Recorre el camino con tranquilidad, sabiendo que el control lo llevas tu.",
+      "foto": "https://auteco.vteximg.com.br/arquivos/ids/1605039/TVS-Dazz-110-Gris-Carbono-360-02.webp?v=639239775680270000",
+      "foto_hero": "https://auteco.vteximg.com.br/arquivos/ids/1605039/TVS-Dazz-110-Gris-Carbono-360-02.webp?v=639239775680270000",
+      "ficha_pdf": null,
+      "credito": 7326874
+    },
+    {
+      "modelo": "SPORT 110 FI",
+      "marca": "TVS",
+      "categoria": "de Trabajo y Transporte",
+      "cilindraje": "109,7 CC",
+      "anio": "2027",
+      "cuota_inicial": 1446875,
+      "comercial": 6199999,
+      "contado": 6921999,
+      "bono": null,
+      "colores": [
+        {
+          "nombre": "Negro Nebulosa - Gris",
+          "hex": "#1a1a1a",
+          "foto": "https://auteco.vteximg.com.br/arquivos/ids/1600102/TVS-Sport-100-FI-Negra-nebulosa-gris-360-02.webp?v=639239028266870000"
+        },
+        {
+          "nombre": "Gris Grafito - Verde",
+          "hex": "#3a3a3a",
+          "foto": "https://auteco.vteximg.com.br/arquivos/ids/1590958/TVS-Sport-100-FI-Gris-grafito-verde-360-01.webp?v=639221616369230000"
+        },
+        {
+          "nombre": "Negro Nebulosa - Azul",
+          "hex": "#1a1a1a",
+          "foto": "https://auteco.vteximg.com.br/arquivos/ids/1605021/TVS-Sport-100-FI-Negra-azul-360-01.webp?v=639239688458730000"
+        }
+      ],
+      "specs": [
+        [
+          "CILINDRAJE",
+          "109,7 CC"
+        ],
+        [
+          "POTENCIA MÁXIMA",
+          "8,1 hp @7350 rpm"
+        ],
+        [
+          "SISTEMA DE FRENOS",
+          "CBS"
+        ],
+        [
+          "CAPACIDAD DEL TANQUE (Incluyendo la reserva)",
+          "10 LT (2,64 GAL)"
+        ],
+        [
+          "MOTOR",
+          "4T MONOCILÍNDRICO"
+        ],
+        [
+          "ALTURA AL PISO",
+          "175 MM"
+        ],
+        [
+          "TORQUE MÁXIMO",
+          "8,4 NM @ 4500 RPM"
+        ],
+        [
+          "COMBUSTIBLE",
+          "Corriente"
+        ],
+        [
+          "RELACIÓN DE COMPRESIÓN",
+          "10:1"
+        ],
+        [
+          "SISTEMA DE ALIMENTACIÓN",
+          "Inyección electrónica"
+        ],
+        [
+          "PESO NETO",
+          "114 KG"
+        ],
+        [
+          "SUSPENSIÓN DELANTERA",
+          "TELESCOPICA HIDRÁULICA"
+        ],
+        [
+          "SISTEMA DE ENCENDIDO",
+          "ECU"
+        ],
+        [
+          "DIÁMETRO POR CARRERA",
+          "53,5 X 48,8 MM"
+        ],
+        [
+          "REFRIGERACIÓN",
+          "Aire"
+        ],
+        [
+          "ARRANQUE",
+          "Eléctrico"
+        ],
+        [
+          "SUSPENSIÓN TRASERA",
+          "DOBLE AMORTIGUADOR TRASERO REGULABLE EN 5 POSICIONES DE PRECARGA"
+        ],
+        [
+          "FRENO DELANTERO",
+          "DISCO 240 MM"
+        ],
+        [
+          "FRENO TRASERO",
+          "CAMPANA 110 MM"
+        ],
+        [
+          "RINES",
+          "Aspas de Aleación"
+        ],
+        [
+          "LLANTA DELANTERA",
+          "2.75 - 17 41P 4PR"
+        ],
+        [
+          "LLANTA TRASERA",
+          "3.00 - 17 50P 6PR"
+        ],
+        [
+          "ABS",
+          "No"
+        ],
+        [
+          "LARGO TOTAL",
+          "1950 MM"
+        ],
+        [
+          "ALTURA TOTAL",
+          "1080 MM"
+        ],
+        [
+          "ANCHO TOTAL",
+          "705 MM"
+        ],
+        [
+          "DISTANCIA ENTRE EJES",
+          "1236 MM"
+        ],
+        [
+          "ALTURA AL SILLÍN",
+          "1236 MM"
+        ],
+        [
+          "APTA PARA PRIMERA MOTO",
+          "Si"
+        ]
+      ],
+      "manual_url": "https://media.autecomobility.com/recursos/marcas/tvs/manuales/usuario/Manual-de-garantia-TVS-Sport-110-FI.pdf",
+      "descripcion": "TVS rompe el esquema del trabajo y el transporte. La nueva TVS Sport 110 FI llegó para demostrar que en ahorro, rendimiento y tecnología no tiene competencia. Gracias a su tecnología FI (Fuel Injection), obtienes: Mayor ahorro de combustible, encendido más rápido y confiable, mejor desempeño en cada recorrido, menor emisión de gases contaminantes Más kilómetros, menos gasto y el respaldo de una mo",
+      "foto": "https://auteco.vteximg.com.br/arquivos/ids/1600102/TVS-Sport-100-FI-Negra-nebulosa-gris-360-02.webp?v=639239028266870000",
+      "foto_hero": "https://auteco.vteximg.com.br/arquivos/ids/1600102/TVS-Sport-100-FI-Negra-nebulosa-gris-360-02.webp?v=639239028266870000",
+      "ficha_pdf": null,
+      "credito": 7026874
+    },
+    {
+      "modelo": "APACHE RTR 310",
+      "marca": "TVS",
+      "categoria": "Deportivas",
+      "cilindraje": "312.12 CC",
+      "anio": "2026",
+      "cuota_inicial": 11371849,
+      "comercial": 27799999,
+      "contado": 29266999,
+      "bono": 1000000,
+      "colores": [
+        {
+          "nombre": "Amarillo Furia - Negra",
+          "hex": "#facc15",
+          "foto": "https://auteco.vteximg.com.br/arquivos/ids/1599111/TVS-Apache-RTR-310-Amarillo-Negro-360-02.webp?v=639238090235770000"
+        },
+        {
+          "nombre": "Negro Rojo",
+          "hex": "#dc2626",
+          "foto": "https://auteco.vteximg.com.br/arquivos/ids/1589328/TVS-Apache-RTR-310-Negro-Rojo-360-01.webp?v=639198286748100000"
+        }
+      ],
+      "specs": [
+        [
+          "CILINDRAJE",
+          "312.12 CC"
+        ],
+        [
+          "POTENCIA MÁXIMA",
+          "35.6 @ 9700 SPORT/TRACK MODE"
+        ],
+        [
+          "CAPACIDAD DEL TANQUE (Incluyendo la reserva)",
+          "11 l (2.9 Gal)"
+        ],
+        [
+          "MOTOR",
+          "4 TIEMPOS, MONOCILÍNDRICO 4 VÁLVULAS"
+        ],
+        [
+          "TORQUE MÁXIMO",
+          "28.7 @ 6650 SPORT/TRACK MODE"
+        ],
+        [
+          "TRANSMISIÓN",
+          "Mecánica 6 velocidades + Quick shifter"
+        ],
+        [
+          "COMBUSTIBLE",
+          "Gasolina extra"
+        ],
+        [
+          "RELACIÓN DE COMPRESIÓN",
+          "12.17:1"
+        ],
+        [
+          "SISTEMA DE ALIMENTACIÓN",
+          "Inyección electrónica"
+        ],
+        [
+          "SUSPENSIÓN DELANTERA",
+          "Horquilla telescópica Invertida"
+        ],
+        [
+          "SISTEMA DE ENCENDIDO",
+          "ECU"
+        ],
+        [
+          "DIÁMETRO POR CARRERA",
+          "80 x 62.1"
+        ],
+        [
+          "REFRIGERACIÓN",
+          "Refrigerante"
+        ],
+        [
+          "ARRANQUE",
+          "Eléctrico"
+        ],
+        [
+          "SUSPENSIÓN TRASERA",
+          "Monoamortiguador, ajustable en precarga y dureza"
+        ],
+        [
+          "FRENO DELANTERO",
+          "DISCO (300 MM)"
+        ],
+        [
+          "FRENO TRASERO",
+          "DISCO (240 MM)"
+        ],
+        [
+          "RINES",
+          "Aspas"
+        ],
+        [
+          "LLANTA DELANTERA",
+          "110/70 R17"
+        ],
+        [
+          "LLANTA TRASERA",
+          "150/60 R17"
+        ],
+        [
+          "LARGO TOTAL",
+          "1991 mm"
+        ],
+        [
+          "ALTURA TOTAL",
+          "1154 mm"
+        ],
+        [
+          "ANCHO TOTAL",
+          "831 mm"
+        ],
+        [
+          "DISTANCIA ENTRE EJES",
+          "1358 mm"
+        ],
+        [
+          "ALTURA AL SILLÍN",
+          "800 mm"
+        ],
+        [
+          "PESO EN SECO",
+          "160 kg"
+        ]
+      ],
+      "manual_url": "https://media.autecomobility.com/recursos/marcas/tvs/manuales/manueal-garantia-310-nuevo.pdf",
+      "descripcion": "La RTR 310 Creada para experimentar la libertad en cada curva, una Naked que desafía los límites en cada aceleración, ¡Atrévete a desatar tu rebeldía al máximo!",
+      "foto": "https://auteco.vteximg.com.br/arquivos/ids/1599111/TVS-Apache-RTR-310-Amarillo-Negro-360-02.webp?v=639238090235770000",
+      "foto_hero": "https://auteco.vteximg.com.br/arquivos/ids/1599111/TVS-Apache-RTR-310-Amarillo-Negro-360-02.webp?v=639238090235770000",
+      "ficha_pdf": null,
+      "credito": 29371849
+    },
+    {
+      "modelo": "APACHE RTR 310 PRO",
+      "marca": "TVS",
+      "categoria": "Deportivas",
+      "cilindraje": "312.12 CC",
+      "anio": "2026",
+      "cuota_inicial": 13071849,
+      "comercial": 29499999,
+      "contado": 30966999,
+      "bono": 1000000,
+      "colores": [
+        {
+          "nombre": "Blanco Azul Rojo",
+          "hex": "#1e40af",
+          "foto": "https://auteco.vteximg.com.br/arquivos/ids/1599102/TVS-Apache-RTR-310-PRM_Blanco-Azul-Rojo-360-02.webp?v=639238089888070000"
+        },
+        {
+          "nombre": "Negro Rojo",
+          "hex": "#dc2626",
+          "foto": "https://auteco.vteximg.com.br/arquivos/ids/1589540/TVS-Apache-RTR-310-PRM-Negra-Rojo-360-01.webp?v=639198995371970000"
+        }
+      ],
+      "specs": [
+        [
+          "CILINDRAJE",
+          "312.12 CC"
+        ],
+        [
+          "POTENCIA MÁXIMA",
+          "35.6 @ 9700 SPORT/TRACK MODE"
+        ],
+        [
+          "SISTEMA DE FRENOS",
+          "ABS"
+        ],
+        [
+          "CAPACIDAD DEL TANQUE (Incluyendo la reserva)",
+          "11 l (2.9 Gal)"
+        ],
+        [
+          "MOTOR",
+          "4 TIEMPOS, MONOCILÍNDRICO 4 VÁLVULAS"
+        ],
+        [
+          "ALTURA AL PISO",
+          "1154 mm"
+        ],
+        [
+          "TORQUE MÁXIMO",
+          "28.7 @ 6650 SPORT/TRACK MODE"
+        ],
+        [
+          "TRANSMISIÓN",
+          "Mecánica 6 velocidades + Quick shifter"
+        ],
+        [
+          "COMBUSTIBLE",
+          "Extra"
+        ],
+        [
+          "RELACIÓN DE COMPRESIÓN",
+          "12.17:1"
+        ],
+        [
+          "SISTEMA DE ALIMENTACIÓN",
+          "Inyección electrónica"
+        ],
+        [
+          "PESO NETO",
+          "170 kg"
+        ],
+        [
+          "SUSPENSIÓN DELANTERA",
+          "Horquilla telescópica Invertida"
+        ],
+        [
+          "SISTEMA DE ENCENDIDO",
+          "ECU"
+        ],
+        [
+          "DIÁMETRO POR CARRERA",
+          "80 x 62.1"
+        ],
+        [
+          "REFRIGERACIÓN",
+          "Refrigerante"
+        ],
+        [
+          "ARRANQUE",
+          "Eléctrico"
+        ],
+        [
+          "SUSPENSIÓN TRASERA",
+          "Monoamortiguador, ajustable en precarga y dureza"
+        ],
+        [
+          "FRENO DELANTERO",
+          "Disco (300 mm)"
+        ],
+        [
+          "TEST DRIVE",
+          "No"
+        ],
+        [
+          "FRENO TRASERO",
+          "Disco (300 mm)"
+        ],
+        [
+          "RINES",
+          "Aspas"
+        ],
+        [
+          "LLANTA DELANTERA",
+          "110/70 R17"
+        ],
+        [
+          "LLANTA TRASERA",
+          "150/60 R17"
+        ],
+        [
+          "ABS",
+          "Si"
+        ],
+        [
+          "LARGO TOTAL",
+          "1991 mm"
+        ],
+        [
+          "ALTURA TOTAL",
+          "1154 mm"
+        ],
+        [
+          "ANCHO TOTAL",
+          "831 mm"
+        ],
+        [
+          "SEÑORITERA",
+          "Si"
+        ],
+        [
+          "DISTANCIA ENTRE EJES",
+          "1358 mm"
+        ],
+        [
+          "ALTURA AL SILLÍN",
+          "800 mm"
+        ],
+        [
+          "PESO EN SECO",
+          "166 kg"
+        ],
+        [
+          "APTA PARA PRIMERA MOTO",
+          "Si"
+        ],
+        [
+          "IMPUESTOS",
+          "Debe pagar impuestos de rodamiento"
+        ]
+      ],
+      "manual_url": "https://media.autecomobility.com/recursos/marcas/tvs/manuales/manual-garantia-310pro-nuevo.pdf",
+      "descripcion": "RTR 310 PRO : ¡Más inteligente, más segura! Creada para experimentar la libertad en cada curva, una Naked que desafía los límites en cada aceleración y cuenta con tecnología IMU de 6 ejes.",
+      "foto": "https://auteco.vteximg.com.br/arquivos/ids/1599102/TVS-Apache-RTR-310-PRM_Blanco-Azul-Rojo-360-02.webp?v=639238089888070000",
+      "foto_hero": "https://auteco.vteximg.com.br/arquivos/ids/1599102/TVS-Apache-RTR-310-PRM_Blanco-Azul-Rojo-360-02.webp?v=639238089888070000",
+      "ficha_pdf": null,
+      "credito": 31071849
+    },
+    {
+      "modelo": "MOTOCARRO KING DELUXE PLUS GS+",
+      "marca": "TVS",
+      "categoria": "Motocarros",
+      "cilindraje": "199.26 cc",
+      "anio": "2027",
+      "cuota_inicial": 3902100,
+      "comercial": 17999000,
+      "contado": 19097000,
+      "bono": 1000000,
+      "colores": [
+        {
+          "nombre": "Blanco",
+          "hex": "#fafafa",
+          "foto": "https://auteco.vteximg.com.br/arquivos/ids/1600075/TVS-King-Deluxe-GS--360-02.webp?v=639239021957500000"
+        },
+        {
+          "nombre": "Blanco",
+          "hex": "#fafafa",
+          "foto": "https://auteco.vteximg.com.br/arquivos/ids/1504573/TVS-KING-GS-_08.png?v=639052101412200000"
+        }
+      ],
+      "specs": [
+        [
+          "MOTOR",
+          "4 tiempos, monocilíndrico"
+        ],
+        [
+          "POTENCIA MÁXIMA",
+          "10.06 HP @ 5500 rpm"
+        ],
+        [
+          "SISTEMA DE ALIMENTACIÓN",
+          "Carburador"
+        ],
+        [
+          "CILINDRAJE",
+          "199.26 cc"
+        ],
+        [
+          "TORQUE MÁXIMO",
+          "15.5 Nm @ 3250 rpm"
+        ],
+        [
+          "COMBUSTIBLE",
+          "Gasolina corriente"
+        ],
+        [
+          "DIÁMETRO POR CARRERA",
+          "62 X 66 mm"
+        ],
+        [
+          "RELACIÓN DE COMPRESIÓN",
+          "9.6:1"
+        ],
+        [
+          "ARRANQUE",
+          "Eléctrico/ palanca"
+        ],
+        [
+          "TRANSMISIÓN",
+          "Mecánica 4 velocidades"
+        ],
+        [
+          "SUSPENSIÓN DELANTERA",
+          "Brazo oscilante coaxial con amortiguador hidraulico de doble acción y resorte helicoidal"
+        ],
+        [
+          "SUSPENSIÓN TRASERA",
+          "Brazos oscilantes independientes tipo McPherson"
+        ],
+        [
+          "FRENO DELANTERO",
+          "TAMBOR"
+        ],
+        [
+          "FRENO TRASERO",
+          "TAMBOR"
+        ],
+        [
+          "LLANTA DELANTERA",
+          "4.00 - R8 76F"
+        ],
+        [
+          "LLANTA TRASERA",
+          "4.00 - R8 76F"
+        ],
+        [
+          "RINES",
+          "Aleación"
+        ],
+        [
+          "CAPACIDAD DEL TANQUE (Incluyendo la reserva)",
+          "7.5 L (1.98 GAL)"
+        ],
+        [
+          "SISTEMA DE ENCENDIDO",
+          "TCI"
+        ],
+        [
+          "LARGO TOTAL",
+          "2724 mm"
+        ],
+        [
+          "ALTURA TOTAL",
+          "1740 mm"
+        ],
+        [
+          "ANCHO TOTAL",
+          "1329 mm"
+        ],
+        [
+          "DISTANCIA ENTRE EJES",
+          "1990 mm"
+        ],
+        [
+          "ALTURA AL SILLÍN",
+          "N/A"
+        ],
+        [
+          "REFRIGERACIÓN",
+          "Aire forzado"
+        ],
+        [
+          "PESO NETO",
+          "347 KG"
+        ]
+      ],
+      "manual_url": null,
+      "descripcion": "El motocarro TVS King es el vehículo perfecto para trabajo en casi cualquier geografía de nuestro país. Gracias a su diseño con techo y amplio espacio para el conductor y sus pasajeros, ofrece mayor comodidad durante cada trayecto. Este vehículo se caracteriza por ser potente, tener un alto desempeño y adaptarse a cualquier terreno.",
+      "foto": "https://auteco.vteximg.com.br/arquivos/ids/1600075/TVS-King-Deluxe-GS--360-02.webp?v=639239021957500000",
+      "foto_hero": "https://auteco.vteximg.com.br/arquivos/ids/1600075/TVS-King-Deluxe-GS--360-02.webp?v=639239021957500000",
+      "ficha_pdf": null,
+      "credito": 19201250
+    },
+    {
+      "modelo": "MOTOCARRO KING DELUXE PLUS GS+ ESPECIAL",
+      "marca": "TVS",
+      "categoria": "Motocarros",
+      "cilindraje": "199.26 cc",
+      "anio": "2027",
+      "cuota_inicial": 4022100,
+      "comercial": 18799000,
+      "contado": 19897000,
+      "bono": 1000000,
+      "colores": [
+        {
+          "nombre": "Blanco",
+          "hex": "#fafafa",
+          "foto": "https://auteco.vteximg.com.br/arquivos/ids/1600066/TVS-King-Deluxe-GS--Especial-360-02.webp?v=639239021715970000"
+        },
+        {
+          "nombre": "Blanco",
+          "hex": "#fafafa",
+          "foto": "https://auteco.vteximg.com.br/arquivos/ids/1504618/TVS-KING-GS--ESPECIAL_08.png?v=639052938976030000"
+        }
+      ],
+      "specs": [
+        [
+          "MOTOR",
+          "4 tiempos, monocilíndrico"
+        ],
+        [
+          "POTENCIA MÁXIMA",
+          "10.06 HP @ 5500 rpm"
+        ],
+        [
+          "SISTEMA DE ALIMENTACIÓN",
+          "Carburador"
+        ],
+        [
+          "CILINDRAJE",
+          "199.26 cc"
+        ],
+        [
+          "TORQUE MÁXIMO",
+          "15.5 Nm @ 3250 rpm"
+        ],
+        [
+          "COMBUSTIBLE",
+          "Gasolina corriente"
+        ],
+        [
+          "DIÁMETRO POR CARRERA",
+          "62 X 66 mm."
+        ],
+        [
+          "RELACIÓN DE COMPRESIÓN",
+          "9.6:1"
+        ],
+        [
+          "ARRANQUE",
+          "Eléctrico/ palanca"
+        ],
+        [
+          "TRANSMISIÓN",
+          "Mecánica 4 velocidades"
+        ],
+        [
+          "SUSPENSIÓN DELANTERA",
+          "Brazo oscilante coaxial con amortiguador hidraulico de doble acción y resorte helicoidal"
+        ],
+        [
+          "SUSPENSIÓN TRASERA",
+          "Brazos oscilantes independientes tipo McPherson"
+        ],
+        [
+          "FRENO DELANTERO",
+          "TAMBOR"
+        ],
+        [
+          "FRENO TRASERO",
+          "TAMBOR"
+        ],
+        [
+          "LLANTA DELANTERA",
+          "4.00 - R8 76F"
+        ],
+        [
+          "LLANTA TRASERA",
+          "4.00 - R8 76F"
+        ],
+        [
+          "RINES",
+          "Aleación"
+        ],
+        [
+          "CAPACIDAD DEL TANQUE (Incluyendo la reserva)",
+          "7.5 L (1.98 GAL)"
+        ],
+        [
+          "SISTEMA DE ENCENDIDO",
+          "TCI"
+        ],
+        [
+          "LARGO TOTAL",
+          "2724 mm"
+        ],
+        [
+          "ALTURA TOTAL",
+          "1740 mm"
+        ],
+        [
+          "ANCHO TOTAL",
+          "1329 mm"
+        ],
+        [
+          "DISTANCIA ENTRE EJES",
+          "1990 mm"
+        ],
+        [
+          "ALTURA AL SILLÍN",
+          "N/A"
+        ],
+        [
+          "REFRIGERACIÓN",
+          "Aire forzado"
+        ],
+        [
+          "PESO NETO",
+          "347 KG"
+        ]
+      ],
+      "manual_url": null,
+      "descripcion": "El motocarro TVS KING DELUX PLUS GS+ ESPECIAL es el vehículo perfecto para trabajo en casi cualquier geografía de nuestro país. Gracias a su diseño con techo y amplio espacio para el conductor y sus pasajeros, ofrece mayor comodidad durante cada trayecto. Este vehículo se caracteriza por ser potente, tener un alto desempeño y adaptarse a cualquier terreno.",
+      "foto": "https://auteco.vteximg.com.br/arquivos/ids/1600066/TVS-King-Deluxe-GS--Especial-360-02.webp?v=639239021715970000",
+      "foto_hero": "https://auteco.vteximg.com.br/arquivos/ids/1600066/TVS-King-Deluxe-GS--Especial-360-02.webp?v=639239021715970000",
+      "ficha_pdf": null,
+      "credito": 20001250
+    },
+    {
+      "modelo": "MOTOCARRO KING DELUXE PLUS GS+ FULL",
+      "marca": "TVS",
+      "categoria": "Motocarros",
+      "cilindraje": "199.26 cc",
+      "anio": "2027",
+      "cuota_inicial": 4142100,
+      "comercial": 19599000,
+      "contado": 20697000,
+      "bono": 1000000,
+      "colores": [
+        {
+          "nombre": "Blanco",
+          "hex": "#fafafa",
+          "foto": "https://auteco.vteximg.com.br/arquivos/ids/1600057/TVS-King-Deluxe-GS--Full-360-02.webp?v=639239021425830000"
+        },
+        {
+          "nombre": "Blanco",
+          "hex": "#fafafa",
+          "foto": "https://auteco.vteximg.com.br/arquivos/ids/1504627/TVS-KING-GS--FULL_08.png?v=639052260504130000"
+        }
+      ],
+      "specs": [
+        [
+          "MOTOR",
+          "4 tiempos, monocilíndrico"
+        ],
+        [
+          "POTENCIA MÁXIMA",
+          "10.06 HP @ 5500 rpm"
+        ],
+        [
+          "SISTEMA DE ALIMENTACIÓN",
+          "Carburador"
+        ],
+        [
+          "CILINDRAJE",
+          "199.26 cc"
+        ],
+        [
+          "TORQUE MÁXIMO",
+          "15.5 Nm @ 3250 rpm"
+        ],
+        [
+          "COMBUSTIBLE",
+          "Gasolina corriente"
+        ],
+        [
+          "DIÁMETRO POR CARRERA",
+          "62 X 66 mm"
+        ],
+        [
+          "RELACIÓN DE COMPRESIÓN",
+          "9.6:1"
+        ],
+        [
+          "ARRANQUE",
+          "Eléctrico/ palanca"
+        ],
+        [
+          "TRANSMISIÓN",
+          "Mecánica 4 velocidades"
+        ],
+        [
+          "SUSPENSIÓN DELANTERA",
+          "Brazo oscilante coaxial con amortiguador hidraulico de doble acción y resorte helicoidal"
+        ],
+        [
+          "SUSPENSIÓN TRASERA",
+          "Brazos oscilantes independientes tipo McPherson"
+        ],
+        [
+          "FRENO DELANTERO",
+          "TAMBOR"
+        ],
+        [
+          "FRENO TRASERO",
+          "TAMBOR"
+        ],
+        [
+          "LLANTA DELANTERA",
+          "4.00 - R8 76F"
+        ],
+        [
+          "LLANTA TRASERA",
+          "4.00 - R8 76F"
+        ],
+        [
+          "RINES",
+          "Aleación"
+        ],
+        [
+          "CAPACIDAD DEL TANQUE (Incluyendo la reserva)",
+          "7.5 L (1.98 GAL)"
+        ],
+        [
+          "SISTEMA DE ENCENDIDO",
+          "TCI"
+        ],
+        [
+          "LARGO TOTAL",
+          "2724 mm"
+        ],
+        [
+          "ALTURA TOTAL",
+          "1740 mm"
+        ],
+        [
+          "ANCHO TOTAL",
+          "1329 mm"
+        ],
+        [
+          "DISTANCIA ENTRE EJES",
+          "1990 mm"
+        ],
+        [
+          "ALTURA AL SILLÍN",
+          "N/A"
+        ],
+        [
+          "REFRIGERACIÓN",
+          "Aire forzado"
+        ],
+        [
+          "PESO NETO",
+          "347 KG"
+        ]
+      ],
+      "manual_url": null,
+      "descripcion": "El MOTOCARRO TVS KING DELUXE PLUS GS+ FULL es el vehículo perfecto para trabajo en casi cualquier geografía de nuestro país. Gracias a su diseño con techo y amplio espacio para el conductor y sus pasajeros, ofrece mayor comodidad durante cada trayecto. Este vehículo se caracteriza por ser potente, tener un alto desempeño y adaptarse a cualquier terreno.",
+      "foto": "https://auteco.vteximg.com.br/arquivos/ids/1600057/TVS-King-Deluxe-GS--Full-360-02.webp?v=639239021425830000",
+      "foto_hero": "https://auteco.vteximg.com.br/arquivos/ids/1600057/TVS-King-Deluxe-GS--Full-360-02.webp?v=639239021425830000",
+      "ficha_pdf": null,
+      "credito": 20801250
+    },
+    {
+      "modelo": "ADVANCE R 125",
+      "marca": "VICTORY",
+      "categoria": "de Trabajo y Transporte",
+      "cilindraje": "124,7 cc",
+      "anio": "2027",
+      "cuota_inicial": 1476775,
+      "comercial": 6499000,
+      "contado": 7221000,
+      "bono": null,
+      "colores": [
+        {
+          "nombre": "Negro",
+          "hex": "#101010",
+          "foto": "https://auteco.vteximg.com.br/arquivos/ids/1509003/moto_victory_advancer125_negro_2026_foto01.png?v=639100643520630000"
+        },
+        {
+          "nombre": "Gris Plata Azul",
+          "hex": "#7a7a7a",
+          "foto": "https://auteco.vteximg.com.br/arquivos/ids/629149/moto_victory_advance125_negro_azul_2023_foto01.png?v=638812090652830000"
+        },
+        {
+          "nombre": "Gris Plata Azul",
+          "hex": "#7a7a7a",
+          "foto": "https://auteco.vteximg.com.br/arquivos/ids/298045/moto_victory_advance125_negro_azul_2023_foto01.png?v=638222839006800000"
+        }
+      ],
+      "specs": [
+        [
+          "CILINDRAJE",
+          "124,7 cc"
+        ],
+        [
+          "POTENCIA MÁXIMA",
+          "8,7HP  @ 8000 rpm"
+        ],
+        [
+          "SISTEMA DE FRENOS",
+          "CBS"
+        ],
+        [
+          "CAPACIDAD DEL TANQUE (Incluyendo la reserva)",
+          "3,7 L (0,97 gal)"
+        ],
+        [
+          "MOTOR",
+          "4 tiempos, monocilíndrico"
+        ],
+        [
+          "TORQUE MÁXIMO",
+          "8,7 Nm @ 6000 rpm"
+        ],
+        [
+          "TRANSMISIÓN",
+          "Semiautomática 4 velocidades"
+        ],
+        [
+          "COMBUSTIBLE",
+          "Gasolina corriente"
+        ],
+        [
+          "RELACIÓN DE COMPRESIÓN",
+          "9,8:1"
+        ],
+        [
+          "SISTEMA DE ALIMENTACIÓN",
+          "Carburador"
+        ],
+        [
+          "SUSPENSIÓN DELANTERA",
+          "Telescópica hidráulica"
+        ],
+        [
+          "SISTEMA DE ENCENDIDO",
+          "CDI"
+        ],
+        [
+          "DIÁMETRO POR CARRERA",
+          "53,5 x 55,5 mm"
+        ],
+        [
+          "REFRIGERACIÓN",
+          "Aire"
+        ],
+        [
+          "ARRANQUE",
+          "Eléctrico y pedal"
+        ],
+        [
+          "SUSPENSIÓN TRASERA",
+          "Doble amortiguador"
+        ],
+        [
+          "FRENO DELANTERO",
+          "Disco 220mm. Pinza doble pistón"
+        ],
+        [
+          "TEST DRIVE",
+          "No"
+        ],
+        [
+          "FRENO TRASERO",
+          "Bandas expandibles de 110 mm"
+        ],
+        [
+          "RINES",
+          "Aspas de Aleación"
+        ],
+        [
+          "LLANTA DELANTERA",
+          "2.50 – R17"
+        ],
+        [
+          "LLANTA TRASERA",
+          "2,75 - R17"
+        ],
+        [
+          "ABS",
+          "No"
+        ],
+        [
+          "LARGO TOTAL",
+          "1940 mm"
+        ],
+        [
+          "ALTURA TOTAL",
+          "1120 mm"
+        ],
+        [
+          "ANCHO TOTAL",
+          "705 mm"
+        ],
+        [
+          "SEÑORITERA",
+          "Si"
+        ],
+        [
+          "DISTANCIA ENTRE EJES",
+          "1245 mm"
+        ],
+        [
+          "ALTURA AL SILLÍN",
+          "770 mm"
+        ],
+        [
+          "PESO EN SECO",
+          "97 kg"
+        ],
+        [
+          "APTA PARA PRIMERA MOTO",
+          "Si"
+        ],
+        [
+          "MOTO PARA",
+          "Hombre"
+        ],
+        [
+          "IMPUESTOS",
+          "Debe pagar impuestos de rodamiento"
+        ]
+      ],
+      "manual_url": "https://www.auteco.com.co/manuales-de-usuarios-y-mantenimiento?marca=victory&modelo=ADVANCE-R-125-TRAKKU",
+      "descripcion": "La Advance R 125 es lo que necesitas, una moto que te entiende y tiene todo lo que te hace falta.",
+      "foto": "https://auteco.vteximg.com.br/arquivos/ids/1509003/moto_victory_advancer125_negro_2026_foto01.png?v=639100643520630000",
+      "foto_hero": "https://auteco.vteximg.com.br/arquivos/ids/1509004/moto_victory_advancer125_negro_2026_foto02.jpg?v=639100643520800000",
+      "ficha_pdf": null,
+      "credito": 7325875
+    },
+    {
+      "modelo": "SWITCH 125",
+      "marca": "VICTORY",
+      "categoria": "Automáticas o Scooter",
+      "cilindraje": "124,8 cc",
+      "anio": "2027",
+      "cuota_inicial": 1616775,
+      "comercial": 7899000,
+      "contado": 8621000,
+      "bono": null,
+      "colores": [
+        {
+          "nombre": "Negro Nebulosa - Naranja",
+          "hex": "#1a1a1a",
+          "foto": "https://auteco.vteximg.com.br/arquivos/ids/1590114/360-moto_victory_switch125_gris_naranja_2026_foto01.png?v=639203568255670000"
+        }
+      ],
+      "specs": [
+        [
+          "CILINDRAJE",
+          "124,8 cc"
+        ],
+        [
+          "POTENCIA MÁXIMA",
+          "10.7 HP @ 9000 rpm"
+        ],
+        [
+          "SISTEMA DE FRENOS",
+          "CBS"
+        ],
+        [
+          "CAPACIDAD DEL TANQUE (Incluyendo la reserva)",
+          "7.2 L (1.9 gal)"
+        ],
+        [
+          "MOTOR",
+          "4 tiempos, Monocilíndrico SOHC"
+        ],
+        [
+          "TORQUE MÁXIMO",
+          "10 Nm @ 7000 rpm"
+        ],
+        [
+          "TRANSMISIÓN",
+          "Mecánica 5 velocidades"
+        ],
+        [
+          "COMBUSTIBLE",
+          "Gasolina"
+        ],
+        [
+          "RELACIÓN DE COMPRESIÓN",
+          "9,5 : 1"
+        ],
+        [
+          "SISTEMA DE ALIMENTACIÓN",
+          "Carburador"
+        ],
+        [
+          "PESO NETO",
+          "105 Kg"
+        ],
+        [
+          "SUSPENSIÓN DELANTERA",
+          "Telescópica"
+        ],
+        [
+          "SISTEMA DE ENCENDIDO",
+          "CDI"
+        ],
+        [
+          "DIÁMETRO POR CARRERA",
+          "57,3 x 48,4 mm"
+        ],
+        [
+          "REFRIGERACIÓN",
+          "Aire"
+        ],
+        [
+          "ARRANQUE",
+          "Eléctrico"
+        ],
+        [
+          "SUSPENSIÓN TRASERA",
+          "Monoamortiguador"
+        ],
+        [
+          "FRENO DELANTERO",
+          "Disco"
+        ],
+        [
+          "FRENO TRASERO",
+          "Disco"
+        ],
+        [
+          "RINES",
+          "Aspas de Aleación"
+        ],
+        [
+          "LLANTA DELANTERA",
+          "120/70*12"
+        ],
+        [
+          "LLANTA TRASERA",
+          "130/70*12"
+        ],
+        [
+          "LARGO TOTAL",
+          "1790 mm"
+        ],
+        [
+          "ALTURA TOTAL",
+          "1000 mm"
+        ],
+        [
+          "ANCHO TOTAL",
+          "740 mm"
+        ],
+        [
+          "DISTANCIA ENTRE EJES",
+          "1150 mm"
+        ],
+        [
+          "ALTURA AL SILLÍN",
+          "730 mm"
+        ],
+        [
+          "PESO EN SECO",
+          "105 Kg"
+        ],
+        [
+          "IMPUESTOS",
+          "Debe pagar impuestos de rodamiento"
+        ]
+      ],
+      "manual_url": "https://www.auteco.com.co/manuales-de-usuarios-y-mantenimiento?marca=victory&modelo=SWITCH-125-CBS",
+      "descripcion": "La street que por su tamaño es la más fácil de controlar y te da confianza. Esta moto no es solo un medio de transporte, es una invitación a descubrir una nueva forma de libertad. Con un diseño compacto y ágil, se adapta a ti desde el primer momento, haciéndote sentir en control total, como si se fundiera con tu cuerpo. Es la compañera perfecta para quienes buscan dominar la ciudad con seguridad y",
+      "foto": "https://auteco.vteximg.com.br/arquivos/ids/1590114/360-moto_victory_switch125_gris_naranja_2026_foto01.png?v=639203568255670000",
+      "foto_hero": "https://auteco.vteximg.com.br/arquivos/ids/1590115/360-moto_victory_switch125_gris_naranja_2026_foto02.jpg?v=639203568255800000",
+      "ficha_pdf": null,
+      "credito": 8725875
+    },
+    {
+      "modelo": "NITRO 125",
+      "marca": "VICTORY",
+      "categoria": "de Trabajo y Transporte",
+      "cilindraje": "124,8 cc",
+      "anio": "2027",
+      "cuota_inicial": 1516775,
+      "comercial": 6899000,
+      "contado": 7621000,
+      "bono": null,
+      "colores": [
+        {
+          "nombre": "Gris Grafito Café",
+          "hex": "#3a3a3a",
+          "foto": "https://auteco.vteximg.com.br/arquivos/ids/1514619/moto_victory_nitro125_gris_naranja_2026_foto01.png?v=639123949225400000"
+        }
+      ],
+      "specs": [
+        [
+          "CILINDRAJE",
+          "124,8 cc"
+        ],
+        [
+          "POTENCIA MÁXIMA",
+          "10,72 HP @ 8500 rpm"
+        ],
+        [
+          "SISTEMA DE FRENOS",
+          "CBS"
+        ],
+        [
+          "CAPACIDAD DEL TANQUE (Incluyendo la reserva)",
+          "13 L (3,43 Gal)"
+        ],
+        [
+          "MOTOR",
+          "4 tiempos, monocilíndrico"
+        ],
+        [
+          "TORQUE MÁXIMO",
+          "10 Nm @ 7000rpm"
+        ],
+        [
+          "TRANSMISIÓN",
+          "Mecánica"
+        ],
+        [
+          "COMBUSTIBLE",
+          "Gasolina corriente"
+        ],
+        [
+          "RELACIÓN DE COMPRESIÓN",
+          "9,5:1"
+        ],
+        [
+          "SISTEMA DE ALIMENTACIÓN",
+          "Carburador"
+        ],
+        [
+          "PESO NETO",
+          "120 kg"
+        ],
+        [
+          "SUSPENSIÓN DELANTERA",
+          "Telecópica hidráulica"
+        ],
+        [
+          "SISTEMA DE ENCENDIDO",
+          "CDI"
+        ],
+        [
+          "DIÁMETRO POR CARRERA",
+          "57,3 x 48,4 mm"
+        ],
+        [
+          "REFRIGERACIÓN",
+          "Aire"
+        ],
+        [
+          "ARRANQUE",
+          "Eléctrico y pedal"
+        ],
+        [
+          "SUSPENSIÓN TRASERA",
+          "Doble amortiguador"
+        ],
+        [
+          "FRENO DELANTERO",
+          "Disco delantero lobulado de 240mm"
+        ],
+        [
+          "TEST DRIVE",
+          "Si"
+        ],
+        [
+          "FRENO TRASERO",
+          "Tambor (110 mm)"
+        ],
+        [
+          "RINES",
+          "Aspas de Aleación"
+        ],
+        [
+          "LLANTA DELANTERA",
+          "80/90-17"
+        ],
+        [
+          "LLANTA TRASERA",
+          "110/80-17"
+        ],
+        [
+          "ABS",
+          "No"
+        ],
+        [
+          "LARGO TOTAL",
+          "2000 mm"
+        ],
+        [
+          "ALTURA TOTAL",
+          "1055mm"
+        ],
+        [
+          "ANCHO TOTAL",
+          "760mm"
+        ],
+        [
+          "SEÑORITERA",
+          "No"
+        ],
+        [
+          "DISTANCIA ENTRE EJES",
+          "1320mm"
+        ],
+        [
+          "ALTURA AL SILLÍN",
+          "780 mm"
+        ],
+        [
+          "PESO EN SECO",
+          "120 kg"
+        ],
+        [
+          "APTA PARA PRIMERA MOTO",
+          "Si"
+        ],
+        [
+          "MOTO PARA",
+          "Hombre"
+        ],
+        [
+          "IMPUESTOS",
+          "No paga impuestos de rodamiento"
+        ]
+      ],
+      "manual_url": "https://www.auteco.com.co/manuales-de-usuarios-y-mantenimiento?marca=victory&modelo=NITRO-125-CBS",
+      "descripcion": "Cuando te subes a la Nitro 125, sientes el poder correr por tus venas. Es más que una moto; es la extensión de tu espíritu guerrero. Ágil, resistente y con un diseño que impone respeto en cada curva, esta máquina está hecha para quienes no le temen a los desafíos. Es buena, porque su rendimiento y fiabilidad te llevan más lejos. Es bonita, porque su diseño atrevido te hace destacar y es berraca, p",
+      "foto": "https://auteco.vteximg.com.br/arquivos/ids/1514619/moto_victory_nitro125_gris_naranja_2026_foto01.png?v=639123949225400000",
+      "foto_hero": "https://auteco.vteximg.com.br/arquivos/ids/1514620/moto_victory_nitro125_gris_naranja_2026_foto02.jpg?v=639123949225530000",
+      "ficha_pdf": null,
+      "credito": 7725875
+    },
+    {
+      "modelo": "X1 FI 125",
+      "marca": "VICTORY",
+      "categoria": "de Trabajo y Transporte",
+      "cilindraje": "124,9 cc",
+      "anio": "2027",
+      "cuota_inicial": 1621775,
+      "comercial": 7949000,
+      "contado": 8671000,
+      "bono": null,
+      "colores": [
+        {
+          "nombre": "Gris Nardo Azul",
+          "hex": "#6f7276",
+          "foto": "https://auteco.vteximg.com.br/arquivos/ids/1508914/moto_victory_x1_125_gris_azul_2025_foto01.png?v=639100619359830000"
+        },
+        {
+          "nombre": "Negro Verde",
+          "hex": "#16a34a",
+          "foto": "https://auteco.vteximg.com.br/arquivos/ids/1508889/moto_victory_x1_125_negro_verde_2025_foto01.png?v=639100618863070000"
+        },
+        {
+          "nombre": "Negro Verde",
+          "hex": "#16a34a",
+          "foto": "https://auteco.vteximg.com.br/arquivos/ids/1473940/moto_victory_x1_125_negro_verde_2025_foto01.png?v=638932260142830000"
+        },
+        {
+          "nombre": "Gris Nardo Azul",
+          "hex": "#6f7276",
+          "foto": "https://auteco.vteximg.com.br/arquivos/ids/1472886/moto_victory_x1_125_gris_azul_2025_foto01.png?v=638931322425400000"
+        }
+      ],
+      "specs": [
+        [
+          "CILINDRAJE",
+          "124,9 cc"
+        ],
+        [
+          "POTENCIA MÁXIMA",
+          "10.1 HP @ 8000 rpm"
+        ],
+        [
+          "SISTEMA DE FRENOS",
+          "CBS"
+        ],
+        [
+          "CAPACIDAD DEL TANQUE (Incluyendo la reserva)",
+          "4L (1 gal)"
+        ],
+        [
+          "MOTOR",
+          "Monocilindrico 4 tiempos, 2 válvulas SOHC"
+        ],
+        [
+          "TORQUE MÁXIMO",
+          "10.5 Nm @ 5500 rpm"
+        ],
+        [
+          "TRANSMISIÓN",
+          "Semiautomática 4 velocidades"
+        ],
+        [
+          "COMBUSTIBLE",
+          "Gasolina corriente"
+        ],
+        [
+          "RELACIÓN DE COMPRESIÓN",
+          "9.1:1"
+        ],
+        [
+          "SISTEMA DE ALIMENTACIÓN",
+          "Inyección electrónica"
+        ],
+        [
+          "PESO NETO",
+          "98kg"
+        ],
+        [
+          "SUSPENSIÓN DELANTERA",
+          "telescópica hidráulica con 93 mm de recorrido"
+        ],
+        [
+          "SISTEMA DE ENCENDIDO",
+          "ECU"
+        ],
+        [
+          "DIÁMETRO POR CARRERA",
+          "54 x 54.54 mm"
+        ],
+        [
+          "REFRIGERACIÓN",
+          "Aire"
+        ],
+        [
+          "ARRANQUE",
+          "Eléctrico"
+        ],
+        [
+          "SUSPENSIÓN TRASERA",
+          "Doble amortiguador"
+        ],
+        [
+          "FRENO DELANTERO",
+          "Disco 220 mm"
+        ],
+        [
+          "FRENO TRASERO",
+          "Campana de 110 mm"
+        ],
+        [
+          "RINES",
+          "Aspas de Aleación"
+        ],
+        [
+          "LLANTA DELANTERA",
+          "70/90 - 17"
+        ],
+        [
+          "LLANTA TRASERA",
+          "80/90 - 17"
+        ],
+        [
+          "LARGO TOTAL",
+          "1980 mm"
+        ],
+        [
+          "ALTURA TOTAL",
+          "1020 mm"
+        ],
+        [
+          "ANCHO TOTAL",
+          "720 mm"
+        ],
+        [
+          "DISTANCIA ENTRE EJES",
+          "1260 mm"
+        ],
+        [
+          "ALTURA AL SILLÍN",
+          "770 mm"
+        ],
+        [
+          "IMPUESTOS",
+          "No paga impuestos de rodamiento"
+        ]
+      ],
+      "manual_url": "https://www.auteco.com.co/manuales-de-usuarios-y-mantenimiento?marca=victory&modelo=X1-FI-125-CBS",
+      "descripcion": "La X1 Fi 125 no solo se ve diferente, se siente diferente.Diseñada para quienes buscan más que una moto: lujo, potencia y tecnología al alcance de su mano. Con un diseño moderno que roba miradas, luces LED que te hacen notar de día y te iluminan de noche, y un potente motor de inyección electrónica que la convierte en la más fuerte de su categoría.",
+      "foto": "https://auteco.vteximg.com.br/arquivos/ids/1508914/moto_victory_x1_125_gris_azul_2025_foto01.png?v=639100619359830000",
+      "foto_hero": "https://auteco.vteximg.com.br/arquivos/ids/1508915/moto_victory_x1_125_gris_azul_2025_foto02.jpg?v=639100619360000000",
+      "ficha_pdf": null,
+      "credito": 8775875
+    },
+    {
+      "modelo": "BET ABS",
+      "marca": "VICTORY",
+      "categoria": "Todo Terreno",
+      "cilindraje": "149,2 cc",
+      "anio": "2027",
+      "cuota_inicial": 2314000,
+      "comercial": 13090000,
+      "contado": 13990000,
+      "bono": null,
+      "colores": [
+        {
+          "nombre": "Gris Nardo",
+          "hex": "#6f7276",
+          "foto": "https://auteco.vteximg.com.br/arquivos/ids/1505391/moto_victory_bet150_gris_2025_foto01.png?v=639059226194400000"
+        },
+        {
+          "nombre": "Blanco Celestial",
+          "hex": "#fafafa",
+          "foto": "https://auteco.vteximg.com.br/arquivos/ids/1505466/moto_victory_betabs_blanco_2026_foto01.png?v=639059857636670000"
+        },
+        {
+          "nombre": "Negro Nebulosa",
+          "hex": "#1a1a1a",
+          "foto": "https://auteco.vteximg.com.br/arquivos/ids/1505491/moto_victory_betabs_negro_2026_foto01.png?v=639059862018530000"
+        },
+        {
+          "nombre": "Gris Nardo",
+          "hex": "#6f7276",
+          "foto": "https://auteco.vteximg.com.br/arquivos/ids/743145/moto_victory_bet150_gris_2025_foto01.png?v=638827950919200000"
+        }
+      ],
+      "specs": [
+        [
+          "CILINDRAJE",
+          "149,2 cc"
+        ],
+        [
+          "POTENCIA MÁXIMA",
+          "14,8 HP @ 8000 rpm"
+        ],
+        [
+          "SISTEMA DE FRENOS",
+          "ABS"
+        ],
+        [
+          "CAPACIDAD DEL TANQUE (Incluyendo la reserva)",
+          "9 L (2,37 gal)"
+        ],
+        [
+          "MOTOR",
+          "4T, Monocilíndrico de 4 válvulas SOHC"
+        ],
+        [
+          "TORQUE MÁXIMO",
+          "14 Nm @ 6750 rpm"
+        ],
+        [
+          "TRANSMISIÓN",
+          "Automática centrífuga (CVT)"
+        ],
+        [
+          "COMBUSTIBLE",
+          "Gasolina extra"
+        ],
+        [
+          "RELACIÓN DE COMPRESIÓN",
+          "11:1"
+        ],
+        [
+          "SISTEMA DE ALIMENTACIÓN",
+          "Inyección electrónica"
+        ],
+        [
+          "PESO NETO",
+          "144 Kg"
+        ],
+        [
+          "SUSPENSIÓN DELANTERA",
+          "Telescopica hidraulica con barras de 33 mm"
+        ],
+        [
+          "SISTEMA DE ENCENDIDO",
+          "ECU"
+        ],
+        [
+          "DIÁMETRO POR CARRERA",
+          "57,3 x 57,9 mm"
+        ],
+        [
+          "REFRIGERACIÓN",
+          "Líquido"
+        ],
+        [
+          "ARRANQUE",
+          "Eléctrico"
+        ],
+        [
+          "SUSPENSIÓN TRASERA",
+          "Doble amortiguador con ajuste en precarga de 5 posiciones"
+        ],
+        [
+          "FRENO DELANTERO",
+          "Disco de 270 mm"
+        ],
+        [
+          "FRENO TRASERO",
+          "Disco de 218 mm"
+        ],
+        [
+          "RINES",
+          "Aspas de Aleación"
+        ],
+        [
+          "LLANTA DELANTERA",
+          "100/80-14"
+        ],
+        [
+          "LLANTA TRASERA",
+          "120/70-14"
+        ],
+        [
+          "LARGO TOTAL",
+          "1926 mm"
+        ],
+        [
+          "ALTURA TOTAL",
+          "1230 mm"
+        ],
+        [
+          "ANCHO TOTAL",
+          "766 mm"
+        ],
+        [
+          "DISTANCIA ENTRE EJES",
+          "1330 mm"
+        ],
+        [
+          "ALTURA AL SILLÍN",
+          "770 mm"
+        ]
+      ],
+      "manual_url": "https://www.auteco.com.co/manuales-de-usuarios-y-mantenimiento?marca=victory&modelo=bet-abs",
+      "descripcion": "Prepárate para una experiencia que va más allá del transporte. La BET ABS no es solo una moto, es pura adrenalina, es tecnología de punta, es potencia en todo sentido.Es potente en todo: en su motor, que ofrece una aceleración inmediata y fuerza constante para dominar la ciudad; en su diseño, con líneas modernas, agresivas y una presencia que impone respeto en cada esquina; en su tecnología, con i",
+      "foto": "https://auteco.vteximg.com.br/arquivos/ids/1505391/moto_victory_bet150_gris_2025_foto01.png?v=639059226194400000",
+      "foto_hero": "https://auteco.vteximg.com.br/arquivos/ids/1505392/moto_victory_bet150_gris_2025_foto02.jpg?v=639059226194530000",
+      "ficha_pdf": null,
+      "credito": 14095000
+    },
+    {
+      "modelo": "BET ADV",
+      "marca": "VICTORY",
+      "categoria": "Todo Terreno",
+      "cilindraje": "174 cc",
+      "anio": "2027",
+      "cuota_inicial": 2482000,
+      "comercial": 14990000,
+      "contado": 15868000,
+      "bono": null,
+      "colores": [
+        {
+          "nombre": "Negro Nebulosa",
+          "hex": "#1a1a1a",
+          "foto": "https://auteco.vteximg.com.br/arquivos/ids/1657645/moto_victory_betadv180_negro_2026_foto01.png?v=639253381021370000"
+        },
+        {
+          "nombre": "Blanco Celestial",
+          "hex": "#fafafa",
+          "foto": "https://auteco.vteximg.com.br/arquivos/ids/1657620/moto_victory_betadv180_blanco_2026_foto01.png?v=639253377284330000"
+        },
+        {
+          "nombre": "Verde",
+          "hex": "#16a34a",
+          "foto": "https://auteco.vteximg.com.br/arquivos/ids/1657677/moto_victory_betadv180_verde_2026_foto01.png?v=639253383503300000"
+        }
+      ],
+      "specs": [
+        [
+          "CILINDRAJE",
+          "174 cc"
+        ],
+        [
+          "POTENCIA MÁXIMA",
+          "18.2 HP @ 8500 rpm"
+        ],
+        [
+          "CAPACIDAD DEL TANQUE (Incluyendo la reserva)",
+          "11,3 L (3 gal)"
+        ],
+        [
+          "MOTOR",
+          "Monocilíndrico 4 tiempos, 4 válvulas"
+        ],
+        [
+          "TORQUE MÁXIMO",
+          "17.2 Nm @ 6500"
+        ],
+        [
+          "TRANSMISIÓN",
+          "Automático (CVT)"
+        ],
+        [
+          "COMBUSTIBLE",
+          "Gasolina extra"
+        ],
+        [
+          "RELACIÓN DE COMPRESIÓN",
+          "11.5 : 1"
+        ],
+        [
+          "SISTEMA DE ALIMENTACIÓN",
+          "Inyección electrónica"
+        ],
+        [
+          "PESO NETO",
+          "151,6 kg"
+        ],
+        [
+          "SUSPENSIÓN DELANTERA",
+          "Horquilla telescópica invertida"
+        ],
+        [
+          "SISTEMA DE ENCENDIDO",
+          "ECU (Bosch - Linkage)"
+        ],
+        [
+          "DIÁMETRO POR CARRERA",
+          "61 X 59.6 mm"
+        ],
+        [
+          "REFRIGERACIÓN",
+          "Líquido"
+        ],
+        [
+          "ARRANQUE",
+          "Eléctrico"
+        ],
+        [
+          "SUSPENSIÓN TRASERA",
+          "Doble amortiguador con camara de gas"
+        ],
+        [
+          "FRENO DELANTERO",
+          "Disco de 240 mm"
+        ],
+        [
+          "FRENO TRASERO",
+          "Disco de 220 mm"
+        ],
+        [
+          "RINES",
+          "Radios"
+        ],
+        [
+          "LLANTA DELANTERA",
+          "110/80-14"
+        ],
+        [
+          "LLANTA TRASERA",
+          "130/70-13"
+        ],
+        [
+          "LARGO TOTAL",
+          "1940 mm"
+        ],
+        [
+          "ALTURA TOTAL",
+          "1285 mm"
+        ],
+        [
+          "ANCHO TOTAL",
+          "770 mm"
+        ],
+        [
+          "DISTANCIA ENTRE EJES",
+          "1335 mm"
+        ],
+        [
+          "ALTURA AL SILLÍN",
+          "797 mm"
+        ],
+        [
+          "PESO EN SECO",
+          "143,4 kg"
+        ],
+        [
+          "IMPUESTOS",
+          "Debe pagar impuestos de rodamiento"
+        ]
+      ],
+      "manual_url": "https://www.auteco.com.co/manuales-de-usuarios-y-mantenimiento?marca=victory&modelo=BET-ADV",
+      "descripcion": "La BET ADV 180 es la combinación perfecta entre potencia, estilo y libertad, una moto diseñada para quienes quieren convertir cada recorrido en una experiencia emocionante; su motor de 174 cc, la suavidad de la transmisión CVT y la tecnología BOSCH ofrecen una conducción ágil, segura y llena de confianza, mientras su diseño moderno con iluminación LED y tablero TFT roba miradas en cualquier lugar,",
+      "foto": "https://auteco.vteximg.com.br/arquivos/ids/1657645/moto_victory_betadv180_negro_2026_foto01.png?v=639253381021370000",
+      "foto_hero": "https://auteco.vteximg.com.br/arquivos/ids/1657646/moto_victory_betadv180_negro_2026_foto02.jpg?v=639253381021400000",
+      "ficha_pdf": null,
+      "credito": 15973000
     }
-  ]
+  ],
+  "nota_precios": "Precios y bonos actualizados a Circular Auteco Noviembre 2026."
 }

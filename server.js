@@ -2210,6 +2210,94 @@ app.post("/api/bot/lead", async (req, res) => {
   }
 });
 
+// --- Extensión "Crear oportunidad": lista de asesores para el dropdown ---
+app.get("/api/asesores", requireAuth, (req, res) => {
+  const asesores = leerUsuarios()
+    .filter(u => ["asesor", "admin"].includes(u.rol) && u.email !== "tempadmin@test.local")
+    .map(u => ({ email: u.email, nombre: u.nombre, idVendedor: String(u.idVendedorImpulsa || "") }))
+    .sort((a, b) => String(a.nombre).localeCompare(String(b.nombre), "es"));
+  res.json({ ok: true, asesores });
+});
+
+// --- Extensión "Crear oportunidad" → crea oportunidad en Impulsa ---
+// Form simple del programa: asesor (preestablecido), cliente, doc, tel, correo (opcional),
+// campaña (preestablecida) y moto (del catálogo). Asigna al IDVendedor del asesor elegido
+// (si tiene); si no, al default (Yeimy). Registra "Asesor: X" en las observaciones.
+app.post("/api/crear-oportunidad", requireAuth, async (req, res) => {
+  const logueado = buscarUsuario(req.session.userEmail);
+  if (!logueado) return res.status(401).json({ ok: false, error: "Sesión inválida" });
+  const b = req.body || {};
+
+  const asesor = buscarUsuario(b.asesorEmail);
+  const asesorNombre = (asesor && asesor.nombre) || String(b.asesorNombre || "").trim().toUpperCase();
+  const nombre = String(b.NombreContacto || "").trim();
+  const documento = String(b.Documento || "").replace(/[^0-9]/g, "");
+  const telefono = String(b.Telefono2 || "").replace(/[^0-9]/g, "");
+  const correoRaw = String(b.Email || "").trim();
+  const correo = /@/.test(correoRaw) ? correoRaw : "";
+  const campanna = String(b.Campanna || "").trim();
+  const producto = String(b.Producto || "").trim();
+  const marca = String(b.Marca || "").trim();
+
+  const faltan = [];
+  if (!asesorNombre) faltan.push("Asesor");
+  if (!nombre) faltan.push("Nombre del cliente");
+  if (!documento) faltan.push("Documento");
+  if (!producto) faltan.push("Moto");
+  if (!telefono && !correo) faltan.push("Teléfono o correo");
+  if (faltan.length) return res.status(400).json({ ok: false, error: `Faltan: ${faltan.join(", ")}` });
+
+  // IDVendedor: el del asesor elegido si lo tiene; si no, el default (Yeimy).
+  const idvRaw = String((asesor && asesor.idVendedorImpulsa) || IDVENDEDOR_DEFAULT || "").replace(/[^0-9]/g, "");
+  const idVendedor = idvRaw && Number(idvRaw) > 0 ? idvRaw : null;
+
+  const payload = {
+    ID: 0,
+    IDOportunidadAuteco: String(Date.now()),
+    Origen: "Programa Serviautec",
+    Campanna: (campanna || "Programa Serviautec").slice(0, 50),
+    Establecimiento: String(ESTABLECIMIENTO),
+    TipoDocumento: String(b.TipoDocumento || "CC").toUpperCase().slice(0, 4),
+    Documento: documento,
+    NombreContacto: nombre.toUpperCase().slice(0, 120),
+    Email: correo,
+    Telefono2: telefono,
+    CodigoDANE: CODIGO_DANE,
+    Direccion: "",
+    Productos: [{ Producto: producto.slice(0, 120), Marca: marca }],
+    Observaciones: `Asesor: ${asesorNombre}. Registró: ${logueado.nombre}.`.slice(0, 500),
+    HabeasData: true,
+    Sistema: "",
+    NivelInteres: "AA",
+    Usuario: logueado.usuarioImpulsa || logueado.email.split("@")[0],
+    ...(idVendedor ? { IDVendedor: idVendedor } : {}),
+  };
+
+  if (!IMPULSA_API_KEY) {
+    append({ ts: new Date().toISOString(), origen: "extension", enviadoAImpulsa: false, motivo: "API_KEY ausente", usuario: logueado.email, payload });
+    return res.status(500).json({ ok: false, error: "IMPULSA_API_KEY no configurada en .env", payload });
+  }
+  try {
+    const r = await fetch(`${IMPULSA_BASE_URL}/oportunidades/Crear`, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${IMPULSA_API_KEY}`, "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    let data = null;
+    try { data = await r.json(); } catch { data = { Exitoso: r.ok }; }
+    const exitoso = r.ok && (!data || data.Exitoso !== false);
+    const idRegistro = (data && (data.IDRegistro ?? data.idRegistro)) || null;
+    append({ ts: new Date().toISOString(), origen: "extension", enviadoAImpulsa: exitoso, status: r.status, ambiente: IMPULSA_ENV, usuario: logueado.email, payload, respuesta: data });
+    return res.status(exitoso ? 200 : r.status).json({
+      ok: exitoso, status: r.status, ambiente: IMPULSA_ENV, idRegistro, impulsa: data, payload,
+      error: exitoso ? null : ((data && (data.Mensaje || data.mensaje || data.Error || data.error)) || "No se creó la oportunidad"),
+    });
+  } catch (e) {
+    append({ ts: new Date().toISOString(), origen: "extension", enviadoAImpulsa: false, motivo: e.message, usuario: logueado.email, payload });
+    return res.status(500).json({ ok: false, error: `Error de red: ${e.message}`, payload });
+  }
+});
+
 // --- Portal público de captación → crea oportunidad en Impulsa asignada a Yeimy ---
 // SIN sesión ni bot-key: lo usa el cliente final desde la web (yeimylaverde.com/verificar).
 // Fuerza IDVendedor = IDVENDEDOR_DEFAULT para que el prospecto quede SIEMPRE de Yeimy,
