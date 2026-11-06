@@ -2305,7 +2305,8 @@ const COT_NIT_ASESOR = process.env.IMPULSA_NIT_ASESOR || "1037603224";
 const COT_CANAL = process.env.IMPULSA_CANAL || "Digital Yeimy";
 const COT_FORMA_PAGO = process.env.IMPULSA_FORMA_PAGO_CREDITO || "02"; // 02 = crédito (ajustable)
 const COT_CIUDAD = process.env.IMPULSA_CODIGO_CIUDAD || "05001";        // Medellín
-app.post("/api/crear-cotizacion", requireAuth, async (req, res) => {
+// Solo admin (Yeimy) puede cotizar; los asesores solo crean oportunidad.
+app.post("/api/crear-cotizacion", requireAuth, requireAdmin, async (req, res) => {
   const logueado = buscarUsuario(req.session.userEmail);
   const b = req.body || {};
   const nombre = String(b.NombreContacto || "").trim();

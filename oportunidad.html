@@ -92,6 +92,18 @@
   </div>
 <script>
   const esc = (s) => String(s==null?"":s).replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+  // Cotizar es SOLO para el perfil admin (Yeimy). Los asesores solo ven "Oportunidad".
+  fetch("/api/me").then(r=>r.json()).then(d=>{
+    const esAdmin = d && d.ok && d.usuario && d.usuario.rol === "admin";
+    if (!esAdmin) {
+      const bc = document.getElementById("btnCot"); if (bc) bc.remove();
+      const g = document.getElementById("genero"); if (g && g.closest("label")) g.closest("label").remove();
+      const p = document.getElementById("precio"); if (p && p.closest("label")) p.closest("label").remove();
+      const btn = document.getElementById("btn"); if (btn) btn.textContent = "🚀 Enviar a Impulsa";
+      const ced = document.querySelector('[name="Documento"]'); // sin cotización la cédula no es obligatoria
+      if (ced) { ced.required = false; const sp = ced.closest("label") && ced.closest("label").querySelector("span"); if (sp) sp.innerHTML = "Documento (opcional)"; }
+    }
+  }).catch(()=>{});
   const $ = (id) => document.getElementById(id);
   const selAsesor = $("asesor"), selMoto = $("moto"), btn = $("btn"), msg = $("msg"), form = $("form");
   const showMsg = (html, tipo) => { msg.className = "msg " + (tipo||""); msg.innerHTML = html; };
