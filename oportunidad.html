@@ -58,7 +58,7 @@
         <input name="NombreContacto" required placeholder="JUAN PEREZ GONZALEZ" />
       </label>
       <label>
-        <span>Documento *</span>
+        <span>Cédula * <small style="color:#7c88a6">(para cotizar)</small></span>
         <input name="Documento" required inputmode="numeric" placeholder="1015388115" />
       </label>
       <label>
@@ -73,9 +73,18 @@
         <span>Moto *</span>
         <select name="MotoSel" id="moto" required><option value="">Cargando catálogo…</option></select>
       </label>
+      <label>
+        <span>Género</span>
+        <select name="CodigoGenero" id="genero"><option value="M">Masculino</option><option value="F">Femenino</option></select>
+      </label>
+      <label>
+        <span>Precio (cotización)</span>
+        <input name="Precio" id="precio" inputmode="numeric" placeholder="auto del catálogo" />
+      </label>
       <div class="actions">
         <button type="reset" class="btn-sec">Limpiar</button>
-        <button type="submit" class="btn-main" id="btn">🚀 Enviar a Impulsa</button>
+        <button type="submit" class="btn-main" id="btn">🚀 Oportunidad</button>
+        <button type="button" class="btn-main" id="btnCot" style="background:linear-gradient(135deg,#f59e0b,#ef4444)">💰 Cotizar</button>
       </div>
       <div id="msg" class="msg"></div>
     </form>
@@ -93,11 +102,18 @@
     else selAsesor.innerHTML = '<option value="">No se pudieron cargar</option>';
   }).catch(()=>{ selAsesor.innerHTML = '<option value="">No se pudieron cargar</option>'; });
 
+  let MOTOS = [];
   fetch("/catalogo.json", {cache:"no-store"}).then(r=>r.json()).then(d=>{
-    const motos = (d && d.motos || []).slice().sort((a,b)=>(a.marca+" "+a.modelo).localeCompare(b.marca+" "+b.modelo,"es"));
+    MOTOS = (d && d.motos || []).slice().sort((a,b)=>(a.marca+" "+a.modelo).localeCompare(b.marca+" "+b.modelo,"es"));
     selMoto.innerHTML = '<option value="">Selecciona moto…</option>' +
-      motos.map(m=>`<option value="${esc(m.marca+"|"+m.modelo)}">${esc(m.marca+" — "+m.modelo)}</option>`).join("");
+      MOTOS.map((m,i)=>`<option value="${esc(m.marca+"|"+m.modelo)}" data-i="${i}">${esc(m.marca+" — "+m.modelo)}</option>`).join("");
   }).catch(()=>{ selMoto.innerHTML = '<option value="">No se pudo cargar el catálogo</option>'; });
+  // Autollenar el precio (comercial del catálogo) al elegir la moto
+  selMoto.addEventListener("change", ()=>{
+    const opt = selMoto.selectedOptions[0];
+    const i = opt ? opt.dataset.i : null;
+    if (i != null && MOTOS[i]) document.getElementById("precio").value = MOTOS[i].comercial || "";
+  });
 
   form.addEventListener("submit", async (ev)=>{
     ev.preventDefault();
@@ -122,6 +138,31 @@
       }
     } catch(e) { showMsg(`❌ <strong>Error de conexión:</strong> ${esc(e.message)}`, "err"); }
     finally { btn.disabled = false; btn.textContent = orig; }
+  });
+
+  // --- Botón COTIZAR → crea cotización en Impulsa (requiere cédula) ---
+  document.getElementById("btnCot").addEventListener("click", async ()=>{
+    const fd = new FormData(form);
+    const [marca, modelo] = String(fd.get("MotoSel")||"").split("|");
+    const opt = selMoto.selectedOptions[0];
+    const i = opt ? opt.dataset.i : null;
+    const anio = (i!=null && MOTOS[i]) ? MOTOS[i].anio : "2027";
+    if (!String(fd.get("Documento")||"").trim()) { showMsg("Para cotizar necesitas la <strong>cédula</strong> del cliente.","err"); return; }
+    const body = {
+      NombreContacto: fd.get("NombreContacto"), Documento: fd.get("Documento"),
+      Telefono2: fd.get("Telefono2"), Email: fd.get("Email"),
+      CodigoGenero: fd.get("CodigoGenero"), Producto: modelo||"", Marca: marca||"",
+      Modelo: anio, Precio: fd.get("Precio"), Cantidad: 1,
+    };
+    const btnc = document.getElementById("btnCot"); const o = btnc.textContent;
+    btnc.disabled = true; btnc.textContent = "Cotizando…"; showMsg("Creando cotización en Impulsa…","info");
+    try {
+      const r = await fetch("/api/crear-cotizacion",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});
+      const data = await r.json();
+      if (data.ok) showMsg(`✅ <strong>Cotización creada en Impulsa</strong>${data.idRegistro?` · ID ${esc(String(data.idRegistro))}`:""}.<br>Cliente <strong>${esc(body.NombreContacto)}</strong> — ${esc((body.Marca||"")+" "+(body.Producto||""))}.`,"ok");
+      else showMsg(`❌ <strong>No se pudo cotizar.</strong><br>${esc(String(data.error||("Status "+r.status)))}`,"err");
+    } catch(e){ showMsg(`❌ <strong>Error de conexión:</strong> ${esc(e.message)}`,"err"); }
+    finally { btnc.disabled=false; btnc.textContent=o; }
   });
 </script>
 </body>

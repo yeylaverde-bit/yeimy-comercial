@@ -2298,6 +2298,84 @@ app.post("/api/crear-oportunidad", requireAuth, async (req, res) => {
   }
 });
 
+// --- Extensión "Cotizar" → crea una cotización en Impulsa (Cotizaciones/Crear) ---
+// Defaults de Yeimy: todo crédito, canal "Digital Yeimy", caliente (AA), Medellín (05001),
+// asesor cédula 1037603224. La cotización EXIGE cédula del cliente (NitContacto).
+const COT_NIT_ASESOR = process.env.IMPULSA_NIT_ASESOR || "1037603224";
+const COT_CANAL = process.env.IMPULSA_CANAL || "Digital Yeimy";
+const COT_FORMA_PAGO = process.env.IMPULSA_FORMA_PAGO_CREDITO || "02"; // 02 = crédito (ajustable)
+const COT_CIUDAD = process.env.IMPULSA_CODIGO_CIUDAD || "05001";        // Medellín
+app.post("/api/crear-cotizacion", requireAuth, async (req, res) => {
+  const logueado = buscarUsuario(req.session.userEmail);
+  const b = req.body || {};
+  const nombre = String(b.NombreContacto || "").trim();
+  const cedula = String(b.Documento || "").replace(/[^0-9]/g, "");
+  const telefono = String(b.Telefono2 || "").replace(/[^0-9]/g, "");
+  const correoRaw = String(b.Email || "").trim();
+  const correo = /@/.test(correoRaw) ? correoRaw : "";
+  const genero = String(b.CodigoGenero || "M").toUpperCase().slice(0, 1);
+  const producto = String(b.Producto || "").trim();
+  const marca = String(b.Marca || "").trim();
+  const anio = String(b.Modelo || "").trim() || "2027";
+  const precio = parseInt(String(b.Precio || "0").replace(/[^0-9]/g, ""), 10) || 0;
+  const cantidad = parseInt(b.Cantidad, 10) || 1;
+  const idOportunidad = parseInt(b.IDOportunidad, 10) || 0;
+
+  const faltan = [];
+  if (!nombre) faltan.push("Nombre");
+  if (!cedula) faltan.push("Cédula (obligatoria para cotizar)");
+  if (!producto) faltan.push("Moto");
+  if (!precio) faltan.push("Precio");
+  if (!telefono && !correo) faltan.push("Teléfono o correo");
+  if (faltan.length) return res.status(400).json({ ok: false, error: `Faltan: ${faltan.join(", ")}` });
+  if (!IMPULSA_API_KEY) return res.status(500).json({ ok: false, error: "IMPULSA_API_KEY no configurada" });
+
+  const total = precio * cantidad;
+  const payload = {
+    id: Date.now(),
+    idExterno: "COT-" + Date.now(),
+    idOportunidad: idOportunidad > 0 ? idOportunidad : 0,
+    codigoEstablecimiento: String(ESTABLECIMIENTO),
+    nitAsesor: COT_NIT_ASESOR,
+    codigoNivelInteres: "AA",
+    codigoCanal: COT_CANAL,
+    nitContacto: cedula,
+    contacto: {
+      nombreContacto: nombre.toUpperCase().slice(0, 120),
+      telefono2: telefono,
+      email: correo,
+      codigoGenero: genero,
+      codigoCiudad: COT_CIUDAD,
+      autorizaHabeasData: true,
+    },
+    codigoFormaPago: COT_FORMA_PAGO,
+    observaciones: `Cotización desde el programa. Registró: ${logueado ? logueado.nombre : ""}.`.slice(0, 500),
+    detalles: [{
+      modelo: anio, vehiculo: producto.slice(0, 120), cantidad: cantidad, precio: precio,
+      descuentoEnPorcentaje: false, descuento: 0, valorPrenda: 0, vueltasTransito: 0,
+      total: total, marca: marca, incluyePrenda: false,
+    }],
+  };
+  try {
+    const r = await fetch(`${IMPULSA_BASE_URL}/Cotizaciones/Crear`, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${IMPULSA_API_KEY}`, "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    let data = null;
+    try { data = await r.json(); } catch { data = { Exitoso: r.ok }; }
+    const exito = r.ok && data && data.Exitoso !== false;
+    const idReg = (data && (data.idRegistro ?? data.IDRegistro)) || null;
+    append({ ts: new Date().toISOString(), origen: "cotizacion", enviadoAImpulsa: exito, status: r.status, usuario: logueado ? logueado.email : "", payload, respuesta: data });
+    return res.status(exito ? 200 : r.status).json({
+      ok: exito, idRegistro: idReg, impulsa: data,
+      error: exito ? null : ((data && data.Error && (data.Error.MensajeUsuario || data.Error.Mensaje)) || "No se creó la cotización"),
+    });
+  } catch (e) {
+    return res.status(500).json({ ok: false, error: `Error de red: ${e.message}` });
+  }
+});
+
 // --- Portal público de captación → crea oportunidad en Impulsa asignada a Yeimy ---
 // SIN sesión ni bot-key: lo usa el cliente final desde la web (yeimylaverde.com/verificar).
 // Fuerza IDVendedor = IDVENDEDOR_DEFAULT para que el prospecto quede SIEMPRE de Yeimy,
