@@ -68,7 +68,6 @@
         <a href="#precios">💵 Lista de precios</a>
         <a href="#inventario">📦 Inventario disponible</a>
         <a href="#registrar" class="nav-cta" data-role-only="admin asesor">✍️ Ingresar lead / cliente</a>
-        <a href="#oportunidad" data-role-only="admin asesor">🚀 Crear oportunidad (Impulsa)</a>
         <a href="#misleads" data-role-only="admin asesor contable dueno">📋 Registros del mes</a>
         <a href="#preasignacion" data-role-only="admin asesor dueno">🔧 Preasignación</a>
         <a href="#ordenfac">📑 Orden facturación</a>
@@ -669,71 +668,6 @@
       </form>
 
       <div id="formMsg" class="form-msg" style="display:none"></div>
-    </section>
-
-    <section id="oportunidad" class="card card-registrar" data-role-only="admin asesor">
-      <div class="card-head">
-        <h2>🚀 Enviar cliente a Impulsa (oportunidad)</h2>
-        <span class="badge" id="oppBadge">—</span>
-      </div>
-      <p class="muted" style="margin:-4px 0 14px">
-        Anexa rápido un cliente como <strong>oportunidad comercial</strong> en Impulsa CRM.
-        Elige el <strong>asesor</strong>, la <strong>campaña</strong> y la <strong>moto</strong> de las listas — sin copiar nada.
-      </p>
-
-      <form id="formOportunidad" class="form-grid" autocomplete="off">
-        <label class="form-field">
-          <span>Asesor *</span>
-          <select name="asesorEmail" id="oppAsesor" required>
-            <option value="">Cargando asesores…</option>
-          </select>
-        </label>
-
-        <label class="form-field">
-          <span>Campaña *</span>
-          <select name="Campanna" required>
-            <option value="">Selecciona…</option>
-            <option value="Mobility">Mobility</option>
-            <option value="Redes">Redes</option>
-            <option value="Sala">Sala</option>
-            <option value="Referidos">Referidos</option>
-          </select>
-        </label>
-
-        <label class="form-field form-field-full">
-          <span>Nombre del cliente *</span>
-          <input name="NombreContacto" required placeholder="JUAN PEREZ GONZALEZ" />
-        </label>
-
-        <label class="form-field">
-          <span>Documento *</span>
-          <input name="Documento" required inputmode="numeric" placeholder="1015388115" />
-        </label>
-
-        <label class="form-field">
-          <span>Teléfono *</span>
-          <input name="Telefono2" required inputmode="tel" placeholder="3001234567" />
-        </label>
-
-        <label class="form-field">
-          <span>Correo (opcional)</span>
-          <input name="Email" type="email" placeholder="cliente@correo.com" />
-        </label>
-
-        <label class="form-field">
-          <span>Moto *</span>
-          <select name="MotoSel" id="oppMoto" required>
-            <option value="">Cargando catálogo…</option>
-          </select>
-        </label>
-
-        <div class="form-actions form-field-full">
-          <button type="reset" class="btn-secondary">Limpiar</button>
-          <button type="submit" class="btn-primary" id="btnOpp">🚀 Enviar a Impulsa</button>
-        </div>
-      </form>
-
-      <div id="oppMsg" class="form-msg" style="display:none"></div>
     </section>
 
     <section id="misleads" class="card" data-role-only="admin asesor contable dueno">
@@ -1694,6 +1628,66 @@
         <div class="modal-actions">
           <button type="submit" class="btn-primary" id="changePassBtn">Guardar nueva clave</button>
         </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===== Widget flotante: Crear oportunidad en Impulsa ===== -->
+  <button id="oppFab" type="button" title="Crear oportunidad en Impulsa" aria-label="Crear oportunidad en Impulsa">🚀</button>
+  <div id="oppPanel" role="dialog" aria-label="Crear oportunidad en Impulsa">
+    <div id="oppPanelHead">
+      <span class="opp-title">🚀 Crear oportunidad</span>
+      <div class="opp-head-btns">
+        <button type="button" id="oppMin" title="Minimizar">–</button>
+        <button type="button" id="oppClose" title="Cerrar">×</button>
+      </div>
+    </div>
+    <div id="oppPanelBody">
+      <p class="opp-hint">Anéxalo a Impulsa desde cualquier pantalla. Elige asesor, campaña y moto de las listas.</p>
+      <form id="formOportunidad" autocomplete="off">
+        <label class="opp-full">
+          <span>Asesor *</span>
+          <select name="asesorEmail" id="oppAsesor" required>
+            <option value="">Cargando asesores…</option>
+          </select>
+        </label>
+        <label class="opp-full">
+          <span>Campaña *</span>
+          <select name="Campanna" required>
+            <option value="">Selecciona…</option>
+            <option value="Mobility">Mobility</option>
+            <option value="Redes">Redes</option>
+            <option value="Sala">Sala</option>
+            <option value="Referidos">Referidos</option>
+          </select>
+        </label>
+        <label class="opp-full">
+          <span>Nombre del cliente *</span>
+          <input name="NombreContacto" required placeholder="JUAN PEREZ GONZALEZ" />
+        </label>
+        <label>
+          <span>Documento *</span>
+          <input name="Documento" required inputmode="numeric" placeholder="1015388115" />
+        </label>
+        <label>
+          <span>Teléfono *</span>
+          <input name="Telefono2" required inputmode="tel" placeholder="3001234567" />
+        </label>
+        <label class="opp-full">
+          <span>Correo (opcional)</span>
+          <input name="Email" type="email" placeholder="cliente@correo.com" />
+        </label>
+        <label class="opp-full">
+          <span>Moto *</span>
+          <select name="MotoSel" id="oppMoto" required>
+            <option value="">Cargando catálogo…</option>
+          </select>
+        </label>
+        <div class="opp-actions">
+          <button type="reset" class="opp-btn-sec">Limpiar</button>
+          <button type="submit" class="opp-btn-main" id="btnOpp">🚀 Enviar a Impulsa</button>
+        </div>
+        <div id="oppMsg" class="opp-msg" style="display:none"></div>
       </form>
     </div>
   </div>

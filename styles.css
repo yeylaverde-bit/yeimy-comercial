@@ -529,3 +529,50 @@ body:not(.role-asesor) #roleBanner{display:none}
   .kpi-mio .kpi-value{font-size:20px}
   .brand-logo-img{max-width:90px}
 }
+
+/* ===== Widget flotante: Crear oportunidad en Impulsa ===== */
+#oppFab{ display:none; position:fixed; right:22px; bottom:22px; z-index:9000;
+  width:58px; height:58px; border-radius:50%; border:none; cursor:pointer;
+  font-size:26px; line-height:1; color:#fff;
+  background:linear-gradient(135deg,#6366f1,#22d3ee);
+  box-shadow:0 10px 26px rgba(79,70,229,.45); transition:transform .15s, box-shadow .15s; }
+#oppFab:hover{ transform:scale(1.08); box-shadow:0 14px 32px rgba(79,70,229,.6); }
+body.role-admin #oppFab, body.role-asesor #oppFab{ display:flex; align-items:center; justify-content:center; }
+#oppPanel{ display:none; position:fixed; right:22px; bottom:90px; z-index:9001;
+  width:360px; max-width:calc(100vw - 28px); max-height:84vh;
+  background:#141a2e; color:#e8ecf6; border:1px solid #2a3350; border-radius:16px;
+  box-shadow:0 24px 60px rgba(0,0,0,.55); flex-direction:column; overflow:hidden; }
+#oppPanel.open{ display:flex; }
+#oppPanel.min{ max-height:none; }
+#oppPanel.min #oppPanelBody{ display:none; }
+#oppPanelHead{ display:flex; align-items:center; justify-content:space-between;
+  padding:12px 14px; cursor:move; user-select:none; color:#fff;
+  background:linear-gradient(135deg,#4f46e5,#06b6d4); }
+#oppPanelHead .opp-title{ font-weight:700; font-size:14px; }
+.opp-head-btns{ display:flex; gap:6px; }
+.opp-head-btns button{ width:26px; height:26px; border:none; border-radius:8px; cursor:pointer;
+  background:rgba(255,255,255,.18); color:#fff; font-size:16px; line-height:1; display:flex; align-items:center; justify-content:center; }
+.opp-head-btns button:hover{ background:rgba(255,255,255,.34); }
+#oppPanelBody{ padding:14px; overflow:auto; }
+#oppPanelBody .opp-hint{ margin:0 0 12px; font-size:11.5px; color:#97a1ba; line-height:1.4; }
+#formOportunidad{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+#formOportunidad label{ display:flex; flex-direction:column; gap:4px; font-size:11px; color:#aab3c8; font-weight:600; }
+#formOportunidad label.opp-full{ grid-column:1 / -1; }
+#formOportunidad input, #formOportunidad select{ padding:9px 10px; border-radius:9px;
+  border:1px solid #2f3a5a; background:#0e1424; color:#eef2fb; font-size:13px; width:100%; box-sizing:border-box; }
+#formOportunidad input:focus, #formOportunidad select:focus{ outline:none; border-color:#6366f1; }
+.opp-actions{ grid-column:1 / -1; display:flex; gap:8px; justify-content:flex-end; margin-top:4px; }
+.opp-btn-sec{ padding:9px 14px; border-radius:9px; border:1px solid #39436a; background:transparent; color:#cfd6e8; cursor:pointer; font-size:13px; }
+.opp-btn-sec:hover{ background:#1c2540; }
+.opp-btn-main{ padding:9px 16px; border-radius:9px; border:none; cursor:pointer; font-weight:700; font-size:13px;
+  color:#fff; background:linear-gradient(135deg,#6366f1,#22d3ee); }
+.opp-btn-main:disabled{ opacity:.6; cursor:default; }
+.opp-msg{ grid-column:1 / -1; margin-top:4px; padding:10px 12px; border-radius:9px; font-size:12.5px; line-height:1.45; }
+.opp-msg.ok{ background:#0f2e1e; border:1px solid #1f6b43; color:#8ff0bd; }
+.opp-msg.err{ background:#331418; border:1px solid #7a2630; color:#ffb3bd; }
+.opp-msg.info{ background:#102033; border:1px solid #294a6b; color:#9ec9ff; }
+@media(max-width:480px){
+  #oppPanel{ right:10px; left:10px; width:auto; bottom:84px; }
+  #oppFab{ right:14px; bottom:14px; }
+  #formOportunidad{ grid-template-columns:1fr; }
+}

@@ -6496,6 +6496,47 @@ if (btnRefrescarMet) btnRefrescarMet.addEventListener("click", async () => {
     const form = document.getElementById("formOportunidad");
     if (!form || form.dataset.ready) return;
     form.dataset.ready = "1";
+
+    // --- Botón flotante: abrir/cerrar/minimizar/arrastrar ---
+    const fab = document.getElementById("oppFab");
+    const panel = document.getElementById("oppPanel");
+    const head = document.getElementById("oppPanelHead");
+    if (fab && panel) {
+      const abrir = () => { panel.classList.add("open"); panel.classList.remove("min"); };
+      fab.addEventListener("click", () => {
+        if (panel.classList.contains("open") && !panel.classList.contains("min")) panel.classList.remove("open");
+        else abrir();
+      });
+      const btnClose = document.getElementById("oppClose");
+      const btnMin = document.getElementById("oppMin");
+      if (btnClose) btnClose.addEventListener("click", () => panel.classList.remove("open"));
+      if (btnMin) btnMin.addEventListener("click", () => panel.classList.toggle("min"));
+      // Arrastrar por el encabezado
+      let drag = false, ox = 0, oy = 0;
+      const startDrag = (cx, cy) => {
+        const r = panel.getBoundingClientRect();
+        ox = cx - r.left; oy = cy - r.top;
+        panel.style.right = "auto"; panel.style.bottom = "auto";
+        panel.style.left = r.left + "px"; panel.style.top = r.top + "px";
+        drag = true;
+      };
+      const moveDrag = (cx, cy) => {
+        if (!drag) return;
+        let x = cx - ox, y = cy - oy;
+        x = Math.max(6, Math.min(x, window.innerWidth - panel.offsetWidth - 6));
+        y = Math.max(6, Math.min(y, window.innerHeight - 48));
+        panel.style.left = x + "px"; panel.style.top = y + "px";
+      };
+      if (head) {
+        head.addEventListener("mousedown", (e) => { if (e.target.closest("button")) return; startDrag(e.clientX, e.clientY); e.preventDefault(); });
+        head.addEventListener("touchstart", (e) => { if (e.target.closest("button")) return; const t = e.touches[0]; startDrag(t.clientX, t.clientY); }, { passive: true });
+      }
+      document.addEventListener("mousemove", (e) => moveDrag(e.clientX, e.clientY));
+      document.addEventListener("touchmove", (e) => { if (drag) { const t = e.touches[0]; moveDrag(t.clientX, t.clientY); } }, { passive: true });
+      document.addEventListener("mouseup", () => { drag = false; });
+      document.addEventListener("touchend", () => { drag = false; });
+    }
+
     const selAsesor = document.getElementById("oppAsesor");
     const selMoto = document.getElementById("oppMoto");
     const btn = document.getElementById("btnOpp");
