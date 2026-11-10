@@ -2775,6 +2775,11 @@ app.get("/api/preasignaciones/auditar-siigo", requireAuth, async (req, res) => {
 let facturasCache = { data: null, fetchedAt: 0 };
 const FACTURAS_CACHE_MS = 5 * 60 * 1000; // 5 min
 
+// Catálogo de clientes de Siigo (cédula → nombre). Las facturas solo traen la
+// cédula; el nombre se cruza desde aquí. Cambia poco, cache de 30 min.
+let clientesCache = { data: null, fetchedAt: 0 };
+const CLIENTES_CACHE_MS = 30 * 60 * 1000; // 30 min
+
 // GET /api/siigo/mis-facturas?asesor=YEIMI|TODOS&desde=YYYY-MM-DD&hasta=YYYY-MM-DD
 // Lista facturas de VENTA de Siigo (fuente autoritaria) filtradas por vendedor
 // y rango de fechas. Solo devuelve items que son MOTOS (los que tienen chasis).
@@ -2792,6 +2797,18 @@ app.get("/api/siigo/mis-facturas", requireAuth, requireAdmin, async (req, res) =
     if (!facturas || (now - facturasCache.fetchedAt) > FACTURAS_CACHE_MS) {
       facturas = await siigo.obtenerFacturasVenta();
       facturasCache = { data: facturas, fetchedAt: now };
+    }
+
+    // Catálogo de clientes (cédula → nombre). Si falla, seguimos mostrando la cédula.
+    let mapaClientes = clientesCache.data;
+    if (!mapaClientes || (now - clientesCache.fetchedAt) > CLIENTES_CACHE_MS) {
+      try {
+        mapaClientes = await siigo.obtenerMapaClientes();
+        clientesCache = { data: mapaClientes, fetchedAt: now };
+      } catch (e) {
+        console.warn("[siigo] no se pudo cargar catálogo de clientes:", e.message);
+        mapaClientes = mapaClientes || {};
+      }
     }
 
     const result = [];
@@ -2823,7 +2840,8 @@ app.get("/api/siigo/mis-facturas", requireAuth, requireAdmin, async (req, res) =
         factura: f.name || `${f.prefix || ""}-${f.number}`,
         fecha: f.date || "",
         cliente_id: f.customer?.identification || "",
-        cliente_nombre: f.customer?.name?.join?.(" ") || f.customer?.commercial_name || "",
+        cliente_nombre: (f.customer?.name?.join?.(" ") || f.customer?.commercial_name
+                         || mapaClientes[String(f.customer?.identification || "").trim()] || ""),
         vendedor: vendedor || "(sin vendedor)",
         motos,
         total: f.total || 0,

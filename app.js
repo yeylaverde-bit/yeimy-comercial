@@ -6346,7 +6346,10 @@ if (btnRefrescarMet) btnRefrescarMet.addEventListener("click", async () => {
                 ? '<td><strong>' + escapeH(f.factura) + '</strong></td>'
                   + '<td>' + fechaCorta(f.fecha) + '</td>'
                   + '<td>' + escapeH(f.vendedor) + '</td>'
-                  + '<td>' + escapeH(f.cliente_id) + '</td>'
+                  + '<td>' + (f.cliente_nombre
+                        ? '<strong>' + escapeH(f.cliente_nombre) + '</strong>'
+                          + '<br><span style="color:var(--muted);font-size:11px">' + escapeH(f.cliente_id) + '</span>'
+                        : escapeH(f.cliente_id)) + '</td>'
                 : '<td colspan="4" class="muted">↳</td>')
             + '<td>' + escapeH(m.modelo) + '</td>'
             + '<td style="font-family:monospace;font-size:11.5px">' + escapeH(m.chasis) + '</td>'
@@ -6451,13 +6454,13 @@ if (btnRefrescarMet) btnRefrescarMet.addEventListener("click", async () => {
   function exportarSiigoCSV() {
     const d = window.__siigoLastData;
     if (!d || !d.facturas || !d.facturas.length) return;
-    const cols = ["Factura","Fecha","Asesor","Cliente CC","Modelo","Chasis","Precio","% Comision","Comision","TotalFactura"];
+    const cols = ["Factura","Fecha","Asesor","Cliente","Cliente CC","Modelo","Chasis","Precio","% Comision","Comision","TotalFactura"];
     const lineas = [cols.join(";")];
     const esc = v => { const s = String(v == null ? "" : v); return /[";\n\r]/.test(s) ? '"' + s.replace(/"/g,'""') + '"' : s; };
     for (const f of d.facturas) {
       for (const m of f.motos) {
         const pct = esVendedorYeimy(f.vendedor) ? "5%" : "1%";
-        lineas.push([f.factura, f.fecha ? f.fecha.slice(0,10) : "", f.vendedor, f.cliente_id, m.modelo, m.chasis, Math.round(m.precio||0), pct, Math.round(comisionMoto(m.precio, f.vendedor)), Math.round(f.total||0)].map(esc).join(";"));
+        lineas.push([f.factura, f.fecha ? f.fecha.slice(0,10) : "", f.vendedor, f.cliente_nombre || "", f.cliente_id, m.modelo, m.chasis, Math.round(m.precio||0), pct, Math.round(comisionMoto(m.precio, f.vendedor)), Math.round(f.total||0)].map(esc).join(";"));
       }
     }
     const csv = lineas.join("\r\n");

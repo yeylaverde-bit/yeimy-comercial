@@ -544,6 +544,50 @@ async function obtenerFacturasVenta({ pageSize = 100, maxPaginas = 50 } = {}) {
   return facturas;
 }
 
+/**
+ * Mapa identificación → nombre del catálogo de clientes de Siigo (/v1/customers).
+ * Las facturas (/v1/invoices) solo traen la cédula del cliente, no el nombre;
+ * el nombre vive en el catálogo de clientes. Paginamos y armamos { cedula: nombre }.
+ */
+async function obtenerMapaClientes({ pageSize = 100, maxPaginas = 100 } = {}) {
+  const jwt = await obtenerToken();
+  const mapa = {};
+  let page = 1;
+
+  while (page <= maxPaginas) {
+    const url = `${SIIGO_BASE}/v1/customers?page=${page}&page_size=${pageSize}`;
+    const resp = await fetch(url, {
+      headers: { "Authorization": `Bearer ${jwt}`, "Partner-Id": PARTNER_ID },
+    });
+
+    if (resp.status === 401) {
+      tokenCache = { jwt: null, expiresAt: 0 };
+      if (page === 1) return obtenerMapaClientes({ pageSize, maxPaginas });
+      throw new Error("Siigo 401 (customers) después de renovar token");
+    }
+    if (resp.status === 429) { await new Promise(r => setTimeout(r, 1500)); continue; }
+    if (!resp.ok) {
+      const txt = await resp.text().catch(() => "");
+      throw new Error(`Siigo /v1/customers ${resp.status}: ${txt.slice(0, 200)}`);
+    }
+
+    const data = await resp.json();
+    const results = Array.isArray(data) ? data : (data.results || data.data || []);
+    if (!results.length) break;
+    for (const c of results) {
+      const id = String(c.identification || "").trim();
+      if (!id) continue;
+      const nombre = (Array.isArray(c.name) ? c.name.join(" ") : (c.name || "")) || c.commercial_name || "";
+      if (nombre) mapa[id] = String(nombre).trim();
+    }
+
+    if (results.length < pageSize) break; // última página
+    page++;
+  }
+
+  return mapa;
+}
+
 module.exports = {
   siigoConfigurado,
   obtenerToken,
@@ -556,5 +600,6 @@ module.exports = {
   obtenerTipoFacturaCompra,
   crearFacturaCompra,
   obtenerFacturasVenta,
+  obtenerMapaClientes,
   vendedorDesdeObservaciones,
 };
