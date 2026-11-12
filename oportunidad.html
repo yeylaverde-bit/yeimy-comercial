@@ -143,7 +143,7 @@
       const r = await fetch("/api/crear-oportunidad", { method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify(body) });
       const data = await r.json();
       if (data.ok) {
-        showMsg(`✅ <strong>Oportunidad creada</strong> (${esc(data.ambiente||"?")})${data.idRegistro?` · ID ${esc(String(data.idRegistro))}`:""}.<br>Cliente <strong>${esc(body.NombreContacto)}</strong> — ${esc((body.Marca||"")+" "+(body.Producto||""))}.`, "ok");
+        showMsg(`✅ <strong>Oportunidad creada</strong> (${esc(data.ambiente||"?")})${data.idRegistro?` · ID ${esc(String(data.idRegistro))}`:""}${data.enProceso?` · <strong>En proceso</strong> 🟢`:` · <span style="color:#ffb3bd">quedó abierta</span>`}.<br>Cliente <strong>${esc(body.NombreContacto)}</strong> — ${esc((body.Marca||"")+" "+(body.Producto||""))}.`, "ok");
         form.reset();
       } else {
         showMsg(`❌ <strong>No se pudo crear.</strong><br>${esc(String(data.error||("Status "+(data.status||"?"))))}`, "err");

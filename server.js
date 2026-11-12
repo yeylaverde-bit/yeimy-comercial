@@ -2219,10 +2219,35 @@ app.get("/api/asesores", requireAuth, (req, res) => {
   res.json({ ok: true, asesores });
 });
 
+// Mueve una oportunidad recién creada de "Abierta" a "Proceso" (CodigoEstado "PR")
+// con un primer seguimiento, para que NO entre al round-robin de Impulsa y quede
+// fija en el asesor asignado. Devuelve {ok}.
+async function impulsaPasarAProceso(idOportunidad, usuarioImpulsa) {
+  if (!idOportunidad || !IMPULSA_API_KEY) return { ok: false };
+  const hoy = new Date().toISOString().slice(0, 10);
+  const prox = new Date(Date.now() + 3 * 864e5).toISOString().slice(0, 10);
+  const body = {
+    IDOportunidad: Number(idOportunidad), IDItem: 0, Fecha: hoy,
+    Observaciones: "Contacto inicial — pasa a gestión.", FechaProximoContacto: prox,
+    UsuarioCreacion: usuarioImpulsa || USUARIO_TRAZABILIDAD || "yeimi",
+    IDCategoria: 1, IDMotivoPerdida: 0, CodigoEstado: "PR",
+  };
+  try {
+    const r = await fetch(`${IMPULSA_BASE_URL}/oportunidades/ActualizarSeguimiento`, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${IMPULSA_API_KEY}`, "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+    let d = null; try { d = await r.json(); } catch {}
+    return { ok: !!(r.ok && d && d.Exitoso !== false), respuesta: d };
+  } catch (e) { return { ok: false, error: e.message }; }
+}
+
 // --- Extensión "Crear oportunidad" → crea oportunidad en Impulsa ---
 // Form simple del programa: asesor (preestablecido), cliente, doc, tel, correo (opcional),
 // campaña (preestablecida) y moto (del catálogo). Asigna al IDVendedor del asesor elegido
 // (si tiene); si no, al default (Yeimy). Registra "Asesor: X" en las observaciones.
+// Tras crearla la pasa de una a "Proceso" para que no se auto-reasigne.
 app.post("/api/crear-oportunidad", requireAuth, async (req, res) => {
   const logueado = buscarUsuario(req.session.userEmail);
   if (!logueado) return res.status(401).json({ ok: false, error: "Sesión inválida" });
@@ -2287,9 +2312,15 @@ app.post("/api/crear-oportunidad", requireAuth, async (req, res) => {
     try { data = await r.json(); } catch { data = { Exitoso: r.ok }; }
     const exitoso = r.ok && (!data || data.Exitoso !== false);
     const idRegistro = (data && (data.IDRegistro ?? data.idRegistro)) || null;
-    append({ ts: new Date().toISOString(), origen: "extension", enviadoAImpulsa: exitoso, status: r.status, ambiente: IMPULSA_ENV, usuario: logueado.email, payload, respuesta: data });
+    // Pasar de "Abierta" a "Proceso" para que no caiga en el round-robin de Impulsa.
+    let enProceso = false;
+    if (exitoso && idRegistro) {
+      const pr = await impulsaPasarAProceso(idRegistro, logueado.usuarioImpulsa);
+      enProceso = pr.ok;
+    }
+    append({ ts: new Date().toISOString(), origen: "extension", enviadoAImpulsa: exitoso, enProceso, status: r.status, ambiente: IMPULSA_ENV, usuario: logueado.email, payload, respuesta: data });
     return res.status(exitoso ? 200 : r.status).json({
-      ok: exitoso, status: r.status, ambiente: IMPULSA_ENV, idRegistro, impulsa: data, payload,
+      ok: exitoso, status: r.status, ambiente: IMPULSA_ENV, idRegistro, enProceso, impulsa: data, payload,
       error: exitoso ? null : ((data && (data.Mensaje || data.mensaje || data.Error || data.error)) || "No se creó la oportunidad"),
     });
   } catch (e) {
