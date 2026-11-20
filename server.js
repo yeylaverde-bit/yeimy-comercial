@@ -2806,6 +2806,11 @@ app.get("/api/preasignaciones/auditar-siigo", requireAuth, async (req, res) => {
 let facturasCache = { data: null, fetchedAt: 0 };
 const FACTURAS_CACHE_MS = 5 * 60 * 1000; // 5 min
 
+// Notas crédito de Siigo (anulan/devuelven ventas). Guardamos el set de chasis
+// anulados para NO contarlos como venta. Mismo cache de 5 min que las facturas.
+let notasCache = { data: null, fetchedAt: 0 };
+const NOTAS_CACHE_MS = 5 * 60 * 1000; // 5 min
+
 // Catálogo de clientes de Siigo (cédula → nombre). Las facturas solo traen la
 // cédula; el nombre se cruza desde aquí. Cambia poco, cache de 30 min.
 let clientesCache = { data: null, fetchedAt: 0 };
@@ -2842,30 +2847,77 @@ app.get("/api/siigo/mis-facturas", requireAuth, requireAdmin, async (req, res) =
       }
     }
 
+    // Notas crédito → set de chasis ANULADOS (esa venta no cuenta). Fail-safe:
+    // si el endpoint falla o la cuenta no lo tiene, seguimos sin excluir nada.
+    let chasisAnulados = notasCache.data;
+    if (!chasisAnulados || (now - notasCache.fetchedAt) > NOTAS_CACHE_MS) {
+      try {
+        const notas = await siigo.obtenerNotasCredito();
+        chasisAnulados = new Set();
+        for (const nc of notas) {
+          for (const it of (nc.items || [])) {
+            const d = String(it.description || "").replace(/CHAISIS/gi, "CHASIS");
+            const p = siigo.parseDescripcion(d);
+            if (p.chasis) chasisAnulados.add(p.chasis.toUpperCase());
+          }
+        }
+        notasCache = { data: chasisAnulados, fetchedAt: now };
+      } catch (e) {
+        console.warn("[siigo] no se pudo cargar notas crédito:", e.message);
+        chasisAnulados = chasisAnulados || new Set();
+      }
+    }
+
+    // Quita facturas duplicadas (la misma factura devuelta dos veces) y ordena
+    // de más nueva a más vieja: si un chasis saliera en dos facturas, nos
+    // quedamos con la más reciente.
+    const vistasFact = new Set();
+    const facturasUnicas = [];
+    for (const f of facturas) {
+      const k = String(f.id || f.name || `${f.prefix || ""}-${f.number}`);
+      if (vistasFact.has(k)) continue;
+      vistasFact.add(k);
+      facturasUnicas.push(f);
+    }
+    facturasUnicas.sort((a, b) => String(b.date || "").localeCompare(String(a.date || "")));
+
+    const chasisVistos = new Set(); // un chasis físico = una sola venta
     const result = [];
     const asesoresSet = new Set();
-    for (const f of facturas) {
+    for (const f of facturasUnicas) {
       const vendedor = (siigo.vendedorDesdeObservaciones(f.observations) || "").toUpperCase();
       const fecha = f.date ? new Date(f.date) : null;
       if (desde && fecha && fecha < desde) continue;
       if (hasta && fecha && fecha > hasta) continue;
 
       // Solo items que son MOTOS (tienen chasis parseado)
+      let motoItems = 0; // cuántos ítems-moto traía la factura (antes de filtrar)
       const motos = [];
       for (const it of (f.items || [])) {
         const descNorm = String(it.description || "").replace(/CHAISIS/gi, "CHASIS");
         const parsed = siigo.parseDescripcion(descNorm);
         if (!parsed.chasis) continue; // no es moto: skip
+        motoItems++;
+        const chasis = parsed.chasis.toUpperCase();
+        if (chasisAnulados.has(chasis)) continue; // anulada por nota crédito → no cuenta
+        if (chasisVistos.has(chasis)) continue;   // ya contada en otra factura → no repetir
+        chasisVistos.add(chasis);
         motos.push({
-          chasis: parsed.chasis.toUpperCase(),
+          chasis,
           modelo: (parsed.modelo || "").trim(),
           precio: it.total || it.price || 0,
         });
       }
-      if (!motos.length) continue; // factura sin motos, saltar
+      if (!motos.length) continue; // factura sin motos válidas (o todas anuladas/repetidas)
 
       if (vendedor) asesoresSet.add(vendedor);
       if (filtrarAsesor && !vendedor.includes(asesorRaw.slice(0, 4))) continue;
+
+      // Si quedaron menos motos que las que traía la factura (alguna anulada o
+      // repetida), prorratea el total para no inflar el monto.
+      const total = (motoItems > 0 && motos.length < motoItems)
+        ? Math.round((f.total || 0) * motos.length / motoItems)
+        : (f.total || 0);
 
       result.push({
         factura: f.name || `${f.prefix || ""}-${f.number}`,
@@ -2875,7 +2927,7 @@ app.get("/api/siigo/mis-facturas", requireAuth, requireAdmin, async (req, res) =
                          || mapaClientes[String(f.customer?.identification || "").trim()] || ""),
         vendedor: vendedor || "(sin vendedor)",
         motos,
-        total: f.total || 0,
+        total,
       });
     }
     result.sort((a, b) => (b.fecha || "").localeCompare(a.fecha || ""));
@@ -3347,6 +3399,8 @@ app.get(PUBLIC_FILES, (req, res) => {
 // --- Catálogo público (link branded para compartir a clientes por WhatsApp) ---
 // Va ANTES de requireAuth: no exige login. Solo el perfil de Yeimy.
 app.get("/catalogo", (req, res) => res.sendFile(path.join(__dirname, "catalogo.html")));
+// Catálogo del convenio Auteco & Seracis (mismo motor, branding del convenio)
+app.get(["/catalogo-seracis", "/seracis", "/convenio"], (req, res) => res.sendFile(path.join(__dirname, "catalogo-seracis.html")));
 // Ventana emergente "Crear oportunidad" (se abre con window.open desde el dashboard)
 app.get("/oportunidad", requireAuth, (req, res) => res.sendFile(path.join(__dirname, "oportunidad.html")));
 app.get("/catalogo.json", (req, res) => res.sendFile(path.join(__dirname, "catalogo.json")));

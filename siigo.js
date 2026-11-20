@@ -496,11 +496,36 @@ async function crearFacturaCompra(datos) {
  *   "Tipo de Documento:\nVendedor: LOREN"
  * → "LOREN"  (null si no hay patrón "Vendedor:")
  */
+// Variantes mal escritas (a mano en Siigo) → nombre correcto del asesor.
+// Agrega aquí cualquier otro typo que aparezca repetido en el ranking.
+const ALIAS_VENDEDOR = {
+  "ELIZABET": "ELIZABETH",
+  "LOREN": "LORENA",
+  // "M IGUEL" lo arregla solo la unión de letras sueltas de abajo.
+};
+
+// Deja el nombre del vendedor en forma canónica para que no se dupliquen filas:
+//  - MAYÚSCULAS, sin tildes, sin espacios de más
+//  - une letras sueltas pegadas por error ("M IGUEL" -> "MIGUEL", "A LEJANDRA" -> "ALEJANDRA")
+//  - aplica la tabla de alias ("ELIZABET" -> "ELIZABETH", "LOREN" -> "LORENA")
+function canonVendedor(nombre) {
+  if (!nombre) return nombre;
+  let s = String(nombre)
+    .normalize("NFD").replace(/[̀-ͯ]/g, "") // quita tildes
+    .toUpperCase()
+    .replace(/\s+/g, " ")
+    .trim();
+  // une una letra suelta con la palabra siguiente: "M IGUEL" -> "MIGUEL"
+  s = s.replace(/\b([A-ZÑ])\s+(?=[A-ZÑ])/g, "$1");
+  if (ALIAS_VENDEDOR[s]) s = ALIAS_VENDEDOR[s];
+  return s || null;
+}
+
 function vendedorDesdeObservaciones(obs) {
   if (!obs || typeof obs !== "string") return null;
   const m = obs.match(/Vendedor:\s*(.+)/i);
   if (!m) return null;
-  return m[1].trim().replace(/\s+/g, " ").toUpperCase() || null;
+  return canonVendedor(m[1]) || null;
 }
 
 /**
@@ -542,6 +567,47 @@ async function obtenerFacturasVenta({ pageSize = 100, maxPaginas = 50 } = {}) {
   }
 
   return facturas;
+}
+
+/**
+ * Lista NOTAS CRÉDITO (/v1/credit-notes) paginando. Una nota crédito ANULA o
+ * devuelve una venta: la moto que aparezca en una NC NO cuenta como vendida.
+ * Devuelve array plano de notas crudas (traen items[] con la misma descripción
+ * de la factura, así que de ahí sacamos el chasis a descontar).
+ * Si el endpoint falla, se maneja arriba (no debe tumbar el listado).
+ */
+async function obtenerNotasCredito({ pageSize = 100, maxPaginas = 50 } = {}) {
+  const jwt = await obtenerToken();
+  const notas = [];
+  let page = 1;
+
+  while (page <= maxPaginas) {
+    const url = `${SIIGO_BASE}/v1/credit-notes?page=${page}&page_size=${pageSize}`;
+    const resp = await fetch(url, {
+      headers: { "Authorization": `Bearer ${jwt}`, "Partner-Id": PARTNER_ID },
+    });
+
+    if (resp.status === 401) {
+      tokenCache = { jwt: null, expiresAt: 0 };
+      if (page === 1) return obtenerNotasCredito({ pageSize, maxPaginas });
+      throw new Error("Siigo 401 (credit-notes) después de renovar token");
+    }
+    if (resp.status === 429) { await new Promise(r => setTimeout(r, 1500)); continue; }
+    if (resp.status === 404) break; // la cuenta no tiene el módulo / sin notas
+    if (!resp.ok) {
+      const txt = await resp.text().catch(() => "");
+      throw new Error(`Siigo /v1/credit-notes ${resp.status}: ${txt.slice(0, 200)}`);
+    }
+
+    const data = await resp.json();
+    const results = Array.isArray(data) ? data : (data.results || data.data || []);
+    if (!results.length) break;
+    notas.push(...results);
+    if (results.length < pageSize) break;
+    page++;
+  }
+
+  return notas;
 }
 
 /**
@@ -600,6 +666,7 @@ module.exports = {
   obtenerTipoFacturaCompra,
   crearFacturaCompra,
   obtenerFacturasVenta,
+  obtenerNotasCredito,
   obtenerMapaClientes,
   vendedorDesdeObservaciones,
 };
