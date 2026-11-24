@@ -196,6 +196,30 @@ function pick(row, candidates) {
   return "";
 }
 
+// Blindaje del asesor: en la hoja, la columna del asesor (la que va justo después
+// de "Fecha", con nombres como YEIMI/MIGUEL/ALEJANDRA) a veces queda SIN título.
+// El dashboard busca el asesor por nombre de columna, así que sin título no lo lee
+// y las ventas salen en 0 para todos. Esta función le pone el título "Asesor" a
+// esa columna cuando está en blanco, ANTES de parsear. Si la hoja ya trae un
+// título de asesor válido, no toca nada.
+function fijarEncabezadoAsesor(csvText) {
+  try {
+    const nl = csvText.indexOf("\n");
+    if (nl < 0) return csvText;
+    const headerLine = csvText.slice(0, nl).replace(/\r$/, "");
+    const cols = headerLine.split(",");
+    const yaHay = cols.some(c => ["asesor", "vendedor", "nombre asesor"].includes(c.trim().toLowerCase()));
+    if (yaHay) return csvText; // ya existe columna de asesor con nombre
+    const iFecha = cols.findIndex(c => c.trim().toLowerCase() === "fecha");
+    if (iFecha < 0 || iFecha + 1 >= cols.length) return csvText;
+    if (cols[iFecha + 1].trim() !== "") return csvText; // la columna de al lado no está vacía
+    cols[iFecha + 1] = "Asesor";
+    return cols.join(",") + csvText.slice(nl);
+  } catch (e) {
+    return csvText;
+  }
+}
+
 // Correcciones manuales de fecha: cuando el Sheet del concesionario tiene la
 // fecha de facturación o pedido en vez de la fecha real de cierre de venta de Yeimy.
 // La clave es el nombre del cliente (uppercase, sin acentos básicos). La fecha
@@ -297,7 +321,7 @@ async function loadData() {
   try {
     const url = CSV_URL + (CSV_URL.includes("?") ? "&" : "?") + "t=" + Date.now();
     const res = await fetch(url, { cache: "no-store" });
-    const text = await res.text();
+    const text = fijarEncabezadoAsesor(await res.text());
     const parsed = Papa.parse(text, { header: true, skipEmptyLines: true });
     state.rows = parsed.data.map(normalizeRow).filter(r => r.fecha || r.monto || r.modelo);
     populateFilters();
