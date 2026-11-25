@@ -3424,6 +3424,84 @@ app.get("/sitemap.xml", (req, res) => res.type("application/xml").sendFile(path.
 // Va ANTES de requireAuth: el cliente final lo abre sin login.
 app.get(["/verificar", "/portal"], (req, res) => res.sendFile(path.join(__dirname, "portal.html")));
 
+// --- Webhook de WhatsApp Cloud API (Meta) ---------------------------------
+// Público (va ANTES de requireAuth): Meta llama estas rutas sin sesión.
+// GET  = handshake de verificación (una vez, al configurar en Meta).
+// POST = cada mensaje entrante → se guarda en el CRM de la nube (JSONL + leads).
+// Reemplaza al bot whatsapp-web.js: ya no depende del PC prendido.
+const WA_VERIFY_TOKEN = process.env.WHATSAPP_VERIFY_TOKEN || "knine-webhook-2026";
+const WA_MSGS_PATH = path.join(DATA_DIR, "whatsapp-mensajes.jsonl");
+const WA_LEADS_PATH = path.join(DATA_DIR, "whatsapp-leads.json");
+
+function waGuardarMensaje(rec) {
+  try { fs.appendFileSync(WA_MSGS_PATH, JSON.stringify(rec) + "\n", "utf8"); }
+  catch (e) { console.error("[WA] guardar msg:", e.message); }
+}
+function waUpsertLead(telefono, nombre, texto, ts) {
+  let leads = {};
+  try { leads = JSON.parse(fs.readFileSync(WA_LEADS_PATH, "utf8")); } catch {}
+  const prev = leads[telefono] || {};
+  leads[telefono] = {
+    telefono,
+    nombre: nombre || prev.nombre || "",
+    primerMsg: prev.primerMsg || ts,
+    ultimoMsg: ts,
+    ultimoTexto: String(texto || "").slice(0, 300),
+    nMsgs: (prev.nMsgs || 0) + 1,
+  };
+  try { fs.writeFileSync(WA_LEADS_PATH, JSON.stringify(leads, null, 2), "utf8"); }
+  catch (e) { console.error("[WA] upsert lead:", e.message); }
+}
+
+// Verificación (Meta hace un GET al configurar el webhook)
+app.get("/webhook", (req, res) => {
+  const mode = req.query["hub.mode"];
+  const token = req.query["hub.verify_token"];
+  const challenge = req.query["hub.challenge"];
+  if (mode === "subscribe" && token === WA_VERIFY_TOKEN) {
+    console.log("[WA] webhook verificado ✓");
+    return res.status(200).send(challenge);
+  }
+  return res.sendStatus(403);
+});
+
+// Recepción de mensajes (Meta hace POST por cada evento)
+app.post("/webhook", (req, res) => {
+  res.sendStatus(200); // responder 200 SIEMPRE y rápido (Meta reintenta si no)
+  try {
+    const body = req.body || {};
+    if (body.object !== "whatsapp_business_account") return;
+    for (const entry of body.entry || []) {
+      for (const ch of entry.changes || []) {
+        const value = ch.value || {};
+        const contactos = {};
+        for (const c of value.contacts || []) contactos[c.wa_id] = (c.profile && c.profile.name) || "";
+        for (const m of value.messages || []) {
+          const telefono = m.from;
+          const nombre = contactos[telefono] || "";
+          const ts = (Number(m.timestamp) || Math.floor(Date.now() / 1000)) * 1000;
+          let texto = "";
+          if (m.type === "text") texto = (m.text && m.text.body) || "";
+          else if (m.type === "button") texto = (m.button && m.button.text) || "";
+          else if (m.type === "interactive") texto = (m.interactive && ((m.interactive.list_reply && m.interactive.list_reply.title) || (m.interactive.button_reply && m.interactive.button_reply.title))) || "";
+          else texto = `[${m.type}]`;
+          waGuardarMensaje({ ts: new Date(ts).toISOString(), telefono, nombre, tipo: m.type, texto, id: m.id });
+          waUpsertLead(telefono, nombre, texto, ts);
+          console.log(`[WA] msg de ${telefono} (${nombre || "?"}): ${String(texto).slice(0, 60)}`);
+        }
+      }
+    }
+  } catch (e) { console.error("[WA] webhook error:", e.message); }
+});
+
+// Ver lo capturado (solo admin, para comprobar): /api/whatsapp/leads
+app.get("/api/whatsapp/leads", requireAuth, requireAdmin, (req, res) => {
+  let leads = {};
+  try { leads = JSON.parse(fs.readFileSync(WA_LEADS_PATH, "utf8")); } catch {}
+  const arr = Object.values(leads).sort((a, b) => (b.ultimoMsg || 0) - (a.ultimoMsg || 0));
+  res.json({ ok: true, total: arr.length, leads: arr });
+});
+
 // Todo lo demás requiere sesión
 app.use(requireAuth);
 // Dashboard interno (antes estaba en "/"). Solo con sesión iniciada.
