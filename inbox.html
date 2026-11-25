@@ -3,153 +3,225 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Inbox WhatsApp · Serviautec</title>
+<title>Bandeja de entrada · CRM Yeimy Laverde</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Lexend+Deca:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#0b1220; --panel:#131c2e; --panel2:#0f172a; --line:#233049;
-    --txt:#e6ecf7; --muted:#7c88a6; --accent:#25d366; --accent2:#7c5cff;
-    --in:#1e293b; --out:#166534;
+    --bg:#f5f8fa; --panel:#ffffff; --line:#dfe3eb; --line2:#cbd6e2;
+    --txt:#33475b; --muted:#7c98b6; --soft:#516f90;
+    --accent:#ff7a59; --accent-h:#ff5c35; --link:#0091ae; --teal:#00a4bd;
+    --in:#f0f3f8; --out:#e5f5f8; --ok:#00bda5;
+    --shadow:0 1px 2px rgba(45,62,80,.08),0 2px 6px rgba(45,62,80,.06);
   }
   *{box-sizing:border-box}
   html,body{margin:0;height:100%;background:var(--bg);color:var(--txt);
-    font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
+    font-family:"Lexend Deca",-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;font-size:14px}
   .app{display:flex;height:100vh;overflow:hidden}
-  /* Lista */
-  .lista{width:340px;min-width:280px;border-right:1px solid var(--line);
-    display:flex;flex-direction:column;background:var(--panel2)}
-  .lista header{padding:14px 16px;border-bottom:1px solid var(--line);
-    display:flex;align-items:center;gap:10px}
-  .lista header .logo{font-weight:700;font-size:16px}
-  .lista header .sub{color:var(--muted);font-size:11px}
-  .buscar{padding:10px 12px;border-bottom:1px solid var(--line)}
-  .buscar input{width:100%;padding:9px 12px;border-radius:10px;border:1px solid var(--line);
-    background:var(--panel);color:var(--txt);font-size:13px}
+  .col{display:flex;flex-direction:column;min-height:0}
+  /* ---- Columna 1: lista ---- */
+  .lista{width:320px;min-width:280px;background:var(--panel);border-right:1px solid var(--line)}
+  .lista .top{padding:16px 18px 12px;border-bottom:1px solid var(--line)}
+  .lista h1{margin:0;font-size:17px;font-weight:700;display:flex;align-items:center;gap:8px}
+  .lista .sub{color:var(--muted);font-size:12px;margin-top:2px}
+  .buscar{padding:10px 14px;border-bottom:1px solid var(--line)}
+  .buscar input{width:100%;padding:9px 12px 9px 34px;border-radius:6px;border:1px solid var(--line2);
+    background:#f5f8fa url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" stroke="%237c98b6" stroke-width="2"><circle cx="7" cy="7" r="5"/><path d="M11 11l3 3"/></svg>') no-repeat 10px center;
+    color:var(--txt);font-size:13px;font-family:inherit}
   .convos{flex:1;overflow-y:auto}
-  .convo{padding:12px 16px;border-bottom:1px solid var(--line);cursor:pointer;display:flex;gap:12px;align-items:center}
-  .convo:hover{background:var(--panel)}
-  .convo.activo{background:var(--panel)}
-  .avatar{width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,#25d366,#128c7e);
-    display:flex;align-items:center;justify-content:center;font-weight:700;color:#04210f;flex-shrink:0}
+  .convo{padding:13px 18px;border-bottom:1px solid var(--line);cursor:pointer;display:flex;gap:12px;align-items:flex-start}
+  .convo:hover{background:#f5f8fa}
+  .convo.activo{background:#eaf0f6;box-shadow:inset 3px 0 0 var(--accent)}
+  .avatar{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#00a4bd,#0091ae);
+    display:flex;align-items:center;justify-content:center;font-weight:600;color:#fff;flex-shrink:0;font-size:15px}
   .convo .info{flex:1;min-width:0}
+  .convo .r1{display:flex;justify-content:space-between;gap:8px;align-items:baseline}
   .convo .nombre{font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .convo .ult{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .convo .hora{font-size:10.5px;color:var(--muted);flex-shrink:0;align-self:flex-start}
-  /* Chat */
-  .chat{flex:1;display:flex;flex-direction:column;background:
-    radial-gradient(circle at 20% 10%, #16203400 0, transparent 40%), var(--bg)}
+  .convo .hora{font-size:11px;color:var(--muted);flex-shrink:0}
+  .convo .ult{font-size:12.5px;color:var(--soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:3px}
+  /* ---- Columna 2: hilo ---- */
+  .chat{flex:1;background:var(--bg)}
   .chat .vacio{margin:auto;color:var(--muted);text-align:center;padding:40px}
-  .chat header{padding:14px 18px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:12px;background:var(--panel2)}
-  .msgs{flex:1;overflow-y:auto;padding:18px;display:flex;flex-direction:column;gap:8px}
-  .burbuja{max-width:72%;padding:8px 12px;border-radius:12px;font-size:13.5px;line-height:1.4;word-wrap:break-word}
-  .burbuja .meta{font-size:10px;color:var(--muted);margin-top:4px;text-align:right}
-  .entrante{align-self:flex-start;background:var(--in);border-top-left-radius:3px}
-  .saliente{align-self:flex-end;background:var(--out);border-top-right-radius:3px}
-  .componer{padding:12px;border-top:1px solid var(--line);display:flex;gap:10px;background:var(--panel2)}
-  .componer textarea{flex:1;resize:none;height:44px;max-height:120px;padding:11px 14px;border-radius:12px;
-    border:1px solid var(--line);background:var(--panel);color:var(--txt);font-size:14px;font-family:inherit}
-  .componer button{padding:0 20px;border:0;border-radius:12px;background:var(--accent);color:#04210f;font-weight:700;cursor:pointer;font-size:14px}
-  .componer button:disabled{opacity:.5;cursor:not-allowed}
-  .aviso{background:#3b2a0a;color:#ffd38a;padding:9px 14px;font-size:12.5px;border-bottom:1px solid var(--line);text-align:center}
-  .badge{background:var(--accent);color:#04210f;border-radius:999px;font-size:10px;padding:1px 7px;font-weight:700}
-  @media(max-width:720px){.lista{width:100%;position:absolute;inset:0;z-index:2}.lista.oculta{display:none}.chat{width:100%}.volver{display:inline-block!important}}
-  .volver{display:none;background:none;border:0;color:var(--accent);font-size:20px;cursor:pointer}
+  .chat .hdr{padding:14px 20px;border-bottom:1px solid var(--line);background:var(--panel);display:flex;align-items:center;gap:12px}
+  .chat .hdr .nm{font-weight:600;font-size:15px}
+  .chat .hdr .tl{color:var(--muted);font-size:12.5px}
+  .msgs{flex:1;overflow-y:auto;padding:22px 26px;display:flex;flex-direction:column;gap:10px}
+  .burbuja{max-width:68%;padding:10px 14px;border-radius:8px;font-size:13.5px;line-height:1.45;box-shadow:var(--shadow);word-wrap:break-word}
+  .burbuja .meta{font-size:10.5px;color:var(--muted);margin-top:5px}
+  .entrante{align-self:flex-start;background:var(--panel);border:1px solid var(--line)}
+  .saliente{align-self:flex-end;background:var(--out);border:1px solid #cdeef3}
+  .saliente .meta{text-align:right}
+  .componer{padding:14px 20px;border-top:1px solid var(--line);background:var(--panel)}
+  .cbox{border:1px solid var(--line2);border-radius:8px;overflow:hidden}
+  .cbox textarea{width:100%;resize:none;height:46px;max-height:130px;padding:12px 14px;border:0;outline:none;
+    background:var(--panel);color:var(--txt);font-size:14px;font-family:inherit}
+  .cbar{display:flex;justify-content:space-between;align-items:center;padding:8px 10px;border-top:1px solid var(--line);background:#f9fbfd}
+  .cbar .hint{font-size:11px;color:var(--muted)}
+  .btn{padding:9px 20px;border:0;border-radius:6px;background:var(--accent);color:#fff;font-weight:600;cursor:pointer;font-size:13.5px;font-family:inherit}
+  .btn:hover{background:var(--accent-h)}
+  .btn:disabled{opacity:.45;cursor:not-allowed}
+  .aviso{background:#fff3e0;color:#b25f00;padding:10px 16px;font-size:12.5px;border-bottom:1px solid #ffe0b2;text-align:center}
+  /* ---- Columna 3: contacto ---- */
+  .contacto{width:300px;min-width:260px;background:var(--panel);border-left:1px solid var(--line);overflow-y:auto}
+  .contacto .perfil{padding:26px 20px 20px;text-align:center;border-bottom:1px solid var(--line)}
+  .contacto .perfil .avatar{width:64px;height:64px;font-size:24px;margin:0 auto 12px}
+  .contacto .perfil .nm{font-weight:600;font-size:16px}
+  .contacto .perfil .tl{color:var(--muted);font-size:13px;margin-top:3px}
+  .contacto .perfil a.wa{display:inline-block;margin-top:12px;color:var(--link);font-size:12.5px;text-decoration:none;font-weight:500}
+  .props{padding:16px 20px}
+  .props h3{font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin:0 0 12px}
+  .prop{display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px solid var(--line);font-size:13px}
+  .prop .k{color:var(--muted)}
+  .prop .v{font-weight:500;text-align:right}
+  .chip{display:inline-block;background:#eaf0f6;color:var(--soft);border-radius:4px;padding:2px 8px;font-size:11px;font-weight:600}
+  .volver{display:none;background:none;border:0;color:var(--accent);font-size:22px;cursor:pointer;margin-right:2px}
+  .tabs{display:flex;gap:4px;padding:8px 12px 0;border-bottom:1px solid var(--line)}
+  .tab{background:none;border:0;padding:8px 12px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;font-family:inherit}
+  .tab.activo{color:var(--accent);border-bottom-color:var(--accent)}
+  @media(max-width:1024px){.contacto{display:none}}
+  @media(max-width:720px){
+    .lista{width:100%;position:absolute;inset:0;z-index:2}.lista.oculta{display:none}
+    .chat{width:100%}.volver{display:inline-block}
+  }
 </style>
 </head>
 <body>
 <div class="app">
-  <aside class="lista" id="lista">
-    <header>
-      <div style="width:36px;height:36px;border-radius:9px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:18px">💬</div>
-      <div><div class="logo">Inbox WhatsApp</div><div class="sub" id="sub">Serviautec · cargando…</div></div>
-    </header>
-    <div class="buscar"><input id="q" placeholder="Buscar conversación…"></div>
+  <aside class="lista col" id="lista">
+    <div class="top">
+      <h1>📥 Bandeja de entrada</h1>
+      <div class="sub" id="sub">CRM Yeimy Laverde · cargando…</div>
+    </div>
+    <div class="buscar"><input id="q" placeholder="Buscar nombre o número…"></div>
+    <div class="tabs" id="tabs"><button class="tab activo" data-f="todas">Todas</button><button class="tab" data-f="sin">Sin leer</button></div>
     <div class="convos" id="convos"></div>
   </aside>
-  <main class="chat">
-    <div id="avisoEnvio" class="aviso" style="display:none">⚠️ Responder aún no está activo: falta configurar el token de WhatsApp en el servidor. Por ahora solo puedes LEER.</div>
-    <div class="vacio" id="vacio">Selecciona una conversación para verla 👈</div>
-    <div id="panelChat" style="display:none;flex:1;flex-direction:column;min-height:0">
-      <header>
+
+  <main class="chat col">
+    <div id="avisoEnvio" class="aviso" style="display:none">⚠️ Responder aún no está activo (falta configurar el token de WhatsApp en el servidor). Por ahora solo lectura.</div>
+    <div class="vacio" id="vacio">
+      <div style="font-size:40px">💬</div>
+      <div style="margin-top:8px">Selecciona una conversación</div>
+    </div>
+    <div id="panelChat" class="col" style="display:none;flex:1;min-height:0">
+      <div class="hdr">
         <button class="volver" id="volver">‹</button>
         <div class="avatar" id="chatAvatar">?</div>
-        <div><div style="font-weight:600" id="chatNombre">—</div><div class="sub" id="chatTel" style="color:var(--muted);font-size:12px"></div></div>
-      </header>
+        <div><div class="nm" id="chatNombre">—</div><div class="tl" id="chatTel"></div></div>
+      </div>
       <div class="msgs" id="msgs"></div>
       <div class="componer">
-        <textarea id="texto" placeholder="Escribe una respuesta…"></textarea>
-        <button id="enviar">Enviar</button>
+        <div class="cbox">
+          <textarea id="texto" placeholder="Escribe tu respuesta…"></textarea>
+          <div class="cbar">
+            <span class="hint">Enter para enviar · Shift+Enter salto de línea</span>
+            <button class="btn" id="enviar">Enviar</button>
+          </div>
+        </div>
       </div>
     </div>
   </main>
+
+  <aside class="contacto col" id="contacto" style="display:none">
+    <div class="perfil">
+      <div class="avatar" id="cAvatar">?</div>
+      <div class="nm" id="cNombre">—</div>
+      <div class="tl" id="cTel"></div>
+      <a class="wa" id="cWa" target="_blank" rel="noopener">Abrir en WhatsApp ↗</a>
+    </div>
+    <div class="props">
+      <h3>Información</h3>
+      <div class="prop"><span class="k">Teléfono</span><span class="v" id="pTel">—</span></div>
+      <div class="prop"><span class="k">Primer contacto</span><span class="v" id="pPrimero">—</span></div>
+      <div class="prop"><span class="k">Último mensaje</span><span class="v" id="pUltimo">—</span></div>
+      <div class="prop"><span class="k">Mensajes</span><span class="v" id="pNmsgs">—</span></div>
+      <div class="prop"><span class="k">Canal</span><span class="v"><span class="chip">WhatsApp</span></span></div>
+    </div>
+  </aside>
 </div>
 <script>
 const $ = s => document.querySelector(s);
-let convos = [], actual = null, envioListo = false, timerMsgs = null;
-const fmtHora = ms => { try { return new Date(ms).toLocaleString("es-CO",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"}); } catch { return ""; } };
-const ini = n => (n||"?").trim().charAt(0).toUpperCase() || "?";
+let convos=[], actual=null, envioListo=false, timerMsgs=null, filtro="todas";
+const DEMO = location.search.includes("demo");
+const ahora = Date.now();
+const DEMO_CONVOS = [
+  {telefono:"573001234567",nombre:"Carlos Ramírez",ultimoTexto:"Listo, mañana paso por los papeles 🙌",ultimoMsg:ahora-180000,primerMsg:ahora-86400000,nMsgs:8},
+  {telefono:"573149876543",nombre:"Diana Osorio",ultimoTexto:"¿La MRX 150 queda en cuánto a crédito?",ultimoMsg:ahora-3600000,primerMsg:ahora-7200000,nMsgs:3},
+  {telefono:"573205558899",nombre:"Andrés Felipe",ultimoTexto:"Me interesa la Apache 200",ultimoMsg:ahora-7200000,primerMsg:ahora-7200000,nMsgs:1},
+];
+const DEMO_MSGS = {
+  "573149876543":[
+    {direccion:"entrante",texto:"Hola, buenas tardes",ts:new Date(ahora-7200000).toISOString()},
+    {direccion:"entrante",texto:"¿La MRX 150 queda en cuánto a crédito?",ts:new Date(ahora-3600000).toISOString()},
+    {direccion:"saliente",texto:"¡Hola Diana! La MRX 150 queda en $11.746.900. Te manejo planes a 13 y 19 meses 😊",ts:new Date(ahora-3000000).toISOString(),agente:"Yeimy"},
+  ],
+};
+const fmtHora = ms => { try{ return new Date(ms).toLocaleString("es-CO",{day:"2-digit",month:"short",hour:"2-digit",minute:"2-digit"});}catch{return"";} };
+const fmtFecha = ms => { try{ return new Date(ms).toLocaleDateString("es-CO",{day:"2-digit",month:"short",year:"numeric"});}catch{return"—";} };
+const ini = n => (String(n||"?").trim().charAt(0)||"?").toUpperCase();
 const esc = s => String(s||"").replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
 
 async function cargarConvos(){
+  if(DEMO){
+    convos=DEMO_CONVOS; envioListo=true;
+    $("#sub").textContent = `${convos.length} conversación(es) · DEMO`;
+    $("#avisoEnvio").style.display="none"; pintarConvos(); return;
+  }
   try{
     const r = await fetch("/api/whatsapp/conversaciones");
-    const d = await r.json();
-    if(!d.ok) return;
-    convos = d.conversaciones || [];
-    envioListo = d.envioListo;
-    $("#sub").textContent = `Serviautec · ${convos.length} conversación(es)`;
+    const d = await r.json(); if(!d.ok) return;
+    convos = d.conversaciones||[]; envioListo = d.envioListo;
+    $("#sub").textContent = `${convos.length} conversación(es)`;
     $("#avisoEnvio").style.display = envioListo ? "none" : "block";
     pintarConvos();
   }catch(e){}
 }
 function pintarConvos(){
   const q = ($("#q").value||"").toLowerCase();
-  const list = convos.filter(c => !q || (c.nombre||"").toLowerCase().includes(q) || (c.telefono||"").includes(q));
-  $("#convos").innerHTML = list.map(c => `
+  const list = convos.filter(c=>!q||(c.nombre||"").toLowerCase().includes(q)||(c.telefono||"").includes(q));
+  $("#convos").innerHTML = list.map(c=>`
     <div class="convo ${actual===c.telefono?'activo':''}" data-tel="${c.telefono}">
       <div class="avatar">${esc(ini(c.nombre||c.telefono))}</div>
       <div class="info">
-        <div class="nombre">${esc(c.nombre||("+"+c.telefono))}</div>
+        <div class="r1"><span class="nombre">${esc(c.nombre||("+"+c.telefono))}</span><span class="hora">${fmtHora(c.ultimoMsg)}</span></div>
         <div class="ult">${esc(c.ultimoTexto||"")}</div>
       </div>
-      <div class="hora">${fmtHora(c.ultimoMsg)}</div>
-    </div>`).join("") || `<div style="padding:24px;color:var(--muted);text-align:center;font-size:13px">Sin conversaciones todavía.<br>Cuando un cliente escriba, aparece aquí.</div>`;
-  document.querySelectorAll(".convo").forEach(el => el.onclick = () => abrir(el.dataset.tel));
+    </div>`).join("") || `<div style="padding:28px;color:var(--muted);text-align:center;font-size:13px">Aún no hay conversaciones.<br>Cuando un cliente escriba, aparece aquí.</div>`;
+  document.querySelectorAll(".convo").forEach(el=>el.onclick=()=>abrir(el.dataset.tel));
 }
 async function abrir(tel){
   actual = tel;
-  const c = convos.find(x=>x.telefono===tel) || {telefono:tel};
-  $("#vacio").style.display="none";
-  $("#panelChat").style.display="flex";
-  $("#chatNombre").textContent = c.nombre || ("+"+tel);
-  $("#chatTel").textContent = "+"+tel;
-  $("#chatAvatar").textContent = ini(c.nombre||tel);
-  $("#lista").classList.add("oculta");
-  $("#enviar").disabled = !envioListo;
-  pintarConvos();
-  await cargarMsgs();
-  if(timerMsgs) clearInterval(timerMsgs);
-  timerMsgs = setInterval(cargarMsgs, 5000);
+  const c = convos.find(x=>x.telefono===tel)||{telefono:tel};
+  $("#vacio").style.display="none"; $("#panelChat").style.display="flex"; $("#contacto").style.display="flex";
+  $("#chatNombre").textContent = c.nombre||("+"+tel);
+  $("#chatTel").textContent = "+"+tel; $("#chatAvatar").textContent = ini(c.nombre||tel);
+  $("#cAvatar").textContent = ini(c.nombre||tel); $("#cNombre").textContent = c.nombre||("+"+tel);
+  $("#cTel").textContent = "+"+tel; $("#pTel").textContent = "+"+tel;
+  $("#pPrimero").textContent = fmtFecha(c.primerMsg); $("#pUltimo").textContent = fmtHora(c.ultimoMsg);
+  $("#pNmsgs").textContent = c.nMsgs||"—"; $("#cWa").href = "https://wa.me/"+tel;
+  $("#lista").classList.add("oculta"); $("#enviar").disabled = !envioListo;
+  pintarConvos(); await cargarMsgs();
+  if(timerMsgs) clearInterval(timerMsgs); timerMsgs = setInterval(cargarMsgs,5000);
 }
 async function cargarMsgs(){
   if(!actual) return;
   try{
-    const r = await fetch("/api/whatsapp/conversacion?telefono="+encodeURIComponent(actual));
-    const d = await r.json();
-    if(!d.ok) return;
-    const html = (d.mensajes||[]).map(m => `
+    let mensajes;
+    if(DEMO){ mensajes = DEMO_MSGS[actual] || [{direccion:"entrante",texto:(convos.find(c=>c.telefono===actual)||{}).ultimoTexto||"Hola",ts:new Date().toISOString()}]; }
+    else { const r = await fetch("/api/whatsapp/conversacion?telefono="+encodeURIComponent(actual)); const d = await r.json(); if(!d.ok) return; mensajes = d.mensajes||[]; }
+    const html = (mensajes).map(m=>`
       <div class="burbuja ${m.direccion==='saliente'?'saliente':'entrante'}">
         ${esc(m.texto)}
         <div class="meta">${m.agente?esc(m.agente)+' · ':''}${fmtHora(new Date(m.ts).getTime())}</div>
       </div>`).join("");
     const box = $("#msgs");
-    const abajo = box.scrollHeight - box.scrollTop - box.clientHeight < 80;
+    const abajo = box.scrollHeight-box.scrollTop-box.clientHeight < 90;
     box.innerHTML = html || `<div style="margin:auto;color:var(--muted)">Sin mensajes.</div>`;
     if(abajo) box.scrollTop = box.scrollHeight;
   }catch(e){}
 }
 async function enviar(){
-  const texto = $("#texto").value.trim();
-  if(!texto || !actual) return;
+  const texto = $("#texto").value.trim(); if(!texto||!actual) return;
   $("#enviar").disabled = true;
   try{
     const r = await fetch("/api/whatsapp/responder",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({telefono:actual,texto})});
@@ -160,11 +232,11 @@ async function enviar(){
   $("#enviar").disabled = !envioListo;
 }
 $("#enviar").onclick = enviar;
-$("#texto").addEventListener("keydown", e => { if(e.key==="Enter" && !e.shiftKey){ e.preventDefault(); enviar(); }});
-$("#q").addEventListener("input", pintarConvos);
-$("#volver").onclick = () => { $("#lista").classList.remove("oculta"); actual=null; if(timerMsgs)clearInterval(timerMsgs); };
-cargarConvos();
-setInterval(cargarConvos, 8000);
+$("#texto").addEventListener("keydown",e=>{ if(e.key==="Enter"&&!e.shiftKey){ e.preventDefault(); enviar(); }});
+$("#q").addEventListener("input",pintarConvos);
+document.querySelectorAll(".tab").forEach(t=>t.onclick=()=>{ document.querySelectorAll(".tab").forEach(x=>x.classList.remove("activo")); t.classList.add("activo"); filtro=t.dataset.f; pintarConvos(); });
+$("#volver").onclick = ()=>{ $("#lista").classList.remove("oculta"); actual=null; if(timerMsgs)clearInterval(timerMsgs); };
+cargarConvos(); setInterval(cargarConvos,8000);
 </script>
 </body>
 </html>
