@@ -3485,7 +3485,7 @@ app.post("/webhook", (req, res) => {
           else if (m.type === "button") texto = (m.button && m.button.text) || "";
           else if (m.type === "interactive") texto = (m.interactive && ((m.interactive.list_reply && m.interactive.list_reply.title) || (m.interactive.button_reply && m.interactive.button_reply.title))) || "";
           else texto = `[${m.type}]`;
-          waGuardarMensaje({ ts: new Date(ts).toISOString(), telefono, nombre, tipo: m.type, texto, id: m.id });
+          waGuardarMensaje({ ts: new Date(ts).toISOString(), telefono, nombre, tipo: m.type, texto, id: m.id, direccion: "entrante" });
           waUpsertLead(telefono, nombre, texto, ts);
           console.log(`[WA] msg de ${telefono} (${nombre || "?"}): ${String(texto).slice(0, 60)}`);
         }
@@ -3501,6 +3501,64 @@ app.get("/api/whatsapp/leads", requireAuth, requireAdmin, (req, res) => {
   const arr = Object.values(leads).sort((a, b) => (b.ultimoMsg || 0) - (a.ultimoMsg || 0));
   res.json({ ok: true, total: arr.length, leads: arr });
 });
+
+// --- INBOX de WhatsApp (leer y responder desde el navegador) ---------------
+// Config para ENVIAR por la Cloud API (se pone en el .env del servidor):
+const WA_TOKEN = process.env.WHATSAPP_TOKEN || "";
+const WA_PHONE_ID = process.env.WHATSAPP_PHONE_NUMBER_ID || "";
+const WA_GRAPH = process.env.WHATSAPP_GRAPH || "https://graph.facebook.com/v21.0";
+
+// Lista de conversaciones
+app.get("/api/whatsapp/conversaciones", requireAuth, (req, res) => {
+  let leads = {};
+  try { leads = JSON.parse(fs.readFileSync(WA_LEADS_PATH, "utf8")); } catch {}
+  const arr = Object.values(leads).sort((a, b) => (b.ultimoMsg || 0) - (a.ultimoMsg || 0));
+  res.json({ ok: true, total: arr.length, conversaciones: arr, envioListo: !!(WA_TOKEN && WA_PHONE_ID) });
+});
+
+// Mensajes de una conversación
+app.get("/api/whatsapp/conversacion", requireAuth, (req, res) => {
+  const tel = String(req.query.telefono || "").replace(/[^0-9]/g, "");
+  if (!tel) return res.status(400).json({ ok: false, error: "Falta teléfono" });
+  const msgs = [];
+  try {
+    const lineas = fs.readFileSync(WA_MSGS_PATH, "utf8").split("\n").filter(Boolean);
+    for (const l of lineas) { try { const r = JSON.parse(l); if (String(r.telefono) === tel) msgs.push(r); } catch {} }
+  } catch {}
+  res.json({ ok: true, telefono: tel, mensajes: msgs });
+});
+
+// Responder por WhatsApp (Cloud API). Solo funciona dentro de 24h del último
+// mensaje del cliente (regla de Meta para texto libre).
+app.post("/api/whatsapp/responder", requireAuth, async (req, res) => {
+  const b = req.body || {};
+  const tel = String(b.telefono || "").replace(/[^0-9]/g, "");
+  const texto = String(b.texto || "").trim();
+  if (!tel || !texto) return res.status(400).json({ ok: false, error: "Falta teléfono o texto" });
+  if (!WA_TOKEN || !WA_PHONE_ID) return res.status(500).json({ ok: false, error: "Falta WHATSAPP_TOKEN / WHATSAPP_PHONE_NUMBER_ID en el .env del servidor" });
+  try {
+    const r = await fetch(`${WA_GRAPH}/${WA_PHONE_ID}/messages`, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${WA_TOKEN}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ messaging_product: "whatsapp", to: tel, type: "text", text: { body: texto } }),
+    });
+    const data = await r.json().catch(() => ({}));
+    if (r.ok && data && data.messages) {
+      const ts = Date.now();
+      const agente = (buscarUsuario(req.session.userEmail) || {}).nombre || "";
+      waGuardarMensaje({ ts: new Date(ts).toISOString(), telefono: tel, nombre: "", tipo: "text", texto, id: (data.messages[0] || {}).id, direccion: "saliente", agente });
+      try {
+        const leads = JSON.parse(fs.readFileSync(WA_LEADS_PATH, "utf8"));
+        if (leads[tel]) { leads[tel].ultimoMsg = ts; leads[tel].ultimoTexto = texto.slice(0, 300); fs.writeFileSync(WA_LEADS_PATH, JSON.stringify(leads, null, 2), "utf8"); }
+      } catch {}
+      return res.json({ ok: true, id: (data.messages[0] || {}).id });
+    }
+    return res.status(r.status).json({ ok: false, error: (data && data.error && data.error.message) || "No se pudo enviar" });
+  } catch (e) { return res.status(500).json({ ok: false, error: "Error de red: " + e.message }); }
+});
+
+// Página del inbox
+app.get("/inbox", requireAuth, (req, res) => res.sendFile(path.join(__dirname, "inbox.html")));
 
 // Todo lo demás requiere sesión
 app.use(requireAuth);
