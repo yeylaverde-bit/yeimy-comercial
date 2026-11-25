@@ -3448,6 +3448,8 @@ function waUpsertLead(telefono, nombre, texto, ts) {
     ultimoMsg: ts,
     ultimoTexto: String(texto || "").slice(0, 300),
     nMsgs: (prev.nMsgs || 0) + 1,
+    estado: prev.estado || "nuevo",
+    moto: prev.moto || "",
   };
   try { fs.writeFileSync(WA_LEADS_PATH, JSON.stringify(leads, null, 2), "utf8"); }
   catch (e) { console.error("[WA] upsert lead:", e.message); }
@@ -3557,10 +3559,29 @@ app.post("/api/whatsapp/responder", requireAuth, async (req, res) => {
   } catch (e) { return res.status(500).json({ ok: false, error: "Error de red: " + e.message }); }
 });
 
+// Cambiar la etapa del pipeline de un contacto (y opcional moto)
+app.post("/api/whatsapp/estado", requireAuth, (req, res) => {
+  const b = req.body || {};
+  const tel = String(b.telefono || "").replace(/[^0-9]/g, "");
+  const estado = String(b.estado || "").trim().toLowerCase();
+  const validos = ["nuevo", "cotizado", "visita", "vendido", "perdido"];
+  if (!tel || !validos.includes(estado)) return res.status(400).json({ ok: false, error: "Datos inválidos" });
+  try {
+    const leads = JSON.parse(fs.readFileSync(WA_LEADS_PATH, "utf8"));
+    if (!leads[tel]) return res.status(404).json({ ok: false, error: "Contacto no existe" });
+    leads[tel].estado = estado;
+    if (typeof b.moto === "string") leads[tel].moto = b.moto.slice(0, 120);
+    fs.writeFileSync(WA_LEADS_PATH, JSON.stringify(leads, null, 2), "utf8");
+    return res.json({ ok: true });
+  } catch (e) { return res.status(500).json({ ok: false, error: e.message }); }
+});
+
 // Página del inbox
 app.get("/inbox", requireAuth, (req, res) => res.sendFile(path.join(__dirname, "inbox.html")));
 // Página de Contactos (CRM)
 app.get("/contactos", requireAuth, (req, res) => res.sendFile(path.join(__dirname, "contactos.html")));
+// Página de Negocios / Pipeline (CRM)
+app.get("/negocios", requireAuth, (req, res) => res.sendFile(path.join(__dirname, "negocios.html")));
 
 // Todo lo demás requiere sesión
 app.use(requireAuth);
