@@ -3559,6 +3559,8 @@ app.post("/api/whatsapp/responder", requireAuth, async (req, res) => {
 
 // Página del inbox
 app.get("/inbox", requireAuth, (req, res) => res.sendFile(path.join(__dirname, "inbox.html")));
+// Página de Contactos (CRM)
+app.get("/contactos", requireAuth, (req, res) => res.sendFile(path.join(__dirname, "contactos.html")));
 
 // Todo lo demás requiere sesión
 app.use(requireAuth);

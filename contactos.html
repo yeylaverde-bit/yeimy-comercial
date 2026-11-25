@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Contactos · CRM Yeimy Laverde</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Lexend+Deca:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f5f8fa; --panel:#ffffff; --line:#dfe3eb; --line2:#cbd6e2;
+    --txt:#33475b; --muted:#7c98b6; --soft:#516f90;
+    --accent:#ff7a59; --accent-h:#ff5c35; --teal:#00a4bd; --link:#0091ae;
+    --nav:#2d3e50; --nav-h:#425066;
+    --shadow:0 1px 2px rgba(45,62,80,.08),0 2px 6px rgba(45,62,80,.06);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;background:var(--bg);color:var(--txt);
+    font-family:"Lexend Deca",-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;font-size:14px}
+  .app{display:flex;height:100vh;overflow:hidden}
+  /* Nav rail */
+  .rail{width:68px;background:var(--nav);display:flex;flex-direction:column;align-items:center;padding:14px 0;gap:6px;flex-shrink:0}
+  .rail .brand{color:#fff;font-weight:700;font-size:11px;text-align:center;line-height:1.1;margin-bottom:14px;padding:0 6px}
+  .rail a{width:48px;height:48px;border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
+    color:#aeb9c7;text-decoration:none;font-size:9px}
+  .rail a .ic{font-size:19px}
+  .rail a:hover{background:var(--nav-h);color:#fff}
+  .rail a.activo{background:var(--accent);color:#fff}
+  /* Main */
+  .main{flex:1;display:flex;flex-direction:column;min-width:0}
+  .top{background:var(--panel);border-bottom:1px solid var(--line);padding:16px 26px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+  .top h1{margin:0;font-size:19px;font-weight:700}
+  .top .count{color:var(--muted);font-size:13px;margin-top:2px}
+  .top .acciones{display:flex;gap:10px;align-items:center}
+  .buscar input{width:260px;padding:9px 12px 9px 34px;border-radius:6px;border:1px solid var(--line2);
+    background:#f5f8fa url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" stroke="%237c98b6" stroke-width="2"><circle cx="7" cy="7" r="5"/><path d="M11 11l3 3"/></svg>') no-repeat 10px center;
+    color:var(--txt);font-size:13px;font-family:inherit}
+  .wrap{flex:1;overflow:auto;padding:22px 26px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:10px;overflow:hidden;box-shadow:var(--shadow)}
+  table{width:100%;border-collapse:collapse}
+  thead th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);
+    padding:12px 18px;border-bottom:1px solid var(--line);background:#f9fbfd;font-weight:600;position:sticky;top:0}
+  tbody td{padding:13px 18px;border-bottom:1px solid var(--line);font-size:13.5px}
+  tbody tr:hover{background:#f5f8fa}
+  .nm{display:flex;align-items:center;gap:11px}
+  .avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#00a4bd,#0091ae);
+    display:flex;align-items:center;justify-content:center;font-weight:600;color:#fff;font-size:13px;flex-shrink:0}
+  .nm .t{font-weight:600}
+  .muted{color:var(--muted)}
+  .chip{display:inline-block;background:#eaf0f6;color:var(--soft);border-radius:4px;padding:2px 9px;font-size:11px;font-weight:600}
+  .chip.wa{background:#e5f7ec;color:#1a8a4e}
+  .ver{color:var(--link);text-decoration:none;font-weight:600;font-size:12.5px;white-space:nowrap}
+  .ver:hover{text-decoration:underline}
+  .vacio{padding:50px;text-align:center;color:var(--muted)}
+  @media(max-width:720px){.rail{width:56px}.buscar input{width:150px}.col-hide{display:none}}
+</style>
+</head>
+<body>
+<div class="app">
+  <nav class="rail">
+    <div class="brand">CRM<br>Yeimy</div>
+    <a href="/inbox"><span class="ic">📥</span>Bandeja</a>
+    <a href="/contactos" class="activo"><span class="ic">👥</span>Contactos</a>
+    <a href="#" title="Próximamente"><span class="ic">🤝</span>Negocios</a>
+    <a href="/panel"><span class="ic">📊</span>Tablero</a>
+  </nav>
+  <div class="main">
+    <div class="top">
+      <div>
+        <h1>👥 Contactos</h1>
+        <div class="count" id="count">cargando…</div>
+      </div>
+      <div class="acciones">
+        <div class="buscar"><input id="q" placeholder="Buscar nombre o número…"></div>
+      </div>
+    </div>
+    <div class="wrap">
+      <div class="card">
+        <table>
+          <thead><tr>
+            <th>Nombre</th><th>Teléfono</th><th class="col-hide">Último contacto</th>
+            <th class="col-hide">Mensajes</th><th>Canal</th><th></th>
+          </tr></thead>
+          <tbody id="tbody"><tr><td colspan="6" class="vacio">Cargando…</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+const $ = s => document.querySelector(s);
+let contactos = [];
+const fmt = ms => { try{ return new Date(ms).toLocaleDateString("es-CO",{day:"2-digit",month:"short",year:"numeric"});}catch{return"—";} };
+const ini = n => (String(n||"?").trim().charAt(0)||"?").toUpperCase();
+const esc = s => String(s||"").replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+
+async function cargar(){
+  try{
+    const r = await fetch("/api/whatsapp/conversaciones");
+    const d = await r.json(); if(!d.ok) return;
+    contactos = d.conversaciones||[];
+    $("#count").textContent = `${contactos.length} contacto(s)`;
+    pintar();
+  }catch(e){ $("#tbody").innerHTML = `<tr><td colspan="6" class="vacio">No se pudieron cargar los contactos.</td></tr>`; }
+}
+function pintar(){
+  const q = ($("#q").value||"").toLowerCase();
+  const list = contactos.filter(c=>!q||(c.nombre||"").toLowerCase().includes(q)||(c.telefono||"").includes(q));
+  if(!list.length){ $("#tbody").innerHTML = `<tr><td colspan="6" class="vacio">Aún no hay contactos.<br>Cuando un cliente escriba por WhatsApp, aparece aquí.</td></tr>`; return; }
+  $("#tbody").innerHTML = list.map(c=>`
+    <tr>
+      <td><div class="nm"><div class="avatar">${esc(ini(c.nombre||c.telefono))}</div><div class="t">${esc(c.nombre||("+"+c.telefono))}</div></div></td>
+      <td class="muted">+${esc(c.telefono)}</td>
+      <td class="muted col-hide">${fmt(c.ultimoMsg)}</td>
+      <td class="col-hide">${c.nMsgs||1}</td>
+      <td><span class="chip wa">WhatsApp</span></td>
+      <td><a class="ver" href="/inbox">Ver chat →</a></td>
+    </tr>`).join("");
+}
+$("#q").addEventListener("input",pintar);
+cargar(); setInterval(cargar,15000);
+</script>
+</body>
+</html>
