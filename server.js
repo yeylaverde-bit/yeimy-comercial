@@ -3627,7 +3627,8 @@ app.post("/api/whatsapp/importar", requireAuth, requireAdmin, (req, res) => {
       ultimoMsg: Math.max((prev && prev.ultimoMsg) || 0, l.ultimoMsg || 0) || Date.now(),
       ultimoTexto: String(l.ultimoTexto || (prev && prev.ultimoTexto) || "").slice(0, 300),
       nMsgs: Math.max((prev && prev.nMsgs) || 0, l.nMsgs || 1),
-      estado: (prev && prev.estado) || l.estado || "nuevo",
+      estado: l.estado || (prev && prev.estado) || "nuevo",
+      etiqueta: l.etiqueta || (prev && prev.etiqueta) || "",
       moto: (prev && prev.moto) || l.moto || "",
       origen: (prev && prev.origen) || "importado",
     };

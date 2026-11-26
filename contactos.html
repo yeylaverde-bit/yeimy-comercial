@@ -49,6 +49,7 @@
   .muted{color:var(--muted)}
   .chip{display:inline-block;background:#eaf0f6;color:var(--soft);border-radius:4px;padding:2px 9px;font-size:11px;font-weight:600}
   .chip.wa{background:#e5f7ec;color:#1a8a4e}
+  .chip.et{background:#fde9e3;color:#c4472a}
   .ver{color:var(--link);text-decoration:none;font-weight:600;font-size:12.5px;white-space:nowrap}
   .ver:hover{text-decoration:underline}
   .vacio{padding:50px;text-align:center;color:var(--muted)}
@@ -78,10 +79,10 @@
       <div class="card">
         <table>
           <thead><tr>
-            <th>Nombre</th><th>Teléfono</th><th class="col-hide">Último contacto</th>
+            <th>Nombre</th><th>Teléfono</th><th>Etiqueta</th><th class="col-hide">Último contacto</th>
             <th class="col-hide">Mensajes</th><th>Canal</th><th></th>
           </tr></thead>
-          <tbody id="tbody"><tr><td colspan="6" class="vacio">Cargando…</td></tr></tbody>
+          <tbody id="tbody"><tr><td colspan="7" class="vacio">Cargando…</td></tr></tbody>
         </table>
       </div>
     </div>
@@ -101,16 +102,17 @@ async function cargar(){
     contactos = d.conversaciones||[];
     $("#count").textContent = `${contactos.length} contacto(s)`;
     pintar();
-  }catch(e){ $("#tbody").innerHTML = `<tr><td colspan="6" class="vacio">No se pudieron cargar los contactos.</td></tr>`; }
+  }catch(e){ $("#tbody").innerHTML = `<tr><td colspan="7" class="vacio">No se pudieron cargar los contactos.</td></tr>`; }
 }
 function pintar(){
   const q = ($("#q").value||"").toLowerCase();
   const list = contactos.filter(c=>!q||(c.nombre||"").toLowerCase().includes(q)||(c.telefono||"").includes(q));
-  if(!list.length){ $("#tbody").innerHTML = `<tr><td colspan="6" class="vacio">Aún no hay contactos.<br>Cuando un cliente escriba por WhatsApp, aparece aquí.</td></tr>`; return; }
+  if(!list.length){ $("#tbody").innerHTML = `<tr><td colspan="7" class="vacio">Aún no hay contactos.<br>Cuando un cliente escriba por WhatsApp, aparece aquí.</td></tr>`; return; }
   $("#tbody").innerHTML = list.map(c=>`
     <tr>
       <td><div class="nm"><div class="avatar">${esc(ini(c.nombre||c.telefono))}</div><div class="t">${esc(c.nombre||("+"+c.telefono))}</div></div></td>
       <td class="muted">+${esc(c.telefono)}</td>
+      <td>${c.etiqueta?`<span class="chip et">${esc(c.etiqueta)}</span>`:'<span class="muted">—</span>'}</td>
       <td class="muted col-hide">${fmt(c.ultimoMsg)}</td>
       <td class="col-hide">${c.nMsgs||1}</td>
       <td><span class="chip wa">WhatsApp</span></td>
