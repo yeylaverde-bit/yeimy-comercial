@@ -38,6 +38,10 @@
   .convo .r1{display:flex;justify-content:space-between;gap:8px;align-items:baseline}
   .convo .nombre{font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .convo .hora{font-size:11px;color:var(--muted);flex-shrink:0}
+  .convo.noleido .nombre{font-weight:700}
+  .convo.noleido .ult{color:var(--txt);font-weight:500}
+  .punto{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--accent);margin-right:6px;vertical-align:middle}
+  .burbuja img{max-width:240px;border-radius:8px;display:block;cursor:pointer}
   .convo .ult{font-size:12.5px;color:var(--soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:3px}
   /* ---- Columna 2: hilo ---- */
   .chat{flex:1;background:var(--bg)}
@@ -164,7 +168,8 @@
 </div>
 <script>
 const $ = s => document.querySelector(s);
-let convos=[], actual=null, envioListo=false, timerMsgs=null, filtro="todas";
+let convos=[], actual=null, envioListo=false, timerMsgs=null, filtro="todas", prevUnread=-1;
+function beep(){ try{ const a=new (window.AudioContext||window.webkitAudioContext)(); const o=a.createOscillator(), g=a.createGain(); o.connect(g); g.connect(a.destination); o.type="sine"; o.frequency.value=680; g.gain.setValueAtTime(.001,a.currentTime); g.gain.exponentialRampToValueAtTime(.15,a.currentTime+.02); g.gain.exponentialRampToValueAtTime(.001,a.currentTime+.35); o.start(); o.stop(a.currentTime+.36); }catch(e){} }
 const DEMO = location.search.includes("demo");
 const ahora = Date.now();
 const DEMO_CONVOS = [
@@ -196,18 +201,24 @@ async function cargarConvos(){
     convos = d.conversaciones||[]; envioListo = d.envioListo;
     $("#sub").textContent = `${convos.length} conversación(es)`;
     $("#avisoEnvio").style.display = envioListo ? "none" : "block";
+    const unread = convos.filter(c=>c.noLeido).length;
+    document.title = (unread?`(${unread}) `:"")+"Bandeja de entrada · CRM Yeimy Laverde";
+    if(prevUnread>=0 && unread>prevUnread) beep();
+    prevUnread = unread;
     pintarConvos();
   }catch(e){}
 }
 function pintarConvos(){
   const q = ($("#q").value||"").toLowerCase();
-  const list = convos.filter(c=>!q||(c.nombre||"").toLowerCase().includes(q)||(c.telefono||"").includes(q));
+  const list = convos
+    .filter(c=> filtro==="sin" ? c.noLeido : true)
+    .filter(c=>!q||(c.nombre||"").toLowerCase().includes(q)||(c.telefono||"").includes(q));
   $("#convos").innerHTML = list.map(c=>`
-    <div class="convo ${actual===c.telefono?'activo':''}" data-tel="${c.telefono}">
+    <div class="convo ${actual===c.telefono?'activo':''} ${c.noLeido?'noleido':''}" data-tel="${c.telefono}">
       <div class="avatar">${esc(ini(c.nombre||c.telefono))}</div>
       <div class="info">
         <div class="r1"><span class="nombre">${esc(c.nombre||("+"+c.telefono))}</span><span class="hora">${fmtHora(c.ultimoMsg)}</span></div>
-        <div class="ult">${esc(c.ultimoTexto||"")}</div>
+        <div class="ult">${c.noLeido?'<span class="punto"></span>':''}${esc(c.ultimoTexto||"")}</div>
       </div>
     </div>`).join("") || `<div style="padding:28px;color:var(--muted);text-align:center;font-size:13px">Aún no hay conversaciones.<br>Cuando un cliente escriba, aparece aquí.</div>`;
   document.querySelectorAll(".convo").forEach(el=>el.onclick=()=>abrir(el.dataset.tel));
@@ -223,6 +234,7 @@ async function abrir(tel){
   $("#pPrimero").textContent = fmtFecha(c.primerMsg); $("#pUltimo").textContent = fmtHora(c.ultimoMsg);
   $("#pNmsgs").textContent = c.nMsgs||"—"; $("#cWa").href = "https://wa.me/"+tel;
   $("#lista").classList.add("oculta"); $("#enviar").disabled = !envioListo;
+  if(c.noLeido){ c.noLeido=false; try{ fetch("/api/whatsapp/leido",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({telefono:tel})}); }catch(e){} }
   pintarConvos(); await cargarMsgs();
   if(timerMsgs) clearInterval(timerMsgs); timerMsgs = setInterval(cargarMsgs,5000);
 }
@@ -232,9 +244,16 @@ async function cargarMsgs(){
     let mensajes;
     if(DEMO){ mensajes = DEMO_MSGS[actual] || [{direccion:"entrante",texto:(convos.find(c=>c.telefono===actual)||{}).ultimoTexto||"Hola",ts:new Date().toISOString()}]; }
     else { const r = await fetch("/api/whatsapp/conversacion?telefono="+encodeURIComponent(actual)); const d = await r.json(); if(!d.ok) return; mensajes = d.mensajes||[]; }
+    const cuerpo = m => {
+      if(m.mediaId && (m.tipo==="image"||m.tipo==="sticker")){
+        const cap = (m.texto && m.texto!=="📷 Foto" && m.texto!=="Sticker") ? `<div style="margin-top:6px">${esc(m.texto)}</div>` : "";
+        return `<img src="/api/whatsapp/media/${esc(m.mediaId)}" loading="lazy" onclick="window.open(this.src)" onerror="this.replaceWith(document.createTextNode('📷 Foto (se verá al activar el token)'))">${cap}`;
+      }
+      return esc(m.texto);
+    };
     const html = (mensajes).map(m=>`
       <div class="burbuja ${m.direccion==='saliente'?'saliente':'entrante'}">
-        ${esc(m.texto)}
+        ${cuerpo(m)}
         <div class="meta">${m.agente?esc(m.agente)+' · ':''}${fmtHora(new Date(m.ts).getTime())}</div>
       </div>`).join("");
     const box = $("#msgs");

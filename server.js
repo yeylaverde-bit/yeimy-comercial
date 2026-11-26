@@ -3450,6 +3450,7 @@ function waUpsertLead(telefono, nombre, texto, ts) {
     nMsgs: (prev.nMsgs || 0) + 1,
     estado: prev.estado || "nuevo",
     moto: prev.moto || "",
+    noLeido: true,
   };
   try { fs.writeFileSync(WA_LEADS_PATH, JSON.stringify(leads, null, 2), "utf8"); }
   catch (e) { console.error("[WA] upsert lead:", e.message); }
@@ -3482,12 +3483,18 @@ app.post("/webhook", (req, res) => {
           const telefono = m.from;
           const nombre = contactos[telefono] || "";
           const ts = (Number(m.timestamp) || Math.floor(Date.now() / 1000)) * 1000;
-          let texto = "";
+          let texto = "", mediaId = "", mime = "";
           if (m.type === "text") texto = (m.text && m.text.body) || "";
           else if (m.type === "button") texto = (m.button && m.button.text) || "";
           else if (m.type === "interactive") texto = (m.interactive && ((m.interactive.list_reply && m.interactive.list_reply.title) || (m.interactive.button_reply && m.interactive.button_reply.title))) || "";
+          else if (m.type === "image") { mediaId = m.image && m.image.id; mime = m.image && m.image.mime_type; texto = (m.image && m.image.caption) || "📷 Foto"; }
+          else if (m.type === "sticker") { mediaId = m.sticker && m.sticker.id; mime = m.sticker && m.sticker.mime_type; texto = "Sticker"; }
+          else if (m.type === "document") { mediaId = m.document && m.document.id; mime = m.document && m.document.mime_type; texto = "📄 " + ((m.document && (m.document.filename || m.document.caption)) || "Documento"); }
+          else if (m.type === "audio") { mediaId = m.audio && m.audio.id; mime = m.audio && m.audio.mime_type; texto = "🎤 Audio"; }
+          else if (m.type === "video") { mediaId = m.video && m.video.id; mime = m.video && m.video.mime_type; texto = (m.video && m.video.caption) || "🎥 Video"; }
+          else if (m.type === "location") texto = "📍 Ubicación";
           else texto = `[${m.type}]`;
-          waGuardarMensaje({ ts: new Date(ts).toISOString(), telefono, nombre, tipo: m.type, texto, id: m.id, direccion: "entrante" });
+          waGuardarMensaje({ ts: new Date(ts).toISOString(), telefono, nombre, tipo: m.type, texto, id: m.id, direccion: "entrante", mediaId: mediaId || undefined, mime: mime || undefined });
           waUpsertLead(telefono, nombre, texto, ts);
           console.log(`[WA] msg de ${telefono} (${nombre || "?"}): ${String(texto).slice(0, 60)}`);
         }
@@ -3634,6 +3641,29 @@ app.post("/api/whatsapp/importar", requireAuth, requireAdmin, (req, res) => {
   res.json({ ok: true, leadsNuevos: nuevos, leadsActualizados: actualizados, mensajes: msgsImp, total: Object.keys(leads).length });
 });
 app.get("/importar", requireAuth, requireAdmin, (req, res) => res.sendFile(path.join(__dirname, "importar.html")));
+
+// Marcar una conversación como leída
+app.post("/api/whatsapp/leido", requireAuth, (req, res) => {
+  const tel = String((req.body || {}).telefono || "").replace(/[^0-9]/g, "");
+  try { const leads = JSON.parse(fs.readFileSync(WA_LEADS_PATH, "utf8")); if (leads[tel]) { leads[tel].noLeido = false; fs.writeFileSync(WA_LEADS_PATH, JSON.stringify(leads, null, 2), "utf8"); } } catch {}
+  res.json({ ok: true });
+});
+
+// Descargar media de WhatsApp (fotos/documentos) — requiere token
+app.get("/api/whatsapp/media/:id", requireAuth, async (req, res) => {
+  const id = String(req.params.id || "").replace(/[^0-9]/g, "");
+  if (!WA_TOKEN) return res.status(503).send("Token no configurado");
+  if (!id) return res.status(400).send("id inválido");
+  try {
+    const meta = await fetch(`${WA_GRAPH}/${id}`, { headers: { Authorization: `Bearer ${WA_TOKEN}` } });
+    const info = await meta.json();
+    if (!info || !info.url) return res.status(404).send("No encontrado");
+    const media = await fetch(info.url, { headers: { Authorization: `Bearer ${WA_TOKEN}` } });
+    res.set("Content-Type", info.mime_type || media.headers.get("content-type") || "application/octet-stream");
+    res.set("Cache-Control", "private, max-age=86400");
+    res.send(Buffer.from(await media.arrayBuffer()));
+  } catch (e) { res.status(500).send("Error: " + e.message); }
+});
 
 // Página del inbox
 app.get("/inbox", requireAuth, (req, res) => res.sendFile(path.join(__dirname, "inbox.html")));
