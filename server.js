@@ -3576,6 +3576,30 @@ app.post("/api/whatsapp/estado", requireAuth, (req, res) => {
   } catch (e) { return res.status(500).json({ ok: false, error: e.message }); }
 });
 
+// --- Respuestas rápidas (plantillas que el asesor inserta con un clic) ---
+const WA_RESP_PATH = path.join(DATA_DIR, "whatsapp-respuestas.json");
+const RESP_DEFAULT = [
+  { titulo: "Saludo", texto: "¡Hola! 👋 Gracias por escribir a Yeimy Laverde Motos. ¿En qué moto estás interesado/a?" },
+  { titulo: "Requisitos crédito", texto: "💳 Para crédito solo necesitas: cédula, un recibo de servicios y datos básicos. Te manejo planes hasta 19 meses. ¿Te cotizo?" },
+  { titulo: "Pedir datos para cotizar", texto: "📄 Pásame tu *nombre completo* y *número de cédula* y te cotizo al instante 😊" },
+  { titulo: "Ubicación y horario", texto: "📍 Estamos en Medellín. Horario: Lun a Sáb, 8am - 6pm. ¡Te esperamos! 🏍️" },
+  { titulo: "Invitar a visitar", texto: "¿Te gustaría venir a verla y hacer la prueba de ruta? Con gusto te atiendo personalmente 🙌" },
+  { titulo: "Cierre / agradecimiento", texto: "¡Con mucho gusto! 🙏 Cualquier cosa quedo pendiente. ¡Que tengas un lindo día! 😊" },
+];
+app.get("/api/whatsapp/respuestas", requireAuth, (req, res) => {
+  let r;
+  try { r = JSON.parse(fs.readFileSync(WA_RESP_PATH, "utf8")); } catch { r = null; }
+  if (!Array.isArray(r)) { r = RESP_DEFAULT; try { fs.writeFileSync(WA_RESP_PATH, JSON.stringify(r, null, 2), "utf8"); } catch {} }
+  res.json({ ok: true, respuestas: r });
+});
+app.post("/api/whatsapp/respuestas", requireAuth, (req, res) => {
+  const lista = Array.isArray(req.body && req.body.respuestas) ? req.body.respuestas
+    .filter(x => x && x.texto).map(x => ({ titulo: String(x.titulo || "").slice(0, 60), texto: String(x.texto).slice(0, 2000) })).slice(0, 100) : null;
+  if (!lista) return res.status(400).json({ ok: false, error: "Formato inválido" });
+  try { fs.writeFileSync(WA_RESP_PATH, JSON.stringify(lista, null, 2), "utf8"); return res.json({ ok: true, respuestas: lista }); }
+  catch (e) { return res.status(500).json({ ok: false, error: e.message }); }
+});
+
 // Página del inbox
 app.get("/inbox", requireAuth, (req, res) => res.sendFile(path.join(__dirname, "inbox.html")));
 // Página de Contactos (CRM)

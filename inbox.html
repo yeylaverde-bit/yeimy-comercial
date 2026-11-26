@@ -57,6 +57,21 @@
     background:var(--panel);color:var(--txt);font-size:14px;font-family:inherit}
   .cbar{display:flex;justify-content:space-between;align-items:center;padding:8px 10px;border-top:1px solid var(--line);background:#f9fbfd}
   .cbar .hint{font-size:11px;color:var(--muted)}
+  .herr{display:flex;gap:8px}
+  .hbtn{background:#eef2f7;border:1px solid var(--line);border-radius:6px;padding:6px 11px;font-size:12.5px;font-weight:600;color:var(--soft);cursor:pointer;font-family:inherit}
+  .hbtn:hover{background:#e3ecf5;color:var(--txt)}
+  .componer{position:relative}
+  .pop{position:absolute;bottom:100%;left:12px;right:12px;margin-bottom:8px;max-height:320px;overflow-y:auto;
+    background:#fff;border:1px solid var(--line2);border-radius:10px;box-shadow:0 8px 24px rgba(45,62,80,.18);z-index:9}
+  .pop .ph{padding:10px 14px;border-bottom:1px solid var(--line);font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:#fff}
+  .pop .it{padding:11px 14px;border-bottom:1px solid var(--line);cursor:pointer}
+  .pop .it:hover{background:#f5f8fa}
+  .pop .it .t{font-weight:600;font-size:13px}
+  .pop .it .d{font-size:12px;color:var(--soft);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .pop .it .pr{color:#1a8a4e;font-weight:600}
+  .pop .buscar2{padding:8px 12px;border-bottom:1px solid var(--line)}
+  .pop .buscar2 input{width:100%;padding:7px 10px;border:1px solid var(--line2);border-radius:6px;font-size:13px;font-family:inherit}
+  .pop .add{color:var(--link);font-weight:600;font-size:12px;cursor:pointer}
   .btn{padding:9px 20px;border:0;border-radius:6px;background:var(--accent);color:#fff;font-weight:600;cursor:pointer;font-size:13.5px;font-family:inherit}
   .btn:hover{background:var(--accent-h)}
   .btn:disabled{opacity:.45;cursor:not-allowed}
@@ -111,11 +126,19 @@
       </div>
       <div class="msgs" id="msgs"></div>
       <div class="componer">
+        <div id="popRespuestas" class="pop" style="display:none"></div>
+        <div id="popCatalogo" class="pop" style="display:none"></div>
         <div class="cbox">
           <textarea id="texto" placeholder="Escribe tu respuesta…"></textarea>
           <div class="cbar">
-            <span class="hint">Enter para enviar · Shift+Enter salto de línea</span>
-            <button class="btn" id="enviar">Enviar</button>
+            <div class="herr">
+              <button class="hbtn" id="btnResp" title="Respuestas rápidas">⚡ Respuestas</button>
+              <button class="hbtn" id="btnCat" title="Enviar una moto del catálogo">🏍️ Catálogo</button>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px">
+              <span class="hint">Enter envía</span>
+              <button class="btn" id="enviar">Enviar</button>
+            </div>
           </div>
         </div>
       </div>
@@ -236,6 +259,44 @@ $("#texto").addEventListener("keydown",e=>{ if(e.key==="Enter"&&!e.shiftKey){ e.
 $("#q").addEventListener("input",pintarConvos);
 document.querySelectorAll(".tab").forEach(t=>t.onclick=()=>{ document.querySelectorAll(".tab").forEach(x=>x.classList.remove("activo")); t.classList.add("activo"); filtro=t.dataset.f; pintarConvos(); });
 $("#volver").onclick = ()=>{ $("#lista").classList.remove("oculta"); actual=null; if(timerMsgs)clearInterval(timerMsgs); };
+
+// ---- Respuestas rápidas + Catálogo ----
+let RESP=[], CAT=[];
+const money = n => "$"+(Number(n)||0).toLocaleString("es-CO");
+function insertar(t){ const ta=$("#texto"); ta.value=(ta.value?ta.value+"\n":"")+t; ta.focus(); cerrarPops(); }
+function cerrarPops(){ $("#popRespuestas").style.display="none"; $("#popCatalogo").style.display="none"; }
+async function cargarRespuestas(){ try{ const r=await fetch("/api/whatsapp/respuestas"); const d=await r.json(); if(d.ok) RESP=d.respuestas||[]; }catch(e){} }
+async function cargarCatalogo(){ try{ const r=await fetch("/catalogo.json"); const d=await r.json(); CAT=(d&&d.motos)||[]; }catch(e){} }
+function pintarResp(){
+  $("#popRespuestas").innerHTML = `<div class="ph">⚡ Respuestas rápidas <span class="add" id="addResp">➕ Nueva</span></div>`+
+    RESP.map((r,i)=>`<div class="it" data-ri="${i}"><div class="t">${esc(r.titulo||"Respuesta")}</div><div class="d">${esc(r.texto)}</div></div>`).join("");
+  $("#popRespuestas").querySelectorAll(".it").forEach(el=>el.onclick=()=>insertar(RESP[+el.dataset.ri].texto));
+  const add=$("#addResp"); if(add) add.onclick=async()=>{
+    const titulo=prompt("Título corto (ej. Promo del mes):"); if(titulo===null)return;
+    const texto=prompt("Texto de la respuesta:"); if(!texto)return;
+    RESP.push({titulo,texto});
+    try{ await fetch("/api/whatsapp/respuestas",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({respuestas:RESP})}); }catch(e){}
+    pintarResp();
+  };
+}
+function pintarCat(q){
+  q=(q||"").toLowerCase();
+  const list=CAT.filter(m=>!q||(m.modelo+" "+m.marca).toLowerCase().includes(q));
+  $("#popCatalogo").innerHTML = `<div class="ph">🏍️ Catálogo — toca una moto para enviarla</div>`+
+    `<div class="buscar2"><input id="qcat" placeholder="Buscar moto…" value="${esc(q)}"></div>`+
+    (list.map((m,i)=>`<div class="it" data-mi="${CAT.indexOf(m)}"><div class="t">${esc(m.marca)} ${esc(m.modelo)}</div><div class="d"><span class="pr">${money(m.comercial)}</span> · inicial ${money(m.cuota_inicial)} · ${esc(m.anio||"")}</div></div>`).join("")||`<div class="it"><div class="d">Sin resultados</div></div>`);
+  $("#popCatalogo").querySelectorAll(".it[data-mi]").forEach(el=>el.onclick=()=>{
+    const m=CAT[+el.dataset.mi];
+    const msg=`🏍️ *${m.marca} ${m.modelo}* (${m.anio||""})\n💰 Precio: ${money(m.comercial)}\n💳 Cuota inicial desde: ${money(m.cuota_inicial)}\n\nMira el catálogo completo 👉 ${location.origin}/catalogo`;
+    insertar(msg);
+  });
+  const qc=$("#qcat"); if(qc){ qc.oninput=()=>pintarCat(qc.value); qc.focus(); }
+}
+$("#btnResp").onclick=(e)=>{ e.stopPropagation(); const p=$("#popRespuestas"); const show=p.style.display==="none"; cerrarPops(); if(show){ pintarResp(); p.style.display="block"; } };
+$("#btnCat").onclick=(e)=>{ e.stopPropagation(); const p=$("#popCatalogo"); const show=p.style.display==="none"; cerrarPops(); if(show){ pintarCat(""); p.style.display="block"; } };
+document.addEventListener("click",e=>{ if(!e.target.closest(".pop")&&!e.target.closest(".herr")) cerrarPops(); });
+cargarRespuestas(); cargarCatalogo();
+
 cargarConvos(); setInterval(cargarConvos,8000);
 </script>
 </body>
