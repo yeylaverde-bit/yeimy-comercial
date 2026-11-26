@@ -356,13 +356,13 @@ async function init(){
   const motos = DATA.motos;
   document.getElementById("stTotal").textContent = motos.length;
   document.getElementById("stMarcas").textContent = new Set(motos.map(m=>m.marca)).size;
-  const minP = Math.min(...motos.map(m=>m.comercial).filter(v=>v>0));
+  const minP = Math.min(...motos.map(m=>(m.credito||m.contado||m.comercial)).filter(v=>v>0));
   document.getElementById("stDesde").textContent = "$" + (minP/1e6).toLocaleString("es-CO",{maximumFractionDigits:1}) + " M";
   document.getElementById("ribbonCount").textContent = motos.filter(m=>m.bono>0).length;
   const heroM = motos.find(m=>m.modelo==="RAIDER 125") || motos.find(m=>m.foto);
   if (heroM) {
     const h = document.getElementById("heroImg"); h.src = IMG(heroM.foto); h.alt = heroM.marca + " " + heroM.modelo;
-    document.getElementById("heroCap").textContent = heroM.bono>0 ? `${heroM.marca} ${heroM.modelo} · Bono ${cop(heroM.bono)}` : (heroM.cuota_inicial ? `${heroM.marca} ${heroM.modelo} · Cuota inicial ${cop(heroM.cuota_inicial)}` : `${heroM.marca} ${heroM.modelo}`);
+    document.getElementById("heroCap").textContent = heroM.bono>0 ? `${heroM.marca} ${heroM.modelo} · Bono ${cop(heroM.bono)}` : `${heroM.marca} ${heroM.modelo}`;
     document.querySelector(".hero .pic .frame").style.cursor = "pointer";
     document.querySelector(".hero .pic .frame").addEventListener("click", ()=>abrir(motos.indexOf(heroM)));
   }
@@ -434,8 +434,8 @@ function render(){
     const idx = DATA.motos.indexOf(m);
     const top = MAS_VENDIDAS.includes(m.modelo), nuevo = !top && NUEVOS.test(m.modelo);
     const tiene = m.bono>0;
-    const precio = tiene ? m.comercial-m.bono : m.comercial;
-    const ini = cop(m.cuota_inicial);
+    const base = m.credito || m.contado || m.comercial;
+    const precio = tiene ? base-m.bono : base;
     return `<article class="card">
       <div class="top">
         <span class="mk ${esc(m.marca)}">${esc(m.marca)}</span>
@@ -447,10 +447,7 @@ function render(){
         <h3>${esc(m.modelo)}</h3>
         <div class="cc">${esc(m.cilindraje||"")}${m.anio?' · Modelo '+esc(m.anio):''}</div>
         ${tiene?`<div class="bonoflag">${BONO_ICON} Bono convenio ${cop(m.bono)}</div>`:""}
-        <div class="price num"><small>PRECIO${tiene?' CON BONO':''}</small>${cop(precio)||"Consultar"}${tiene?`<span class="was">Antes ${cop(m.comercial)}</span>`:""}</div>
-        ${ini?`<div class="ini"><span>Cuota inicial</span><b class="num">${ini}</b></div>`:`<div class="ini none">Consulta tu cuota inicial</div>`}
-        ${m.contado?`<div class="contado">De contado <b class="num">${cop(m.contado)}</b></div>`:""}
-        ${m.credito?`<div class="contado">A crédito (con prenda) <b class="num">${cop(m.credito)}</b></div>`:""}
+        <div class="price num"><small>PRECIO DE LA MOTO</small>${cop(precio)||"Consultar"}${tiene?`<span class="was">Antes ${cop(base)}</span>`:""}</div>
         ${swatches(m)}
         <div class="actions">
           <button class="btn btn-more" data-i="${idx}">Conoce más</button>
@@ -467,7 +464,8 @@ function abrir(i){
   const foto = (colFoto && colFoto.foto) ? colFoto.foto : (m.foto || m.foto_hero);
   const specs = (m.specs||[]).map(([k,v])=>`<div class="spec"><div class="k">${esc(k)}</div><div class="v">${esc(v)}</div></div>`).join("");
   const cols = (m.colores||[]).map((c,ci)=>`<button class="cpick${ci===0?' active':''}" data-img="${esc(IMG(c.foto))}"><span class="sw" style="background:${esc(c.hex||'#888')}"></span>${esc(c.nombre)}</button>`).join("");
-  const precio = m.bono>0 ? m.comercial-m.bono : m.comercial;
+  const base = m.credito || m.contado || m.comercial;
+  const precio = m.bono>0 ? base-m.bono : base;
   document.getElementById("modal").innerHTML = `
     <button class="close" onclick="cerrar()" aria-label="Cerrar">×</button>
     <div class="pd">
@@ -480,13 +478,10 @@ function abrir(i){
         <h2>${esc(m.modelo)}</h2>
         <div class="cc">${esc(CAT_NOMBRE(m.categoria))}${m.cilindraje?' · '+esc(m.cilindraje):''}${m.anio?' · Modelo '+esc(m.anio):''}</div>
         <div class="pbox num">
-          <div class="row big"><span class="l">Precio${m.bono>0?' con bono':''}</span><span class="v">${cop(precio)||"Consultar"}</span></div>
+          <div class="row big"><span class="l">Precio de la moto</span><span class="v">${cop(precio)||"Consultar"}</span></div>
           ${m.bono>0?`<div class="row bono"><span class="l">Bono del convenio</span><span class="v">− ${cop(m.bono)}</span></div>`:""}
-          <div class="row ini"><span class="l">Cuota inicial</span><span class="v">${cop(m.cuota_inicial)||"Consultar"}</span></div>
-          <div class="row"><span class="l">De contado (con papeles)</span><span class="v">${cop(m.contado)||"Consultar"}</span></div>
-          ${m.credito?`<div class="row"><span class="l">A crédito (con prenda)</span><span class="v">${cop(m.credito)}</span></div>`:""}
         </div>
-        <div class="disc">El valor <b>de contado</b> incluye papeles de tránsito (matrícula). El valor <b>a crédito</b> incluye papeles con prenda. La <b>cuota inicial</b> es 10% del precio (15% en motocarros) + papeles con prenda; la financiera presta hasta $18.000.000, por eso en vehículos de mayor valor la inicial sube. Precios referenciales, sujetos a confirmación en punto de venta.</div>
+        <div class="disc">El precio ya incluye los papeles de tránsito (matrícula). <b>Con el convenio de Seracis no necesitas cuota inicial.</b> Precios referenciales, sujetos a confirmación en punto de venta.</div>
         <div class="pd-btns">
           <a class="btn-lg btn-wa" target="_blank" rel="noopener" href="${waLink('Hola '+(DATA.asesora||'Yeimy')+', soy colaborador de Seracis y me interesa la '+m.marca+' '+m.modelo+'. ¿Me das más información y disponibilidad?')}">${WA_ICON}Cotizar por WhatsApp</a>
           ${m.ficha_pdf?`<a class="btn-lg btn-red" href="catalogo-fichas/${esc(m.ficha_pdf)}" target="_blank" rel="noopener" download>Descargar ficha técnica (PDF)</a>`:""}
