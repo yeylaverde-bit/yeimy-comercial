@@ -298,21 +298,26 @@ function pintarResp(){
     pintarResp();
   };
 }
-function pintarCat(q){
+function catResultados(q){
   q=(q||"").toLowerCase();
+  const cont=$("#catResults"); if(!cont) return;
   const list=CAT.filter(m=>!q||(m.modelo+" "+m.marca).toLowerCase().includes(q));
-  $("#popCatalogo").innerHTML = `<div class="ph">🏍️ Catálogo — toca una moto para enviarla</div>`+
-    `<div class="buscar2"><input id="qcat" placeholder="Buscar moto…" value="${esc(q)}"></div>`+
-    (list.map((m,i)=>`<div class="it" data-mi="${CAT.indexOf(m)}"><div class="t">${esc(m.marca)} ${esc(m.modelo)}</div><div class="d"><span class="pr">${money(m.comercial)}</span> · inicial ${money(m.cuota_inicial)} · ${esc(m.anio||"")}</div></div>`).join("")||`<div class="it"><div class="d">Sin resultados</div></div>`);
-  $("#popCatalogo").querySelectorAll(".it[data-mi]").forEach(el=>el.onclick=()=>{
+  cont.innerHTML = list.map(m=>`<div class="it" data-mi="${CAT.indexOf(m)}"><div class="t">${esc(m.marca)} ${esc(m.modelo)}</div><div class="d"><span class="pr">${money(m.comercial)}</span> · inicial ${money(m.cuota_inicial)} · ${esc(m.anio||"")}</div></div>`).join("")||`<div class="it"><div class="d">Sin resultados</div></div>`;
+  cont.querySelectorAll(".it[data-mi]").forEach(el=>el.onclick=()=>{
     const m=CAT[+el.dataset.mi];
     const msg=`🏍️ *${m.marca} ${m.modelo}* (${m.anio||""})\n💰 Precio: ${money(m.comercial)}\n💳 Cuota inicial desde: ${money(m.cuota_inicial)}\n\nMira el catálogo completo 👉 ${location.origin}/catalogo`;
     insertar(msg);
   });
-  const qc=$("#qcat"); if(qc){ qc.oninput=()=>pintarCat(qc.value); qc.focus(); }
+}
+function abrirCat(){
+  $("#popCatalogo").innerHTML = `<div class="ph">🏍️ Catálogo — toca una moto para enviarla</div>`+
+    `<div class="buscar2"><input id="qcat" placeholder="Buscar moto…" autocomplete="off"></div>`+
+    `<div id="catResults"></div>`;
+  const qc=$("#qcat"); qc.addEventListener("input",()=>catResultados(qc.value));
+  catResultados(""); qc.focus();
 }
 $("#btnResp").onclick=(e)=>{ e.stopPropagation(); const p=$("#popRespuestas"); const show=p.style.display==="none"; cerrarPops(); if(show){ pintarResp(); p.style.display="block"; } };
-$("#btnCat").onclick=(e)=>{ e.stopPropagation(); const p=$("#popCatalogo"); const show=p.style.display==="none"; cerrarPops(); if(show){ pintarCat(""); p.style.display="block"; } };
+$("#btnCat").onclick=(e)=>{ e.stopPropagation(); const p=$("#popCatalogo"); const show=p.style.display==="none"; cerrarPops(); if(show){ abrirCat(); p.style.display="block"; } };
 document.addEventListener("click",e=>{ if(!e.target.closest(".pop")&&!e.target.closest(".herr")) cerrarPops(); });
 cargarRespuestas(); cargarCatalogo();
 
