@@ -3600,6 +3600,41 @@ app.post("/api/whatsapp/respuestas", requireAuth, (req, res) => {
   catch (e) { return res.status(500).json({ ok: false, error: e.message }); }
 });
 
+// Importar contactos/mensajes del bot viejo (crm.db exportado a JSON) al CRM
+app.post("/api/whatsapp/importar", requireAuth, requireAdmin, (req, res) => {
+  const b = req.body || {};
+  const inLeads = Array.isArray(b.leads) ? b.leads : [];
+  const inMsgs = Array.isArray(b.mensajes) ? b.mensajes : [];
+  let leads = {};
+  try { leads = JSON.parse(fs.readFileSync(WA_LEADS_PATH, "utf8")); } catch {}
+  let nuevos = 0, actualizados = 0;
+  for (const l of inLeads) {
+    const tel = String(l.telefono || "").replace(/[^0-9]/g, "");
+    if (tel.length < 10) continue;
+    const prev = leads[tel];
+    if (!prev) nuevos++; else actualizados++;
+    leads[tel] = {
+      telefono: tel,
+      nombre: l.nombre || (prev && prev.nombre) || "",
+      primerMsg: (prev && prev.primerMsg) || l.primerMsg || l.ultimoMsg || Date.now(),
+      ultimoMsg: Math.max((prev && prev.ultimoMsg) || 0, l.ultimoMsg || 0) || Date.now(),
+      ultimoTexto: String(l.ultimoTexto || (prev && prev.ultimoTexto) || "").slice(0, 300),
+      nMsgs: Math.max((prev && prev.nMsgs) || 0, l.nMsgs || 1),
+      estado: (prev && prev.estado) || l.estado || "nuevo",
+      moto: (prev && prev.moto) || l.moto || "",
+      origen: (prev && prev.origen) || "importado",
+    };
+  }
+  try { fs.writeFileSync(WA_LEADS_PATH, JSON.stringify(leads, null, 2), "utf8"); }
+  catch (e) { return res.status(500).json({ ok: false, error: e.message }); }
+  let msgsImp = 0;
+  if (inMsgs.length) {
+    try { fs.appendFileSync(WA_MSGS_PATH, inMsgs.map(m => JSON.stringify(m)).join("\n") + "\n", "utf8"); msgsImp = inMsgs.length; } catch {}
+  }
+  res.json({ ok: true, leadsNuevos: nuevos, leadsActualizados: actualizados, mensajes: msgsImp, total: Object.keys(leads).length });
+});
+app.get("/importar", requireAuth, requireAdmin, (req, res) => res.sendFile(path.join(__dirname, "importar.html")));
+
 // Página del inbox
 app.get("/inbox", requireAuth, (req, res) => res.sendFile(path.join(__dirname, "inbox.html")));
 // Página de Contactos (CRM)

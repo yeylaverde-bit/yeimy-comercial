@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Importar contactos · CRM Yeimy Laverde</title>
+<style>
+  body{margin:0;background:#f5f8fa;color:#33475b;font-family:-apple-system,Segoe UI,Roboto,Arial,sans-serif;padding:40px}
+  .card{max-width:620px;margin:0 auto;background:#fff;border:1px solid #dfe3eb;border-radius:12px;padding:30px;box-shadow:0 2px 8px rgba(45,62,80,.08)}
+  h1{font-size:20px;margin:0 0 6px}
+  p{color:#516f90;font-size:14px;line-height:1.5}
+  input[type=file]{margin:14px 0;font-size:14px}
+  button{padding:11px 22px;border:0;border-radius:6px;background:#ff7a59;color:#fff;font-weight:600;font-size:14px;cursor:pointer}
+  button:disabled{opacity:.5;cursor:not-allowed}
+  #log{margin-top:18px;background:#f5f8fa;border:1px solid #dfe3eb;border-radius:8px;padding:14px;font-size:13px;white-space:pre-wrap;max-height:260px;overflow:auto;display:none}
+  .ok{color:#00876a;font-weight:600}
+  a{color:#0091ae}
+</style>
+</head>
+<body>
+<div class="card">
+  <h1>📥 Importar contactos al CRM</h1>
+  <p>Sube el archivo <b>crm_export.json</b> (tus contactos y mensajes del bot viejo). Se agregan al CRM sin borrar lo que ya hay.</p>
+  <input type="file" id="archivo" accept=".json,application/json">
+  <br>
+  <button id="btn" disabled>Importar</button>
+  <div id="log"></div>
+  <p style="margin-top:20px"><a href="/contactos">← Volver a Contactos</a></p>
+</div>
+<script>
+const $ = s => document.querySelector(s);
+let datos = null;
+const log = (t,cls)=>{ const l=$("#log"); l.style.display="block"; l.innerHTML += (cls?`<span class="${cls}">${t}</span>`:t)+"\n"; l.scrollTop=l.scrollHeight; };
+$("#archivo").onchange = e => {
+  const f = e.target.files[0]; if(!f) return;
+  const r = new FileReader();
+  r.onload = () => { try{ datos = JSON.parse(r.result); $("#btn").disabled=false;
+    log(`Archivo leído: ${(datos.leads||[]).length} contactos, ${(datos.mensajes||[]).length} mensajes.`); }
+    catch(err){ log("❌ El archivo no es un JSON válido.","ok"); } };
+  r.readAsText(f);
+};
+async function postChunk(payload){
+  const r = await fetch("/api/whatsapp/importar",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)});
+  return r.json();
+}
+$("#btn").onclick = async () => {
+  if(!datos) return;
+  $("#btn").disabled = true;
+  const leads = datos.leads||[], mensajes = datos.mensajes||[];
+  try{
+    // Contactos: en tandas de 200
+    let tot=0;
+    for(let i=0;i<leads.length;i+=200){
+      const r = await postChunk({leads:leads.slice(i,i+200)});
+      tot = r.total||tot; log(`Contactos ${Math.min(i+200,leads.length)}/${leads.length}…`);
+    }
+    log(`✅ Contactos importados. Total en CRM: ${tot}`,"ok");
+    // Mensajes: en tandas de 400
+    let m=0;
+    for(let i=0;i<mensajes.length;i+=400){
+      await postChunk({mensajes:mensajes.slice(i,i+400)}); m+=Math.min(400,mensajes.length-i);
+      if(i%4000===0) log(`Mensajes ${m}/${mensajes.length}…`);
+    }
+    if(mensajes.length) log(`✅ ${mensajes.length} mensajes importados.`,"ok");
+    log(`🎉 ¡Listo! Abre /contactos o /negocios para verlos.`,"ok");
+  }catch(err){ log("❌ Error: "+err.message,"ok"); $("#btn").disabled=false; }
+};
+</script>
+</body>
+</html>
