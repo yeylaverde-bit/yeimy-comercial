@@ -19,6 +19,13 @@
     font-family:"Lexend Deca",-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;font-size:14px}
   .app{display:flex;height:100vh;overflow:hidden}
   .col{display:flex;flex-direction:column;min-height:0}
+  /* ---- Menú lateral ---- */
+  .rail{width:68px;background:#2d3e50;display:flex;flex-direction:column;align-items:center;padding:14px 0;gap:6px;flex-shrink:0;z-index:3}
+  .rail .brand{color:#fff;font-weight:700;font-size:11px;text-align:center;line-height:1.1;margin-bottom:14px;padding:0 6px}
+  .rail a{width:48px;height:48px;border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;color:#aeb9c7;text-decoration:none;font-size:9px}
+  .rail a .ic{font-size:19px}
+  .rail a:hover{background:#425066;color:#fff}
+  .rail a.activo{background:var(--accent);color:#fff}
   /* ---- Columna 1: lista ---- */
   .lista{width:320px;min-width:280px;background:var(--panel);border-right:1px solid var(--line)}
   .lista .top{padding:16px 18px 12px;border-bottom:1px solid var(--line)}
@@ -99,13 +106,21 @@
   .tab.activo{color:var(--accent);border-bottom-color:var(--accent)}
   @media(max-width:1024px){.contacto{display:none}}
   @media(max-width:720px){
-    .lista{width:100%;position:absolute;inset:0;z-index:2}.lista.oculta{display:none}
+    .rail{width:52px}
+    .lista{width:auto;position:absolute;top:0;right:0;bottom:0;left:52px;z-index:2}.lista.oculta{display:none}
     .chat{width:100%}.volver{display:inline-block}
   }
 </style>
 </head>
 <body>
 <div class="app">
+  <nav class="rail">
+    <div class="brand">CRM<br>Yeimy</div>
+    <a href="/inbox" class="activo"><span class="ic">📥</span>Bandeja</a>
+    <a href="/contactos"><span class="ic">👥</span>Contactos</a>
+    <a href="/negocios"><span class="ic">🤝</span>Negocios</a>
+    <a href="/panel"><span class="ic">📊</span>Tablero</a>
+  </nav>
   <aside class="lista col" id="lista">
     <div class="top">
       <h1>📥 Bandeja de entrada</h1>
