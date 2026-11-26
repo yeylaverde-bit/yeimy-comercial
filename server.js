@@ -3537,6 +3537,70 @@ app.get("/api/whatsapp/conversacion", requireAuth, (req, res) => {
   res.json({ ok: true, telefono: tel, mensajes: msgs });
 });
 
+// --- Asistente de IA: sugiere la respuesta al asesor (modo asistente) ---
+// Lee el cerebro de ventas (cerebro-ventas.txt) + el historial del chat y
+// devuelve una respuesta redactada que la asesora revisa y envía con un clic.
+let _cerebroCache = null;
+function cargarCerebro() {
+  if (_cerebroCache !== null) return _cerebroCache;
+  try { _cerebroCache = fs.readFileSync(path.join(__dirname, "cerebro-ventas.txt"), "utf8"); }
+  catch { _cerebroCache = ""; }
+  return _cerebroCache;
+}
+// Quita los bloques internos que el cliente nunca debe ver.
+function limpiarSugerencia(t) {
+  return String(t || "")
+    .replace(/\[FICHA_IMPULSA\][\s\S]*?\[\/FICHA_IMPULSA\]/gi, "")
+    .replace(/\[ESCALAR_YEIMY:[^\]]*\]/gi, "")
+    .replace(/\[AUDIO:[^\]]*\]/gi, "")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+}
+// Convierte el historial a mensajes de Claude: entrante=user, saliente=assistant,
+// fusiona turnos del mismo rol, empieza en 'user' y termina en el cliente.
+function mensajesParaIA(msgs) {
+  const orden = [...msgs].sort((a, b) => new Date(a.ts) - new Date(b.ts));
+  const out = [];
+  for (const m of orden) {
+    const texto = String(m.texto || "").trim();
+    if (!texto) continue;
+    const role = m.direccion === "saliente" ? "assistant" : "user";
+    if (out.length && out[out.length - 1].role === role) {
+      out[out.length - 1].content += "\n" + texto;
+    } else {
+      out.push({ role, content: texto });
+    }
+  }
+  while (out.length && out[0].role === "assistant") out.shift();
+  return out;
+}
+app.post("/api/whatsapp/sugerir", requireAuth, async (req, res) => {
+  if (!anthropic) return res.status(500).json({ ok: false, error: "Falta la ANTHROPIC_API_KEY en el servidor (Render → Environment)." });
+  const tel = String((req.body || {}).telefono || "").replace(/[^0-9]/g, "");
+  if (!tel) return res.status(400).json({ ok: false, error: "Falta teléfono" });
+  const msgs = [];
+  try {
+    const lineas = fs.readFileSync(WA_MSGS_PATH, "utf8").split("\n").filter(Boolean);
+    for (const l of lineas) { try { const r = JSON.parse(l); if (String(r.telefono) === tel) msgs.push(r); } catch {} }
+  } catch {}
+  const mensajes = mensajesParaIA(msgs).slice(-30);
+  if (!mensajes.length) return res.json({ ok: true, sugerencia: "", nota: "Aún no hay mensajes del cliente para sugerir una respuesta." });
+  try {
+    const result = await anthropic.messages.create({
+      model: "claude-sonnet-4-5",
+      max_tokens: 500,
+      temperature: 0.6,
+      system: cargarCerebro(),
+      messages: mensajes,
+    });
+    const crudo = (result.content.find(b => b.type === "text") || {}).text || "";
+    return res.json({ ok: true, sugerencia: limpiarSugerencia(crudo) });
+  } catch (e) {
+    const msg = (e && e.message) || "Error al generar la sugerencia";
+    return res.status(500).json({ ok: false, error: msg });
+  }
+});
+
 // Responder por WhatsApp (Cloud API). Solo funciona dentro de 24h del último
 // mensaje del cliente (regla de Meta para texto libre).
 app.post("/api/whatsapp/responder", requireAuth, async (req, res) => {

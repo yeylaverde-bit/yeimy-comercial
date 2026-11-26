@@ -71,6 +71,9 @@
   .herr{display:flex;gap:8px}
   .hbtn{background:#eef2f7;border:1px solid var(--line);border-radius:6px;padding:6px 11px;font-size:12.5px;font-weight:600;color:var(--soft);cursor:pointer;font-family:inherit}
   .hbtn:hover{background:#e3ecf5;color:var(--txt)}
+  .hbtn.ia{background:#f3eaff;border-color:#e0ccff;color:#7b3fe4}
+  .hbtn.ia:hover{background:#ece0ff;color:#6a2fd0}
+  .hbtn.ia:disabled{opacity:.55;cursor:wait}
   .componer{position:relative}
   .pop{position:absolute;bottom:100%;left:12px;right:12px;margin-bottom:8px;max-height:320px;overflow-y:auto;
     background:#fff;border:1px solid var(--line2);border-radius:10px;box-shadow:0 8px 24px rgba(45,62,80,.18);z-index:9}
@@ -151,6 +154,7 @@
           <textarea id="texto" placeholder="Escribe tu respuesta…"></textarea>
           <div class="cbar">
             <div class="herr">
+              <button class="hbtn ia" id="btnIA" title="La IA te sugiere la respuesta">✨ Sugerir IA</button>
               <button class="hbtn" id="btnResp" title="Respuestas rápidas">⚡ Respuestas</button>
               <button class="hbtn" id="btnCat" title="Enviar una moto del catálogo">🏍️ Catálogo</button>
             </div>
@@ -290,6 +294,24 @@ async function enviar(){
 }
 $("#enviar").onclick = enviar;
 $("#texto").addEventListener("keydown",e=>{ if(e.key==="Enter"&&!e.shiftKey){ e.preventDefault(); enviar(); }});
+
+// ---- Sugerir respuesta con IA (modo asistente) ----
+async function sugerirIA(){
+  if(!actual) return;
+  const btn=$("#btnIA"); const orig=btn.textContent;
+  btn.disabled=true; btn.textContent="✨ Pensando…";
+  try{
+    const r=await fetch("/api/whatsapp/sugerir",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({telefono:actual})});
+    const d=await r.json();
+    if(d.ok){
+      if(d.sugerencia){ $("#texto").value=d.sugerencia; $("#texto").focus(); $("#texto").dispatchEvent(new Event("input")); }
+      else alert(d.nota||"No hay suficiente conversación para sugerir una respuesta.");
+    } else alert("No se pudo sugerir: "+(d.error||""));
+  }catch(e){ alert("Error de red al sugerir."); }
+  btn.disabled=false; btn.textContent=orig;
+}
+$("#btnIA").onclick=sugerirIA;
+$("#texto").addEventListener("input",function(){ this.style.height="46px"; this.style.height=Math.min(this.scrollHeight,130)+"px"; });
 $("#q").addEventListener("input",pintarConvos);
 document.querySelectorAll(".tab").forEach(t=>t.onclick=()=>{ document.querySelectorAll(".tab").forEach(x=>x.classList.remove("activo")); t.classList.add("activo"); filtro=t.dataset.f; pintarConvos(); });
 $("#volver").onclick = ()=>{ $("#lista").classList.remove("oculta"); actual=null; if(timerMsgs)clearInterval(timerMsgs); };
