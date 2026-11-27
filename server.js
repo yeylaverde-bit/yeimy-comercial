@@ -3649,6 +3649,86 @@ app.get("/api/whatsapp/reporte", requireAuth, (req, res) => {
   res.json({ ok: true, generado: now, total: rows.length, rows });
 });
 
+// --- Cruce de ventas reales (Siigo) con los chats de WhatsApp ---
+// Por cada venta (cédula + nombre) busca el chat que coincide: primero por la
+// cédula escrita en la conversación (match fuerte), luego por nombre completo.
+// Con aplicar:true marca ese chat como "vendido" en el pipeline.
+function sinTildes(s) {
+  return String(s || "").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
+}
+app.post("/api/whatsapp/cruzar-ventas", requireAuth, requireAdmin, (req, res) => {
+  const ventas = Array.isArray((req.body || {}).ventas) ? req.body.ventas : null;
+  const aplicar = !!(req.body || {}).aplicar;
+  if (!ventas) return res.status(400).json({ ok: false, error: "Falta la lista de ventas" });
+
+  let leads = {};
+  try { leads = JSON.parse(fs.readFileSync(WA_LEADS_PATH, "utf8")); } catch {}
+  // Índice por teléfono: texto concatenado (sin tildes) + set de números largos (posibles cédulas).
+  const textoTel = {}, numsTel = {};
+  try {
+    const lineas = fs.readFileSync(WA_MSGS_PATH, "utf8").split("\n").filter(Boolean);
+    for (const l of lineas) {
+      try {
+        const r = JSON.parse(l); if (!r || !r.texto) continue;
+        const t = String(r.telefono);
+        textoTel[t] = (textoTel[t] || "") + " " + sinTildes(r.texto);
+        const ns = String(r.texto).match(/\d{6,12}/g);
+        if (ns) { (numsTel[t] = numsTel[t] || new Set()); ns.forEach(n => numsTel[t].add(n)); }
+      } catch {}
+    }
+  } catch {}
+  const telNombre = {};
+  for (const t in leads) telNombre[t] = sinTildes(leads[t].nombre || "");
+
+  const resultados = [];
+  for (const v of ventas) {
+    const cc = String(v.cc || "").replace(/\D/g, "");
+    const nombre = sinTildes(v.nombre || "");
+    const palabras = nombre.split(/\s+/).filter(w => w.length >= 3);
+    const primer = palabras[0] || "";
+    const apellidos = palabras.slice(-2); // últimos 2 = apellidos típicamente
+    let telefono = null, via = null, candidatos = 0;
+
+    // 1) Por cédula escrita en el chat (fuerte; cédula de 7+ dígitos)
+    if (cc.length >= 7) {
+      const hits = Object.keys(numsTel).filter(t => numsTel[t].has(cc));
+      candidatos = hits.length;
+      if (hits.length === 1) { telefono = hits[0]; via = "cédula"; }
+      else if (hits.length > 1) { // desempata por el más reciente
+        telefono = hits.sort((a, b) => (leads[b]?.ultimoMsg || 0) - (leads[a]?.ultimoMsg || 0))[0]; via = "cédula (varios)";
+      }
+    }
+    // 2) Por nombre completo (nombre del lead o mencionado en el chat)
+    if (!telefono && primer && apellidos.length) {
+      const hits = Object.keys(leads).filter(t => {
+        const n = telNombre[t] || "";
+        const enNombre = n.includes(primer) && apellidos.some(a => n.includes(a));
+        const enTexto = (textoTel[t] || "").includes(primer) && apellidos.every(a => (textoTel[t] || "").includes(a));
+        return enNombre || enTexto;
+      });
+      candidatos = hits.length;
+      if (hits.length === 1) { telefono = hits[0]; via = "nombre"; }
+      else if (hits.length > 1) { telefono = hits.sort((a, b) => (leads[b]?.ultimoMsg || 0) - (leads[a]?.ultimoMsg || 0))[0]; via = "nombre (varios)"; }
+    }
+    resultados.push({ cc, nombre: v.nombre || "", moto: v.moto || "", fecha: v.fecha || "", telefono, via, candidatos });
+  }
+
+  // Aplicar: marca vendido los que tengan match
+  let marcados = 0;
+  if (aplicar) {
+    for (const r of resultados) {
+      if (r.telefono && leads[r.telefono]) {
+        leads[r.telefono].estado = "vendido";
+        if (!leads[r.telefono].moto && r.moto) leads[r.telefono].moto = r.moto;
+        marcados++;
+      }
+    }
+    try { fs.writeFileSync(WA_LEADS_PATH, JSON.stringify(leads, null, 2), "utf8"); } catch (e) { return res.status(500).json({ ok: false, error: "No se pudo guardar: " + e.message }); }
+  }
+  const conMatch = resultados.filter(r => r.telefono).length;
+  res.json({ ok: true, total: ventas.length, conMatch, sinMatch: ventas.length - conMatch, aplicado: aplicar, marcados, resultados });
+});
+
 // Responder por WhatsApp (Cloud API). Solo funciona dentro de 24h del último
 // mensaje del cliente (regla de Meta para texto libre).
 app.post("/api/whatsapp/responder", requireAuth, async (req, res) => {
