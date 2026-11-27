@@ -3656,10 +3656,21 @@ app.get("/api/whatsapp/reporte", requireAuth, (req, res) => {
 function sinTildes(s) {
   return String(s || "").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
 }
-app.post("/api/whatsapp/cruzar-ventas", requireAuth, requireAdmin, (req, res) => {
+let clientesTelCache = { data: null, fetchedAt: 0 };
+app.post("/api/whatsapp/cruzar-ventas", requireAuth, requireAdmin, async (req, res) => {
   const ventas = Array.isArray((req.body || {}).ventas) ? req.body.ventas : null;
   const aplicar = !!(req.body || {}).aplicar;
   if (!ventas) return res.status(400).json({ ok: false, error: "Falta la lista de ventas" });
+
+  // Teléfonos de los clientes desde Siigo (cédula → {nombre, tels}) para el match fuerte.
+  let mapaTel = {};
+  try {
+    const now = Date.now();
+    if (!clientesTelCache.data || (now - clientesTelCache.fetchedAt) > 10 * 60 * 1000) {
+      clientesTelCache = { data: await siigo.obtenerMapaClientesTel(), fetchedAt: now };
+    }
+    mapaTel = clientesTelCache.data || {};
+  } catch (e) { mapaTel = {}; }
 
   let leads = {};
   try { leads = JSON.parse(fs.readFileSync(WA_LEADS_PATH, "utf8")); } catch {}
@@ -3689,8 +3700,15 @@ app.post("/api/whatsapp/cruzar-ventas", requireAuth, requireAdmin, (req, res) =>
     const apellidos = palabras.slice(-2); // últimos 2 = apellidos típicamente
     let telefono = null, via = null, candidatos = 0;
 
+    // 0) Por teléfono del cliente en Siigo ↔ teléfono del chat (match más fuerte)
+    const infoTel = mapaTel[cc] || mapaTel[String(v.cc || "").trim()];
+    const telsSiigo = (infoTel && infoTel.tels) || [];
+    for (const t of telsSiigo) {
+      if (leads[t]) { telefono = t; via = "teléfono Siigo"; candidatos = 1; break; }
+    }
+
     // 1) Por cédula escrita en el chat (fuerte; cédula de 7+ dígitos)
-    if (cc.length >= 7) {
+    if (!telefono && cc.length >= 7) {
       const hits = Object.keys(numsTel).filter(t => numsTel[t].has(cc));
       candidatos = hits.length;
       if (hits.length === 1) { telefono = hits[0]; via = "cédula"; }
@@ -3710,7 +3728,7 @@ app.post("/api/whatsapp/cruzar-ventas", requireAuth, requireAdmin, (req, res) =>
       if (hits.length === 1) { telefono = hits[0]; via = "nombre"; }
       else if (hits.length > 1) { telefono = hits.sort((a, b) => (leads[b]?.ultimoMsg || 0) - (leads[a]?.ultimoMsg || 0))[0]; via = "nombre (varios)"; }
     }
-    resultados.push({ cc, nombre: v.nombre || "", moto: v.moto || "", fecha: v.fecha || "", telefono, via, candidatos });
+    resultados.push({ cc, nombre: v.nombre || "", moto: v.moto || "", fecha: v.fecha || "", telefono, via, candidatos, telSiigo: telsSiigo[0] || "", leadExiste: telefono ? true : telsSiigo.some(t => !!leads[t]) });
   }
 
   // Aplicar: marca vendido los que tengan match

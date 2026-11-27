@@ -654,7 +654,62 @@ async function obtenerMapaClientes({ pageSize = 100, maxPaginas = 100 } = {}) {
   return mapa;
 }
 
+// Normaliza un teléfono colombiano al formato 57XXXXXXXXXX (celular). "" si no sirve.
+function normTelCo(s) {
+  const d = String(s || "").replace(/\D/g, "");
+  if (/^3\d{9}$/.test(d)) return "57" + d;            // 3001234567
+  if (/^57\d{10}$/.test(d) && d[2] === "3") return d; // 573001234567
+  if (/^\d{12}$/.test(d) && d.startsWith("573")) return d;
+  return "";
+}
+
+/**
+ * Mapa identificación → { nombre, tels:[...] } del catálogo de clientes de Siigo.
+ * Igual que obtenerMapaClientes pero además extrae los teléfonos (celulares) del
+ * cliente, para poder cruzar una venta con el chat de WhatsApp por número.
+ */
+async function obtenerMapaClientesTel({ pageSize = 100, maxPaginas = 100 } = {}) {
+  const jwt = await obtenerToken();
+  const mapa = {};
+  let page = 1;
+
+  while (page <= maxPaginas) {
+    const url = `${SIIGO_BASE}/v1/customers?page=${page}&page_size=${pageSize}`;
+    const resp = await fetch(url, {
+      headers: { "Authorization": `Bearer ${jwt}`, "Partner-Id": PARTNER_ID },
+    });
+    if (resp.status === 401) {
+      tokenCache = { jwt: null, expiresAt: 0 };
+      if (page === 1) return obtenerMapaClientesTel({ pageSize, maxPaginas });
+      throw new Error("Siigo 401 (customers) después de renovar token");
+    }
+    if (resp.status === 429) { await new Promise(r => setTimeout(r, 1500)); continue; }
+    if (!resp.ok) {
+      const txt = await resp.text().catch(() => "");
+      throw new Error(`Siigo /v1/customers ${resp.status}: ${txt.slice(0, 200)}`);
+    }
+    const data = await resp.json();
+    const results = Array.isArray(data) ? data : (data.results || data.data || []);
+    if (!results.length) break;
+    for (const c of results) {
+      const id = String(c.identification || "").trim();
+      if (!id) continue;
+      const tels = new Set();
+      const push = x => { const t = normTelCo(x); if (t) tels.add(t); };
+      (c.phones || []).forEach(p => push(p && (p.number || p)));
+      (c.contacts || []).forEach(ct => { if (ct) { push(ct.phone); push(ct.mobile); } });
+      push(c.mobile); push(c.phone);
+      const nombre = (Array.isArray(c.name) ? c.name.join(" ") : (c.name || "")) || c.commercial_name || "";
+      mapa[id] = { nombre: String(nombre).trim(), tels: [...tels] };
+    }
+    if (results.length < pageSize) break;
+    page++;
+  }
+  return mapa;
+}
+
 module.exports = {
+  obtenerMapaClientesTel,
   siigoConfigurado,
   obtenerToken,
   obtenerProductos,
