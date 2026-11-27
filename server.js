@@ -3744,7 +3744,12 @@ app.post("/api/whatsapp/cruzar-ventas", requireAuth, requireAdmin, async (req, r
     try { fs.writeFileSync(WA_LEADS_PATH, JSON.stringify(leads, null, 2), "utf8"); } catch (e) { return res.status(500).json({ ok: false, error: "No se pudo guardar: " + e.message }); }
   }
   const conMatch = resultados.filter(r => r.telefono).length;
-  res.json({ ok: true, total: ventas.length, conMatch, sinMatch: ventas.length - conMatch, aplicado: aplicar, marcados, resultados });
+  const diag = {
+    clientesSiigo: Object.keys(mapaTel).length,
+    clientesConTel: Object.values(mapaTel).filter(c => c.tels && c.tels.length).length,
+    ejemplo: (() => { const k = Object.keys(mapaTel)[0]; return k ? { cc: k, ...mapaTel[k] } : null; })(),
+  };
+  res.json({ ok: true, total: ventas.length, conMatch, sinMatch: ventas.length - conMatch, aplicado: aplicar, marcados, diag, resultados });
 });
 
 // Responder por WhatsApp (Cloud API). Solo funciona dentro de 24h del último
