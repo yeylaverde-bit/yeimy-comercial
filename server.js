@@ -3601,6 +3601,54 @@ app.post("/api/whatsapp/sugerir", requireAuth, async (req, res) => {
   }
 });
 
+// --- Reporte de efectividad por marca (TVS / MOBILITY) + soporte por lead ---
+// Deduce la marca de interés escaneando lo que se habló en cada chat
+// (igual que la asesora: "apache"->TVS, "mrx"->MOBILITY), y arma una fila por
+// cada lead con su etapa, etiqueta, fechas y días sin contacto (seguimiento).
+const MARCA_KW = {
+  MOBILITY: ["mrx", "mobility", "arizona", "venom", "nitro", "switch", "combat", "new life", "advance r", "advance 125", "one mp", "victory", "bet abs"],
+  TVS: ["apache", "raider", "ntorq", "dazz", "neon nx", "king deluxe", "rtr", "sport 100", "sport kls", " els", " tvs "],
+  OTRA: ["agility", "fusion", "kymco", "tricargo", "ceronte", "carguero"],
+};
+function clasificarMarca(txt) {
+  const h = { MOBILITY: 0, TVS: 0, OTRA: 0 };
+  const t = " " + String(txt || "").toLowerCase() + " ";
+  for (const m in MARCA_KW) for (const k of MARCA_KW[m]) { if (t.includes(k)) h[m]++; }
+  const best = Object.keys(h).sort((a, b) => h[b] - h[a])[0];
+  return h[best] > 0 ? best : "SIN_DEFINIR";
+}
+app.get("/api/whatsapp/reporte", requireAuth, (req, res) => {
+  let leadsObj = {};
+  try { leadsObj = JSON.parse(fs.readFileSync(WA_LEADS_PATH, "utf8")); } catch {}
+  // Junta todos los textos de cada teléfono en una sola pasada.
+  const textoPorTel = {};
+  try {
+    const lineas = fs.readFileSync(WA_MSGS_PATH, "utf8").split("\n").filter(Boolean);
+    for (const l of lineas) {
+      try { const r = JSON.parse(l); if (r && r.texto) { const t = String(r.telefono); (textoPorTel[t] = textoPorTel[t] || []).push(String(r.texto)); } } catch {}
+    }
+  } catch {}
+  const now = Date.now();
+  const rows = Object.keys(leadsObj).map(tel => {
+    const L = leadsObj[tel] || {};
+    const blob = (L.moto || "") + " " + (L.ultimoTexto || "") + " " + ((textoPorTel[tel] || []).join(" "));
+    const ultimo = L.ultimoMsg || 0;
+    return {
+      telefono: tel,
+      nombre: L.nombre || "",
+      marca: clasificarMarca(blob),
+      moto: L.moto || "",
+      estado: L.estado || "nuevo",
+      etiqueta: L.etiqueta || "",
+      primerMsg: L.primerMsg || null,
+      ultimoMsg: ultimo || null,
+      dias: ultimo ? Math.floor((now - ultimo) / 86400000) : null,
+      nMsgs: L.nMsgs || 0,
+    };
+  });
+  res.json({ ok: true, generado: now, total: rows.length, rows });
+});
+
 // Responder por WhatsApp (Cloud API). Solo funciona dentro de 24h del último
 // mensaje del cliente (regla de Meta para texto libre).
 app.post("/api/whatsapp/responder", requireAuth, async (req, res) => {
@@ -3736,6 +3784,8 @@ app.get("/inbox", requireAuth, (req, res) => res.sendFile(path.join(__dirname, "
 app.get("/contactos", requireAuth, (req, res) => res.sendFile(path.join(__dirname, "contactos.html")));
 // Página de Negocios / Pipeline (CRM)
 app.get("/negocios", requireAuth, (req, res) => res.sendFile(path.join(__dirname, "negocios.html")));
+// Página de Reporte / Efectividad (CRM)
+app.get("/reporte", requireAuth, (req, res) => res.sendFile(path.join(__dirname, "reporte.html")));
 
 // Todo lo demás requiere sesión
 app.use(requireAuth);
