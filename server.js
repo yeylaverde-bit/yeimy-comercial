@@ -3661,6 +3661,7 @@ app.post("/api/whatsapp/cruzar-ventas", requireAuth, requireAdmin, async (req, r
   const ventas = Array.isArray((req.body || {}).ventas) ? req.body.ventas : null;
   const aplicar = !!(req.body || {}).aplicar;
   const crearFaltantes = !!(req.body || {}).crearFaltantes;
+  const sincronizar = !!(req.body || {}).sincronizar;
   if (!ventas) return res.status(400).json({ ok: false, error: "Falta la lista de ventas" });
 
   // Teléfonos de los clientes desde Siigo (cédula → {nombre, tels}) para el match fuerte.
@@ -3734,7 +3735,7 @@ app.post("/api/whatsapp/cruzar-ventas", requireAuth, requireAdmin, async (req, r
 
   // Aplicar: marca vendido los que tengan match; crearFaltantes crea la venta
   // como contacto nuevo (con el tel/nombre de Siigo) cuando no hay chat.
-  let marcados = 0, creados = 0;
+  let marcados = 0, creados = 0; const revertidos = [];
   if (aplicar) {
     for (const r of resultados) {
       if (r.telefono && leads[r.telefono]) {
@@ -3752,6 +3753,17 @@ app.post("/api/whatsapp/cruzar-ventas", requireAuth, requireAdmin, async (req, r
         creados++; marcados++;
       }
     }
+    // sincronizar: deja vendido SOLO los teléfonos de estas ventas (Siigo);
+    // cualquier otro lead que estuviera vendido vuelve a "nuevo".
+    if (sincronizar) {
+      const oficiales = new Set(resultados.filter(r => r.telefono).map(r => r.telefono));
+      for (const t in leads) {
+        if (leads[t].estado === "vendido" && !oficiales.has(t)) {
+          leads[t].estado = "nuevo";
+          revertidos.push({ telefono: t, nombre: leads[t].nombre || "", etiqueta: leads[t].etiqueta || "" });
+        }
+      }
+    }
     try { fs.writeFileSync(WA_LEADS_PATH, JSON.stringify(leads, null, 2), "utf8"); } catch (e) { return res.status(500).json({ ok: false, error: "No se pudo guardar: " + e.message }); }
   }
   const conMatch = resultados.filter(r => r.telefono).length;
@@ -3760,7 +3772,7 @@ app.post("/api/whatsapp/cruzar-ventas", requireAuth, requireAdmin, async (req, r
     clientesConTel: Object.values(mapaTel).filter(c => c.tels && c.tels.length).length,
     ejemplo: (() => { const k = Object.keys(mapaTel)[0]; return k ? { cc: k, ...mapaTel[k] } : null; })(),
   };
-  res.json({ ok: true, total: ventas.length, conMatch, sinMatch: ventas.length - conMatch, aplicado: aplicar, marcados, creados, diag, resultados });
+  res.json({ ok: true, total: ventas.length, conMatch, sinMatch: ventas.length - conMatch, aplicado: aplicar, marcados, creados, revertidos, diag, resultados });
 });
 
 // Responder por WhatsApp (Cloud API). Solo funciona dentro de 24h del último
