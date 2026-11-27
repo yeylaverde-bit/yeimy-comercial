@@ -3660,6 +3660,7 @@ let clientesTelCache = { data: null, fetchedAt: 0 };
 app.post("/api/whatsapp/cruzar-ventas", requireAuth, requireAdmin, async (req, res) => {
   const ventas = Array.isArray((req.body || {}).ventas) ? req.body.ventas : null;
   const aplicar = !!(req.body || {}).aplicar;
+  const crearFaltantes = !!(req.body || {}).crearFaltantes;
   if (!ventas) return res.status(400).json({ ok: false, error: "Falta la lista de ventas" });
 
   // Teléfonos de los clientes desde Siigo (cédula → {nombre, tels}) para el match fuerte.
@@ -3731,14 +3732,24 @@ app.post("/api/whatsapp/cruzar-ventas", requireAuth, requireAdmin, async (req, r
     resultados.push({ cc, nombre: v.nombre || "", moto: v.moto || "", fecha: v.fecha || "", telefono, via, candidatos, telSiigo: telsSiigo[0] || "", leadExiste: telefono ? true : telsSiigo.some(t => !!leads[t]) });
   }
 
-  // Aplicar: marca vendido los que tengan match
-  let marcados = 0;
+  // Aplicar: marca vendido los que tengan match; crearFaltantes crea la venta
+  // como contacto nuevo (con el tel/nombre de Siigo) cuando no hay chat.
+  let marcados = 0, creados = 0;
   if (aplicar) {
     for (const r of resultados) {
       if (r.telefono && leads[r.telefono]) {
         leads[r.telefono].estado = "vendido";
         if (!leads[r.telefono].moto && r.moto) leads[r.telefono].moto = r.moto;
         marcados++;
+      } else if (crearFaltantes && r.telSiigo && !leads[r.telSiigo]) {
+        const ts = Date.parse(r.fecha) || Date.now();
+        leads[r.telSiigo] = {
+          telefono: r.telSiigo, nombre: r.nombre || "", primerMsg: ts, ultimoMsg: ts,
+          ultimoTexto: "🧾 Venta registrada en Siigo", nMsgs: 0, estado: "vendido",
+          moto: r.moto || "", etiqueta: "Venta", origen: "Siigo",
+        };
+        r.telefono = r.telSiigo; r.via = "creado desde Siigo";
+        creados++; marcados++;
       }
     }
     try { fs.writeFileSync(WA_LEADS_PATH, JSON.stringify(leads, null, 2), "utf8"); } catch (e) { return res.status(500).json({ ok: false, error: "No se pudo guardar: " + e.message }); }
@@ -3749,7 +3760,7 @@ app.post("/api/whatsapp/cruzar-ventas", requireAuth, requireAdmin, async (req, r
     clientesConTel: Object.values(mapaTel).filter(c => c.tels && c.tels.length).length,
     ejemplo: (() => { const k = Object.keys(mapaTel)[0]; return k ? { cc: k, ...mapaTel[k] } : null; })(),
   };
-  res.json({ ok: true, total: ventas.length, conMatch, sinMatch: ventas.length - conMatch, aplicado: aplicar, marcados, diag, resultados });
+  res.json({ ok: true, total: ventas.length, conMatch, sinMatch: ventas.length - conMatch, aplicado: aplicar, marcados, creados, diag, resultados });
 });
 
 // Responder por WhatsApp (Cloud API). Solo funciona dentro de 24h del último
