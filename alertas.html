@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Alertas · CRM Yeimy Laverde</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Lexend+Deca:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f5f8fa; --panel:#ffffff; --line:#dfe3eb; --line2:#cbd6e2;
+    --txt:#33475b; --muted:#7c98b6; --soft:#516f90;
+    --accent:#ff7a59; --link:#0091ae; --nav:#2d3e50; --nav-h:#425066;
+    --alert:#e0697f; --alert-bg:#fdecef; --ok:#00bda5;
+    --shadow:0 1px 2px rgba(45,62,80,.08),0 2px 6px rgba(45,62,80,.06);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;background:var(--bg);color:var(--txt);
+    font-family:"Lexend Deca",-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;font-size:14px}
+  .app{display:flex;height:100vh;overflow:hidden}
+  .rail{width:68px;background:var(--nav);display:flex;flex-direction:column;align-items:center;padding:14px 0;gap:6px;flex-shrink:0}
+  .rail .brand{color:#fff;font-weight:700;font-size:11px;text-align:center;line-height:1.1;margin-bottom:14px;padding:0 6px}
+  .rail a{position:relative;width:48px;height:48px;border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;color:#aeb9c7;text-decoration:none;font-size:9px}
+  .rail a .ic{font-size:19px}
+  .rail a:hover{background:var(--nav-h);color:#fff}
+  .rail a.activo{background:var(--accent);color:#fff}
+  .rail a .badge{position:absolute;top:4px;right:6px;background:var(--alert);color:#fff;border-radius:999px;font-size:9px;font-weight:700;min-width:15px;height:15px;display:flex;align-items:center;justify-content:center;padding:0 3px}
+  .main{flex:1;display:flex;flex-direction:column;min-width:0}
+  .top{background:var(--panel);border-bottom:1px solid var(--line);padding:16px 26px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+  .top h1{margin:0;font-size:19px;font-weight:700}
+  .top .count{color:var(--muted);font-size:13px;margin-top:2px}
+  .btnx{padding:9px 15px;border:1px solid var(--line2);border-radius:6px;background:#fff;color:var(--soft);font-weight:600;cursor:pointer;font-size:13px;font-family:inherit}
+  .btnx:hover{background:#f0f4f8;color:var(--txt)}
+  .wrap{flex:1;overflow:auto;padding:22px 26px}
+  .hero{display:flex;gap:14px;align-items:center;background:var(--alert-bg);border:1px solid #f6c9d2;border-radius:12px;padding:18px 20px;margin-bottom:22px}
+  .hero .big{font-size:40px;font-weight:700;color:var(--alert);line-height:1}
+  .hero .tx{font-size:13.5px;color:var(--soft)}
+  .hero .tx b{color:var(--txt)}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:10px;overflow:hidden;box-shadow:var(--shadow)}
+  table{width:100%;border-collapse:collapse}
+  thead th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);
+    padding:12px 16px;border-bottom:1px solid var(--line);background:#f9fbfd;font-weight:600;white-space:nowrap}
+  tbody td{padding:13px 16px;border-bottom:1px solid var(--line);font-size:13px;vertical-align:top}
+  tbody tr:hover{background:#fff7f8}
+  .cliente .n{font-weight:600}
+  .muted{color:var(--muted)}
+  .moto{font-weight:500}
+  .vend{display:inline-block;background:#fde9e3;color:#c4472a;border-radius:5px;padding:2px 9px;font-size:12px;font-weight:600}
+  .via{display:inline-block;background:#eaf0f6;color:var(--soft);border-radius:5px;padding:1px 7px;font-size:10.5px;font-weight:600}
+  .wa{color:#1a8a4e;text-decoration:none;font-weight:600;font-size:12.5px;white-space:nowrap}
+  .wa:hover{text-decoration:underline}
+  .vacio{padding:50px;text-align:center;color:var(--muted)}
+  .vacio .em{font-size:40px}
+  .loading{padding:40px;text-align:center;color:var(--muted)}
+  @media(max-width:720px){.rail{width:54px}.col-hide{display:none}}
+</style>
+</head>
+<body>
+<div class="app">
+  <nav class="rail">
+    <div class="brand">CRM<br>Yeimy</div>
+    <a href="/inbox"><span class="ic">📥</span>Bandeja</a>
+    <a href="/contactos"><span class="ic">👥</span>Contactos</a>
+    <a href="/negocios"><span class="ic">🤝</span>Negocios</a>
+    <a href="/reporte"><span class="ic">📈</span>Reporte</a>
+    <a href="/alertas" class="activo"><span class="ic">🚨</span>Alertas</a>
+    <a href="/panel"><span class="ic">📊</span>Tablero</a>
+  </nav>
+  <div class="main">
+    <div class="top">
+      <div>
+        <h1>🚨 Alertas — clientes robados</h1>
+        <div class="count" id="count">buscando en Siigo…</div>
+      </div>
+      <button class="btnx" id="btnRefrescar">🔄 Refrescar</button>
+    </div>
+    <div class="wrap">
+      <div class="hero" id="hero" style="display:none">
+        <div class="big" id="heroNum">0</div>
+        <div class="tx" id="heroTx"></div>
+      </div>
+      <div class="card">
+        <table>
+          <thead><tr>
+            <th>Tu cliente</th><th>Moto facturada</th><th>Facturó</th>
+            <th class="col-hide">Fecha</th><th class="col-hide">Detectado por</th><th></th>
+          </tr></thead>
+          <tbody id="tbody"><tr><td colspan="6" class="loading">⏳ Revisando las facturas de Siigo contra tus chats… (puede tardar unos segundos)</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+const $ = s => document.querySelector(s);
+const esc = s => String(s||"").replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+const fmtF = s => { try{ return s?new Date(s).toLocaleDateString("es-CO",{day:"2-digit",month:"short",year:"numeric"}):"—"; }catch{return "—";} };
+
+async function cargar(){
+  $("#count").textContent = "buscando en Siigo…";
+  try{
+    const r = await fetch("/api/whatsapp/robados");
+    const d = await r.json();
+    if(!d.ok){ throw new Error(d.error||"fallo"); }
+    const a = d.alertas||[];
+    $("#count").textContent = `${a.length} alerta(s) · ${new Date(d.generado).toLocaleString("es-CO",{day:"2-digit",month:"short",hour:"2-digit",minute:"2-digit"})}`;
+    pintarBadge(a.length);
+    if(!a.length){
+      $("#hero").style.display="none";
+      $("#tbody").innerHTML = `<tr><td colspan="6" class="vacio"><div class="em">✅</div>¡Todo en orden!<br>Ningún cliente tuyo aparece facturado por otro asesor.</td></tr>`;
+      return;
+    }
+    $("#hero").style.display="flex";
+    $("#heroNum").textContent = a.length;
+    $("#heroTx").innerHTML = `<b>${a.length} cliente(s) que tú atendiste por WhatsApp fueron facturados por OTRO asesor.</b><br>Revísalos: puede que te estén quitando comisiones. Reclama con el soporte de tu chat.`;
+    $("#tbody").innerHTML = a.map(x=>`
+      <tr>
+        <td class="cliente">
+          <div class="n">${esc(x.clienteChat || x.clienteSiigo || ("+"+x.telefono))}</div>
+          <div class="muted">+${esc(x.telefono)}${x.cc?` · CC ${esc(x.cc)}`:""}</div>
+        </td>
+        <td class="moto">🏍️ ${esc(x.moto||"—")}</td>
+        <td><span class="vend">${esc(x.vendedor||"—")}</span></td>
+        <td class="muted col-hide">${fmtF(x.fecha)}</td>
+        <td class="col-hide"><span class="via">${esc(x.via||"")}</span></td>
+        <td><a class="wa" href="https://wa.me/${esc(x.telefono)}" target="_blank" rel="noopener">Abrir chat ↗</a></td>
+      </tr>`).join("");
+  }catch(e){
+    $("#count").textContent = "No se pudo cargar.";
+    $("#tbody").innerHTML = `<tr><td colspan="6" class="vacio">No se pudo leer Siigo ahora.<br><span class="muted">${esc(e.message||"")}</span></td></tr>`;
+  }
+}
+function pintarBadge(n){
+  const link = document.querySelector('.rail a[href="/alertas"]');
+  let b = link.querySelector(".badge");
+  if(n>0){ if(!b){ b=document.createElement("span"); b.className="badge"; link.appendChild(b);} b.textContent=n>99?"99+":n; }
+  else if(b){ b.remove(); }
+}
+$("#btnRefrescar").onclick=cargar;
+cargar();
+</script>
+</body>
+</html>

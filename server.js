@@ -3775,6 +3775,82 @@ app.post("/api/whatsapp/cruzar-ventas", requireAuth, requireAdmin, async (req, r
   res.json({ ok: true, total: ventas.length, conMatch, sinMatch: ventas.length - conMatch, aplicado: aplicar, marcados, creados, revertidos, diag, resultados });
 });
 
+// --- ALERTA: clientes míos facturados por OTRO asesor (clientes robados) ---
+// Recorre las facturas de Siigo de otros vendedores (no Yeimy) y, si el cliente
+// empata con uno de mis chats de WhatsApp (por teléfono de Siigo o cédula escrita
+// en el chat), lo reporta como alerta.
+app.get("/api/whatsapp/robados", requireAuth, requireAdmin, async (req, res) => {
+  const now = Date.now();
+  let facturas, mapaTel;
+  try {
+    if (!facturasCache.data || (now - facturasCache.fetchedAt) > FACTURAS_CACHE_MS) {
+      facturasCache = { data: await siigo.obtenerFacturasVenta(), fetchedAt: now };
+    }
+    facturas = facturasCache.data || [];
+    if (!clientesTelCache.data || (now - clientesTelCache.fetchedAt) > 10 * 60 * 1000) {
+      clientesTelCache = { data: await siigo.obtenerMapaClientesTel(), fetchedAt: now };
+    }
+    mapaTel = clientesTelCache.data || {};
+  } catch (e) { return res.status(502).json({ ok: false, error: "No se pudo leer Siigo: " + e.message }); }
+
+  // Mis clientes atendidos = leads de WhatsApp (por teléfono) + cédulas escritas en el chat.
+  let leads = {};
+  try { leads = JSON.parse(fs.readFileSync(WA_LEADS_PATH, "utf8")); } catch {}
+  const numsTel = {};
+  try {
+    const lineas = fs.readFileSync(WA_MSGS_PATH, "utf8").split("\n").filter(Boolean);
+    for (const l of lineas) {
+      try { const r = JSON.parse(l); if (!r || !r.texto) continue; const t = String(r.telefono);
+        const ns = String(r.texto).match(/\d{6,12}/g); if (ns) { (numsTel[t] = numsTel[t] || new Set()); ns.forEach(n => numsTel[t].add(n)); }
+      } catch {}
+    }
+  } catch {}
+
+  const alertas = [];
+  const vistos = new Set();
+  for (const f of facturas) {
+    const vendedor = (siigo.vendedorDesdeObservaciones(f.observations) || "").toUpperCase().trim();
+    if (!vendedor || vendedor.includes("YEIM")) continue; // mía o sin vendedor → no es robo
+
+    const cc = String(f.customer?.identification || "").replace(/\D/g, "");
+    const nombre = (f.customer?.name?.join?.(" ") || f.customer?.commercial_name || "").trim();
+    // Motos de la factura
+    const motos = [];
+    for (const it of (f.items || [])) {
+      const p = siigo.parseDescripcion(String(it.description || "").replace(/CHAISIS/gi, "CHASIS"));
+      if (p.chasis) motos.push((p.modelo || "").trim());
+    }
+    if (!motos.length) continue; // factura sin moto → ignorar
+
+    // ¿El cliente es uno de mis chats?
+    let telefono = null, via = null;
+    const info = mapaTel[cc];
+    const tels = (info && info.tels) || [];
+    for (const t of tels) { if (leads[t]) { telefono = t; via = "teléfono"; break; } }
+    if (!telefono && cc.length >= 7) {
+      const hit = Object.keys(numsTel).find(t => numsTel[t].has(cc));
+      if (hit && leads[hit]) { telefono = hit; via = "cédula en el chat"; }
+    }
+    if (!telefono) continue; // no es cliente mío
+
+    const key = telefono + "|" + motos.join(",") + "|" + vendedor;
+    if (vistos.has(key)) continue; vistos.add(key);
+    alertas.push({
+      telefono,
+      clienteChat: leads[telefono].nombre || "",
+      clienteSiigo: nombre || (info && info.nombre) || "",
+      cc,
+      moto: motos.join(" | "),
+      vendedor,
+      fecha: f.date || "",
+      via,
+      factura: f.name || `${f.prefix || ""}-${f.number}`,
+    });
+  }
+  alertas.sort((a, b) => String(b.fecha).localeCompare(String(a.fecha)));
+  res.json({ ok: true, generado: now, total: alertas.length, alertas });
+});
+
 // Responder por WhatsApp (Cloud API). Solo funciona dentro de 24h del último
 // mensaje del cliente (regla de Meta para texto libre).
 app.post("/api/whatsapp/responder", requireAuth, async (req, res) => {
@@ -3912,6 +3988,8 @@ app.get("/contactos", requireAuth, (req, res) => res.sendFile(path.join(__dirnam
 app.get("/negocios", requireAuth, (req, res) => res.sendFile(path.join(__dirname, "negocios.html")));
 // Página de Reporte / Efectividad (CRM)
 app.get("/reporte", requireAuth, (req, res) => res.sendFile(path.join(__dirname, "reporte.html")));
+// Página de Alertas (clientes robados por otro asesor)
+app.get("/alertas", requireAuth, (req, res) => res.sendFile(path.join(__dirname, "alertas.html")));
 
 // Todo lo demás requiere sesión
 app.use(requireAuth);
