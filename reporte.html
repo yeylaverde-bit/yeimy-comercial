@@ -102,6 +102,14 @@
       <button class="btnx pri" id="btnExport">⬇️ Exportar a Excel</button>
     </div>
     <div class="wrap">
+      <!-- Filtro por fecha (afecta todo el reporte) -->
+      <div class="ctrl" style="margin-bottom:14px">
+        <span style="font-weight:600;color:var(--soft)">📅 Rango:</span>
+        <label class="muted" style="font-size:12.5px">Desde <input type="date" id="fDesde"></label>
+        <label class="muted" style="font-size:12.5px">Hasta <input type="date" id="fHasta"></label>
+        <button class="btnx" id="btnTodo">Todo el tiempo</button>
+      </div>
+
       <!-- Filtro por marca -->
       <div class="marcas" id="marcas">
         <button class="mf activo" data-m="TODAS"><span class="d" style="background:#2d3e50"></span>Todas</button>
@@ -172,6 +180,15 @@ const ESTADOS = ["nuevo","cotizado","visita","vendido","perdido"];
 const fmtF = ms => { try{ return ms?new Date(ms).toLocaleDateString("es-CO",{day:"2-digit",month:"short",year:"2-digit"}):"—"; }catch{return"—";} };
 const ini = n => (String(n||"?").trim().charAt(0)||"?").toUpperCase();
 let ROWS = [], marcaSel = "TODAS";
+// Filtro de fechas: aplica a TODO el reporte (KPIs, marcas y detalle).
+function enRango(r){
+  const t = r.ultimoMsg || r.primerMsg; if(!t) return true;
+  const dv = $("#fDesde").value, hv = $("#fHasta").value;
+  if(dv){ const d0 = new Date(dv+"T00:00:00").getTime(); if(t < d0) return false; }
+  if(hv){ const h1 = new Date(hv+"T23:59:59").getTime(); if(t > h1) return false; }
+  return true;
+}
+function baseRows(){ return ROWS.filter(enRango); }
 
 async function cargar(){
   try{
@@ -179,7 +196,7 @@ async function cargar(){
     const d = await r.json(); if(!d.ok) throw 0;
     ROWS = d.rows||[];
     $("#count").textContent = `${ROWS.length} leads analizados · generado ${new Date(d.generado).toLocaleString("es-CO",{day:"2-digit",month:"short",hour:"2-digit",minute:"2-digit"})}`;
-    pintarMarcas(); pintar();
+    pintar();
   }catch(e){ $("#count").textContent = "No se pudo cargar el reporte."; $("#tbDetalle").innerHTML = `<tr><td colspan="9" class="vacio">No se pudo cargar.</td></tr>`; }
 }
 
@@ -195,7 +212,8 @@ function embudo(rows){
 }
 
 function pintarKPIs(){
-  const base = marcaSel==="TODAS"?ROWS:ROWS.filter(r=>r.marca===marcaSel);
+  const BR = baseRows();
+  const base = marcaSel==="TODAS"?BR:BR.filter(r=>r.marca===marcaSel);
   const e = embudo(base);
   const nom = marcaSel==="TODAS"?"todas las marcas":(NOMBRE_MARCA[marcaSel]||marcaSel);
   $("#kpis").innerHTML = `
@@ -211,9 +229,10 @@ const pct = (a,b)=> b?Math.round(a/b*100)+"%":"0%";
 function pintarMarcas(){
   const orden = ["TVS","MOBILITY","OTRA","SIN_DEFINIR"];
   let html = "";
-  const totalEmb = embudo(ROWS);
+  const BR = baseRows();
+  const totalEmb = embudo(BR);
   orden.forEach(m=>{
-    const e = embudo(ROWS.filter(r=>r.marca===m));
+    const e = embudo(BR.filter(r=>r.marca===m));
     if(!e.total) return;
     html += filaMarca(NOMBRE_MARCA[m], m, e);
   });
@@ -245,7 +264,7 @@ function semaforo(dias){
 function filtradas(){
   const q = ($("#q").value||"").toLowerCase().trim();
   const fe = $("#fEstado").value, fs = $("#fSeg").value;
-  return ROWS.filter(r=>{
+  return baseRows().filter(r=>{
     if(marcaSel!=="TODAS" && r.marca!==marcaSel) return false;
     if(fe && (r.estado||"nuevo")!==fe) return false;
     if(fs){ const s=semaforo(r.dias).cls; if("d-"+fs!==s) return false; }
@@ -272,7 +291,7 @@ function pintarDetalle(){
     </tr>`;
   }).join("");
 }
-function pintar(){ pintarKPIs(); pintarDetalle(); }
+function pintar(){ pintarMarcas(); pintarKPIs(); pintarDetalle(); }
 
 // Exportar a Excel (CSV que abre en Excel) — el "soporte"
 function exportar(){
@@ -301,7 +320,12 @@ document.querySelectorAll(".mf").forEach(b=>b.onclick=()=>{
 $("#q").addEventListener("input",pintarDetalle);
 $("#fEstado").addEventListener("change",pintarDetalle);
 $("#fSeg").addEventListener("change",pintarDetalle);
+$("#fDesde").addEventListener("change",pintar);
+$("#fHasta").addEventListener("change",pintar);
+$("#btnTodo").onclick=()=>{ $("#fDesde").value=""; $("#fHasta").value=""; pintar(); };
 $("#btnExport").onclick=exportar;
+// Por defecto: hasta el 26-nov-2026 (lo de hoy no cuenta en el reporte)
+$("#fHasta").value = "2026-11-26";
 cargar(); setInterval(cargar,30000);
 </script>
 </body>
