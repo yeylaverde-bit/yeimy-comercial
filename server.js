@@ -3649,6 +3649,55 @@ app.get("/api/whatsapp/reporte", requireAuth, (req, res) => {
   res.json({ ok: true, generado: now, total: rows.length, rows });
 });
 
+// --- Canal de respaldo: recibe chats de WhatsApp Web (CORS + llave) ---
+// El scraper corre en web.whatsapp.com (otro origen), por eso CORS abierto
+// y protección por llave en la URL (no cookie). Solo escribe mensajes/leads.
+const WA_INGEST_KEY_PATH = path.join(DATA_DIR, "ingest-key.txt");
+function ingestCors(res) {
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "POST,OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+}
+// Genera/devuelve la llave (solo admin autenticada)
+app.get("/api/whatsapp/ingest-key", requireAuth, requireAdmin, (req, res) => {
+  let key = "";
+  try { key = fs.readFileSync(WA_INGEST_KEY_PATH, "utf8").trim(); } catch {}
+  if (!key) { key = require("crypto").randomBytes(18).toString("hex"); try { fs.writeFileSync(WA_INGEST_KEY_PATH, key, "utf8"); } catch {} }
+  res.json({ ok: true, key });
+});
+app.options("/api/whatsapp/ingest", (req, res) => { ingestCors(res); res.sendStatus(204); });
+app.post("/api/whatsapp/ingest", (req, res) => {
+  ingestCors(res);
+  let key = ""; try { key = fs.readFileSync(WA_INGEST_KEY_PATH, "utf8").trim(); } catch {}
+  if (!key || String(req.query.key || "") !== key) return res.status(403).json({ ok: false, error: "llave inválida" });
+  const msgs = Array.isArray(req.body && req.body.mensajes) ? req.body.mensajes : [];
+  if (!msgs.length) return res.json({ ok: true, nuevos: 0 });
+  let leads = {}; try { leads = JSON.parse(fs.readFileSync(WA_LEADS_PATH, "utf8")); } catch {}
+  const existIds = new Set();
+  try { const ls = fs.readFileSync(WA_MSGS_PATH, "utf8").split("\n").filter(Boolean); for (const l of ls) { try { const r = JSON.parse(l); if (r.id) existIds.add(r.id); } catch {} } } catch {}
+  const nuevos = [];
+  for (const m of msgs) {
+    const tel = String(m.telefono || "").replace(/\D/g, ""); if (!tel) continue;
+    const ts = Number(m.ts) || Date.now();
+    const id = String(m.id || ("wh-" + tel + "-" + ts));
+    if (existIds.has(id)) continue; existIds.add(id);
+    const dir = m.direccion === "saliente" ? "saliente" : "entrante";
+    const texto = String(m.texto || "").slice(0, 2000);
+    nuevos.push({ ts: new Date(ts).toISOString(), telefono: tel, nombre: m.nombre || "", tipo: "text", texto, id, direccion: dir });
+    let L = leads[tel];
+    if (!L) { L = leads[tel] = { telefono: tel, nombre: m.nombre || "", primerMsg: ts, ultimoMsg: ts, ultimoTexto: "", nMsgs: 0, estado: "nuevo", moto: "", etiqueta: "" }; }
+    if (m.nombre && !L.nombre) L.nombre = m.nombre;
+    L.primerMsg = Math.min(L.primerMsg || ts, ts);
+    if (ts >= (L.ultimoMsg || 0)) { L.ultimoMsg = ts; if (dir === "entrante") L.ultimoTexto = texto.slice(0, 300); }
+    L.nMsgs = (L.nMsgs || 0) + 1;
+  }
+  if (nuevos.length) {
+    try { fs.appendFileSync(WA_MSGS_PATH, nuevos.map(x => JSON.stringify(x)).join("\n") + "\n", "utf8"); } catch (e) { return res.status(500).json({ ok: false, error: e.message }); }
+    try { fs.writeFileSync(WA_LEADS_PATH, JSON.stringify(leads, null, 2), "utf8"); } catch {}
+  }
+  res.json({ ok: true, nuevos: nuevos.length, recibidos: msgs.length });
+});
+
 // --- Cruce de ventas reales (Siigo) con los chats de WhatsApp ---
 // Por cada venta (cédula + nombre) busca el chat que coincide: primero por la
 // cédula escrita en la conversación (match fuerte), luego por nombre completo.
