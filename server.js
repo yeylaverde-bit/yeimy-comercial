@@ -3851,6 +3851,28 @@ app.get("/api/whatsapp/robados", requireAuth, requireAdmin, async (req, res) => 
   res.json({ ok: true, generado: now, total: alertas.length, alertas });
 });
 
+// --- Copia de seguridad del CRM de WhatsApp (leads + mensajes + respuestas) ---
+// Descarga TODO lo del CRM en un solo JSON, para respaldar antes de migrar.
+app.get("/api/whatsapp/backup", requireAuth, requireAdmin, (req, res) => {
+  let leads = {}, mensajes = [], respuestas = [];
+  try { leads = JSON.parse(fs.readFileSync(WA_LEADS_PATH, "utf8")); } catch {}
+  try {
+    const lineas = fs.readFileSync(WA_MSGS_PATH, "utf8").split("\n").filter(Boolean);
+    for (const l of lineas) { try { mensajes.push(JSON.parse(l)); } catch {} }
+  } catch {}
+  try { respuestas = JSON.parse(fs.readFileSync(WA_RESP_PATH, "utf8")); } catch {}
+  const payload = {
+    generado: new Date().toISOString(),
+    version: 1,
+    totales: { contactos: Object.keys(leads).length, mensajes: mensajes.length, respuestas: respuestas.length },
+    leads, mensajes, respuestas,
+  };
+  const nombre = `backup-crm-yeimy-${new Date().toISOString().slice(0, 10)}.json`;
+  res.setHeader("Content-Type", "application/json; charset=utf-8");
+  res.setHeader("Content-Disposition", `attachment; filename="${nombre}"`);
+  res.send(JSON.stringify(payload));
+});
+
 // Responder por WhatsApp (Cloud API). Solo funciona dentro de 24h del último
 // mensaje del cliente (regla de Meta para texto libre).
 app.post("/api/whatsapp/responder", requireAuth, async (req, res) => {
